@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<link rel="icon" type="image/x-icon" href="furniture/favicon.ico"/>
+		<title>Lexonomy</title>
+		<meta property="og:title" content="Lexonomy" />
+		<meta property="og:site_name" content="Lexonomy"/>
+		<meta name="description" content="A platform for writing and publishing dictionaries" />
+		<meta property="og:description" content="A platform for writing and publishing dictionaries" />
+		<meta property="og:image" content="<%-siteconfig.baseUrl%>furniture/preview.gif" />
+		<meta property="og:url" content="<%-siteconfig.baseUrl%>" />
+		<meta name="twitter:url" content="<%-siteconfig.baseUrl%>" />
+		<script type="text/javascript" src="libs/jquery.js"></script>
+		<script type="text/javascript" src="libs/screenful/screenful.js"></script>
+		<script type="text/javascript" src="libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="libs/screenful/screenful-user.css" />
+		<script type="text/javascript">
+		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
+		Screenful.User.username="<%=user.email%>";
+		</script>
+		<script type="text/javascript">var rootPath="";</script>
+		<script type="text/javascript" src="furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="furniture/public.css" />
+	</head>
+	<body class="sitehome">
+		<div id="header">
+			<a class="sitehome" href=""></a>
+		  <div class="email ScreenfulUser"></div>
+		</div>
+
+		<div class="invelope top">
+			<div class="leftie">
+				<div class="welcome">
+					<div class="intro">Welcome to <strong>Lexonomy</strong>, a cloud-based, open-source platform for writing and publishing dictionaries.</div>
+					<div class="point">
+						<div class="title"><a href="docs/intro/">Gentle introduction to Lexonomy</a></div>
+						<div class="blurb">A short and sweet guided tour of Lexonomy for beginners.</div>
+					</div>
+					<div class="point">
+						<div class="title"><a href="docs/elex2017.pdf">Introducing Lexonomy: an open-source dictionary writing and publishing system&nbsp;<span class="pdf">PDF</span></a></div>
+						<div class="blurb">A conference paper offering a detailed review of Lexonomy's features.</div>
+						<div class="subtitle">Reference</div>
+						<div class="subblurb">
+							Měchura, M. B. (2017) ‘<a href="docs/elex2017.pdf">Introducing Lexonomy: an open-source dictionary writing and publishing system</a>’ in <i>Electronic Lexicography in the 21st Century: Lexicography from Scratch. Proceedings of the eLex 2017 conference, 19-21 September 2017, Leiden, The Netherlands.</i>
+							<div class="add">If you are referring to Lexonomy from an academic publication, it is recommended that you cite this paper.</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="rightie">
+				<%if(!user.loggedin){%>
+					<div class="usertop">
+						<div class="title">Registered user login</div>
+						<div class="subtitle"><a href="signup/">Get an account</a> | <a href="forgotpwd/">Forgot your password?</a></div>
+					</div>
+					<form id="login" onsubmit="return false">
+						<div class="field email"><div class="label">E-mail address</div><input class="textbox email"/></div>
+						<div class="field password"><div class="label">Password</div><input class="textbox password" type="password"/></div>
+						<div class="field submit"><button>Log in</button></div>
+						<div class="error" style="display: none">Invalid e-mail address or password.</div>
+					</form>
+					<script type="text/javascript">
+					$(window).ready(function(){
+						$("form#login").on("submit", function(e){
+				      var email=$("form#login div.field.email input").val();
+				      var password=$("form#login div.field.password input").val();
+				      if(email!="" && password!="") {
+								$.ajax({url: "login.json", dataType: "json", method: "POST", data: {email: email, password: password}}).done(function(data){
+						      if(data.success) window.location.reload();
+						      else $("form#login div.error").show();
+						    });
+							}
+				      return false;
+				    });
+					});
+					</script>
+				<%}else{%>
+					<div class="usertop">
+						<div class="title"><%=user.email%></div>
+						<div class="subtitle"><a href="logout/">Log out</a> | <a href="changepwd/">Change your password</a></div>
+					</div>
+					<div class="yourdicts">Your dictionaries</div>
+					<%if(dicts.length==0){%>
+						<div class="nodicts">You have no dictionaries yet.</div>
+					<%}else{%>
+						<%for(var i=0; i<dicts.length; i++){%>
+							<div class="dict"><a href="<%-dicts[i].id%>/"><%=dicts[i].title%></a></div>
+						<%}%>
+					<%}%>
+					<div class="createdict"><a href="make/">Create a dictionary</a></div>
+					<div class="yourdicts">One-Click Dictionary settings</div>
+					<div class="adminlink"><a href="oneclick/">API key</a></div>
+					<%if(user.isAdmin){%>
+						<div class="yourdicts">Administration</div>
+						<div class="adminlink"><a href="users/">Users</a> <a href="dicts/">Dictionaries</a></div>
+					<%}%>
+				<%}%>
+			</div>
+			<div class="clear"></div>
+		</div>
+
+
+
+		<div class="invelope bottom">
+			<div id="sitefooter">
+				<div class="right"><a href="https://github.com/michmech/lexonomy" class="github" title="GitHub" target="_blank"></a></div>
+				<div>Lexonomy &copy; <a href="http://www.lexiconista.com/" target="_blank">Michal Boleslav Měchura</a> 2016&ndash;2017</div>
+				<div class="logolint">
+					<a class="muni" target="_blank" href="https://www.muni.cz/" title="Masaryk University"></a>
+					<a class="ske" target="_blank" href="https://www.sketchengine.co.uk/" title="Sketch Engine"></a>
+				</div>
+			</div>
+		</div>
+
+		<%-siteconfig.trackingCode%>
+	</body>
+</html>

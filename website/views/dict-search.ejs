@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<link rel="icon" type="image/x-icon" href="../../furniture/favicon.ico"/>
+		<title><%=q%> | <%=dictTitle%></title>
+		<meta property="og:title" content="<%=q%>" />
+		<meta property="og:site_name" content="<%=dictTitle%>"/>
+		<meta property="og:url" content="<%=siteconfig.baseUrl%><%=dictID%>/?q=<%=q%>" />
+		<meta name="twitter:url" content="<%=siteconfig.baseUrl%><%=dictID%>/?q=<%=q%>" />
+		<meta property="og:image" content="<%=siteconfig.baseUrl%>furniture/preview.gif" />
+		<script type="text/javascript" src="../../libs/jquery.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
+		<script type="text/javascript">
+		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
+		Screenful.User.username="<%=user.email%>";
+		</script>
+		<script type="text/javascript">var rootPath="../../";</script>
+		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../furniture/public.css" />
+		<script type="text/javascript" src="../../widgets/xematron.js"></script>
+		<script type="text/javascript" src="../../widgets/xemplatron.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../widgets/xemplatron.css" />
+		<script type="text/javascript">
+			$(window).ready(function(){
+				var regexp=new RegExp("<%=q%>", "gi");
+				$("#crossroads > div > a").each(function(){
+					var text=$(this).html();
+					var $text=$("<span>"+text+"</span>");
+					$text.find("span.headword, span.redirector").each(function(){
+						var $this=$(this);
+						$this.html($this.html().replace(regexp, function(match){ return "<span class='searchtext'>"+match+"</span>"; }));
+					});
+					$(this).html($text.html());
+				});
+			});
+		</script>
+	</head>
+	<body class="entrypage">
+		<div id="header">
+			<a class="sitehome" href="../../"></a>
+		  <div class="email ScreenfulUser"></div>
+		</div>
+
+		<div class="invelope">
+			<div id="dictheader">
+				<div class="titleContainer"><span class="dictTitle"><a class="dictTitle" href="../../<%=dictID%>/"><%=dictTitle%></a><%if(user.dictAccess){%><a href="../../<%=dictID%>/edit/" class="editLink">Edit</a><%}%></span></div>
+				<form class="searchContainer" action="../../<%=dictID%>/search/" method="GET"><span class="searchbox"><input class="searchbox" name="q" value="<%=q%>"/><input type="submit" class="submit" value="&nbsp;"/></span></form>
+			</div>
+		</div>
+
+		<div class="midlope">
+			<div class="invelope">
+				<div id="crossroads">
+					<%if(entries.length==0){%><div class="nojoy">?</div><%}%>
+					<%for(var i=0; i<entries.length; i++){%>
+						<div>
+							<a href="../../<%=dictID%>/<%=entries[i].id%>/"><span class="bullet">»</span>&nbsp;<%-entries[i].title%>&nbsp;<span class="arrow">»</span></a>
+						</div>
+					<%}%>
+				</div>
+				<div id="nabes">
+					<%for(var i=0; i<nabes.length; i++){%>
+						<a href="../../<%=dictID%>/<%=nabes[i].id%>/"><%-nabes[i].title%></a>
+					<%}%>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</div>
+
+		<div class="invelope bottom">
+			<div id="dictfooter">
+				<div class="right"><a href="../../">Lexonomy</a></div>
+				<div><a href="../../<%=dictID%>/"><%=dictTitle%></a></div>
+				<%if(siteconfig.licences[publico.licence]){ var lic=siteconfig.licences[publico.licence];%>
+					<a href="<%-lic.url%>" target="_blank"><img src="../../<%-lic.icon%>" alt="<%=lic.title%>"/></a>
+				<%}%>
+			</div>
+		</div>
+
+		<%-siteconfig.trackingCode%>
+	</body>
+</html>

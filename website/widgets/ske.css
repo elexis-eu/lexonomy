@@ -1,0 +1,18 @@
+div.skebox {padding: 0px; width: 600px; height: 300px; position: relative;}
+div.skebox form.topbar {position: absolute; top: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }
+div.skebox div.bottombar {position: absolute; bottom: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }
+
+div.skebox input.ske {background-image: url(../furniture/ske.png); background-position: center center; background-repeat: no-repeat; padding: 4px 0px 4px 0px; width: 40px; border-width: 1px; border-radius: 2px; cursor: pointer;}
+div.skebox button.insert {background-image: url(../furniture/add.png); background-position: 10px center; background-repeat: no-repeat; padding: 5px 10px 5px 30px; border-width: 1px; border-radius: 2px; cursor: pointer;}
+div.skebox button:hover {background-color: #eeeeee;}
+
+div.skebox div.waiter {position: absolute; top: 43px; left: 0px; right: 0px; bottom: 0px; background-color: #ffffff; background-image: url(../furniture/loader.gif); background-position: center center; background-repeat: no-repeat;}
+
+div.skebox div.choices {position: absolute; top: 43px; left: 0px; right: 0px; bottom: 45px; overflow-y: scroll; }
+div.skebox div.choices label {cursor: pointer; padding: 5px 5px; font-size: 0.9rem; display: block; position: relative;}
+div.skebox div.choices label input {position: absolute; top: 1px; left: 5px; }
+div.skebox div.choices label span.inside {display: block; margin-left: 30px; }
+div.skebox div.choices label:hover {color: #333333; background-color: #ffffcc;}
+div.skebox div.choices label.selected {color: #002e88;}
+
+div.skebox div.choices div.error {text-align: center; margin-top: 50px;}

@@ -1,0 +1,41 @@
+.viewer {font-size: 1.1rem; padding: 20px; line-height: 1.75em;}
+.viewer .clearFont {font-style: normal; font-weight: normal; color: #333333;}
+
+.viewer a.xref {color: inherit; text-decoration: inherit;}
+.viewer a.xref:hover {xtext-decoration: underline; border-bottom: 1px solid #aaaaaa;}
+
+.viewer span.italic {font-style: italic;}
+.viewer span.bold {font-weight: bold;}
+.viewer span.red {color: #9e2929;}
+.viewer span.blue {color: #29549e;}
+.viewer span.green {color: #0d9558;}
+.viewer span.grey {color: #777777;}
+
+.viewer .border {border-radius: 4px;}
+.viewer div.border {padding: 5px 10px; margin: 15px -10px; }
+.viewer span.border {padding: 0px 2px; margin: 0px 0px;}
+.viewer .border.dotted {border: 1px dotted #999999;}
+.viewer .border.solid {border: 1px solid #999999;}
+.viewer .border.thick {border: 2px solid #999999;}
+
+.viewer .background {border-radius: 4px; }
+.viewer div.background {padding: 5px 10px; margin: -5px -10px; }
+.viewer span.background {padding: 0px 2px; margin: 0px -2px; }
+.viewer .background.yellow {background-color: #fffde3;}
+.viewer .background.blue {background-color: #d9f7ff; text-shadow: 1px 1px 0px #ffffff;}
+.viewer .background.grey {background-color: #eeeeee; text-shadow: 1px 1px 0px #ffffff;}
+
+.viewer div.indented {margin-left: 40px;}
+.viewer span.indented {margin-left: 1.5em;}
+
+.viewer div.bulleted {}
+.viewer div.bulleted > div.bullet {float: left; margin-left: 5px; color: #999999; text-align: center; width: 20px;}
+.viewer div.bulleted > div.inside {margin-left: 40px;}
+.viewer div.bulleted > div.clear {clear: left;}
+.viewer span.bulleted {color: #999999; font-size: 0.75rem; margin: 0 0 0 0.25em;}
+.viewer .bulleted span.numberingSymbol { background-color: #999999; color: #ffffff; padding: 2px 6px; border-radius: 4px; font-size: 1rem;}
+
+/*separation dimension*/
+.viewer div.space {margin: 0.5em 0;}
+
+.viewer span.label {font-style: normal; font-weight: normal; color: #333333; font-size: 0.85em; white-space: nowrap; background-color: #eeeeee; padding: 2px 4px; border-radius: 4px; text-shadow: 1px 1px 0px #ffffff;}

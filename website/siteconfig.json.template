@@ -1,0 +1,60 @@
+{
+  "baseUrl": "http://localhost/",
+  "rootPath": "/",
+  "port": 80,
+  "dataDir": "../data/",
+  "verbose": {
+    "filename": "",
+    "multiline": true
+  },
+  "admins": ["root@localhost"],
+  "trackingCode": "",
+  "licences": {
+    "cc-by-4.0": {
+      "title": "Creative Commons Attribution 4.0 International",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "icon": "furniture/lic-cc-by.png",
+      "canDownloadXml": true
+    },
+    "cc-by-sa-4.0": {
+      "title": "Creative Commons Attribution Share-Alike 4.0 International",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "icon": "furniture/lic-cc-by-sa.png",
+      "canDownloadXml": true
+    },
+    "odbl-1.0": {
+      "title": "Open Database Licence 1.0",
+      "url": "https://opendatacommons.org/licenses/odbl/summary/",
+      "icon": "furniture/lic-opendata.png",
+      "canDownloadXml": true
+    }
+  },
+  "defaultAbc": [
+    ["a", "á", "à", "â", "ä", "ă", "ā", "ã", "å", "ą", "æ"],
+    ["b"],
+    ["c", "ć", "ċ", "ĉ", "č", "ç"],
+    ["d", "ď", "đ"],
+    ["e", "é", "è", "ė", "ê", "ë", "ě", "ē", "ę"],
+    ["f"],
+    ["g", "ġ", "ĝ", "ğ", "ģ"],
+    ["h", "ĥ", "ħ"],
+    ["i", "ı", "í", "ì", "i", "î", "ï", "ī", "į"],
+    ["j", "ĵ"],
+    ["k", "ĸ", "ķ"],
+    ["l", "ĺ", "ŀ", "ľ", "ļ", "ł"],
+    ["m"],
+    ["n", "ń", "ň", "ñ", "ņ"],
+    ["o", "ó", "ò", "ô", "ö", "ō", "õ", "ő", "ø", "œ"],
+    ["p"],
+    ["q"],
+    ["r", "ŕ", "ř", "ŗ"],
+    ["s", "ś", "ŝ", "š", "ş", "ș", "ß"],
+    ["t", "ť", "ţ", "ț"],
+    ["u", "ú", "ù", "û", "ü", "ŭ", "ū", "ů", "ų", "ű"],
+    ["v"],
+    ["w", "ẃ", "ẁ", "ŵ", "ẅ"],
+    ["x"],
+    ["y", "ý", "ỳ", "ŷ", "ÿ"],
+    ["z", "ź", "ż", "ž"]
+  ]
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<link rel="icon" type="image/x-icon" href="../../furniture/favicon.ico"/>
+		<title><%=dictTitle%></title>
+		<script type="text/javascript" src="../../libs/jquery.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful.css" />
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
+		<script type="text/javascript">
+		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
+		Screenful.User.username="<%=user.email%>";
+		</script>
+		<script type="text/javascript">var rootPath="../../";</script>
+		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-navigator.css" />
+		<script type="text/javascript" src="../../libs/screenful/screenful-navigator.js"></script>
+		<script type="text/javascript">
+		Screenful.Navigator.listUrl="../../<%=dictID%>/entrylist.json";
+		Screenful.Navigator.stepSize=1000;
+		Screenful.Navigator.editorUrl="../../<%=dictID%>/entryeditor/";
+		Screenful.Navigator.renderer=function(div, entry, searchtext){
+			var $xml=$($.parseXML(entry.content));
+			var text=entry.title;
+			var regexp=new RegExp(searchtext, "gi");
+			if(searchtext!=""){
+				$text=$("<span>"+text+"</span>");
+				$text.find("span.headword, span.redirector").each(function(){
+					var $this=$(this);
+					$this.html($this.html().replace(regexp, function(match){ return "<span class='searchtext'>"+match+"</span>"; }));
+				});
+				text=$text.html();
+			}
+			$(div).html(text);
+		};
+		</script>
+		<link type="text/css" rel="stylesheet" href="../../furniture/ui.css" />
+	</head>
+	<body>
+		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "edit", rootPath: "../../"})%>
+	</body>
+</html>

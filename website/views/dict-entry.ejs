@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<link rel="icon" type="image/x-icon" href="../../furniture/favicon.ico"/>
+		<title><%=title.replace(/\<[^\<\>]+\>/g, "")%> | <%=dictTitle%></title>
+		<meta property="og:title" content="<%=title.replace(/\<[^\<\>]+\>/g, "")%>" />
+		<meta property="og:site_name" content="<%=dictTitle%>"/>
+		<meta property="og:url" content="<%=siteconfig.baseUrl%><%=dictID%>/<%=entryID%>/" />
+		<meta name="twitter:url" content="<%=siteconfig.baseUrl%><%=dictID%>/<%=entryID%>/" />
+		<meta property="og:image" content="<%=siteconfig.baseUrl%>furniture/preview.gif" />
+		<script type="text/javascript" src="../../libs/jquery.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
+		<script type="text/javascript">
+		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
+		Screenful.User.username="<%=user.email%>";
+		</script>
+		<script type="text/javascript">var rootPath="../../";</script>
+		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../furniture/public.css" />
+		<link type="text/css" rel="stylesheet" href="../../widgets/xemplatron.css" />
+		<script type="text/javascript">
+		$(window).ready(function(){
+			$("#viewer a.xref").on("click", function(e){
+				var text=$(e.delegateTarget).attr("data-text");
+				window.location="../../<%-dictID%>/search/?q="+encodeURIComponent(text);
+			});
+		});
+		</script>
+	</head>
+	<body class="entrypage">
+		<div id="header">
+			<a class="sitehome" href="../../"></a>
+		  <div class="email ScreenfulUser"></div>
+		</div>
+
+		<div class="invelope">
+			<div id="dictheader">
+				<div class="titleContainer"><span class="dictTitle"><a class="dictTitle" href="../../<%=dictID%>/"><%=dictTitle%></a><%if(user.dictAccess){%><a href="../../<%=dictID%>/edit/" class="editLink">Edit</a><%}%></span></div>
+				<form class="searchContainer" action="../../<%=dictID%>/search/" method="GET"><span class="searchbox"><input class="searchbox" name="q"/><input type="submit" class="submit" value="&nbsp;"/></span></form>
+			</div>
+		</div>
+
+		<div class="midlope">
+			<div class="invelope">
+				<div id="viewer" class="viewer"><%-html%></div>
+				<div id="nabes">
+					<%for(var i=0; i<nabes.length; i++){%>
+						<a <%if(nabes[i].id==entryID){%>class="current"<%}%> href="../../<%=dictID%>/<%=nabes[i].id%>/"><%-nabes[i].title%></a>
+					<%}%>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</div>
+
+		<div class="invelope bottom">
+			<div id="dictfooter">
+				<div class="right"><a href="../../">Lexonomy</a></div>
+				<div><a href="../../<%=dictID%>/"><%=dictTitle%></a></div>
+				<%if(siteconfig.licences[publico.licence]){ var lic=siteconfig.licences[publico.licence];%>
+					<a href="<%-lic.url%>" target="_blank"><img src="../../<%-lic.icon%>" alt="<%=lic.title%>"/></a>
+				<%}%>
+				<%if(siteconfig.licences[publico.licence].canDownloadXml){%>
+					<a class="xml" href="../../<%=dictID%>/<%=entryID%>.xml" target="_blank">XML</a>
+				<%}%>
+			</div>
+		</div>
+
+		<%-siteconfig.trackingCode%>
+	</body>
+</html>

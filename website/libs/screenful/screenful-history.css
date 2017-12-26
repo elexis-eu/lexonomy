@@ -1,0 +1,22 @@
+body {background-color: #dddddd; font-size: 0.85rem; box-shadow: inside 0px 0px 5px #666666; padding: 20px 0px; overflow: auto;}
+body > div.leftie {position: absolute; top: 0px; left: 0px; bottom: 0px; width: 1px; box-shadow: 0px 0px 5px #666666;}
+
+div.revision {background-color: #f0f0f0; margin: 0px 15px; padding: 0px 5px 0px 15px; border-radius: 4px; cursor: pointer; color: #004f9b; position: relative;}
+div.revision:hover {color: #0063c2;}
+div.revision span.label {display: inline-block; padding: 10px 0px; vertical-align: middle;}
+div.revision.current {background-color: #ffffff; margin-left: 0px; padding-left: 30px; box-shadow: 0px 0px 5px #666666; border-radius: 0px 4px 4px 0px; z-index: 10;}
+
+div.revision span.revive {visibility: hidden; display: inline-block; padding: 5px 30px 5px 10px; margin: 5px 0px 0px 0px; vertical-align: middle; float: right; background-image: url(lightning.png); background-position: center right+5px; background-repeat: no-repeat; border-radius: 4px;}
+div.revision:hover span.revive { visibility: visible;}
+div.revision:hover span.revive:hover { background-color: #eeeeee; box-shadow: 0px 0px 4px #aaaaaa;}
+div.revision:hover span.revive:active { background-color: #ffffff; box-shadow: 0px 0px 4px #aaaaaa inset;}
+
+div.revision span.pretty {background-image: url(page_white_text.png); background-position: center center; background-repeat: no-repeat; display: inline-block; height: 30px; width: 28px; border-radius: 2px; vertical-align: middle; margin-left: -12px;}
+div.revision span.pretty:hover {background-color: #b4daff;}
+div.revision.current.pretty span.pretty {background-color: #d0e6fb;}
+
+div.interRevision {padding: 15px 0px 15px 20px; margin: 3px 0px 3px 30px; border-left: 1px solid #4457bd; text-shadow: 1px 1px 0px #ffffff; color: #666666; position: relative; z-index: 11;}
+div.interRevision > div.arrowTop {width: 16px; height: 16px; position: absolute; top: -9px; left: -8px; background-image: url(control_stop_blue.png);}
+div.interRevision > div.arrowMiddle {width: 16px; position: absolute; top: 0px; bottom: 0px; left: -8px; background-image: url(resultset_up.png); background-position: center center; background-repeat: no-repeat;}
+div.interRevision:first-child > div.arrowTop {width: 16px; height: 16px; position: absolute; top: -4px; left: -8px; background-image: url(control_stop_blue.png);}
+div.interRevision > div.arrowBottom {width: 16px; height: 16px; position: absolute; bottom: -9px; left: -8px; background-image: url(control_stop_blue.png);}

@@ -1,0 +1,35 @@
+#toolbar { position: absolute; top: 0px; left: 0px; right: 0px; height: 52px; box-shadow: -2px 2px 2px #999999; overflow-x: hidden; white-space: nowrap; overflow-y: hidden; z-index: 1; padding: 0px 10px; }
+#container { position: absolute; top: 54px; bottom: 0px; left: 15px; right: 0px; overflow-x: hidden; overflow-y: auto; padding: 5px 20px 5px 0px; }
+#container.withHistory {right: 350px; margin-right: 10px;}
+#container.withSourceCode {left: 0px;}
+#container #editor { margin-bottom: 20px; padding-bottom: 300px; }
+#container.empty {}
+
+#toolbar span.divider {font: inherit; border-left: 2px dotted #cccccc; padding: 2px 0px; margin: 8px 5px; min-height: 2em; display: inline-block; vertical-align: middle; }
+#toolbar span#idlabel {font: inherit; border-radius: 4px 0px 0px 4px; background-color: #eeeeee; color: #666666; text-shadow: 1px 1px 0px #ffffff; padding: 6px 10px 5px 10px; margin: 0px 5px; min-height: 1.3em; display: inline-block; width: 20px; vertical-align: middle; z-index: 1; position: relative; text-align: center;}
+#toolbar input#idbox {font: inherit; border: 1px inset #cccccc; cursor: inline; border-radius: 4px; background-color: #ffffff; color: #333333; padding: 6px 35px 6px 50px; margin: 8px 5px; min-height: 1.3em; display: inline-block; width: 5em; vertical-align: middle; margin-left: -46px;}
+#toolbar button.iconYes#butNew {background-image: url(lightning.png);}
+#toolbar button.iconOnly#butOpen {background-image: url(resultset_next.png);}
+#toolbar button.iconYes#butSave {background-image: url(disk.png);}
+#toolbar button.iconYes#butSave span.star {color: #ff0000; position: relative; top: 2px;}
+#toolbar button.iconYes#butEdit {background-image: url(cut.png);}
+#toolbar button.iconYes#butView {background-image: url(arrow_left.png);}
+#toolbar button.iconYes#butLeave {background-image: url(arrow_left.png);}
+#toolbar button.iconYes#butNonew {background-image: url(arrow_left.png);}
+#toolbar button.iconYes#butDelete {background-image: url(delete.png);}
+#toolbar button.iconYes#butClone {background-image: url(lightning.png);}
+#toolbar button.iconYes#butSourceCode {background-image: url(page_white_text.png); float: right;}
+#toolbar button.iconYes#butHistory {background-image: url(time.png); float: right;}
+#toolbar span#errorMessage {float: right; padding: 6px 10px; margin: 10px 5px; min-height: 1.3em; display: inline-block; color: #aa0000; font-size: 0.85em;}
+
+#waiter {
+  background-image: url(loader.gif); background-position: 30px 28px; background-repeat: no-repeat; padding: 30px 30px 30px 90px;
+  position: absolute; top: 300px; left: 30%; width: 40%; background-color: #ffffff; box-shadow: 0px 0px 5px #666666; border-radius: 4px; z-index: 10;
+  line-height: 1.75em;
+}
+
+#history { position: absolute; top: 53px; bottom: 0px; right: 0px; width: 350px; background-color: #ffffff; z-index: 0; }
+#history > iframe {width: 100%; height: 100%;}
+
+#sourceCode {position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; padding: 20px 40px 40px 20px; background-color: #eeeeee;}
+#sourceCode textarea {width: 100%; height: 100%; border: 1px solid #cccccc; box-shadow: inset 0px 0px 2px #666666; padding: 9px; resize: none; font-family: monospace; font-size: 0.85rem; border-radius: 4px; line-height: 1.5em; color: #666666; white-space: pre;}

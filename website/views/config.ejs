@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<link rel="icon" type="image/x-icon" href="../../furniture/favicon.ico"/>
+		<title><%=dictTitle%></title>
+		<script type="text/javascript" src="../../libs/jquery.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful.css" />
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
+		<script type="text/javascript">
+		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
+		Screenful.User.username="<%=user.email%>";
+		</script>
+		<script type="text/javascript">var rootPath="../../";</script>
+		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../furniture/ui.css" />
+	</head>
+	<body>
+		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "config", configTitle: "", configUrl: "", rootPath: "../../"})%>
+		<div id="pagebody">
+			<%if(needResave){%><div class="notification">Your dictionary needs to be re-indexed. <a href="../../<%=dictID%>/config/resave/">Do it now&nbsp;»</a></div><%}%>
+			<div class="field">
+				<div class="signposts">
+					<div class="title">Dictionary settings</div>
+					<div class="signpost"><a href="../../<%=dictID%>/config/ident/">Name and description</a></div>
+					<div class="signpost"><a href="../../<%=dictID%>/config/users/">Users</a></div>
+				</div>
+				<div class="signposts">
+					<div class="title">Entries</div>
+					<div class="signpost"><a href="../../<%=dictID%>/config/xema/">Entry structure</a></div>
+					<div class="signpost"><a href="../../<%=dictID%>/config/titling/">Headwords</a></div>
+					<div class="signpost"><a href="../../<%=dictID%>/config/searchability/">Search</a></div>
+				</div>
+				<div class="signposts">
+					<div class="title">Publishing</div>
+					<div class="signpost"><a href="../../<%=dictID%>/config/xemplate/">Entry formatting</a></div>
+					<div class="signpost"><a href="../../<%=dictID%>/config/publico/">Public access</a></div>
+				</div>
+				<div class="signposts">
+					<div class="title">External data sources</div>
+					<div class="signpost"><a href="../../<%=dictID%>/config/kex/">Sketch Engine connection</a></div>
+					<div class="signpost"><a href="../../<%=dictID%>/config/xampl/">Corpus example settings</a></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+			<div class="dangerzone">
+				<div class="inside">
+					<a href="../../<%=dictID%>/config/url/" class="changeUrl">Change the dictionary's URL</a>
+					<a href="javascript:void(null)" class="destroy" onclick="destroy()">Delete the dictionary</a>
+					<script type="text/javascript">
+					function destroy(){
+						if(confirm("Careful now! You will not be able to undo this.")){
+							$.ajax({url: "../../<%-dictID%>/destroy.json", dataType: "json", method: "POST", data: {}}).done(function(data){
+								if(data.success) window.location="../../";
+							});
+						}
+					}
+					</script>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

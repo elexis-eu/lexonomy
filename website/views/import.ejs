@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<link rel="icon" type="image/x-icon" href="../../furniture/favicon.ico"/>
+		<title><%=dictTitle%></title>
+		<script type="text/javascript" src="../../libs/jquery.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful.css" />
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
+		<script type="text/javascript">
+		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
+		Screenful.User.username="<%=user.email%>";
+		</script>
+		<script type="text/javascript">var rootPath="../../";</script>
+		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-job.css" />
+		<script type="text/javascript" src="../../libs/screenful/screenful-job.js"></script>
+		<script type="text/javascript">
+		Screenful.Job.message="Lexonomy is importing your entries.";
+		Screenful.Job.actionUrl="../import.json";
+		Screenful.Job.state={filename: "<%-filename%>", uploadStart: "<%-uploadStart%>", offset: 0};
+		Screenful.Job.awayUrl="../edit/";
+		</script>
+		<link type="text/css" rel="stylesheet" href="../../furniture/ui.css" />
+	</head>
+	<body>
+		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "upload", configTitle: "", configUrl: "", rootPath: "../../"})%>
+	</body>
+</html>

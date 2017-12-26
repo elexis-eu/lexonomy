@@ -1,0 +1,6 @@
+#middlebox {max-width: 600px; padding: 40px 30px; min-height: 100px; margin: 75px auto 50px auto; border: 1px solid rgb(38, 122, 181); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; }
+
+#middlebox div.message {text-align: center; margin: 50px 0px 0px 0px;}
+#middlebox div.url {text-align: center; margin: 10px 0px 50px 0px;}
+#middlebox div.url a {text-decoration: none; color: #004f9b;}
+#middlebox div.url a:hover {color: #006ed7;}

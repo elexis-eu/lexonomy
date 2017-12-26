@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<link rel="icon" type="image/x-icon" href="../../furniture/favicon.ico"/>
+		<title><%=doc.title%></title>
+		<meta property="og:title" content="<%=doc.title%>" />
+		<meta property="og:site_name" content="Lexonomy"/>
+		<meta property="og:url" content="<%=siteconfig.baseUrl%>../../docs/<%=doc.id%>/" />
+		<meta name="twitter:url" content="<%=siteconfig.baseUrl%>../../<%=doc.id%>/" />
+		<script type="text/javascript" src="../../libs/jquery.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
+		<script type="text/javascript">
+		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
+		Screenful.User.username="<%=user.email%>";
+		</script>
+		<script type="text/javascript">var rootPath="../../";</script>
+		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../furniture/public.css" />
+		<link type="text/css" rel="stylesheet" href="../../furniture/github-markdown.css" />
+	</head>
+	<body class="doc">
+		<div id="header">
+			<a class="sitehome" href="../../"></a>
+		  <div class="email ScreenfulUser"></div>
+		</div>
+
+
+		<div class="invelope top">
+			<div class="markdown">
+				<div class="markdown-body">
+					<%-doc.html.replace(/=\"\//g, "=\"../../")%>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+
+
+		<div class="invelope bottom">
+			<div id="sitefooter">
+				<div class="right"><a href="https://github.com/michmech/lexonomy" class="github" title="GitHub" target="_blank"></a></div>
+				<div>Lexonomy &copy; <a href="http://www.lexiconista.com/" target="_blank">Michal Boleslav Měchura</a> 2016&ndash;2017</div>
+				<div class="logolint">
+					<a class="muni" target="_blank" href="https://www.muni.cz/" title="Masaryk University"></a>
+					<a class="ske" target="_blank" href="https://www.sketchengine.co.uk/" title="Sketch Engine"></a>
+				</div>
+			</div>
+		</div>
+
+		<%-siteconfig.trackingCode%>
+	</body>
+</html>

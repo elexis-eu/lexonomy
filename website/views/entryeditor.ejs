@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Screenful Editor</title>
+		<script type="text/javascript">var rootPath="../../";</script>
+		<script type="text/javascript" src="../../libs/jquery.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful.css" />
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-editor.css" />
+		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-editor.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/xonomy/xonomy.css" />
+		<script type="text/javascript" src="../../libs/xonomy/xonomy.js"></script>
+		<script type="text/javascript" src="../../widgets/xematron.js"></script>
+		<script type="text/javascript" src="../../widgets/xemplatron.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../widgets/xemplatron.css" />
+		<script type="text/javascript" src="../../widgets/ske.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../widgets/ske.css" />
+		<script type="text/javascript" src="../../libs/js.cookie.js"></script>
+		<script type="text/javascript">
+		Screenful.Editor.createUrl="../../<%=dictID%>/entrycreate.json";
+		Screenful.Editor.readUrl="../../<%=dictID%>/entryread.json";
+		Screenful.Editor.updateUrl="../../<%=dictID%>/entryupdate.json";
+		Screenful.Editor.deleteUrl="../../<%=dictID%>/entrydelete.json";
+		Screenful.Editor.historyUrl="../../<%=dictID%>/history/";
+		var dictID="<%=dictID%>";
+		var xema=<%-JSON.stringify(xema)%>;
+		var xemplate=<%-JSON.stringify(xemplate)%>;
+		var kex=<%-JSON.stringify(kex)%>;
+		var xampl=<%-JSON.stringify(xampl)%>;
+		var titling=<%-JSON.stringify(titling)%>;
+		if(!xemplate[xema.root]) xemplate[xema.root]={shown: false};
+		if(xemplate[xema.root].shown=="false") xemplate[xema.root].shown=false;
+		Screenful.Editor.viewer=null; if(xemplate[xema.root].shown) Screenful.Editor.viewer=function(div, entry){
+			var html=Xemplatron.xml2html(entry.content, xemplate, xema); $(div).addClass("viewer").html(html);
+			$(div).find("a.xref").on("click", function(e){
+				var text=$(e.delegateTarget).attr("data-text");
+				window.parent.$("#searchbox").val(text);
+				window.parent.Screenful.Navigator.list();
+			});
+		};
+		Screenful.Editor.editor=function(div, entry, uneditable){
+			Xonomy.lang="en";
+			var docSpec=Xematron.xema2docspec(xema);
+			docSpec.allowModeSwitching=true;
+			docSpec.onModeSwitch=function(mode){
+				Cookies.set("xonomyMode", mode);
+			};
+			Xonomy.setMode(Cookies.get("xonomyMode") || "nerd");
+			Ske.extendDocspec(docSpec, xema);
+			docSpec.onchange=Screenful.Editor.changed;
+			if(uneditable) {
+				for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
+				docSpec.unknownElement.isReadOnly=true;
+			}
+			<%if(!user.canEdit){%>
+				for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
+				docSpec.unknownElement.isReadOnly=true;
+			<%}%>
+			Xonomy.render((entry ? entry.content : Xematron.xema2xml(xema)), div, docSpec);
+			if(!Xonomy.keyNav) Xonomy.startKeyNav(document, document.getElementById("container"));
+		};
+		Screenful.Editor.harvester=function(div){
+			return Xonomy.harvest();
+		};
+		Screenful.Editor.allowSourceCode=true;
+		Screenful.Editor.formatSourceCode=function(str){
+			return Screenful.formatXml(str);
+		};
+		Screenful.Editor.validateSourceCode=function(str){
+			return Screenful.isWellFormedXml(str);
+		};
+		Screenful.Editor.cleanupSourceCode=function(str){
+			return Screenful.cleanupXml(str);
+		};
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

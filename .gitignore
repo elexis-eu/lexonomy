@@ -1,0 +1,4 @@
+data/lexonomy.sqlite
+data/dicts/*
+data/uploads/*
+website/siteconfig.json

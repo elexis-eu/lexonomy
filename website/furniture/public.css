@@ -1,0 +1,162 @@
+body {background-image: url(header-back.gif); background-position: right top; background-repeat: no-repeat; font-family: sans-serif; background-color: #ffffff; margin: 0; padding: 0; line-height: 1.3em; font-size: 1rem;}
+
+#header {padding: 10px 10px; height: 38px;}
+#header a.sitehome {display: inline-block; width: 119px; height: 26px; background-image: url(lexonomy-brackets.png); margin-top: 5px; margin-left: 4px;}
+#header a.sitehome:hover {position: relative; top: -1px;}
+#header div.email {display: inline-block; position: absolute; top: 18px; right: 20px; color: #666666;}
+@media (max-width: 800px){ #header span.email {display: none;} }
+
+.invelope {max-width: 1250px; margin: 0px auto; padding: 0px 10px; }
+.midlope {border-top: 1px solid #1e6bcf; padding-top: 30px; margin-top: 30px;}
+.invelope.bottom {margin-top: 100px; border-top: 1px dotted #999999;  }
+.invelope > .clear {clear: both;}
+
+#dictheader {margin-bottom: 20px;}
+body.homepage #dictheader {text-align: center; margin-top: 100px; margin-bottom: 100px;}
+body.entrypage #dictheader {margin-top: -10px;}
+@media (max-width: 800px){ body.homepage #dictheader {margin-top: 20px; margin-bottom: 60px;} }
+@media (min-width: 1550px){ body.entrypage #dictheader {margin-top: -30px;} }
+#dictheader div.titleContainer {}
+#dictheader div.titleContainer span.dictTitle {display: inline-block; position: relative;}
+#dictheader div.titleContainer span.dictTitle a.dictTitle {display: inline-block; font-size: 30px; padding: 10px 20px; background-color: #4c9ed9; color: #ffffff; border-radius: 4px; text-decoration: none; line-height: 1.5em;}
+body.entrypage #dictheader div.titleContainer span.dictTitle a.dictTitle {font-size: 25px;}
+@media (max-width: 800px) { body.entrypage #dictheader div.titleContainer span.dictTitle a.dictTitle {font-size: 23px; padding: 5px 10px;} }
+#dictheader div.titleContainer span.dictTitle a.dictTitle:hover {box-shadow: 0px 0px 2px #999999; color: #eeeeee;}
+#dictheader div.titleContainer span.dictTitle a.editLink {font-size: 16px; border: 1px solid transparent; border-radius: 100px; border-color: #666666; color: #666666; background-color: #ffffff; padding: 5px 10px; text-decoration: none; position: absolute; top: -15px; right: -25px;}
+@media (max-width: 800px){ #dictheader div.titleContainer span.dictTitle a.editLink {display: none;} }
+#dictheader div.titleContainer span.dictTitle a.editLink:hover {color: #666666; box-shadow: 0px 0px 2px #999999;}
+#dictheader form.searchContainer {margin-top: 20px;}
+@media (max-width: 800px) { body.entrypage #dictheader form.searchContainer {margin-top: 15px;} }
+#dictheader form.searchContainer span.searchbox {position: relative; display: inline-block; width: 90%; padding: 0px 10px; max-width: 400px; border: 1px inset #cccccc; box-shadow: 0px 0px 4px #999999; text-align: left;}
+#dictheader form.searchContainer span.searchbox input.searchbox {font: inherit; border: 0px; cursor: inline; border-radius: 4px; background-color: #ffffff; color: #333333; font-size: 1rem; padding: 10px 0px 10px 0px; display: inline-block; vertical-align: middle; width: 100%; }
+#dictheader form.searchContainer span.searchbox input.submit {font: inherit; border-width: 0px; cursor: pointer; background-color: #ffffff; color: #004f9b; display: inline-block; font-size: 1rem; padding: 8px 0px; background-image: url(zoom.png); background-position: center center; background-repeat: no-repeat; position: absolute; right: 4px; top: 4px; width: 30px; }
+
+#dictblurb { font-size: 1rem; color: #333333; line-height: 1.75em; margin: 0px auto; max-width: 1000px;}
+#dictblurb.centered {text-align: center;}
+#dictblurb a {color: #124f6c; text-decoration: none;}
+#dictblurb a:hover {color: #1a668b;}
+
+#randoms { margin-top: 60px; position: relative; min-height: 100px;}
+#randoms.short {}
+#randoms.hasMore {}
+#randoms > div.list {font-size: 1rem; line-height: 2em; text-align: center;}
+#randoms.short div.list {margin: auto; max-width: 1100px;}
+#randoms.hasMore div.list {text-align: left; border-left: 1px solid #dddddd; padding-left: 10px; margin-left: 105px;}
+#randoms > div.list > a {color: #666666; text-decoration: none; white-space: nowrap; margin: 0px 0px; padding: 5px 10px;}
+#randoms > div.list > a span.headword {font-weight: bold; color: #000000;}
+#randoms > div.list > a:hover {background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff;}
+#randoms > div.list > a:hover span.headword {color: rgb(0, 76, 131);}
+#randoms > div.randomizer {display: none; }
+#randoms.hasMore > div.randomizer {display: block; position: absolute; top: 0px; left: 45px; background-image: url(refresh-static.gif); width: 40px; height: 40px; background-position: center center; background-repeat: no-repeat; cursor: pointer;}
+#randoms.hasMore > div.randomizer:hover {background-color: #f7f9ea;}
+#randoms.hasMore > div.randomizer.animated {background-image: url(refresh-animated.gif);}
+@media (max-width: 800px){
+  #randoms.hasMore div.list {border-left: 0px; padding-left: 0px; margin-left: 0px; border-top: 1px solid #dddddd; padding-top: 10px; margin-top: 10px;}
+  #randoms.hasMore > div.randomizer {display: block; position: relative; top: 0px; left: 0px;}
+
+}
+
+#dictfooter { padding: 10px 0px 50px 0px; color: #666666; font-size: 0.9rem; }
+#dictfooter > div {margin: 10px 0px;}
+#dictfooter > div.right {float: right;}
+#dictfooter a {text-decoration: none; color: inherit; }
+#dictfooter a:hover {color: #2c7fba; }
+#dictfooter a.lic {position: relative; top: 2px;}
+#dictfooter a.xml {margin-left: 10px;}
+
+#sitefooter { padding: 10px 0px 50px 0px; color: #666666; font-size: 0.9rem; }
+#sitefooter > div {margin: 10px 0px;}
+#sitefooter > div.right {float: right;}
+#sitefooter a {text-decoration: none; color: #09587e; }
+#sitefooter a:hover {color: #2c7fba; }
+#sitefooter a.github {display: block; width: 20px; height: 19px; background-image: url(github.png);}
+#sitefooter div.logolint {margin-top: 20px;}
+#sitefooter div.logolint a {display: inline-block; vertical-align: middle; margin-right: 20px;}
+#sitefooter div.logolint a.muni {background-image: url(logo_muni.png); width: 60px; height: 60px;}
+#sitefooter div.logolint a.ske {background-image: url(logo_ske.png); width: 105px; height: 39px;}
+
+#viewer {padding: 0px 0px !important; float: left; max-width: 930px; width: 100%}
+
+#crossroads {font-size: 1rem; padding: 0px 0px !important; float: left; max-width: 930px; width: 100%}
+#crossroads > div.nojoy {text-align: center; color: #eeeeee; font-size: 10rem; text-align: center; margin: 100px 0px;}
+#crossroads > div { margin: 15px 0px 30px 0px; }
+#crossroads > div > a {color: #666666; text-decoration: none; padding-right: 10px;}
+#crossroads > div > a span.headword {color: #000000; font-weight: bold;}
+#crossroads > div > a:hover {background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff;}
+#crossroads > div > a:hover span.headword {color: rgb(0, 76, 131);}
+#crossroads > div > a span.searchtext { background-color: #ffecb3; text-shadow: 0px 0px 0px transparent; border: 1px solid #ffffff; margin: 0px -1px; box-shadow: 0px 0px 2px #333333; }
+#crossroads > div > a span.bullet {background-color: #4c9ed9; color: #ffffff; border-radius: 20px; padding: 5px 10px; margin-right: 10px;}
+#crossroads > div > a:hover span.bullet {box-shadow: 0px 0px 2px #999999;  text-shadow: 0px 0px 0px transparent;}
+
+#nabes {float: right; width: 300px;}
+#nabes > a {display: block; padding: 5px 5px; border-bottom: 1px solid #eeeeee; cursor: pointer; color: #666666; text-decoration: none;}
+#nabes > a:first-child {border-top: 1px solid #eeeeee;}
+#nabes > a:hover {background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff;}
+#nabes > a.current {background-color: rgb(153, 212, 255); text-shadow: 1px 1px 0px #dddddd;}
+#nabes > a span.headword {font-weight: bold; color: #000000;}
+@media (max-width: 1240px){
+  #nabes {float: none; clear: left; padding-top: 60px; width: auto; max-width: 930px;}
+}
+
+.error404 {text-align: center; line-height: normal; margin: 100px auto 0px auto;}
+.error404 .num {font-size: 8rem; color: #dddddd; text-shadow: 2px 2px 0px #cccccc; }
+.error404 .desc {color: #666666; margin-top: 10px}
+
+body.sitehome .invelope.top {margin: 50px auto 25px auto;}
+body.sitehome .invelope.top > div.clear {clear: left;}
+div.leftie {float: left; width: 50%; box-sizing: border-box; padding: 20px 40px 0px 0px; border-right: 1px solid #1e6bcf;}
+div.rightie {float: left; width: 50%; box-sizing: border-box; border-left: 1px solid #1e6bcf; padding: 20px 0px 20px 40px; position: relative; left: -1px;}
+@media (max-width: 800px){
+  body.sitehome .invelope.top {margin-top: 50px;}
+  div.leftie {float: none; width: auto; box-sizing: border-box; padding: 0px 0px 0px 0px; border-right: 0px}
+  div.rightie {float: none; width: auto; box-sizing: border-box; padding: 40px 0px 0px 0px; border-left: 0px; left: 0px; margin-top: 40px;}
+}
+
+div.welcome {font-size: 1.1rem; line-height: 1.5em; color: #666666; }
+div.welcome > div.intro {color: #333333;}
+div.welcome > div.point { margin: 20px 0px;}
+div.welcome > div.point > div.title {}
+div.welcome > div.point > div.title > a {font-weight: bold; background-image: url(signpost.png); background-position: 5px 0px; background-repeat: no-repeat; padding-left: 50px; display: block; min-height: 30px;}
+div.welcome > div.point > div.title > a:hover {background-image: url(signpost-on.png);}
+div.welcome a {text-decoration: none; color: #09587e;}
+div.welcome a:hover {color: #2c7fba; }
+div.welcome > div.point > div.title > a > span.pdf {background-color: #bd6c73; color: #ffffff; padding: 2px 5px; font-size: 0.8rem; border-radius: 2px; position: relative; top: -2px;}
+div.welcome > div.point > div.blurb {margin-top: 5px; padding-left: 50px; }
+div.welcome > div.point > div.subtitle {margin: 20px 0px 0px 45px; background-color: #f3f3f3; border-radius: 4px 4px 0px 0px; padding: 10px 15px 0px 15px; text-shadow: 1px 1px 0px #ffffff; font-size: 0.95rem; width: 25%; font-weight: bold;}
+div.welcome > div.point > div.subblurb {margin: 0px 0px 0px 45px; background-color: #f3f3f3; border-radius: 0px 4px 4px 4px; padding: 15px 15px; text-shadow: 1px 1px 0px #ffffff; font-size: 0.95rem;}
+div.welcome > div.point > div.subblurb > div.add {margin-top: 10px; padding-top: 10px; border-top: 2px solid #ffffff; color: #999999; margin-left: -15px; margin-right: -15px; padding-left: 15px; padding-right: 15px;}
+
+div.usertop {background-image: url(user.png); background-position: left center; background-repeat: no-repeat; padding-left: 80px; min-height: 60px; margin-bottom: 20px;}
+div.usertop a {text-decoration: none; color: #09587e;}
+div.usertop a:hover {color: #2c7fba; }
+div.usertop > div.title {font-size: 1.5rem; padding-top: 10px;}
+div.usertop > div.subtitle {margin-top: 10px; color: #666666;}
+
+div.field {margin-top: 10px;}
+div.field:first-child {margin-top: 0px;}
+div.field div.label {font-weight: bold; margin: 0px 0px 5px 0px; color: #333333;}
+div.field input.textbox {box-sizing: border-box; width: 100%; margin: 0px 0px 0px 0px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 9px 8px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
+div.field button {box-sizing: border-box; margin: 0px 0px 0px 0px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: 0px 0px 2px #666666; padding: 9px 30px; min-height: 1.3em; display: inline-block; vertical-align: middle; color: #267ab5; cursor: pointer;}
+div.field button:hover {color: #4698d1;}
+div.field.submit {text-align: right; margin-top: 20px;}
+div.field.submit button {font-weight: bold;}
+div.error {background-color: #ffcdcc; color: #99004d; font-weight: bold; text-align: center; padding: 20px; margin: 20px 0px 0px 0px; text-shadow: 1px 1px 0px #eeeeee; border-radius: 4px;}
+
+div.yourdicts {font-size: 1.2rem; color: #666666; padding-bottom: 5px; border-bottom: 1px dotted #999999; margin-top: 40px;}
+div.nodicts {margin-top: 15px; color: #999999; margin-bottom: -3px;}
+div.createdict {margin-top: 15px; color: #999999;}
+div.createdict a {text-decoration: none; color: #09587e; background-image: url(lightning.png); background-position: left center; background-repeat: no-repeat; padding-left: 25px; display: inline-block; min-height: 16px;}
+div.createdict a:hover {color: #2c7fba;}
+
+div.dict {margin-top: 13px;}
+div.dict a {display: inline-block; font-size: 1.2rem; padding: 5px 10px; background-color: #4c9ed9; color: #ffffff; border-radius: 4px; text-decoration: none; line-height: 1.5em;}
+div.dict a:hover {box-shadow: 0px 0px 2px #999999; color: #eeeeee;}
+
+div.adminlink {margin-top: 15px; color: #999999;}
+div.adminlink a {text-decoration: none; color: #09587e; background-image: url(cog.png); background-position: left center; background-repeat: no-repeat; padding-left: 25px; display: inline-block; min-height: 16px; margin-right: 0.75em;}
+div.adminlink a:hover {color: #2c7fba;}
+
+body.doc div.markdown {max-width: 900px; margin-top: 70px; }
+@media (max-width: 800px){
+  body.doc div.markdown {margin-top: 50px;}
+}
