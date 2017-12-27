@@ -23,7 +23,7 @@ module.exports={
     if(prohibitedDictIDs.indexOf(dictID)>-1 || module.exports.dictExists(dictID)){
       callnext(false);
     } else {
-      fs.copy(path.join(module.exports.siteconfig.dataDir, "dictTemplates/"+template+".sqlite"), path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), function(err){
+      fs.copy("dictTemplates/"+template+".sqlite", path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), function(err){
         var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READWRITE);
         var users={}; users[email]={"canEdit": true, "canConfig": true, "canDownload": true, "canUpload": true};
         db.run("update configs set json=$json where id='users'", {$json: JSON.stringify(users, null, "\t")}, function(err){ if(err) console.log(err);
