@@ -25,7 +25,7 @@ if(siteconfig.verbose) app.use(function (req, res, next) {
     var delim="\t"; if(siteconfig.verbose.multiline) {delim="\n";}
     var str=req.method+delim+req.url+delim+"COOKIES: "+JSON.stringify(req.cookies)+delim+"REQUEST BODY: "+JSON.stringify(bodyCopy)+"\n";
     if(siteconfig.verbose.multiline && siteconfig.verbose.filename) str+="\n";
-    if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str);
+    if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str, function(err){});
     else console.log(str);
   }
   next();

@@ -7,7 +7,7 @@ fs.readFile(path.join(__dirname, "siteconfig.json"), "utf8", function(err, conte
   var siteconfig=JSON.parse(content);
   var password="lexonomy";
   var passwordHash=sha1(password);
-  var db=new sqlite3.Database(path.join(__dirname, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+  var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
   for(var i=0; i<siteconfig.admins.length; i++){
     var email=siteconfig.admins[i];
     insertUser(db, email, password, passwordHash);

@@ -3,12 +3,10 @@
   "rootPath": "/",
   "port": 80,
   "dataDir": "../data/",
-  "verbose": {
-    "filename": "",
-    "multiline": true
-  },
+  "verbose": false,
   "admins": ["root@localhost"],
   "trackingCode": "",
+  "welcome": "Welcome to your <a href='http://www.lexonomy.eu/'>Lexonomy</a> installation.",
   "licences": {
     "cc-by-4.0": {
       "title": "Creative Commons Attribution 4.0 International",
