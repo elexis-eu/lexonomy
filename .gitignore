@@ -1,4 +1,6 @@
 data/lexonomy.sqlite
 data/dicts/*
+!data/dicts/README.md
 data/uploads/*
+!data/uploads/README.md
 website/siteconfig.json

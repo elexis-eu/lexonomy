@@ -1,0 +1,1 @@
+This folder is where the Lexonomy web application stores its data, including (importantly) all the dictionaries. The folder can be located anywhere in the server's file system and does not even have to be called `data`. The path to the folder is given in `../website/siteconfig.json`.
