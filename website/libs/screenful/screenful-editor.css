@@ -22,6 +22,9 @@
 #toolbar button.iconYes#butHistory {background-image: url(time.png); float: right;}
 #toolbar span#errorMessage {float: right; padding: 6px 10px; margin: 10px 5px; min-height: 1.3em; display: inline-block; color: #aa0000; font-size: 0.85em;}
 
+#toolbar a {color: #004f9b; padding: 5px 0px; margin: 10px 5px; min-height: 1.3em; display: inline-block; padding-left: 35px; background-position: left+10px center; background-repeat: no-repeat; text-decoration: none;}
+#toolbar a:hover {color: #2f7ecb;}
+
 #waiter {
   background-image: url(loader.gif); background-position: 30px 28px; background-repeat: no-repeat; padding: 30px 30px 30px 90px;
   position: absolute; top: 300px; left: 30%; width: 40%; background-color: #ffffff; box-shadow: 0px 0px 5px #666666; border-radius: 4px; z-index: 10;

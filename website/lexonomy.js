@@ -490,7 +490,10 @@ app.get(siteconfig.rootPath+":dictID/config/", function(req, res){
     ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, req.params.dictID, function(user){
       if(!user.canConfig) res.redirect(siteconfig.baseUrl+req.params.dictID+"/edit/"); else {
         ops.getDictStats(req.params.dictID, function(stats){
-          res.render("config.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, needResave: (stats.needResave>0), siteconfig: siteconfig});
+          res.render("config.ejs", {
+            user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, needResave: (stats.needResave>0), siteconfig: siteconfig,
+            hasXemaOverride: (configs.xema.xonomyDocSpec!=null)
+          });
         });
       }
     });

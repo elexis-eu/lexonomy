@@ -42,7 +42,11 @@
 		};
 		Screenful.Editor.editor=function(div, entry, uneditable){
 			Xonomy.lang="en";
-			var docSpec=Xematron.xema2docspec(xema);
+			<%if(xema.xonomyDocSpec){%>
+				var docSpec=<%-xema.xonomyDocSpec%>;
+			<%} else {%>
+				var docSpec=Xematron.xema2docspec(xema);
+			<%}%>
 			docSpec.allowModeSwitching=true;
 			docSpec.onModeSwitch=function(mode){
 				Cookies.set("xonomyMode", mode);

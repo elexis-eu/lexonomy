@@ -30,7 +30,11 @@
 				</div>
 				<div class="signposts">
 					<div class="title">Entries</div>
-					<div class="signpost"><a href="../../<%=dictID%>/config/xema/">Entry structure</a></div>
+					<%if(hasXemaOverride) {%>
+						<div class="signpost"><a href="../../<%=dictID%>/config/xema-override/">Entry structure</a></div>
+					<%} else {%>
+						<div class="signpost"><a href="../../<%=dictID%>/config/xema/">Entry structure</a></div>
+					<%}%>
 					<div class="signpost"><a href="../../<%=dictID%>/config/titling/">Headwords</a></div>
 					<div class="signpost"><a href="../../<%=dictID%>/config/searchability/">Search</a></div>
 				</div>

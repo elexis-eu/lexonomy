@@ -83,6 +83,12 @@ Screenful.Editor={
     if(!Screenful.Editor.singleton && Screenful.Editor.deleteUrl) {
       $("<button id='butDelete' class='iconYes'>"+Screenful.Loc.delete+"</button>").appendTo($toolbar).on("click", Screenful.Editor.delete);
     }
+    if(Screenful.Editor.toolbarLinks){
+      for(var i=0; i<Screenful.Editor.toolbarLinks.length; i++){
+        var link=Screenful.Editor.toolbarLinks[i];
+        $("<a class='iconYes' style='background-image: url("+link.image+")' href='"+link.href+"'>"+link.caption+"</a>").appendTo($toolbar);
+      }
+    }
   },
   entryID: null,
   updateToolbar: function(){
