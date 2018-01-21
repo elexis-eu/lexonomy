@@ -492,7 +492,8 @@ app.get(siteconfig.rootPath+":dictID/config/", function(req, res){
         ops.getDictStats(req.params.dictID, function(stats){
           res.render("config.ejs", {
             user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, needResave: (stats.needResave>0), siteconfig: siteconfig,
-            hasXemaOverride: (configs.xema.xonomyDocSpec!=null)
+            hasXemaOverride: (configs.xema.xonomyDocSpec!=null),
+            hasXemplateOverride: (configs.xemplate._xsl!=null || configs.xemplate._css!=null)
           });
         });
       }

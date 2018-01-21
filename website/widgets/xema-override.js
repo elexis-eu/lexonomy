@@ -16,16 +16,17 @@ XemaOverride.render=function(div, json){
 	$block.append("<div class='title'>Document specification</div>");
   $block.append("<textarea class='textbox' spellcheck='false'></textarea>");
   $block.find("textarea").val(code).data("origval", code).on("change keyup", function(e){
-    if($div.find(".block.theSchema textarea").val()!=$div.find(".block.template textarea").data("origval")) XemaOverride.change();
+    if($div.find(".block.theSchema textarea").val()!=$div.find(".block.theSchema textarea").data("origval")) XemaOverride.change();
   });
   $block.append("<div class='instro'>Bla bla...</div>");
   $block.append("<div class='error' style='display: none;'></div>");
 
+  var code=json.newXml;
   var $block=$("<div class='block newXml'></div>").appendTo($div);
 	$block.append("<div class='title'>Template for new entries</div>");
   $block.append("<textarea class='textbox' spellcheck='false'></textarea>");
-  $block.find("textarea").val(json.newXml).data("origval", json.newXml).on("change keyup", function(e){
-    if($div.find(".block.theSchema textarea").val()!=$div.find(".block.template textarea").data("origval")) XemaOverride.change();
+  $block.find("textarea").val(code).data("origval", code).on("change keyup", function(e){
+    if($div.find(".block.newXml textarea").val()!=$div.find(".block.newXml textarea").data("origval")) XemaOverride.change();
   });
   $block.append("<div class='instro'>Bla bla...</div>");
   $block.append("<div class='error' style='display: none;'></div>");
@@ -41,7 +42,6 @@ XemaOverride.harvest=function(div){
   for(var elName in docspec.elements){
     ret.elements[elName]={};
   }
-  console.log(ret.elements);
 
   //understand what the top-level element:
   var match=ret.newXml.match(/^\<([^ \>\/]+)/);

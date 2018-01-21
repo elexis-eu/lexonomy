@@ -40,7 +40,11 @@
 				</div>
 				<div class="signposts">
 					<div class="title">Publishing</div>
-					<div class="signpost"><a href="../../<%=dictID%>/config/xemplate/">Entry formatting</a></div>
+					<%if(hasXemplateOverride) {%>
+						<div class="signpost"><a href="../../<%=dictID%>/config/xemplate-override/">Entry formatting</a></div>
+					<%} else {%>
+						<div class="signpost"><a href="../../<%=dictID%>/config/xemplate/">Entry formatting</a></div>
+					<%}%>
 					<div class="signpost"><a href="../../<%=dictID%>/config/publico/">Public access</a></div>
 				</div>
 				<div class="signposts">
