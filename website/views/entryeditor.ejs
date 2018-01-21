@@ -33,7 +33,8 @@
 		if(!xemplate[xema.root]) xemplate[xema.root]={shown: false};
 		if(xemplate[xema.root].shown=="false") xemplate[xema.root].shown=false;
 		Screenful.Editor.viewer=null; if(xemplate[xema.root].shown) Screenful.Editor.viewer=function(div, entry){
-			var html=Xemplatron.xml2html(entry.content, xemplate, xema); $(div).addClass("viewer").html(html);
+			//var html=Xemplatron.xml2html(entry.content, xemplate, xema); $(div).addClass("viewer").html(html);
+			$(div).addClass("viewer").html(entry.contentHtml);
 			$(div).find("a.xref").on("click", function(e){
 				var text=$(e.delegateTarget).attr("data-text");
 				window.parent.$("#searchbox").val(text);

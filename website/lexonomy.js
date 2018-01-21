@@ -430,8 +430,12 @@ app.post(siteconfig.rootPath+":dictID/entryread.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, req.params.dictID, function(user){
     if(!user.dictAccess) res.json({success: false}); else {
-      ops.readEntry(req.params.dictID, req.body.id, function(adjustedEntryID, xml){
-        res.json({success: (adjustedEntryID>0), id: adjustedEntryID, content: xml});
+      ops.readDictConfigs(req.params.dictID, function(configs){
+        ops.readEntry(req.params.dictID, req.body.id, function(adjustedEntryID, xml){
+          var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
+          var html=xemplatron.xml2html(doc, configs.xemplate, configs.xema);
+          res.json({success: (adjustedEntryID>0), id: adjustedEntryID, content: xml, contentHtml: html});
+        });
       });
     }
   });
