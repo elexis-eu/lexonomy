@@ -29,9 +29,9 @@
 		Screenful.Editor.editor=function(div, entry){
 			XemaDesigner.start(entry.content);
 			XemaDesigner.onchange=Screenful.Editor.changed;
-			if(entry.content.xonomyDocSpec) { //the user is switching back from own schema
-				delete entry.content.xonomyDocSpec;
-				delete entry.content.newXml;
+			if(entry.content._xonomyDocSpec) { //the user is switching back from own schema
+				delete entry.content._xonomyDocSpec;
+				delete entry.content._newXml;
 				window.setTimeout(Screenful.Editor.changed, 100);
 			}
 		};
