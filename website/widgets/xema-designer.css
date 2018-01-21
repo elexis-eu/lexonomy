@@ -47,8 +47,8 @@ div#editor.designer div.list div.children {margin-left: 10px; padding-left: 5px;
 div#editor.designer div.list div.container { position: relative; margin: 0px 0px 0px 10px; }
 div#editor.designer div.list div.horizontal { position: absolute; top: 15px; left: -15px; width: 50px; border-top: 1px dotted #cccccc;}
 div#editor.designer div.list div.children > div.blinder { position: absolute; left: 5px; width: 10px; bottom: 0px; background-color: #ffffff; top: 100px;}
-div#editor.designer div.list div.title { margin: 20px 0px 10px 15px; }
-div#editor.designer div.list div.title span { background-color: #eeeeee; padding: 7px 10px; color: #666666; text-shadow: 1px 1px 0px #ffffff; }
+div#editor.designer div.list div.title:not(.container) { margin: 20px 0px 10px 15px; }
+div#editor.designer div.list div.title:not(.container) span { background-color: #eeeeee; padding: 7px 10px; color: #666666; text-shadow: 1px 1px 0px #ffffff; }
 
 div#editor.designer div.list div.container > div.horizontal span.plusminus {display: none;}
 div#editor.designer div.list div.container.hasChildren > div.horizontal span.plusminus { display: block; background-image: url(../furniture/minus.gif); width: 18px; height: 18px; background-position: center center; background-repeat: no-repeat; position: absolute; top: -9px; left: 17px; cursor: pointer; }

@@ -32,10 +32,21 @@ XemaOverride.render=function(div, json){
 };
 XemaOverride.harvest=function(div){
   var ret={};
-  ret.root="school";
-  ret.elements={"school": {}, "teachers": {}};
   ret.xonomyDocSpec=$(".pillarform .block.theSchema textarea").val();
   ret.newXml=$(".pillarform .block.newXml textarea").val();
-  console.log(ret);
+
+  //understand the docspec a little:
+  ret.elements={};
+  var Xonomy={}; eval("var docspec="+ret.xonomyDocSpec+";");
+  for(var elName in docspec.elements){
+    ret.elements[elName]={};
+  }
+  console.log(ret.elements);
+
+  //understand what the top-level element:
+  var match=ret.newXml.match(/^\<([^ \>\/]+)/);
+  if(match) ret.root=match[1];
+  if(!ret.elements[ret.root]) for(var elName in ret.elements) {ret.root=elName; break;}
+
   return ret;
 };

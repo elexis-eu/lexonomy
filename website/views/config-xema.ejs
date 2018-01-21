@@ -27,7 +27,6 @@
 		Screenful.Editor.readUrl="../../../<%=dictID%>/configread.json";
 		Screenful.Editor.updateUrl="../../../<%=dictID%>/configupdate.json";
 		Screenful.Editor.editor=function(div, entry){
-			console.log(entry.content);
 			XemaDesigner.start(entry.content);
 			XemaDesigner.onchange=Screenful.Editor.changed;
 			if(entry.content.xonomyDocSpec) { //the user is switching back from own schema
