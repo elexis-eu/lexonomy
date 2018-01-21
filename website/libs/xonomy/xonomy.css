@@ -9,6 +9,15 @@
 .xonomy .childrenCollapsed.focused { outline: 1px dotted #666666; background-color: #ffff99 !important; }
 .xonomy .rollouter.focused { border: 1px dotted #666666 !important; background-color: #ffff99 !important; margin-left: 2px !important; }
 
+.xonomy.nerd .element > .children > .textnode .char.focused {  }
+.xonomy.nerd .element > .children > .textnode .char.focused > .selector { position: absolute; left: 0px; right: 0px; z-index: 2; background-color: #00cc00; height: 3px; bottom: -3px; }
+.xonomy.nerd .element > .children > .textnode .char.focused > .selector > .inside { position: absolute; left: 0px; right: 0px; top: -2px; bottom: -1px; background-color: transparent; }
+
+.xonomy.laic .element > .children > .textnode .char.focused { }
+.xonomy.laic .element > .children > .textnode .char.focused > .selector { position: absolute; left: 0px; right: 0px; z-index: 2; background-color: #00cc00; height: 8px; bottom: -10px; }
+.xonomy.laic .element > .children > .textnode .char.focused > .selector > .inside { position: absolute; left: 0px; right: 0px; top: -2px; bottom: -1px; background-color: transparent; }
+
+
 /*NERD MODE*/
 .xonomy.nerd { font-family: monospace; font-size: 1rem; cursor: default; background-color: #ffffff;
 	-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
