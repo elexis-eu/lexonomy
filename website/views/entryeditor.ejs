@@ -18,6 +18,7 @@
 		<script type="text/javascript" src="../../widgets/ske.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../widgets/ske.css" />
 		<script type="text/javascript" src="../../libs/js.cookie.js"></script>
+		<script type="text/javascript" src="../../libs/xslt/xslt.js"></script>
 		<script type="text/javascript">
 		Screenful.Editor.createUrl="../../<%=dictID%>/entrycreate.json";
 		Screenful.Editor.readUrl="../../<%=dictID%>/entryread.json";
@@ -32,15 +33,28 @@
 		var titling=<%-JSON.stringify(titling)%>;
 		if(!xemplate[xema.root]) xemplate[xema.root]={shown: false};
 		if(xemplate[xema.root].shown=="false") xemplate[xema.root].shown=false;
-		Screenful.Editor.viewer=null; if(xemplate[xema.root].shown) Screenful.Editor.viewer=function(div, entry){
-			//var html=Xemplatron.xml2html(entry.content, xemplate, xema); $(div).addClass("viewer").html(html);
-			$(div).addClass("viewer").html(entry.contentHtml);
-			$(div).find("a.xref").on("click", function(e){
-				var text=$(e.delegateTarget).attr("data-text");
-				window.parent.$("#searchbox").val(text);
-				window.parent.Screenful.Navigator.list();
-			});
-		};
+
+		Screenful.Editor.viewer=null;
+		if(!xemplate._xsl && !xemplate._css && xemplate[xema.root].shown) {
+			Screenful.Editor.viewer=function(div, entry){
+				var html=Xemplatron.xml2html(entry.content, xemplate, xema); $(div).addClass("viewer").html(html);
+				$(div).find("a.xref").on("click", function(e){
+					var text=$(e.delegateTarget).attr("data-text");
+					window.parent.$("#searchbox").val(text);
+					window.parent.Screenful.Navigator.list();
+				});
+			};
+		} else if(xemplate._xsl){
+			Screenful.Editor.viewer=function(div, entry){
+				var html=xslt(entry.content, xemplate._xsl, {cleanup: false}); $(div).addClass("viewer").html(html);
+				$(div).find("a.xref").on("click", function(e){
+					var text=$(e.delegateTarget).attr("data-text");
+					window.parent.$("#searchbox").val(text);
+					window.parent.Screenful.Navigator.list();
+				});
+			};
+		}
+
 		Screenful.Editor.editor=function(div, entry, uneditable){
 			Xonomy.lang="en";
 			<%if(xema.xonomyDocSpec){%>

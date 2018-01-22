@@ -325,12 +325,10 @@ app.get(siteconfig.rootPath+":dictID/:entryID(\\d+)/", function(req, res){
         ops.readEntry(req.params.dictID, req.params.entryID, function(adjustedEntryID, xml, title){
           if(adjustedEntryID==0) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
           ops.readNabesByEntryID(req.params.dictID, req.params.entryID, function(nabes){
-            var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
-            var html=xemplatron.xml2html(doc, configs.xemplate, configs.xema);
             res.render("dict-entry.ejs", {
               user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, dictBlurb: configs.ident.blurb,
-              publico: configs.publico, siteconfig: configs.siteconfig, entryID: adjustedEntryID, nabes: nabes, html: html,
-              title: title,
+              publico: configs.publico, siteconfig: configs.siteconfig, entryID: adjustedEntryID, nabes: nabes, xml: xml,
+              xemplate: configs.xemplate, xema: configs.xema, title: title,
             });
           });
         });
@@ -430,12 +428,8 @@ app.post(siteconfig.rootPath+":dictID/entryread.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, req.params.dictID, function(user){
     if(!user.dictAccess) res.json({success: false}); else {
-      ops.readDictConfigs(req.params.dictID, function(configs){
-        ops.readEntry(req.params.dictID, req.body.id, function(adjustedEntryID, xml){
-          var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
-          var html=xemplatron.xml2html(doc, configs.xemplate, configs.xema);
-          res.json({success: (adjustedEntryID>0), id: adjustedEntryID, content: xml, contentHtml: html});
-        });
+      ops.readEntry(req.params.dictID, req.body.id, function(adjustedEntryID, xml){
+        res.json({success: (adjustedEntryID>0), id: adjustedEntryID, content: xml});
       });
     }
   });
