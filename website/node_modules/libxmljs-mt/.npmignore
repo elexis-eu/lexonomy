@@ -1,0 +1,24 @@
+.lock-wscript
+*.swp
+build/
+node_modules/
+npm-debug.log
+*~
+
+# The parts below will be ignored by git since libxml is a submodule.
+# NPM on the other hand will honor them and exlude many unneccessary files.
+/vendor/libxml/bakefile/
+/vendor/libxml/doc/
+/vendor/libxml/example/
+/vendor/libxml/macos/
+/vendor/libxml/optim/
+/vendor/libxml/os400/
+/vendor/libxml/python/
+/vendor/libxml/result/
+/vendor/libxml/test/
+/vendor/libxml/test*
+/vendor/libxml/vms/
+/vendor/libxml/VxWorks/
+/vendor/libxml/win32/
+/vendor/libxml/xstc/
+/vendor/libxml/*.py

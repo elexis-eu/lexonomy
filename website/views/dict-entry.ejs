@@ -25,23 +25,9 @@
 		<link type="text/css" rel="stylesheet" href="../../furniture/public.css" />
 		<script type="text/javascript" src="../../widgets/xemplatron.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../widgets/xemplatron.css" />
-		<script type="text/javascript" src="../../libs/xslt/xslt.js"></script>
-		<script type="text/javascript">
-		var xemplate=<%-JSON.stringify(xemplate)%>;
-		var xema=<%-JSON.stringify(xema)%>;
-		$(window).ready(function(){
-			if(!xemplate._xsl && !xemplate._css && xemplate[xema.root].shown){
-				$("#viewer").html( Xemplatron.xml2html($("#viewer").html(), xemplate, xema) );
-			} else if(xemplate._xsl) {
-				$("#viewer").html( xslt($("#viewer").html(), xemplate._xsl, {cleanup: false}) );
-			}
-			$("#viewer a.xref").on("click", function(e){
-				var text=$(e.delegateTarget).attr("data-text");
-				window.location="../../<%-dictID%>/search/?q="+encodeURIComponent(text);
-			});
-			$("#viewer").show();
-		});
-		</script>
+		<style>
+		<%-css%>
+		</style>
 	</head>
 	<body class="entrypage">
 		<div id="header">
@@ -58,7 +44,7 @@
 
 		<div class="midlope">
 			<div class="invelope">
-				<div id="viewer" class="viewer" style="display: none;"><%-xml%></div>
+				<div id="viewer" class="viewer"><%-html%></div>
 				<div id="nabes">
 					<%for(var i=0; i<nabes.length; i++){%>
 						<a <%if(nabes[i].id==entryID){%>class="current"<%}%> href="../../<%=dictID%>/<%=nabes[i].id%>/"><%-nabes[i].title%></a>

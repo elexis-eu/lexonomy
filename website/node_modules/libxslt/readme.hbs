@@ -1,0 +1,130 @@
+node-libxslt
+============
+
+[![Build status](https://travis-ci.org/albanm/node-libxslt.svg)](https://travis-ci.org/albanm/node-libxslt)
+[![Code Climate](https://codeclimate.com/github/albanm/node-libxslt/badges/gpa.svg)](https://codeclimate.com/github/albanm/node-libxslt)
+[![NPM version](https://badge.fury.io/js/libxslt.svg)](http://badge.fury.io/js/libxslt)
+
+Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [libxmljs](https://github.com/polotek/libxmljs/issues/226).
+
+Installation
+------------
+
+	npm install libxslt
+
+Basic usage
+-----------
+
+```js
+var libxslt = require('libxslt');
+
+libxslt.parse(stylesheetString, function(err, stylesheet){
+  var params = {
+    MyParam: 'my value'
+  };
+
+  // 'params' parameter is optional
+  stylesheet.apply(documentString, params, function(err, result){
+    // err contains any error from parsing the document or applying the stylesheet
+    // result is a string containing the result of the transformation
+  });  
+});
+```
+
+Libxmljs integration
+--------------------
+
+Node-libxslt depends on [libxmljs](https://github.com/polotek/libxmljs/issues/226) in the same way that [libxslt](http://xmlsoft.org/libxslt/) depends on [libxml](http://xmlsoft.org/). This dependancy makes possible to bundle and to load in memory libxml only once for users of both libraries.
+
+The libxmljs module required by node-libxslt is exposed as ```require('libxslt').libxmljs```. This prevents depending on libxmljs twice which is not optimal and source of weird bugs.
+
+It is possible to work with libxmljs documents instead of strings:
+
+```js
+var libxslt = require('libxslt');
+var libxmljs = libxslt.libxmljs;
+
+var stylesheetObj = libxmljs.parseXml(stylesheetString, { nocdata: true });
+var stylesheet = libxslt.parse(stylesheetObj);
+
+var document = libxmljs.parseXml(documentString);
+stylesheet.apply(document, function(err, result){
+  // result is now a libxmljs document containing the result of the transformation
+});
+
+```
+
+This is only useful if you already needed to parse a document before applying the stylesheet for previous manipulations.
+Or if you wish to be returned a document instead of a string for ulterior manipulations.
+In these cases you will prevent extraneous parsings and serializations.	
+
+Includes
+--------
+
+XSL includes are supported but relative paths must be given from the execution directory, usually the root of the project.
+
+Includes are resolved when parsing the stylesheet by libxml. Therefore the parsing task becomes IO bound, which is why you should not use synchronous parsing when you expect some includes.
+
+Sync or async
+-------------
+
+The same *parse()* and *apply()* functions can be used in synchronous mode simply by removing the callback parameter.
+In this case if a parsing error occurs it will be thrown.
+
+```js
+var libxslt = require('libxslt');
+
+var stylesheet = libxslt.parse(stylesheetString);
+
+var result = stylesheet.apply(documentString);
+
+```
+
+The asynchronous functions use the [libuv work queue](http://nikhilm.github.io/uvbook/threads.html#libuv-work-queue)
+to provide parallelized computation in node.js worker threads. This makes it non-blocking for the main event loop of node.js.
+
+Note that libxmljs parsing doesn't use the work queue, so only a part of the process is actually parallelized.
+
+A small benchmark is available in the project. It has a very limited scope, it uses always the same small transformation a few thousand times.
+To run it use:
+
+    node benchmark.js
+
+This is an example of its results with an intel core i5 3.1GHz:
+
+```
+10000 synchronous parse from parsed doc                in 52ms = 192308/s
+10000 asynchronous parse in series from parsed doc     in 229ms = 43668/s
+10000 asynchronous parse in parallel from parsed doc   in 56ms = 178571/s
+10000 synchronous apply from parsed doc                in 329ms = 30395/s
+10000 asynchronous apply in series from parsed doc     in 569ms = 17575/s
+10000 asynchronous apply in parallel from parsed doc   in 288ms = 34722/s
+
+```
+
+Observations:
+  - it's pretty fast !
+  - asynchronous is slower when running in series.
+  - asynchronous can become faster when concurrency is high.
+
+Conclusion:
+  - use asynchronous by default it will be kinder to your main event loop and is pretty fast anyway.
+  - use synchronous only if you really want the highest performance and expect low concurrency.
+  - of course you can also use synchronous simply to reduce code depth. If you don't expect a huge load it will be ok.
+  - DO NOT USE synchronous parsing if there is some includes in your XSL stylesheets.
+
+Environment compatibility
+-------------------------
+
+For now 64bits linux and 32bits windows are confirmed. Other environments are probably ok, but not checked. Please report an issue if you encounter some difficulties.
+
+Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you will need to meet its requirements. This can be a bit painful mostly for windows users. The node-gyp version bundled in your npm will have to be greater than 0.13.0, so you might have to follow [these instructions to upgrade](https://github.com/TooTallNate/node-gyp/wiki/Updating-npm's-bundled-node-gyp). There is no system dependancy otherwise, libxslt is bundled in the project.
+
+API Reference
+=============
+{{#module name="libxslt"~}}
+  {{>body~}}
+  {{>members~}}
+{{/module~}}
+
+*documented by [jsdoc-to-markdown](https://github.com/75lb/jsdoc-to-markdown)*.
