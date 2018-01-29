@@ -18,6 +18,7 @@
 #envelope div.pillarform label:hover { background-color: #f7f9ea; padding: 5px 0px 5px 0px; }
 
 #envelope div.pillarform div.title { background-color: #eeeeee; padding: 10px 8px; border-radius: 4px; margin-bottom: 10px; text-shadow: 1px 1px 0px #ffffff; margin-top: 20px; font-weight: bold; color: #004f9b;}
+#envelope div.pillarform div.title a {font-weight: normal; font-size: 0.9em; color: #3182d0; float: right; }
 #envelope div.pillarform div.instro { padding: 0px 5px; margin-bottom: 10px; text-shadow: 1px 1px 0px #ffffff; margin-top: 7px; color: #999999; font-size: 0.9em; line-height: 1.5em;}
 #envelope div.pillarform div.instro a {text-decoration: none; color: #537ea7;}
 #envelope div.pillarform div.instro a:hover {color: #004f9b;}

@@ -18,9 +18,7 @@
 		<script type="text/javascript" src="../../widgets/ske.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../widgets/ske.css" />
 		<script type="text/javascript" src="../../libs/js.cookie.js"></script>
-		<style>
-		<%-css%>
-		</style>
+		<style><%-css%></style>
 		<script type="text/javascript">
 		Screenful.Editor.createUrl="../../<%=dictID%>/entrycreate.json";
 		Screenful.Editor.readUrl="../../<%=dictID%>/entryread.json";
@@ -50,10 +48,15 @@
 
 		Screenful.Editor.editor=function(div, entry, uneditable){
 			Xonomy.lang="en";
-			<%if(xema.xonomyDocSpec){%>
-				var docSpec=<%-xema.xonomyDocSpec%>;
+			<%if(xema._xonomyDocSpec){%>
+				var docSpec=<%-xema._xonomyDocSpec%>;
 			<%} else {%>
 				var docSpec=Xematron.xema2docspec(xema);
+			<%}%>
+			<%if(xema._newXml){%>
+				var newXml=`<%-xema._newXml%>`;
+			<%} else {%>
+				var newXml=Xematron.xema2xml(xema);
 			<%}%>
 			docSpec.allowModeSwitching=true;
 			docSpec.onModeSwitch=function(mode){
@@ -70,7 +73,7 @@
 				for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
 				docSpec.unknownElement.isReadOnly=true;
 			<%}%>
-			Xonomy.render((entry ? entry.content : Xematron.xema2xml(xema)), div, docSpec);
+			Xonomy.render((entry ? entry.content : newXml), div, docSpec);
 			if(!Xonomy.keyNav) Xonomy.startKeyNav(document, document.getElementById("container"));
 		};
 		Screenful.Editor.harvester=function(div){
