@@ -371,7 +371,7 @@ Screenful.Editor={
       var content=Screenful.Editor.harvester(document.getElementById("editor"));
       if(Screenful.Editor.formatSourceCode) content=Screenful.Editor.formatSourceCode(content);
       $("#container").removeClass("withHistory").addClass("withSourceCode");
-      $("#container").removeClass("empty").html("<div id='sourceCode'><textarea spellcheck='false'>"+content+"</textarea></div>");
+      $("#container").removeClass("empty").html("<div id='sourceCode'><textarea spellcheck='false'>"+content.replace(/\&/g, "&amp;")+"</textarea></div>");
       $("#container").hide().fadeIn();
       $("#sourceCode textarea").focus().on("keydown", function(e){e.stopPropagation();})
       Screenful.Editor.updateToolbar();
