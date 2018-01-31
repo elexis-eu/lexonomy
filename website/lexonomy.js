@@ -750,18 +750,20 @@ app.post(siteconfig.rootPath+":dictID/history.json", function(req, res){
         var domparser=null;
         for(var i=0; i<history.length; i++){
           var xml=history[i].content;
-          var html="";
-          if(configs.xemplate._xsl) {
-            if(!stylesheet) stylesheet=libxslt.parse(configs.xemplate._xsl);
-            html=stylesheet.apply(xml);
-          } else if(configs.xemplate._css) {
-            html=xml;
-          } else {
-            if(!domparser) domparser=new xmldom.DOMParser();
-            var doc=domparser.parseFromString(xml, 'text/xml');
-            html=xemplatron.xml2html(doc, configs.xemplate, configs.xema);
+          if(xml) {
+            var html="";
+            if(configs.xemplate._xsl) {
+              if(!stylesheet) stylesheet=libxslt.parse(configs.xemplate._xsl);
+              html=stylesheet.apply(xml);
+            } else if(configs.xemplate._css) {
+              html=xml;
+            } else {
+              if(!domparser) domparser=new xmldom.DOMParser();
+              var doc=domparser.parseFromString(xml, 'text/xml');
+              html=xemplatron.xml2html(doc, configs.xemplate, configs.xema);
+            }
+            history[i].contentHtml=html;
           }
-          history[i].contentHtml=html;
         }
         res.json(history);
       });

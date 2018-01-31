@@ -67,7 +67,7 @@
 			docSpec.onchange=Screenful.Editor.changed;
 			if(uneditable) {
 				for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
-				docSpec.unknownElement.isReadOnly=true;
+				if(docSpec.unknownElement) docSpec.unknownElement.isReadOnly=true;
 			}
 			<%if(!user.canEdit){%>
 				for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
