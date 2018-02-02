@@ -34,7 +34,7 @@
 			//return revision.action+", "+revision.email+", "+revision.when+", "+JSON.stringify(revision.historiography, null, "<br/>");
 		};
 		Screenful.History.fakeEntry=function(revision){
-			return {id: revision.entry_id, content: revision.content};
+			return {id: revision.entry_id, content: revision.content, contentHtml: revision.contentHtml};
 		};
 		var dictID="<%=dictID%>";
 		</script>

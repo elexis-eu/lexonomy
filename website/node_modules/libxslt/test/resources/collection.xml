@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="xslinclude.xsl"?>
+<COLLECTION>
+   <BOOK>
+      <TITLE>Lover Birds</TITLE>
+      <AUTHOR>Cynthia Randall</AUTHOR>
+      <PUBLISHER>Lucerne Publishing</PUBLISHER>
+   </BOOK>
+   <BOOK>
+      <TITLE>The Sundered Grail</TITLE>
+      <AUTHOR>Eva Corets</AUTHOR>
+      <PUBLISHER>Lucerne Publishing</PUBLISHER>
+   </BOOK>
+   <BOOK>
+      <TITLE>Splish Splash</TITLE>
+      <AUTHOR>Paula Thurman</AUTHOR>
+      <PUBLISHER>Scootney</PUBLISHER>
+   </BOOK>
+</COLLECTION>

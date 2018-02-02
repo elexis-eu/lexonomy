@@ -23,15 +23,11 @@
 		<script type="text/javascript">var rootPath="../../";</script>
 		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../furniture/public.css" />
+		<script type="text/javascript" src="../../widgets/xemplatron.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../widgets/xemplatron.css" />
-		<script type="text/javascript">
-		$(window).ready(function(){
-			$("#viewer a.xref").on("click", function(e){
-				var text=$(e.delegateTarget).attr("data-text");
-				window.location="../../<%-dictID%>/search/?q="+encodeURIComponent(text);
-			});
-		});
-		</script>
+		<style>
+		<%-css%>
+		</style>
 	</head>
 	<body class="entrypage">
 		<div id="header">

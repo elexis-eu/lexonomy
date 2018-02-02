@@ -30,13 +30,21 @@
 				</div>
 				<div class="signposts">
 					<div class="title">Entries</div>
-					<div class="signpost"><a href="../../<%=dictID%>/config/xema/">Entry structure</a></div>
+					<%if(hasXemaOverride) {%>
+						<div class="signpost"><a href="../../<%=dictID%>/config/xema-override/">Entry structure</a></div>
+					<%} else {%>
+						<div class="signpost"><a href="../../<%=dictID%>/config/xema/">Entry structure</a></div>
+					<%}%>
 					<div class="signpost"><a href="../../<%=dictID%>/config/titling/">Headwords</a></div>
 					<div class="signpost"><a href="../../<%=dictID%>/config/searchability/">Search</a></div>
 				</div>
 				<div class="signposts">
 					<div class="title">Publishing</div>
-					<div class="signpost"><a href="../../<%=dictID%>/config/xemplate/">Entry formatting</a></div>
+					<%if(hasXemplateOverride) {%>
+						<div class="signpost"><a href="../../<%=dictID%>/config/xemplate-override/">Entry formatting</a></div>
+					<%} else {%>
+						<div class="signpost"><a href="../../<%=dictID%>/config/xemplate/">Entry formatting</a></div>
+					<%}%>
 					<div class="signpost"><a href="../../<%=dictID%>/config/publico/">Public access</a></div>
 				</div>
 				<div class="signposts">

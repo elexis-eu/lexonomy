@@ -34,6 +34,11 @@
 		Screenful.Editor.editor=function(div, entry){
 			XemplateDesigner.start(xema, entry.content);
 			XemaDesigner.onchange=XemplateDesigner.onchange;
+			if(entry.content._xsl || entry.content._css) { //the user is switching back from own stylesheet
+				delete entry.content._xsl;
+				delete entry.content._css;
+				window.setTimeout(Screenful.Editor.changed, 100);
+			}
 		};
 		Screenful.Editor.harvester=function(div){
 			return JSON.stringify(XemplateDesigner.xemplate);
@@ -48,6 +53,9 @@
 		Screenful.Editor.cleanupSourceCode=function(str){
 			return JSON.parse(str);
 		};
+		Screenful.Editor.toolbarLinks=[
+			{image: "../../../furniture/cog.png", caption: "Use your own stylesheet...", href: "../../../<%=dictID%>/config/xemplate-override/"}
+		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
 	</head>

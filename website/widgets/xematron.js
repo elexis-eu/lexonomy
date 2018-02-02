@@ -135,7 +135,7 @@ Xematron.xema2docspec=function(xema){
 
 //takes a xema, returns an initial XML document (as string):
 Xematron.xema2xml= function(xema){
-	return Xematron.initialElement(xema, xema.root);
+	return xema.newXml || Xematron.initialElement(xema, xema.root);
 };
 
 //helper functions:

@@ -29,6 +29,11 @@
 		Screenful.Editor.editor=function(div, entry){
 			XemaDesigner.start(entry.content);
 			XemaDesigner.onchange=Screenful.Editor.changed;
+			if(entry.content._xonomyDocSpec) { //the user is switching back from own schema
+				delete entry.content._xonomyDocSpec;
+				delete entry.content._newXml;
+				window.setTimeout(Screenful.Editor.changed, 100);
+			}
 		};
 		Screenful.Editor.harvester=function(div){
 			for(var el in XemaDesigner.xema.elements){
@@ -48,6 +53,9 @@
 		Screenful.Editor.cleanupSourceCode=function(str){
 			return JSON.parse(str);
 		};
+		Screenful.Editor.toolbarLinks=[
+			{image: "../../../furniture/cog.png", caption: "Use your own schema...", href: "../../../<%=dictID%>/config/xema-override/"}
+		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
 	</head>

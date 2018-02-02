@@ -705,7 +705,7 @@ module.exports={
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
           module.exports.readDictConfigs(dictID, function(configs){
-            if(!configs.users[email] && configs.module.exports.siteconfig.admins.indexOf(email)==-1){
+            if(!configs.users[email] && module.exports.siteconfig.admins.indexOf(email)==-1){
               callnext({loggedin: true, email: email, dictAccess: false, isAdmin: false});
             } else {
               var canEdit=(configs.siteconfig.admins.indexOf(email)>-1 ? true : configs.users[email].canEdit);

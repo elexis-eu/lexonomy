@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<link rel="icon" type="image/x-icon" href="../../../furniture/favicon.ico"/>
+		<title><%=dictTitle%></title>
+		<script type="text/javascript" src="../../../libs/jquery.js"></script>
+		<script type="text/javascript" src="../../../libs/screenful/screenful.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
+		<script type="text/javascript" src="../../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../../libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-user.css" />
+		<script type="text/javascript">
+		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
+		Screenful.User.username="<%=user.email%>";
+		</script>
+		<script type="text/javascript">var rootPath="../../../";</script>
+		<script type="text/javascript" src="../../../furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-editor.css" />
+		<script type="text/javascript" src="../../../libs/screenful/screenful-editor.js"></script>
+		<script type="text/javascript" src="../../../widgets/xema-override.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../widgets/pillarform.css" />
+		<script type="text/javascript">
+		Screenful.Editor.singleton=true;
+		Screenful.Editor.entryID="xema";
+		Screenful.Editor.leaveUrl="../../../<%=dictID%>/config/";
+		Screenful.Editor.readUrl="../../../<%=dictID%>/configread.json";
+		Screenful.Editor.updateUrl="../../../<%=dictID%>/configupdate.json";
+		Screenful.Editor.editor=function(div, entry){
+			XemaOverride.change=Screenful.Editor.changed;
+			XemaOverride.render(div, entry.content);
+		};
+		Screenful.Editor.harvester=function(div){
+			return JSON.stringify(XemaOverride.harvest(div));
+		};
+		Screenful.Editor.allowSourceCode=false;
+		Screenful.Editor.toolbarLinks=[
+			{image: "../../../furniture/cancel.png", caption: "Stop using your own schema...", href: "../../../<%=dictID%>/config/xema/"}
+		];
+		</script>
+		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
+	</head>
+	<body>
+		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "config", configTitle: "Entry structure", configUrl: "xema-override", rootPath: "../../../"})%>
+	</body>
+</html>
