@@ -94,6 +94,7 @@ module.exports={
       var configs={};
       configs.siteconfig=JSON.parse(content);
       var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
+      db.configure("busyTimeout", 6000); //https://github.com/mapbox/node-sqlite3/issues/273
       db.all("select * from configs", {}, function(err, rows){
         for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
         db.close();
