@@ -8,6 +8,15 @@ const xmlsplit = require("xmlsplit"); //https://www.npmjs.com/package/xmlsplit
 
 module.exports={
   siteconfig: {}, //populated by lexonomy.js on startup
+  getDB: function(dictID, readonly){
+    var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE)
+    var db=new sqlite3.Database(
+      path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"),
+      mode,
+      function(){db.run('PRAGMA foreign_keys=on')}
+     );
+    return db;
+  },
 
   dictExists: function(dictID){
     return fs.existsSync(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"));
@@ -24,13 +33,13 @@ module.exports={
       callnext(false);
     } else {
       fs.copy("dictTemplates/"+template+".sqlite", path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), function(err){
-        var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READWRITE);
+        var db=module.exports.getDB(dictID);
         var users={}; users[email]={"canEdit": true, "canConfig": true, "canDownload": true, "canUpload": true};
         db.run("update configs set json=$json where id='users'", {$json: JSON.stringify(users, null, "\t")}, function(err){ if(err) console.log(err);
           var ident={"title": title, "blurb": blurb};
           db.run("update configs set json=$json where id='ident'", {$json: JSON.stringify(ident, null, "\t")}, function(err){ if(err) console.log(err);
-            db.close();
-            module.exports.attachDict(dictID, function(){
+            module.exports.attachDict(db, dictID, function(){
+              db.close();
               callnext(true);
             });
           });
@@ -46,15 +55,17 @@ module.exports={
         var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
         db.run("delete from dicts where id=$dictID", {$dictID: oldDictID}, function(err){ if(err) console.log(err);
           db.close();
-          module.exports.attachDict(newDictID, function(){
+          var dictDB=module.exports.getDB(newDictID);
+          module.exports.attachDict(dictDB, newDictID, function(){
+            dictDB.close();
             callnext(true);
           });
         });
       });
     }
   },
-  attachDict: function(dictID, callnext){
-    module.exports.readDictConfigs(dictID, function(configs){
+  attachDict: function(dictDB, dictID, callnext){
+    module.exports.readDictConfigs(dictDB, dictID, function(configs){
       var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
       db.run("delete from dicts where id=$dictID", {$dictID: dictID}, function(err){ if(err) console.log(err);
         var title=configs.ident.title;
@@ -89,37 +100,30 @@ module.exports={
       callnext(siteconfig);
     });
   },
-  readDictConfigs: function(dictID, callnext){
+  readDictConfigs: function(db, dictID, callnext){
     fs.readFile("siteconfig.json", "utf8", function(err, content){
       var configs={};
       configs.siteconfig=JSON.parse(content);
-      var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
-      db.configure("busyTimeout", 6000); //https://github.com/mapbox/node-sqlite3/issues/273
       db.all("select * from configs", {}, function(err, rows){
         for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
-        db.close();
         callnext(configs);
       });
     });
   },
-  readDictConfig: function(dictID, configID, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
+  readDictConfig: function(db, dictID, configID, callnext){
     db.get("select * from configs where id=$id", {$id: configID}, function(err, row){
       var config=JSON.parse(row.json);
-      db.close();
       callnext(config);
     });
   },
-  updateDictConfig: function(dictID, configID, json, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READWRITE);
+  updateDictConfig: function(db, dictID, configID, json, callnext){
     db.run("update configs set json=$json where id=$id", {$id: configID, $json: JSON.stringify(json, null, "\t")}, function(err){ if(err) console.log(err);
-      db.close();
       if(configID=="ident" || configID=="users"){
-        module.exports.attachDict(dictID, function(){
+        module.exports.attachDict(db, dictID, function(){
           callnext(json, false);
         });
       } else if(configID=="titling" || configID=="searchability"){
-        module.exports.flagForResave(dictID, function(resaveNeeded){
+        module.exports.flagForResave(db, dictID, function(resaveNeeded){
           callnext(json, resaveNeeded);
         });
       } else {
@@ -127,11 +131,9 @@ module.exports={
       }
     });
   },
-  readRandomOne: function(dictID, callnext){
+  readRandomOne: function(db, dictID, callnext){
     var sql_random="select id, title, xml from entries where id in (select id from entries order by random() limit 1)"
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
     db.get(sql_random, {}, function(err, row){
-      db.close();
       if(row){
         callnext({id: row.id, title: row.title, xml: row.xml});
       } else {
@@ -139,17 +141,14 @@ module.exports={
       }
     });
   },
-  flagForResave: function(dictID, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READWRITE);
+  flagForResave: function(db, dictID, callnext){
     db.run("update entries set needs_resave=1", {}, function(err){ if(err) console.log(err);
       var resaveNeeded=(this.changes>0);
-      db.close();
       callnext(resaveNeeded);
     });
   },
 
-  readEntry: function(dictID, entryID, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
+  readEntry: function(db, dictID, entryID, callnext){
     db.get("select * from entries where id=$id", {$id: entryID}, function(err, row){
       if(row) {
         var entryID=row.id;
@@ -160,12 +159,10 @@ module.exports={
         var xml="";
         var title="";
       }
-      db.close();
       callnext(entryID, xml, title);
     });
   },
-  deleteEntry: function(dictID, entryID, email, historiography, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+  deleteEntry: function(db, dictID, entryID, email, historiography, callnext){
     db.run("delete from entries where id=$id", {
       $id: entryID,
     }, function(err){
@@ -177,14 +174,12 @@ module.exports={
         $xml: null,
         $historiography: JSON.stringify(historiography),
       }, function(err){});
-      db.close();
       callnext();
     });
   },
-  createEntry: function(dictID, entryID, xml, email, historiography, callnext){
-    module.exports.readDictConfigs(dictID, function(configs){
+  createEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
+    module.exports.readDictConfigs(db, dictID, function(configs){
       var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
-      var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
       var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
       xml=(new xmldom.XMLSerializer()).serializeToString(doc);
       var sql="insert into entries(xml, title, sortkey) values($xml, $title, $sortkey)";
@@ -216,18 +211,16 @@ module.exports={
             $level: (searchables[i]==headword ? 1 : 2),
           }, function(err){ if(err) console.log(err); });
         }
-        db.close();
         callnext(this.lastID, xml);
       });
     })
   },
-  updateEntry: function(dictID, entryID, xml, email, historiography, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+  updateEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
     db.get("select id from entries where id=$id", {$id: entryID}, function(err, row){
       if(!row) { //an entry with that ID does not exist: recreate it with that ID:
-        module.exports.createEntry(dictID, entryID, xml, email, historiography, callnext);
+        module.exports.createEntry(db, dictID, entryID, xml, email, historiography, callnext);
       } else { //an entry with that ID exists: update it
-        module.exports.readDictConfigs(dictID, function(configs){
+        module.exports.readDictConfigs(db, dictID, function(configs){
           var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
           var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
           db.run("update entries set xml=$xml, title=$title, sortkey=$sortkey where id=$id", {
@@ -254,7 +247,6 @@ module.exports={
                   $level: (searchables[i]==headword ? 1 : 2),
                 });
               }
-              db.close();
               callnext(entryID, xml);
             });
           });
@@ -263,23 +255,20 @@ module.exports={
     });
   },
 
-  getDictStats: function(dictID, callnext){
+  getDictStats: function(db, dictID, callnext){
     var ret={entryCount: 0, needResave: 0};
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
     db.get("select count(*) as entryCount from entries", {}, function(err, row){
       if(row) ret.entryCount=row.entryCount;
       db.get("select count(*) as needResave from entries where needs_resave=1", {}, function(err, row){
         if(row) ret.needResave=row.needResave;
-        db.close();
         callnext(ret);
       });
     });
   },
-  resave: function(dictID, callnext){
-    module.exports.readDictConfigs(dictID, function(configs){
+  resave: function(db, dictID, callnext){
+    module.exports.readDictConfigs(db, dictID, function(configs){
       var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
       const domparser=new xmldom.DOMParser();
-      var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READWRITE);
       db.all("select id, xml from entries where needs_resave=1 limit 12", {}, function(err, rows){
         for(var i=0; i<rows.length; i++){
           var entryID=rows[i].id;
@@ -307,13 +296,11 @@ module.exports={
 
         }
       });
-      db.close(function(){
-        callnext();
-      });
+      callnext();
     });
   },
 
-  listEntries: function(dictID, searchtext, howmany, callnext){
+  listEntries: function(db, dictID, searchtext, howmany, callnext){
     var sql1=`select s.txt, min(s.level) as level, e.id, e.title
       from searchables as s
       inner join entries as e on e.id=s.entry_id
@@ -325,7 +312,6 @@ module.exports={
       from searchables as s
       where s.txt like $like`;
     var like="%"+searchtext+"%";
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
     db.all(sql1, {$howmany: howmany, $like: like}, function(err, rows){
       var entries=[];
       for(var i=0; i<rows.length; i++){
@@ -335,7 +321,6 @@ module.exports={
       }
       db.get(sql2, {$like: like}, function(err, row){
         var total=row.total;
-        db.close();
         callnext(total, entries);
       });
     });
@@ -416,7 +401,7 @@ module.exports={
     return ret;
   },
 
-  readNabesByEntryID: function(dictID, entryID, callnext){
+  readNabesByEntryID: function(db, dictID, entryID, callnext){
     var sql_before=`select e1.id, e1.title
       from entries as e1
       where e1.sortkey<=(select sortkey from entries where id=$id)
@@ -427,7 +412,6 @@ module.exports={
       where e1.sortkey>(select sortkey from entries where id=$id)
       order by e1.sortkey asc
       limit 15`;
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
     var nabes=[];
     db.all(sql_before, {$id: entryID}, function(err, rows){
       for(var i=0; i<rows.length; i++){
@@ -437,13 +421,12 @@ module.exports={
         for(var i=0; i<rows.length; i++){
           nabes.push({id: rows[i].id, title: rows[i].title});
         }
-        db.close();
         callnext(nabes);
       });
     });
   },
-  readNabesByText: function(dictID, text, callnext){
-    module.exports.readDictConfigs(dictID, function(configs){
+  readNabesByText: function(db, dictID, text, callnext){
+    module.exports.readDictConfigs(db, dictID, function(configs){
       var sql_before=`select e1.id, e1.title
         from entries as e1
         where e1.sortkey<=$sortkey
@@ -456,7 +439,6 @@ module.exports={
         limit 15`;
       var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
       var sortkey=module.exports.toSortkey(text, abc);
-      var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
       var nabes=[];
       db.all(sql_before, {$sortkey: sortkey}, function(err, rows){
         for(var i=0; i<rows.length; i++){
@@ -466,17 +448,15 @@ module.exports={
           for(var i=0; i<rows.length; i++){
             nabes.push({id: rows[i].id, title: rows[i].title});
           }
-          db.close();
           callnext(nabes);
         });
       });
     });
   },
-  readRandoms: function(dictID, callnext){
+  readRandoms: function(db, dictID, callnext){
     var limit=75;
     var sql_randoms="select id, title from entries where id in (select id from entries order by random() limit $limit) order by sortkey"
     var sql_total="select count(*) as total from entries";
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
     var randoms=[];
     var more=false;
     db.all(sql_randoms, {$limit: limit}, function(err, rows){
@@ -485,12 +465,11 @@ module.exports={
       }
       db.get(sql_total, {}, function(err, row){
         if(row.total>limit) more=true;
-        db.close();
         callnext(more, randoms);
       });
     });
   },
-  listEntriesPublic: function(dictID, searchtext, callnext){
+  listEntriesPublic: function(db, dictID, searchtext, callnext){
     var howmany=100;
     var sql_list=`select s.txt, min(s.level) as level, e.id, e.title,
       case when s.txt=$searchtext then 1 else 2 end as priority
@@ -501,7 +480,6 @@ module.exports={
       order by priority, level, e.sortkey, s.level
       limit $howmany`;
     var like="%"+searchtext+"%";
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
     db.all(sql_list, {$howmany: howmany, $like: like, $searchtext: searchtext}, function(err, rows){
       var entries=[];
       for(var i=0; i<rows.length; i++){
@@ -509,17 +487,14 @@ module.exports={
         if(rows[i].level>1) item.title="<span class='redirector'>"+rows[i].txt+"</span> → "+item.title;
         entries.push(item);
       }
-      db.close();
       callnext(entries);
     });
   },
-  exportEntryXml: function(baseUrl, dictID, entryID, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
+  exportEntryXml: function(baseUrl, db, dictID, entryID, callnext){
     db.get("select * from entries where id=$id", {$id: entryID}, function(err, row){
       if(!row) {
         var entryID=0;
         var xml="";
-        db.close();
         callnext(entryID, xml);
       } else {
         var entryID=row.id;
@@ -540,15 +515,13 @@ module.exports={
             db.get(sql_before, {$id: entryID}, function(err, row){
               if(row) attribs+=" previous=\""+baseUrl+dictID+"/"+row.id+".xml"+"\"";
               xml="<lexonomy"+attribs+">"+xml+"</lexonomy>";
-              db.close();
               callnext(entryID, xml);
             });
         });
       }
     });
   },
-  download: function(dictID, res){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
+  download: function(db, dictID, res){
     res.setHeader("content-type", "text/xml; charset=utf-8");
     res.setHeader("content-disposition", "attachment; filename="+dictID+".xml");
     res.write("<"+dictID+">\n");
@@ -558,11 +531,9 @@ module.exports={
     }, function(err, rowCount){
       res.write("</"+dictID+">\n");
       res.end();
-      db.close();
     });
   },
-  purge: function(dictID, email, historiography, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+  purge: function(db, dictID, email, historiography, callnext){
     db.run("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', $when, $email, xml, $historiography from entries", {
       $when: (new Date()).toISOString(),
       $email: email,
@@ -573,7 +544,7 @@ module.exports={
       });
     });
   },
-  import: function(dictID, filepath, offset, email, historiography, callnext){
+  import: function(db, dictID, filepath, offset, email, historiography, callnext){
     var regexOpeningTag=new RegExp("\<[^\!\?\>\<][^\>\<]*\>");
     var readStream=fs.createReadStream(filepath).setEncoding("utf8");
     var tempFilePath=filepath+"_temp";
@@ -616,18 +587,17 @@ module.exports={
                 //console.log(xml.substring(0, 10)+"..."+xml.substring(xml.length-10));
                 if(entryID) {
                   //console.log("about to update entry");
-                  module.exports.updateEntry(dictID, entryID, xml, email, historiography, function(){
+                  module.exports.updateEntry(db, dictID, entryID, xml, email, historiography, function(){
                     //console.log("entry updated");
                     callnext(offset, success, finished);
                   });
                 } else {
                   //console.log("about to create entry");
-                  module.exports.createEntry(dictID, null, xml, email, historiography, function(){
+                  module.exports.createEntry(db, dictID, null, xml, email, historiography, function(){
                     //console.log("entry created");
                     callnext(offset, success, finished);
                   });
                 }
-
                 break;
               }
             }
@@ -693,7 +663,7 @@ module.exports={
       }
     });
   },
-  verifyLoginAndDictAccess: function(email, sessionkey, dictID, callnext){
+  verifyLoginAndDictAccess: function(email, sessionkey, dictDB, dictID, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
@@ -705,7 +675,7 @@ module.exports={
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
-          module.exports.readDictConfigs(dictID, function(configs){
+          module.exports.readDictConfigs(dictDB, dictID, function(configs){
             if(!configs.users[email] && module.exports.siteconfig.admins.indexOf(email)==-1){
               callnext({loggedin: true, email: email, dictAccess: false, isAdmin: false});
             } else {
@@ -902,8 +872,7 @@ module.exports={
     });
   },
 
-  readDictHistory: function(dictID, entryID, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), sqlite3.OPEN_READONLY);
+  readDictHistory: function(db, dictID, entryID, callnext){
     db.all("select * from history where entry_id=$entryID order by [when] desc", {$entryID: entryID}, function(err, rows){
       var history=[];
       for(var i=0; i<rows.length; i++) {
@@ -918,7 +887,6 @@ module.exports={
           "historiography": JSON.parse(row.historiography)
         });
       }
-      db.close();
       callnext(history);
     });
   },
