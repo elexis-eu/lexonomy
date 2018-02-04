@@ -14,6 +14,7 @@ Screenful.User={
     }
     $(".ScreenfulUser .clickable").on("click", function(e){
       $(e.delegateTarget).closest(".ScreenfulUser").find(".menu").hide().slideDown();
+      $("#navbox .lineModifiers .menu").slideUp();
       e.stopPropagation();
     });
     $(document).on("click", function(e){

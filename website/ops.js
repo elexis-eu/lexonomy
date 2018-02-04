@@ -300,26 +300,55 @@ module.exports={
     });
   },
 
-  listEntries: function(db, dictID, searchtext, howmany, callnext){
-    var sql1=`select s.txt, min(s.level) as level, e.id, e.title
-      from searchables as s
-      inner join entries as e on e.id=s.entry_id
-      where s.txt like $like
-      group by e.id
-      order by e.sortkey, s.level
-      limit $howmany`;
-    var sql2=`select count(distinct s.entry_id) as total
-      from searchables as s
-      where s.txt like $like`;
-    var like="%"+searchtext+"%";
-    db.all(sql1, {$howmany: howmany, $like: like}, function(err, rows){
+  listEntries: function(db, dictID, searchtext, modifier, howmany, callnext){
+    if(modifier=="start") {
+      var sql1=`select s.txt, min(s.level) as level, e.id, e.title
+        from searchables as s
+        inner join entries as e on e.id=s.entry_id
+        where s.txt like $like
+        group by e.id
+        order by e.sortkey, s.level
+        limit $howmany`;
+      var params1={$howmany: howmany, $like: searchtext+"%"};
+      var sql2=`select count(distinct s.entry_id) as total
+        from searchables as s
+        where s.txt like $like`;
+      var params2={$like: searchtext+"%"};
+    } else if(modifier=="wordstart"){
+      var sql1=`select s.txt, min(s.level) as level, e.id, e.title
+        from searchables as s
+        inner join entries as e on e.id=s.entry_id
+        where s.txt like $like1 or s.txt like $like2
+        group by e.id
+        order by e.sortkey, s.level
+        limit $howmany`;
+      var params1={$howmany: howmany, $like1: searchtext+"%", $like2: "% "+searchtext+"%"};
+      var sql2=`select count(distinct s.entry_id) as total
+        from searchables as s
+        where s.txt like $like1 or s.txt like $like2`;
+      var params2={$like1: searchtext+"%", $like2: "% "+searchtext+"%"};
+    } else if(modifier=="substring"){
+      var sql1=`select s.txt, min(s.level) as level, e.id, e.title
+        from searchables as s
+        inner join entries as e on e.id=s.entry_id
+        where s.txt like $like
+        group by e.id
+        order by e.sortkey, s.level
+        limit $howmany`;
+      var params1={$howmany: howmany, $like: "%"+searchtext+"%"};
+      var sql2=`select count(distinct s.entry_id) as total
+        from searchables as s
+        where s.txt like $like`;
+      var params2={$like: "%"+searchtext+"%"};
+    }
+    db.all(sql1, params1, function(err, rows){
       var entries=[];
       for(var i=0; i<rows.length; i++){
         var item={id: rows[i].id, title: rows[i].title};
-        if(rows[i].level>1) item.title="<span class='redirector'>"+rows[i].txt+"</span> → "+item.title;
+        if(rows[i].level>1) item.title+=" ← <span class='redirector'>"+rows[i].txt+"</span>";
         entries.push(item);
       }
-      db.get(sql2, {$like: like}, function(err, row){
+      db.get(sql2, params2, function(err, row){
         var total=row.total;
         callnext(total, entries);
       });
@@ -484,7 +513,7 @@ module.exports={
       var entries=[];
       for(var i=0; i<rows.length; i++){
         var item={id: rows[i].id, title: rows[i].title, exactMatch: (rows[i].level==1 && rows[i].priority==1)};
-        if(rows[i].level>1) item.title="<span class='redirector'>"+rows[i].txt+"</span> → "+item.title;
+        if(rows[i].level>1) item.title+=" ← <span class='redirector'>"+rows[i].txt+"</span>";
         entries.push(item);
       }
       callnext(entries);

@@ -16,21 +16,35 @@
 		</script>
 		<script type="text/javascript">var rootPath="../../";</script>
 		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-navigator.css" />
-		<script type="text/javascript" src="../../libs/screenful/screenful-navigator.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-navigator.css?2018-02-04" />
+		<script type="text/javascript" src="../../libs/screenful/screenful-navigator.js?2018-02-04"></script>
 		<script type="text/javascript">
 		Screenful.Navigator.listUrl="../../<%=dictID%>/entrylist.json";
 		Screenful.Navigator.stepSize=1000;
 		Screenful.Navigator.editorUrl="../../<%=dictID%>/entryeditor/";
-		Screenful.Navigator.renderer=function(div, entry, searchtext){
+		Screenful.Navigator.modifiers=[
+			{value: "start", caption: "starts like this"},
+			{value: "wordstart", caption: "contains a word that starts like this"},
+			{value: "substring", caption: "contains this sequence of characters"},
+		];
+		Screenful.Navigator.renderer=function(div, entry, searchtext, modifier){
 			var $xml=$($.parseXML(entry.content));
 			var text=entry.title;
-			var regexp=new RegExp(searchtext, "gi");
 			if(searchtext!=""){
 				$text=$("<span>"+text+"</span>");
 				$text.find("span.headword, span.redirector").each(function(){
 					var $this=$(this);
-					$this.html($this.html().replace(regexp, function(match){ return "<span class='searchtext'>"+match+"</span>"; }));
+					if(modifier=="start") {
+						var regexp=new RegExp("^"+searchtext, "gi");
+						$this.html($this.html().replace(regexp, function(match){ return "<span class='searchtext'>"+match+"</span>"; }));
+					} else if(modifier=="wordstart") {
+						var regexp=new RegExp("(^| )("+searchtext+")", "gi");
+						$this.html($this.html().replace(regexp, function(match, $1, $2){ return $1+"<span class='searchtext'>"+$2+"</span>"; }));
+					} else if(modifier=="substring") {
+						var regexp=new RegExp(searchtext, "gi");
+						$this.html($this.html().replace(regexp, function(match){ return "<span class='searchtext'>"+match+"</span>"; }));
+					}
+
 				});
 				text=$text.html();
 			}

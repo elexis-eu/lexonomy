@@ -456,7 +456,7 @@ app.post(siteconfig.rootPath+":dictID/entrylist.json", function(req, res){ //con
       db.close();
       res.json({success: false});
     } else {
-      ops.listEntries(db, req.params.dictID, req.body.searchtext, req.body.howmany, function(total, entries){
+      ops.listEntries(db, req.params.dictID, req.body.searchtext, req.body.modifier, req.body.howmany, function(total, entries){
         db.close();
         res.json({success: true, total: total, entries: entries});
       });

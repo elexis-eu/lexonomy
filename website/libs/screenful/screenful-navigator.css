@@ -1,10 +1,12 @@
 #navbox { position: absolute; top: 0px; left: 0px; width: 30%; height: 100px; box-shadow: -2px 2px 2px #999999; z-index: 5; }
 #listbox { position: absolute; top: 100px; left: 0px; width: 30%; bottom: 0px; overflow-y: scroll; overflow-x: hidden; padding-top: 10px; }
+#navbox.hasSearchModifiers {height: 125px;}
+#listbox.hasSearchModifiers {top: 125px;}
 #editbox { position: absolute; top: 1px; left: 30%; right: 0px; bottom: 0px; border-left: 1px solid #1e6bcf; }
 #editbox iframe { width: 100%; height: 100%; border: 0px; }
 #critbox { position: absolute; top: 70px; left: 15px; bottom: 30px; max-height: 600px; width: 60%; background-color: #ffffff; box-shadow: 0px 0px 5px #666666; border-radius: 4px; z-index: 10;}
 
-input#searchbox {font: inherit; border: 1px inset #cccccc; cursor: inline; border-radius: 4px; background-color: #ffffff; color: #333333; padding: 6px 35px 6px 10px; margin: 10px 5px 10px 5px; min-height: 1.3em; display: inline-block; width: 30%; vertical-align: middle;}
+input#searchbox {font: inherit; border: 1px inset #cccccc; cursor: inline; border-radius: 4px; background-color: #ffffff; color: #333333; padding: 6px 35px 6px 10px; margin: 10px 5px 10px 5px; min-height: 1.3em; display: inline-block; width: 40%; vertical-align: middle;}
 
 button#butCritOpen {background-image: url(find.png);}
 button#butCritOpen.on { background-color: rgb(198, 231, 255); }
@@ -14,11 +16,26 @@ button#butCritCancel {background-image: url(arrow_left.png);}
 button#butCritGo {background-image: url(find.png);}
 button.iconOnly#butSearch {background-image: url(magnifier.png);}
 
-
-#navbox .line1 { padding-left: 10px; border-bottom: 1px solid #eeeeee; overflow-x: hidden; white-space: nowrap;}
+#navbox .line1 { padding-left: 10px; overflow-x: hidden; white-space: nowrap; border-bottom: 1px solid #eeeeee;}
+#navbox.hasSearchModifiers .line1 {border-bottom: 0px;}
+#navbox .lineModifiers { display: none; padding-left: 15px; border-bottom: 1px solid #eeeeee; overflow-x: hidden; white-space: nowrap; padding-bottom: 5px; margin-top: -5px; font-size: 0.9em;}
+#navbox .lineModifiers.hasCrits {padding-left: 62px;}
+#navbox.hasSearchModifiers .lineModifiers {display: block;}
 #navbox .line2 { padding-left: 10px; margin: 0px 0px 0px 0px; overflow-x: hidden; white-space: nowrap; }
 #navbox .line2 button {padding-top: 0px; padding-bottom: 0px;}
 #navbox #countcaption {color: #666666; padding: 14px 20px 0px 10px; float: right;}
+
+#navbox .lineModifiers span.clickable { color: #999999; cursor: pointer;}
+#navbox .lineModifiers span.clickable:hover {color: #09587e; }
+#navbox .lineModifiers span.clickable span.arrow {color: #999999; font-size: 85%; position: relative; top: -2px; margin-left: 5px; }
+#navbox .lineModifiers span.clickable:hover span.arrow {color: #09587e; }
+
+#navbox .lineModifiers div.menu {border: 1px solid rgb(38, 122, 181); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; left: 10px; margin-top: 5px; z-index: 1; white-space: nowrap;}
+#navbox .lineModifiers.hasCrits div.menu {left: 55px;}
+#navbox .lineModifiers div.menu a {display: block; padding: 10px 20px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
+#navbox .lineModifiers div.menu a:first-child {border-top-left-radius: 4px; border-top-right-radius: 4px; border-top: 0px;}
+#navbox .lineModifiers div.menu a:last-child {border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;}
+#navbox .lineModifiers div.menu a:hover {background-color: #f7f9ea; }
 
 #critbox #editor { position: absolute; top: 15px; left: 15px; right: 10px; bottom: 4em; overflow-y: scroll; overflow-x: hidden; padding-right: 20px;}
 #critbox .buttons { position: absolute; left: 15px; right: 10px; bottom: 0px; text-align: right; }

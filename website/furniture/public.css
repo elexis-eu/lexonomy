@@ -84,7 +84,7 @@ body.entrypage #dictheader div.titleContainer span.dictTitle a.dictTitle {font-s
 #crossroads > div > a span.headword {color: #000000; font-weight: bold;}
 #crossroads > div > a:hover {background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff;}
 #crossroads > div > a:hover span.headword {color: rgb(0, 76, 131);}
-#crossroads > div > a span.searchtext { background-color: #ffecb3; text-shadow: 0px 0px 0px transparent; border: 1px solid #ffffff; margin: 0px -1px; box-shadow: 0px 0px 2px #333333; }
+#crossroads > div > a span.searchtext { background-color: #ffecb3; text-shadow: 0px 0px 0px transparent; }
 #crossroads > div > a span.bullet {background-color: #4c9ed9; color: #ffffff; border-radius: 20px; padding: 5px 10px; margin-right: 10px;}
 #crossroads > div > a:hover span.bullet {box-shadow: 0px 0px 2px #999999;  text-shadow: 0px 0px 0px transparent;}
 
