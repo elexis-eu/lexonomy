@@ -58,4 +58,5 @@ Screenful.Loc={
   clone: "Klonovat",
   sourceCode: "Zdrojový kód",
   invalidSourceCode: "Neplatný zdrojový kód",
+  unsavedConfirm: "Más neuložené změny. Opravdu o ně chceš přijít?",
 };
