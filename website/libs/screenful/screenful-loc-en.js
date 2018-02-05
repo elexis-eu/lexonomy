@@ -58,5 +58,5 @@ Screenful.Loc={
   clone: "Clone",
   sourceCode: "Source code",
   invalidSourceCode: "Invalid source code",
-  unsavedConfirm: "You have unsaved changes. Are you sure want to lose them?",
+  unsavedConfirm: "You have unsaved changes. Are you sure you want to lose them?",
 };
