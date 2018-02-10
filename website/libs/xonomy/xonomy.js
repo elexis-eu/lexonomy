@@ -443,9 +443,8 @@ Xonomy.render=function(data, editor, docSpec) { //renders the contents of an edi
 	$(editor).show();
 
 	if(docSpec.allowLayby){
-		var laybyHtml="<div class='layby closed empty' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)''>";
-		laybyHtml+="<span class='button opener' onclick='Xonomy.openLayby()'>&nbsp;</span>";
-		laybyHtml+="<span class='button closer' onclick='Xonomy.closeLayby()'>&nbsp;</span>";
+		var laybyHtml="<div class='layby closed empty' onclick='if($(this).hasClass(\"closed\")) Xonomy.openLayby()' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)''>";
+		laybyHtml+="<span class='button closer' onclick='Xonomy.closeLayby();'>&nbsp;</span>";
 		laybyHtml+="<span class='button purger' onclick='Xonomy.emptyLayby()'>&nbsp;</span>";
 		laybyHtml+="<div class='content'></div>";
 		laybyHtml+="<div class='message'>"+docSpec.laybyMessage+"</div>";
@@ -1400,7 +1399,9 @@ Xonomy.openLayby=function(){
 	$(".xonomy .layby").removeClass("closed").addClass("open");
 };
 Xonomy.closeLayby=function(){
-	$(".xonomy .layby").removeClass("open").addClass("closed");
+	window.setTimeout(function(){
+		$(".xonomy .layby").removeClass("open").addClass("closed");
+	}, 10);
 };
 Xonomy.emptyLayby=function(){
 	$(".xonomy .layby .content").html("");

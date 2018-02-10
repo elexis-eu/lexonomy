@@ -430,23 +430,21 @@
 .xonomy.laic div.modeSwitcher span.laic {background-color: #fbeb93; }
 
 .xonomy div.layby { position: fixed; bottom: 0px; top: 0px; right: 0px; padding: 10px 10px 0px 10px; background-color: #fffef4; z-index: 12; border-left: 2px solid #cccccc; z-index: 9}
-.xonomy div.layby.closed { width: 30px; }
+.xonomy div.layby.closed { width: 0px; padding: 5px 10px 0px 5px; cursor: pointer; }
+.xonomy div.layby.closed:hover {background-color: #f9f6dc;}
 .xonomy div.layby span.button {display: inline-block; width: 30px; height: 30px; background-position: center center; background-repeat: no-repeat; background-color: #ffffff; border: 1px solid #cccccc; cursor: pointer;}
-.xonomy div.layby span.button:hover {box-shadow: 0px 0px 1px #666666;}
-.xonomy div.layby span.opener {background-image: url(bullet_arrow_up.png);}
+.xonomy div.layby span.button:hover {box-shadow: 0px 0px 1px #333333;}
 .xonomy div.layby span.closer {background-image: url(bullet_arrow_down.png);}
 .xonomy div.layby span.purger {background-image: url(bin_closed.png); float: right;}
-.xonomy div.layby.closed span.opener { display: inline-block; }
 .xonomy div.layby.closed span.closer { display: none; }
 .xonomy div.layby.closed span.purger { display: none; }
 .xonomy div.layby.closed div.content { display: none; }
 .xonomy div.layby.open { width: 30%; }
-.xonomy div.layby.open span.opener { display: none; }
 .xonomy div.layby.open span.closer { display: inline-block; }
 .xonomy div.layby.open div.content { display: block; }
 .xonomy div.layby.empty span.purger { display: none; }
 .xonomy div.layby.nonempty.open span.purger { display: inline-block; }
-.xonomy div.layby div.message { display: none; position: absolute; top: 50px; left: 10px; right: 10px; bottom: 0px; overflow: hidden; font-family: sans-serif; font-size: 1.25rem; line-height: 1.5em; text-align: center; padding-top: 100px; color: #cccccc;}
+.xonomy div.layby div.message { display: none; position: absolute; top: 40px; left: 20px; right: 20px; bottom: 0px; overflow: hidden; font-family: sans-serif; font-size: 1.25rem; line-height: 1.5em; text-align: center; padding-top: 100px; color: #cccccc;}
 .xonomy div.layby.empty.open div.message { display: block; }
 .xonomy div.layby.activeDropper {background-color: #f9f6dc;}
 .xonomy div.layby > div.content { position: absolute; top: 50px; left: 10px; right: 10px; bottom: 0px; overflow-x: hidden; overflow-y: auto;}

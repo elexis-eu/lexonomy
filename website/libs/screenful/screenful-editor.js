@@ -158,6 +158,7 @@ Screenful.Editor={
   },
   new: function(event, content){
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
+      $("#container").css("right", ""); //remove room for xonomy layby
       Screenful.Editor.needsSaving=false;
       Screenful.Editor.hideHistory();
       id=$("#idbox").val("");
@@ -165,6 +166,7 @@ Screenful.Editor={
       $("#container").removeClass("empty").removeClass("withHistory").removeClass("withSourceCode").html("<div id='editor'></div>");
       var fakeentry=null; if(content) fakeentry={id: null, content: content};
       Screenful.Editor.editor(document.getElementById("editor"), fakeentry);
+      if("#container #editor .xonomy .layby") $("#container").remove(".withHistory").css("right", "15px"); //make room for xonomy layby
       $("#container").hide().fadeIn();
       Screenful.status(Screenful.Loc.ready);
       Screenful.Editor.updateToolbar();
@@ -173,6 +175,7 @@ Screenful.Editor={
   },
   edit: function(event, id){
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
+      $("#container").css("right", ""); //remove room for xonomy layby
       Screenful.Editor.needsSaving=false;
       Screenful.Editor.hideHistory();
       if(!id) id=Screenful.Editor.entryID;
@@ -192,6 +195,9 @@ Screenful.Editor={
             $("#container").removeClass("empty").html("<div id='editor'></div>");
             Screenful.Editor.editor(document.getElementById("editor"), data);
             $("#container").hide().fadeIn();
+            if($("#container .xonomy .layby").length>0) {
+              $("#container").css("right", "15px"); //make room for xonomy layby
+            }
             Screenful.status(Screenful.Loc.ready);
             Screenful.Editor.updateToolbar();
             if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.setEntryAsCurrent(data.id);
@@ -202,6 +208,7 @@ Screenful.Editor={
   },
   view: function(event, id){
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
+      $("#container").css("right", ""); //remove room for xonomy layby
       Screenful.Editor.needsSaving=false;
       Screenful.Editor.hideHistory();
     	if(!Screenful.Editor.viewer) Screenful.Editor.edit(event, id);
@@ -348,6 +355,7 @@ Screenful.Editor={
   },
   history: function(){
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
+      $("#container").css("right", ""); //remove room for xonomy layby
       Screenful.Editor.needsSaving=false;
       if($("#container").hasClass("withHistory")) {
         Screenful.Editor.hideHistory();
@@ -358,6 +366,7 @@ Screenful.Editor={
         $("#container").html("").removeClass("withSourceCode").addClass("withHistory");
         $("#history").show();
         Screenful.Editor.updateToolbar();
+        $("#container .xonomy .layby").remove();
         window.frames["historyframe"].Screenful.History.go(id);
       }
     }
