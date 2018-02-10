@@ -225,17 +225,17 @@
 .xonomy.laic .element > .children > .textnode > .value { display: inline-block; font-family: monospace; background-color: #ffffff; padding: 4px 0px; border-bottom: 1px solid #999999; cursor: pointer; min-width: 2em; }
 .xonomy.laic .element.oneliner > .children > .textnode > .value { text-align: center; }
 .xonomy.laic .element > .tag.closing { display: none; }
-.xonomy.laic .element > .tag { display: block; padding: 5px 10px; background-color: #eeeeee; box-shadow: 0px 0px 2px #999999; z-index: 9; }
-.xonomy.laic .element > .tag > .name {font-weight: bold; color: #315696; cursor: pointer; }
-.xonomy.laic .element > .tag.opening > .attributes > .attribute { margin-left: 0.75em; border-left: 1px solid #cccccc; padding-left: 0.75em; padding-top: 5px; padding-bottom: 5px; }
+.xonomy.laic .element > .tag { display: block; padding: 5px 10px; background-color: #eeeeee; box-shadow: 0px 0px 2px #999999; z-index: 9;}
+.xonomy.laic .element > .tag > .name {font-weight: bold; color: #315696; cursor: pointer;}
+.xonomy.laic .element > .tag.opening > .attributes > .attribute { margin-left: 0.75em; border-left: 1px solid #cccccc; padding-left: 0.75em; display: inline-block; }
 .xonomy.laic .element > .tag.opening > .attributes > .attribute > .name { font-weight: bold; color: #6385bf; cursor: pointer; }
 .xonomy.laic .element > .tag.opening > .attributes > .attribute > .valueContainer { display: inline; padding: 2px 5px; border-bottom: 1px solid #999999; margin-left: 10px; font-family: monospace; font-size: 0.85rem; cursor: pointer; }
 .xonomy.laic .element > .children > .textnode > .value > .insertionPoint { display: none; }
 .xonomy.laic .element > .children > .textnode > .value > .dots { display: none; }
 
 /*oneliner*/
-.xonomy.laic .element.oneliner {padding: 5px 0px 0px 0px; white-space: nowrap; }
-.xonomy.laic .element.oneliner > .tag.opening { display: inline-block; min-width: 25%; margin-right: 1em; padding: 5px 10px; }
+.xonomy.laic .element.oneliner {padding: 5px 0px 0px 0px; }
+.xonomy.laic .element.oneliner > .tag.opening { display: inline-block; min-width: 25%; margin-right: 1em; padding: 2px 10px; line-height: 2em;}
 .xonomy.laic .element.oneliner > .children { display: inline-block; padding: 0px; margin: 0px; }
 .xonomy.laic .element.oneliner > .children > .textnode { display: inline-block; }
 .xonomy.laic .element.oneliner > .children > .textnode > .value { display: inline-block; }
