@@ -225,7 +225,7 @@
 .xonomy.laic .element > .children > .textnode > .value { display: inline-block; font-family: monospace; background-color: #ffffff; padding: 4px 0px; border-bottom: 1px solid #999999; cursor: pointer; min-width: 2em; }
 .xonomy.laic .element.oneliner > .children > .textnode > .value { text-align: center; }
 .xonomy.laic .element > .tag.closing { display: none; }
-.xonomy.laic .element > .tag { display: block; padding: 5px 10px; background-color: #eeeeee; box-shadow: 0px 0px 2px #999999; z-index: 10; }
+.xonomy.laic .element > .tag { display: block; padding: 5px 10px; background-color: #eeeeee; box-shadow: 0px 0px 2px #999999; z-index: 9; }
 .xonomy.laic .element > .tag > .name {font-weight: bold; color: #315696; cursor: pointer; }
 .xonomy.laic .element > .tag.opening > .attributes > .attribute { margin-left: 0.75em; border-left: 1px solid #cccccc; padding-left: 0.75em; padding-top: 5px; padding-bottom: 5px; }
 .xonomy.laic .element > .tag.opening > .attributes > .attribute > .name { font-weight: bold; color: #6385bf; cursor: pointer; }
@@ -255,7 +255,7 @@
 .xonomy.laic .element.hasText .element.oneliner.collapsed > .tag { display: none; }
 
 /*The "collapsoid" (= rectangle that hides collapsed stuff)*/
-.xonomy.laic .element > .childrenCollapsed { display: none; border: 1px solid #cccccc; color: #999999; padding: 1px 5px; cursor: pointer; font-family: monospace; background-color: #ffffff; font-size: 0.85rem; z-index: 11; }
+.xonomy.laic .element > .childrenCollapsed { display: none; border: 1px solid #cccccc; color: #999999; padding: 1px 5px; cursor: pointer; font-family: monospace; background-color: #ffffff; font-size: 0.85rem; z-index: 9; }
 .xonomy.laic .element.collapsed > .childrenCollapsed { display: block; position: absolute; top: 8px; right: 3px; }
 .xonomy.laic .element.collapsed > .childrenCollapsed:hover { background-color: #f4f4f4; }
 
@@ -428,3 +428,30 @@
 .xonomy div.modeSwitcher:hover {box-shadow: 0px 0px 1px #999999; }
 .xonomy.nerd div.modeSwitcher span.nerd {background-color: #fbeb93; }
 .xonomy.laic div.modeSwitcher span.laic {background-color: #fbeb93; }
+
+.xonomy div.layby { position: fixed; bottom: 0px; top: 0px; right: 0px; padding: 10px 10px 0px 10px; background-color: #fffef4; z-index: 12; border-left: 2px solid #cccccc; z-index: 9}
+.xonomy div.layby.closed { width: 30px; }
+.xonomy div.layby span.button {display: inline-block; width: 30px; height: 30px; background-position: center center; background-repeat: no-repeat; background-color: #ffffff; border: 1px solid #cccccc; cursor: pointer;}
+.xonomy div.layby span.button:hover {box-shadow: 0px 0px 1px #666666;}
+.xonomy div.layby span.opener {background-image: url(bullet_arrow_up.png);}
+.xonomy div.layby span.closer {background-image: url(bullet_arrow_down.png);}
+.xonomy div.layby span.purger {background-image: url(bin_closed.png); float: right;}
+.xonomy div.layby.closed span.opener { display: inline-block; }
+.xonomy div.layby.closed span.closer { display: none; }
+.xonomy div.layby.closed span.purger { display: none; }
+.xonomy div.layby.closed div.content { display: none; }
+.xonomy div.layby.open { width: 30%; }
+.xonomy div.layby.open span.opener { display: none; }
+.xonomy div.layby.open span.closer { display: inline-block; }
+.xonomy div.layby.open div.content { display: block; }
+.xonomy div.layby.empty span.purger { display: none; }
+.xonomy div.layby.nonempty.open span.purger { display: inline-block; }
+.xonomy div.layby div.message { display: none; position: absolute; top: 50px; left: 10px; right: 10px; bottom: 0px; overflow: hidden; font-family: sans-serif; font-size: 1.25rem; line-height: 1.5em; text-align: center; padding-top: 100px; color: #cccccc;}
+.xonomy div.layby.empty.open div.message { display: block; }
+.xonomy div.layby.activeDropper {background-color: #f9f6dc;}
+.xonomy div.layby > div.content { position: absolute; top: 50px; left: 10px; right: 10px; bottom: 0px; overflow-x: hidden; overflow-y: auto;}
+.xonomy.laic div.layby > div.content { padding-right: 1px; }
+.xonomy.nerd div.layby > div.content > .element {margin-left: 10px;}
+.xonomy.laic div.layby > div.content > .element {margin-left: 35px;}
+.xonomy.laic div.layby > div.content .children {background-color: transparent !important;}
+.xonomy.laic div.layby > div.content .textnode > .value {background-color: transparent !important;}

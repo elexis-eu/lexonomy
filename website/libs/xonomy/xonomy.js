@@ -441,6 +441,18 @@ Xonomy.render=function(data, editor, docSpec) { //renders the contents of an edi
 	$(editor).hide();
 	editor.innerHTML=Xonomy.renderElement(data, editor);
 	$(editor).show();
+
+	if(docSpec.allowLayby){
+		var laybyHtml="<div class='layby closed empty' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)''>";
+		laybyHtml+="<span class='button opener' onclick='Xonomy.openLayby()'>&nbsp;</span>";
+		laybyHtml+="<span class='button closer' onclick='Xonomy.closeLayby()'>&nbsp;</span>";
+		laybyHtml+="<span class='button purger' onclick='Xonomy.emptyLayby()'>&nbsp;</span>";
+		laybyHtml+="<div class='content'></div>";
+		laybyHtml+="<div class='message'>"+docSpec.laybyMessage+"</div>";
+		laybyHtml+="</div>";
+		$(laybyHtml).appendTo($(editor));
+	}
+
 	if(docSpec.allowModeSwitching){
 		$("<div class='modeSwitcher'><span class='nerd'></span><span class='laic'></span></div>").appendTo($(editor)).on("click", function(e){
 			if(Xonomy.mode=="nerd") { Xonomy.setMode("laic"); } else { Xonomy.setMode("nerd"); }
@@ -1340,27 +1352,67 @@ Xonomy.drag=function(ev) { //called when dragging starts
 };
 Xonomy.dragOver=function(ev) {
 	ev.preventDefault();
-	$(ev.target.parentNode).addClass("activeDropper");
+	if($(ev.currentTarget).hasClass("layby")){
+		$(ev.currentTarget).addClass("activeDropper");
+	} else {
+		$(ev.target.parentNode).addClass("activeDropper");
+	}
 };
 Xonomy.dragOut=function(ev) {
 	ev.preventDefault();
-	$(".xonomy .activeDropper").removeClass("activeDropper");
+	if($(ev.currentTarget).hasClass("layby")){
+		$(ev.currentTarget).removeClass("activeDropper");
+	} else {
+		$(".xonomy .activeDropper").removeClass("activeDropper");
+	}
 };
 Xonomy.drop=function(ev) {
 	ev.preventDefault();
 	var node=document.getElementById(Xonomy.draggingID); //the thing we are moving
 	$(node).hide();
-	$(ev.target.parentNode).replaceWith(node);
+	if($(ev.currentTarget).hasClass("layby")) {
+		$(".xonomy .layby > .content").append(node);
+	} else {
+		$(ev.target.parentNode).replaceWith(node);
+	}
 	$(node).fadeIn(function(){
 		Xonomy.changed();
 	});
+	Xonomy.openCloseLayby();
+	Xonomy.recomputeLayby();
 };
 Xonomy.dragend=function(ev) {
 	$(".xonomy .attributeDropper").remove();
 	$(".xonomy .elementDropper").remove();
 	$(".xonomy .dragging").removeClass("dragging");
 	Xonomy.refresh();
+	$(".xonomy .layby").removeClass("activeDropper");
 };
+
+Xonomy.openCloseLayby=function(){ //open the layby if it's full, close it if it's empty
+	if($(".xonomy .layby > .content > *").length>0){
+		$(".xonomy .layby").removeClass("closed").addClass("open");
+	} else {
+		$(".xonomy .layby").removeClass("open").addClass("closed");
+	}
+};
+Xonomy.openLayby=function(){
+	$(".xonomy .layby").removeClass("closed").addClass("open");
+};
+Xonomy.closeLayby=function(){
+	$(".xonomy .layby").removeClass("open").addClass("closed");
+};
+Xonomy.emptyLayby=function(){
+	$(".xonomy .layby .content").html("");
+	$(".xonomy .layby").removeClass("nonempty").addClass("empty");
+};
+Xonomy.recomputeLayby=function(){
+	if($(".xonomy .layby > .content > *").length>0){
+		$(".xonomy .layby").removeClass("empty").addClass("nonempty");
+	} else {
+		$(".xonomy .layby").removeClass("nonempty").addClass("empty");
+	}
+}
 
 Xonomy.changed=function(jsElement) { //called when the document changes
 	Xonomy.refresh();
