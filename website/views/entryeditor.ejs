@@ -59,9 +59,11 @@
 				var newXml=Xematron.xema2xml(xema);
 			<%}%>
 			docSpec.allowModeSwitching=true;
-			docSpec.onModeSwitch=function(mode){
-				Cookies.set("xonomyMode", mode);
-			};
+			docSpec.onModeSwitch=function(mode){ Cookies.set("xonomyMode", mode); };
+			if(!uneditable) {
+				docSpec.allowLayby=true;
+				docSpec.laybyMessage="This is your temporary lay-by for entry fragments. You can drag and drop XML elements here.";
+			}
 			Xonomy.setMode(Cookies.get("xonomyMode") || "nerd");
 			Ske.extendDocspec(docSpec, xema);
 			docSpec.onchange=Screenful.Editor.changed;
