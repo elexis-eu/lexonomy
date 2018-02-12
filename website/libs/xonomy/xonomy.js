@@ -164,6 +164,55 @@ Xonomy.enrichElement=function(jsElement) {
 		}
 		return false;
 	};
+	jsElement.getPrecedingSibling=function(){
+		var parent=this.parent();
+		if(parent){
+			var lastSibling=null;
+			for(var i=0; i<parent.children.length; i++) {
+				if(parent.children[i].type=="element" && parent.children[i].htmlID!=this.htmlID) {
+					lastSibling=parent.children[i];
+				} else if(parent.children[i].htmlID==this.htmlID){
+					return lastSibling;
+				}
+			}
+		}
+		return null;
+	};
+	jsElement.getFollowingSibling=function(){
+		var parent=this.parent();
+		if(parent){
+			var seenSelf=false;
+			for(var i=0; i<parent.children.length; i++) {
+				if(parent.children[i].htmlID==this.htmlID){
+					seenSelf=true;
+				} else if(parent.children[i].type=="element" && seenSelf) {
+					return parent.children[i];
+				}
+			}
+		}
+		return null;
+	};
+	jsElement.setAttribute=function(name, value){
+		if(this.hasAttribute(name)){
+			this.getAttribute(name).value=value;
+		} else {
+			this.attributes.push({
+				type: "attribute",
+				name: name,
+				value: value,
+				htmlID: null,
+				parent: function(){return this;}
+			});
+		}
+	};
+	jsElement.addText=function(txt){
+		this.children.push({
+			type: "text",
+			value: txt,
+			htmlID: null,
+			parent: function(){return this;}
+		});
+	};
 	return jsElement;
 };
 
@@ -447,7 +496,7 @@ Xonomy.render=function(data, editor, docSpec) { //renders the contents of an edi
 		laybyHtml+="<span class='button closer' onclick='Xonomy.closeLayby();'>&nbsp;</span>";
 		laybyHtml+="<span class='button purger' onclick='Xonomy.emptyLayby()'>&nbsp;</span>";
 		laybyHtml+="<div class='content'></div>";
-		laybyHtml+="<div class='message'>"+docSpec.laybyMessage+"</div>";
+		laybyHtml+="<div class='message'>"+Xonomy.textByLang(docSpec.laybyMessage)+"</div>";
 		laybyHtml+="</div>";
 		$(laybyHtml).appendTo($(editor));
 	}
@@ -1273,7 +1322,181 @@ Xonomy.editRaw=function(htmlID, parameter) {
 		window.setTimeout(function(){ Xonomy.setFocus($(html).prop("id"), "openingTagName"); }, 100);
 	};
 };
+Xonomy.duplicateElement=function(htmlID) {
+	Xonomy.clickoff();
+	var jsElement=Xonomy.harvestElement(document.getElementById(htmlID));
+	var html=Xonomy.renderElement(jsElement);
+	var $html=$(html).hide();
+	$("#"+htmlID).after($html);
+	Xonomy.changed();
+	$html.fadeIn();
+	window.setTimeout(function(){ Xonomy.setFocus($html.prop("id"), "openingTagName"); }, 100);
+};
+Xonomy.moveElementUp=function(htmlID){
+	Xonomy.clickoff();
+	var $me=$("#"+htmlID);
+	if($me.closest(".layby > .content").length==0) {
+		Xonomy.insertDropTargets(htmlID);
+		var $droppers=$(".xonomy .elementDropper").add($me);
+		var i=$droppers.index($me[0])-1;
+		if(i>=0) {
+			$($droppers[i]).replaceWith($me);
+			Xonomy.changed();
+			$me.hide().fadeIn();
+		}
+		Xonomy.dragend();
+	}
+	window.setTimeout(function(){ Xonomy.setFocus(htmlID, "openingTagName"); }, 100);
+};
+Xonomy.moveElementDown=function(htmlID){
+	Xonomy.clickoff();
+	var $me=$("#"+htmlID);
+	if($me.closest(".layby > .content").length==0) {
+		Xonomy.insertDropTargets(htmlID);
+		var $droppers=$(".xonomy .elementDropper").add($me);
+		var i=$droppers.index($me[0])+1;
+		if(i<$droppers.length) {
+			$($droppers[i]).replaceWith($me);
+			Xonomy.changed();
+			$me.hide().fadeIn();
+		}
+		Xonomy.dragend();
+	}
+	window.setTimeout(function(){ Xonomy.setFocus(htmlID, "openingTagName"); }, 100);
+};
+Xonomy.canMoveElementUp=function(htmlID){
+	var ret=false;
+	var $me=$("#"+htmlID);
+	if($me.closest(".layby > .content").length==0) {
+		Xonomy.insertDropTargets(htmlID);
+		var $droppers=$(".xonomy .elementDropper").add($me);
+		var i=$droppers.index($me[0])-1;
+		if(i>=0) ret=true;
+		Xonomy.dragend();
+	}
+	return ret;
+};
+Xonomy.canMoveElementDown=function(htmlID){
+	var ret=false;
+	var $me=$("#"+htmlID);
+	if($me.closest(".layby > .content").length==0) {
+		Xonomy.insertDropTargets(htmlID);
+		var $droppers=$(".xonomy .elementDropper").add($me);
+		var i=$droppers.index($me[0])+1;
+		if(i<$droppers.length) ret=true;
+		Xonomy.dragend();
+	}
+	return ret;
+};
+Xonomy.mergeWithPrevious=function(htmlID, parameter){
+	var domDead=document.getElementById(htmlID);
+	var elDead=Xonomy.harvestElement(domDead);
+	var elLive=elDead.getPrecedingSibling();
+	Xonomy.mergeElements(elDead, elLive);
+};
+Xonomy.mergeWithNext=function(htmlID, parameter){
+	var domDead=document.getElementById(htmlID);
+	var elDead=Xonomy.harvestElement(domDead);
+	var elLive=elDead.getFollowingSibling();
+	Xonomy.mergeElements(elDead, elLive);
+};
+Xonomy.mergeElements=function(elDead, elLive){
+	Xonomy.clickoff();
+	var domDead=document.getElementById(elDead.htmlID);
+	if(elLive && elLive.type=="element") {
+		for(var i=0; i<elDead.attributes.length; i++){ //merge attributes
+			var atDead=elDead.attributes[i];
+			if(!elLive.hasAttribute(atDead.name) || elLive.getAttributeValue(atDead.name)==""){
+				elLive.setAttribute(atDead.name, atDead.value);
+			}
+		}
+		var specDead=Xonomy.docSpec.elements[elDead.name];
+		var specLive=Xonomy.docSpec.elements[elLive.name];
+		if(specDead.hasText(elDead) || specLive.hasText(elLive)){ //if either element is meant to have text, concatenate their children
+			if(elLive.children.length>0 && elDead.children.length>0) elLive.addText(" ");
+			for(var i=0; i<elDead.children.length; i++) elLive.children.push(elDead.children[i]);
+		} else { //if no text, merge their children one by one
+			for(var i=0; i<elDead.children.length; i++){
+				var xmlDeadChild=Xonomy.js2xml(elDead.children[i]);
+				var has=false;
+				for(y=0; y<elLive.children.length; y++){
+					var xmlLiveChild=Xonomy.js2xml(elLive.children[y]);
+					if(xmlDeadChild==xmlLiveChild){ has=true; break; }
+				}
+				if(!has) elLive.children.push(elDead.children[i]);
+			}
+		}
+		domDead.parentNode.removeChild(domDead);
+		Xonomy.setFocus(elLive.htmlID, "openingTagName");
+		Xonomy.replace(elLive.htmlID, elLive);
+		for(var i=0; i<elLive.children.length; i++) Xonomy.elementReorder(elLive.children[i].htmlID);
+	} else {
+		window.setTimeout(function(){ Xonomy.setFocus(htmlID, "openingTagName"); }, 100);
+	}
+};
 
+Xonomy.insertDropTargets=function(htmlID){
+	var $element=$("#"+htmlID);
+	$element.addClass("dragging");
+	var elementName=$element.attr("data-name");
+	var elSpec=Xonomy.docSpec.elements[elementName];
+	$(".xonomy .children").append("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
+	$(".xonomy .children .element").before("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
+	$(".xonomy .children .text").before("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
+	$(".xonomy .dragging .elementDropper").remove(); //remove drop targets fom inside the element being dragged
+	$(".xonomy .dragging").prev(".elementDropper").remove(); //remove drop targets from immediately before the element being dragged
+	$(".xonomy .dragging").next(".elementDropper").remove(); //remove drop targets from immediately after the element being dragged
+	$(".xonomy .element.readonly .elementDropper").remove(); //remove drop targets from inside read-only elements
+	if(elSpec.localDropOnly(Xonomy.harvest(htmlID))) {
+		if(elSpec.canDropTo) { //remove the drop target from elements that are not the dragged element's parent
+			var droppers=$(".xonomy .elementDropper").toArray();
+			for(var i=0; i<droppers.length; i++) {
+				var dropper=droppers[i];
+				if(dropper.parentNode!=ev.target.parentNode.parentNode.parentNode) {
+					dropper.parentNode.removeChild(dropper);
+				}
+			}
+		}
+	}
+	if(elSpec.canDropTo) { //remove the drop target from elements it cannot be dropped into
+		var droppers=$(".xonomy .elementDropper").toArray();
+		for(var i=0; i<droppers.length; i++) {
+			var dropper=droppers[i];
+			var parentElementName=$(dropper.parentNode.parentNode).toArray()[0].getAttribute("data-name");
+			if($.inArray(parentElementName, elSpec.canDropTo)<0) {
+				dropper.parentNode.removeChild(dropper);
+			}
+		}
+	}
+	if(elSpec.mustBeBefore) { //remove the drop target from after elements it cannot be after
+		var jsElement=Xonomy.harvestElement($element.toArray()[0]);
+		var droppers=$(".xonomy .elementDropper").toArray();
+		for(var i=0; i<droppers.length; i++) {
+			var dropper=droppers[i];
+			jsElement.internalParent=Xonomy.harvestElement(dropper.parentNode.parentNode); //pretend the element's parent is the dropper's parent
+			var mustBeBefore=elSpec.mustBeBefore(jsElement);
+			for(var ii=0; ii<mustBeBefore.length; ii++) {
+				if( $(dropper).prevAll("*[data-name='"+mustBeBefore[ii]+"']").toArray().length>0 ) {
+					dropper.parentNode.removeChild(dropper);
+				}
+			}
+		}
+	}
+	if(elSpec.mustBeAfter) { //remove the drop target from before elements it cannot be before
+		var jsElement=Xonomy.harvestElement($element.toArray()[0]);
+		var droppers=$(".xonomy .elementDropper").toArray();
+		for(var i=0; i<droppers.length; i++) {
+			var dropper=droppers[i];
+			jsElement.internalParent=Xonomy.harvestElement(dropper.parentNode.parentNode); //pretend the element's parent is the dropper's parent
+			var mustBeAfter=elSpec.mustBeAfter(jsElement);
+			for(var ii=0; ii<mustBeAfter.length; ii++) {
+				if( $(dropper).nextAll("*[data-name='"+mustBeAfter[ii]+"']").toArray().length>0 ) {
+					dropper.parentNode.removeChild(dropper);
+				}
+			}
+		}
+	}
+};
 Xonomy.draggingID=null; //what are we dragging?
 Xonomy.drag=function(ev) { //called when dragging starts
 	// Wrapping all the code into a timeout handler is a workaround for a Chrome browser bug
@@ -1285,66 +1508,7 @@ Xonomy.drag=function(ev) { //called when dragging starts
 	ev.dataTransfer.setData("text", htmlID);
 	setTimeout(function() {
 		Xonomy.clickoff();
-		var $element=$("#"+htmlID);
-		var elementName=$element.attr("data-name");
-		var elSpec=Xonomy.docSpec.elements[elementName];
-		$element.addClass("dragging");
-		$(".xonomy .children").append("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
-		$(".xonomy .children .element").before("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
-		$(".xonomy .children .text").before("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
-		$(".xonomy .dragging .elementDropper").remove(); //remove drop targets fom inside the element being dragged
-		$(".xonomy .dragging").prev(".elementDropper").remove(); //remove drop targets from immediately before the element being dragged
-		$(".xonomy .dragging").next(".elementDropper").remove(); //remove drop targets from immediately after the element being dragged
-		$(".xonomy .element.readonly .elementDropper").remove(); //remove drop targets from inside read-only elements
-		if(elSpec.localDropOnly(Xonomy.harvest(htmlID))) {
-			if(elSpec.canDropTo) { //remove the drop target from elements that are not the dragged element's parent
-				var droppers=$(".xonomy .elementDropper").toArray();
-				for(var i=0; i<droppers.length; i++) {
-					var dropper=droppers[i];
-					if(dropper.parentNode!=ev.target.parentNode.parentNode.parentNode) {
-						dropper.parentNode.removeChild(dropper);
-					}
-				}
-			}
-		}
-		if(elSpec.canDropTo) { //remove the drop target from elements it cannot be dropped into
-			var droppers=$(".xonomy .elementDropper").toArray();
-			for(var i=0; i<droppers.length; i++) {
-				var dropper=droppers[i];
-				var parentElementName=$(dropper.parentNode.parentNode).toArray()[0].getAttribute("data-name");
-				if($.inArray(parentElementName, elSpec.canDropTo)<0) {
-					dropper.parentNode.removeChild(dropper);
-				}
-			}
-		}
-		if(elSpec.mustBeBefore) { //remove the drop target from after elements it cannot be after
-			var jsElement=Xonomy.harvestElement($element.toArray()[0]);
-			var droppers=$(".xonomy .elementDropper").toArray();
-			for(var i=0; i<droppers.length; i++) {
-				var dropper=droppers[i];
-				jsElement.internalParent=Xonomy.harvestElement(dropper.parentNode.parentNode); //pretend the element's parent is the dropper's parent
-				var mustBeBefore=elSpec.mustBeBefore(jsElement);
-				for(var ii=0; ii<mustBeBefore.length; ii++) {
-					if( $(dropper).prevAll("*[data-name='"+mustBeBefore[ii]+"']").toArray().length>0 ) {
-						dropper.parentNode.removeChild(dropper);
-					}
-				}
-			}
-		}
-		if(elSpec.mustBeAfter) { //remove the drop target from before elements it cannot be before
-			var jsElement=Xonomy.harvestElement($element.toArray()[0]);
-			var droppers=$(".xonomy .elementDropper").toArray();
-			for(var i=0; i<droppers.length; i++) {
-				var dropper=droppers[i];
-				jsElement.internalParent=Xonomy.harvestElement(dropper.parentNode.parentNode); //pretend the element's parent is the dropper's parent
-				var mustBeAfter=elSpec.mustBeAfter(jsElement);
-				for(var ii=0; ii<mustBeAfter.length; ii++) {
-					if( $(dropper).nextAll("*[data-name='"+mustBeAfter[ii]+"']").toArray().length>0 ) {
-						dropper.parentNode.removeChild(dropper);
-					}
-				}
-			}
-		}
+		Xonomy.insertDropTargets(htmlID);
 		Xonomy.draggingID=htmlID;
 		Xonomy.refresh();
 	}, 10);
