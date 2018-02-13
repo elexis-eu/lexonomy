@@ -1532,15 +1532,29 @@ Xonomy.dragOut=function(ev) {
 Xonomy.drop=function(ev) {
 	ev.preventDefault();
 	var node=document.getElementById(Xonomy.draggingID); //the thing we are moving
-	$(node).hide();
 	if($(ev.currentTarget).hasClass("layby")) {
-		$(".xonomy .layby > .content").append(node);
+		if(ev.dataTransfer.dropEffect=="copy"){
+			var js=Xonomy.harvestElement(node);
+			var $html=$(Xonomy.renderElement(js)).hide();
+			$(".xonomy .layby > .content").append($html[0]);
+			$($html[0]).fadeIn(function(){ Xonomy.changed(); });
+		} else {
+			$(node).hide();
+			$(".xonomy .layby > .content").append(node);
+			$(node).fadeIn(function(){ Xonomy.changed(); });
+		}
 	} else {
-		$(ev.target.parentNode).replaceWith(node);
+		if(ev.dataTransfer.dropEffect=="copy"){
+			var js=Xonomy.harvestElement(node);
+			var $html=$(Xonomy.renderElement(js)).hide();
+			$(ev.target.parentNode).replaceWith($html[0]);
+			$($html[0]).fadeIn(function(){ Xonomy.changed(); });
+		} else {
+			$(node).hide();
+			$(ev.target.parentNode).replaceWith(node);
+			$(node).fadeIn(function(){ Xonomy.changed(); });
+		}
 	}
-	$(node).fadeIn(function(){
-		Xonomy.changed();
-	});
 	Xonomy.openCloseLayby();
 	Xonomy.recomputeLayby();
 };
