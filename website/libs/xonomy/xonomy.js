@@ -1205,9 +1205,12 @@ Xonomy.deleteElement=function(htmlID, parameter) {
 	var obj=document.getElementById(htmlID);
 	var parentID=obj.parentNode.parentNode.id;
 	$(obj).fadeOut(function(){
-		obj.parentNode.removeChild(obj);
+		var parentNode=obj.parentNode;
+		parentNode.removeChild(obj);
 		Xonomy.changed();
-		window.setTimeout(function(){ Xonomy.setFocus(parentID, "openingTagName");  }, 100);
+		if($(parentNode).closest(".layby").length==0) {
+			window.setTimeout(function(){ Xonomy.setFocus(parentID, "openingTagName");  }, 100);
+		}
 	});
 };
 Xonomy.newAttribute=function(htmlID, parameter) {
@@ -1504,6 +1507,7 @@ Xonomy.drag=function(ev) { //called when dragging starts
 	//
 	// for more details @see:
 	//   http://stackoverflow.com/questions/19639969/html5-dragend-event-firing-immediately
+	ev.dataTransfer.effectAllowed="move"; //only allow moving (and not eg. copying]
 	var htmlID=ev.target.parentNode.parentNode.id;
 	ev.dataTransfer.setData("text", htmlID);
 	setTimeout(function() {
@@ -1515,6 +1519,7 @@ Xonomy.drag=function(ev) { //called when dragging starts
 };
 Xonomy.dragOver=function(ev) {
 	ev.preventDefault();
+	ev.dataTransfer.dropEffect="move"; //only allow moving (and not eg. copying]
 	if($(ev.currentTarget).hasClass("layby")){
 		$(ev.currentTarget).addClass("activeDropper");
 	} else {
@@ -1533,27 +1538,13 @@ Xonomy.drop=function(ev) {
 	ev.preventDefault();
 	var node=document.getElementById(Xonomy.draggingID); //the thing we are moving
 	if($(ev.currentTarget).hasClass("layby")) {
-		if(ev.dataTransfer.dropEffect=="copy"){
-			var js=Xonomy.harvestElement(node);
-			var $html=$(Xonomy.renderElement(js)).hide();
-			$(".xonomy .layby > .content").append($html[0]);
-			$($html[0]).fadeIn(function(){ Xonomy.changed(); });
-		} else {
-			$(node).hide();
-			$(".xonomy .layby > .content").append(node);
-			$(node).fadeIn(function(){ Xonomy.changed(); });
-		}
+		$(node).hide();
+		$(".xonomy .layby > .content").append(node);
+		$(node).fadeIn(function(){ Xonomy.changed(); });
 	} else {
-		if(ev.dataTransfer.dropEffect=="copy"){
-			var js=Xonomy.harvestElement(node);
-			var $html=$(Xonomy.renderElement(js)).hide();
-			$(ev.target.parentNode).replaceWith($html[0]);
-			$($html[0]).fadeIn(function(){ Xonomy.changed(); });
-		} else {
-			$(node).hide();
-			$(ev.target.parentNode).replaceWith(node);
-			$(node).fadeIn(function(){ Xonomy.changed(); });
-		}
+		$(node).hide();
+		$(ev.target.parentNode).replaceWith(node);
+		$(node).fadeIn(function(){ Xonomy.changed(); });
 	}
 	Xonomy.openCloseLayby();
 	Xonomy.recomputeLayby();
