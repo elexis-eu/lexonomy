@@ -1278,6 +1278,7 @@ Xonomy.newElementBefore=function(htmlID, parameter) {
 	var html=Xonomy.renderElement(Xonomy.xml2js(parameter, jsElement.parent()));
 	var $html=$(html).hide();
 	$("#"+htmlID).before($html);
+	Xonomy.elementReorder($html.prop("id"));
 	Xonomy.changed();
 	$html.fadeIn();
 	window.setTimeout(function(){ Xonomy.setFocus($html.prop("id"), "openingTagName"); }, 100);
@@ -1288,6 +1289,7 @@ Xonomy.newElementAfter=function(htmlID, parameter) {
 	var html=Xonomy.renderElement(Xonomy.xml2js(parameter, jsElement.parent()));
 	var $html=$(html).hide();
 	$("#"+htmlID).after($html);
+	Xonomy.elementReorder($html.prop("id"));
 	Xonomy.changed();
 	$html.fadeIn();
 	window.setTimeout(function(){ Xonomy.setFocus($html.prop("id"), "openingTagName"); }, 100);
@@ -1416,7 +1418,7 @@ Xonomy.mergeElements=function(elDead, elLive){
 		var specDead=Xonomy.docSpec.elements[elDead.name];
 		var specLive=Xonomy.docSpec.elements[elLive.name];
 		if(specDead.hasText(elDead) || specLive.hasText(elLive)){ //if either element is meant to have text, concatenate their children
-			if(elLive.children.length>0 && elDead.children.length>0) elLive.addText(" ");
+			if(elLive.getText()!="" && elDead.getText()!="") elLive.addText(" ");
 			for(var i=0; i<elDead.children.length; i++) elLive.children.push(elDead.children[i]);
 		} else { //if no text, merge their children one by one
 			for(var i=0; i<elDead.children.length; i++){
@@ -1432,7 +1434,7 @@ Xonomy.mergeElements=function(elDead, elLive){
 		domDead.parentNode.removeChild(domDead);
 		Xonomy.setFocus(elLive.htmlID, "openingTagName");
 		Xonomy.replace(elLive.htmlID, elLive);
-		for(var i=0; i<elLive.children.length; i++) Xonomy.elementReorder(elLive.children[i].htmlID);
+		for(var i=0; i<elLive.children.length; i++) if(elLive.children[i].type=="element") Xonomy.elementReorder(elLive.children[i].htmlID);
 	} else {
 		window.setTimeout(function(){ Xonomy.setFocus(htmlID, "openingTagName"); }, 100);
 	}

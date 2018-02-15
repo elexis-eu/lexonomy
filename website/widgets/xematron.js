@@ -21,6 +21,60 @@ Xematron.xema2docspec=function(xema){
 		del.inlineMenu=[];
 		del.collapsible=false;
 
+		var submenu=[];
+
+		//children of inl elements have a menu item to unwrap themselves:
+		submenu.push({
+			caption: "Unwrap this <"+elname+">",
+			action: Xonomy.unwrap,
+			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling!="inl"; },
+		});
+
+		//all elements have a menu item to remove themselves, except the top-level element and except children of inl elements:
+		submenu.push({
+			caption: "Remove this <"+elname+">",
+			action: Xonomy.deleteElement,
+			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
+		});
+
+		//all elements have a menu item to duplicate themselves, except the top-level element and except children of inl elements:
+		submenu.push({
+			caption: "Duplicate this <"+elname+">",
+			action: Xonomy.duplicateElement,
+			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
+		});
+
+		//all elements have a menu item to move themselves up and down, except the top-level element, and except children of inl elements, and expect elements that have nowhere to move to:
+		submenu.push({
+			caption: "Move this <"+elname+"> up",
+			action: Xonomy.moveElementUp,
+			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementUp(jsMe.htmlID); },
+		});
+		submenu.push({
+			caption: "Move this <"+elname+"> down",
+			action: Xonomy.moveElementDown,
+			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementDown(jsMe.htmlID); },
+		});
+
+		//all elements have a menu item to merge themselves with a sibling, except the top-level element, and except children of inl elements, and expect elements that have no-one to merge with:
+		submenu.push({
+			caption: "Merge this <"+elname+"> with the previous <"+elname+">",
+			action: Xonomy.mergeWithPrevious,
+			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getPrecedingSibling() || jsMe.getPrecedingSibling().name!=elname },
+		});
+		submenu.push({
+			caption: "Merge this <"+elname+"> with the next <"+elname+">",
+			action: Xonomy.mergeWithNext,
+			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getFollowingSibling() || jsMe.getFollowingSibling().name!=elname },
+		});
+
+		if(submenu.length>0) {
+			del.menu.push({
+				caption: "This element",
+				menu: submenu,
+			});
+		}
+
 		//txt elements are easy:
 		if(xel.filling=="txt"){
 			del.hasText=true;
@@ -44,13 +98,20 @@ Xematron.xema2docspec=function(xema){
 		//chd elements have menu items for adding children:
 		if(xel.filling=="chd"){
 			if(!xel.children) xel.children=[];
+			var submenu=[];
 			xel.children.forEach(function(obj){
-				del.menu.push({
+				submenu.push({
 					caption: "Add <"+obj.name+">",
 					action: Xonomy.newElementChild,
 					actionParameter: Xematron.initialElement(xema, obj.name),
 				});
 			});
+			if(submenu.length>0) {
+				del.menu.push({
+					caption: "Child elements",
+					menu: submenu,
+				});
+			}
 			del.collapsible=function(jsMe){ return (jsMe.internalParent ? true : false); };
 			del.collapsed=true;
 		}
@@ -72,14 +133,8 @@ Xematron.xema2docspec=function(xema){
 			// del.collapsed=function(jsMe){ return (jsMe.getText().length>100 ? true : false); };
 		}
 
-		//all elements can be dragged-and-droped:
-		del.canDropTo=Xematron.listParents(xema, elname);
-
-		//all elements have a fixed position among their siblings if the parent is a 'chd' element:
-		del.mustBeAfter=Xematron.listPrecedingSiblings(xema, elname);
-		del.mustBeBefore=Xematron.listFollowingSiblings(xema, elname)
-
 		del.attributes={};
+		var submenu=[];
 		var attnames=[]; for(var attname in xel.attributes) attnames.push(attname); attnames.forEach(function(attname){
 			var xatt=xel.attributes[attname]; //the xema attribute from which we are creating a docSpec attribute
 			var datt={}; del.attributes[attname]=datt; //the docSpec attribute we are creating
@@ -100,7 +155,7 @@ Xematron.xema2docspec=function(xema){
 			}
 
 			//every attribute's owner element has a menu item to add the attribute:
-			del.menu.push({
+			submenu.push({
 				caption: "Add @"+attname+"",
 				action: Xonomy.newAttribute,
 				actionParameter: {name: attname, value: ""},
@@ -114,20 +169,57 @@ Xematron.xema2docspec=function(xema){
 			});
 
 		}); //end of loop over attributes
+		if(submenu.length>0) {
+			del.menu.push({
+				caption: "Attributes",
+				menu: submenu,
+			});
+		}
 
-		//all elements have a menu item to remove themselves, except the top-level element and except children of inl elements:
-		del.menu.push({
-			caption: "Remove <"+elname+">",
-			action: Xonomy.deleteElement,
-			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
-		});
+		//all elements can be dragged-and-droped:
+		del.canDropTo=Xematron.listParents(xema, elname);
 
-		//children of inl elements have a menu item to unwrap themselves:
-		del.menu.push({
-			caption: "Unwrap <"+elname+">",
-			action: Xonomy.unwrap,
-			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling!="inl"; },
+		//all elements have a fixed position among their siblings if the parent is a 'chd' element:
+		del.mustBeAfter=Xematron.listPrecedingSiblings(xema, elname);
+		del.mustBeBefore=Xematron.listFollowingSiblings(xema, elname)
+
+		//Menu items for adding siblings:
+		var submenu=[];
+		Xematron.listElements(xema).forEach(function(siblingName){
+			submenu.push({
+				caption: "Add <"+siblingName+">",
+				action: Xonomy.newElementBefore,
+				actionParameter: Xematron.initialElement(xema, siblingName),
+				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingName) || (jsMe.getPrecedingSibling() && jsMe.getPrecedingSibling().name==jsMe.name) || del.mustBeAfter(jsMe).indexOf(siblingName)==-1; },
+			});
 		});
+		submenu.push({
+			caption: "Add another <"+elname+"> before this <"+elname+">",
+			action: Xonomy.newElementBefore,
+			actionParameter: Xematron.initialElement(xema, elname),
+			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl"; },
+		});
+		submenu.push({
+			caption: "Add another <"+elname+"> after this <"+elname+">",
+			action: Xonomy.newElementAfter,
+			actionParameter: Xematron.initialElement(xema, elname),
+			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl"; },
+		});
+		Xematron.listElements(xema).forEach(function(siblingName){
+			submenu.push({
+				caption: "Add <"+siblingName+">",
+				action: Xonomy.newElementAfter,
+				actionParameter: Xematron.initialElement(xema, siblingName),
+				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingName) || (jsMe.getFollowingSibling() && jsMe.getFollowingSibling().name==jsMe.name) || del.mustBeBefore(jsMe).indexOf(siblingName)==-1; },
+			});
+		});
+		if(submenu.length>0) {
+			del.menu.push({
+				caption: "Sibling elements",
+				menu: submenu,
+			});
+		}
+
 
 	}); //end of loop over elements
 	return docSpec;
