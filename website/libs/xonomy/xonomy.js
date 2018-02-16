@@ -1123,8 +1123,8 @@ Xonomy.wyc=function(url, callback){ //a "when-you-can" function for delayed rend
 
 Xonomy.toggleSubmenu=function(menuItem){
 	var $menuItem=$(menuItem);
-	if($menuItem.hasClass("expanded")){ $menuItem.removeClass("expanded"); $menuItem.find(".submenu").first().slideUp("fast"); }
-	else { $menuItem.addClass("expanded"); $menuItem.find(".submenu").first().slideDown("fast"); };
+	if($menuItem.hasClass("expanded")){ $menuItem.find(".submenu").first().slideUp("fast", function(){$menuItem.removeClass("expanded");}); }
+	else { $menuItem.find(".submenu").first().slideDown("fast", function(){$menuItem.addClass("expanded");}); };
 }
 Xonomy.internalMenu=function(htmlID, items, harvest, getter, indices) {
 	indices = indices || [];
@@ -1140,7 +1140,7 @@ Xonomy.internalMenu=function(htmlID, items, harvest, getter, indices) {
 				var internalHtml=Xonomy.internalMenu(htmlID, item.menu, harvest, getter, indices);
 				if(internalHtml!="<div class='submenu'></div>") {
 					html+="<div class='menuItem"+(item.expanded(jsMe)?" expanded":"")+"'>";
-					html+="<div class='menuLabel focusme' tabindex='0' onclick='Xonomy.toggleSubmenu(this.parentNode)'>"+icon+Xonomy.formatCaption(Xonomy.textByLang(item.caption(jsMe)))+"</div>";
+					html+="<div class='menuLabel focusme' tabindex='0' onkeydown='if(Xonomy.keyNav && [37, 39].indexOf(event.which)>-1) Xonomy.toggleSubmenu(this.parentNode)' onclick='Xonomy.toggleSubmenu(this.parentNode)'>"+icon+Xonomy.formatCaption(Xonomy.textByLang(item.caption(jsMe)))+"</div>";
 					html+=internalHtml;
 					html+="</div>";
 				}
