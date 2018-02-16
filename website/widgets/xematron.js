@@ -28,6 +28,8 @@ Xematron.xema2docspec=function(xema){
 			caption: "Unwrap this <"+elname+">",
 			action: Xonomy.unwrap,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling!="inl"; },
+			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
+			keyCaption: "Ctrl + Shift + X",
 		});
 
 		//all elements have a menu item to remove themselves, except the top-level element and except children of inl elements:
@@ -35,6 +37,8 @@ Xematron.xema2docspec=function(xema){
 			caption: "Remove this <"+elname+">",
 			action: Xonomy.deleteElement,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
+			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
+			keyCaption: "Ctrl + Shift + X",
 		});
 
 		//all elements have a menu item to duplicate themselves, except the top-level element and except children of inl elements:
@@ -42,6 +46,8 @@ Xematron.xema2docspec=function(xema){
 			caption: "Duplicate this <"+elname+">",
 			action: Xonomy.duplicateElement,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
+			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==68 },
+			keyCaption: "Ctrl + Shift + D",
 		});
 
 		//all elements have a menu item to move themselves up and down, except the top-level element, and except children of inl elements, and expect elements that have nowhere to move to:
@@ -49,11 +55,15 @@ Xematron.xema2docspec=function(xema){
 			caption: "Move this <"+elname+"> up",
 			action: Xonomy.moveElementUp,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementUp(jsMe.htmlID); },
+			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==38 },
+			keyCaption: "Ctrl + Shift + Up",
 		});
 		submenu.push({
 			caption: "Move this <"+elname+"> down",
 			action: Xonomy.moveElementDown,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementDown(jsMe.htmlID); },
+			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==40 },
+			keyCaption: "Ctrl + Shift + Down",
 		});
 
 		//all elements have a menu item to merge themselves with a sibling, except the top-level element, and except children of inl elements, and expect elements that have no-one to merge with:
@@ -129,6 +139,8 @@ Xematron.xema2docspec=function(xema){
 			datt.menu.push({
 				caption: "Remove @"+attname+"",
 				action: Xonomy.deleteAttribute,
+				keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
+				keyCaption: "Ctrl + Shift + X",
 			});
 
 		}); //end of loop over attributes

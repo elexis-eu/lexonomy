@@ -821,7 +821,7 @@ Xonomy.click=function(htmlID, what) {
 		if(!isReadOnly && (what=="openingTagName" || what=="closingTagName") ) {
 			$("#"+htmlID).addClass("current"); //make the element current
 			var content=Xonomy.elementMenu(htmlID); //compose bubble content
-			if(content!="") {
+			if(content!="<div class='menu'></div>") {
 				document.body.appendChild(Xonomy.makeBubble(content)); //create bubble
 				if(what=="openingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.opening > .name")); //anchor bubble to opening tag
 				if(what=="closingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.closing > .name")); //anchor bubble to closing tag
@@ -832,7 +832,7 @@ Xonomy.click=function(htmlID, what) {
 		if(!isReadOnly && what=="attributeName") {
 			$("#"+htmlID).addClass("current"); //make the attribute current
 			var content=Xonomy.attributeMenu(htmlID); //compose bubble content
-			if(content!="") {
+			if(content!="<div class='menu'></div>") {
 				document.body.appendChild(Xonomy.makeBubble(content)); //create bubble
 				Xonomy.showBubble($("#"+htmlID+" > .name")); //anchor bubble to attribute name
 			}
@@ -869,7 +869,7 @@ Xonomy.click=function(htmlID, what) {
 			} else {
 				var content=spec.asker(value, spec.askerParameter, Xonomy.harvestElement($("#"+htmlID).closest(".element").toArray()[0])); //use specified asker
 			}
-			if(content!="") {
+			if(content!="<div class='menu'></div>") {
 				document.body.appendChild(Xonomy.makeBubble(content)); //create bubble
 				Xonomy.showBubble($("#"+htmlID+" > .value")); //anchor bubble to value
 				Xonomy.answer=function(val) {
@@ -1136,6 +1136,7 @@ Xonomy.internalMenu=function(htmlID, items, harvest, getter, indices) {
 		if(includeIt) {
 			indices.push(i);
 			var icon=""; if(item.icon) icon="<span class='icon'><img src='"+item.icon+"'/></span> ";
+			var key=""; if(item.keyTrigger && item.keyCaption) key="<span class='keyCaption'>"+Xonomy.textByLang(item.keyCaption)+"</span>";
 			if (item.menu) {
 				var internalHtml=Xonomy.internalMenu(htmlID, item.menu, harvest, getter, indices);
 				if(internalHtml!="<div class='submenu'></div>") {
@@ -1146,7 +1147,7 @@ Xonomy.internalMenu=function(htmlID, items, harvest, getter, indices) {
 				}
 			} else {
 				html+="<div class='menuItem focusme' tabindex='0' onclick='Xonomy.callMenuFunction("+getter(indices)+", \""+htmlID+"\")'>";
-				html+=icon+Xonomy.formatCaption(Xonomy.textByLang(item.caption(jsMe)));
+				html+=key+icon+Xonomy.formatCaption(Xonomy.textByLang(item.caption(jsMe)));
 				html+="</div>";
 			}
 			indices.pop();
@@ -1650,7 +1651,7 @@ Xonomy.setFocus=function(htmlID, what){
 	}
 };
 Xonomy.key=function(event){
-	if(!Xonomy.notKeyUp && !$("#xonomyBubble").length>0 ) {
+	if(!Xonomy.notKeyUp && !Xonomy.keyboardMenu(event) && !$("#xonomyBubble").length>0 && !event.shiftKey ) {
 		if(event.which==27) {
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -1703,6 +1704,39 @@ Xonomy.key=function(event){
 	}
 	Xonomy.notKeyUp=false;
 };
+Xonomy.keyboardMenu=function(event){
+	var $obj=$("#"+Xonomy.currentHtmlId);
+	var jsMe=null;
+	var menu=null;
+	if($obj.hasClass("element")){
+		jsMe=Xonomy.harvestElement($obj[0]);
+		var elName=$obj.attr("data-name");
+		menu=Xonomy.docSpec.elements[elName].menu;
+	} else if($obj.hasClass("attribute")) {
+		jsMe=Xonomy.harvestAttribute($obj[0]);
+		var atName=$obj.attr("data-name");
+		var elName=$obj.closest(".element").attr("data-name");
+		menu=Xonomy.docSpec.elements[elName].attributes[atName].menu;
+	}
+	if(menu){
+		var findMenuItem=function(menu){
+			var ret=null;
+			for(var i=0; i<menu.length; i++){
+				if(menu[i].menu) ret=findMenuItem(menu[i].menu);
+				else if(menu[i].keyTrigger && !menu[i].hideIf(jsMe) && menu[i].keyTrigger(event)) ret=menu[i];
+				if(ret) break;
+			}
+			return ret;
+		};
+		var menuItem=findMenuItem(menu);
+		if(menuItem) {
+			Xonomy.callMenuFunction(menuItem, Xonomy.currentHtmlId);
+			Xonomy.clickoff();
+			return true;
+		}
+	}
+	return false;
+},
 
 Xonomy.goDown=function(){
 	if(Xonomy.currentFocus!="openingTagName" && Xonomy.currentFocus!="closingTagName" && Xonomy.currentFocus!="text" && Xonomy.currentFocus!="char") {
