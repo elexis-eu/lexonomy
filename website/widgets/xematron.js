@@ -72,6 +72,7 @@ Xematron.xema2docspec=function(xema){
 			del.menu.push({
 				caption: "This element",
 				menu: submenu,
+				expanded: true,
 			});
 		}
 
@@ -93,44 +94,6 @@ Xematron.xema2docspec=function(xema){
 			xel.values.forEach(function(obj){
 				del.askerParameter.push({ value: obj.value, caption: obj.caption });
 			});
-		}
-
-		//chd elements have menu items for adding children:
-		if(xel.filling=="chd"){
-			if(!xel.children) xel.children=[];
-			var submenu=[];
-			xel.children.forEach(function(obj){
-				submenu.push({
-					caption: "Add <"+obj.name+">",
-					action: Xonomy.newElementChild,
-					actionParameter: Xematron.initialElement(xema, obj.name),
-				});
-			});
-			if(submenu.length>0) {
-				del.menu.push({
-					caption: "Child elements",
-					menu: submenu,
-				});
-			}
-			del.collapsible=function(jsMe){ return (jsMe.internalParent ? true : false); };
-			del.collapsed=true;
-		}
-
-		//inl elements have inline menu items for wrapping:
-		if(xel.filling=="inl"){
-			del.hasText=true;
-			del.oneliner=true;
-			del.asker=Xonomy.askLongString;
-			if(!xel.children) xel.children=[];
-			xel.children.forEach(function(obj){
-				del.inlineMenu.push({
-					caption: "Wrap with <"+obj.name+">",
-					action: Xonomy.wrap,
-					actionParameter: {template: "<"+obj.name+Xematron.initialAttributes(xema, obj.name)+">$</"+obj.name+">", placeholder: "$"},
-				});
-			});
-			// del.collapsible=function(jsMe){ return (jsMe.getText().length>100 ? true : false); };
-			// del.collapsed=function(jsMe){ return (jsMe.getText().length>100 ? true : false); };
 		}
 
 		del.attributes={};
@@ -174,6 +137,44 @@ Xematron.xema2docspec=function(xema){
 				caption: "Attributes",
 				menu: submenu,
 			});
+		}
+
+		//chd elements have menu items for adding children:
+		if(xel.filling=="chd"){
+			if(!xel.children) xel.children=[];
+			var submenu=[];
+			xel.children.forEach(function(obj){
+				submenu.push({
+					caption: "Add <"+obj.name+">",
+					action: Xonomy.newElementChild,
+					actionParameter: Xematron.initialElement(xema, obj.name),
+				});
+			});
+			if(submenu.length>0) {
+				del.menu.push({
+					caption: "Child elements",
+					menu: submenu,
+				});
+			}
+			del.collapsible=function(jsMe){ return (jsMe.internalParent ? true : false); };
+			del.collapsed=true;
+		}
+
+		//inl elements have inline menu items for wrapping:
+		if(xel.filling=="inl"){
+			del.hasText=true;
+			del.oneliner=true;
+			del.asker=Xonomy.askLongString;
+			if(!xel.children) xel.children=[];
+			xel.children.forEach(function(obj){
+				del.inlineMenu.push({
+					caption: "Wrap with <"+obj.name+">",
+					action: Xonomy.wrap,
+					actionParameter: {template: "<"+obj.name+Xematron.initialAttributes(xema, obj.name)+">$</"+obj.name+">", placeholder: "$"},
+				});
+			});
+			// del.collapsible=function(jsMe){ return (jsMe.getText().length>100 ? true : false); };
+			// del.collapsed=function(jsMe){ return (jsMe.getText().length>100 ? true : false); };
 		}
 
 		//all elements can be dragged-and-droped:

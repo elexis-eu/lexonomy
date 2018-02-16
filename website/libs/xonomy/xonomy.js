@@ -285,6 +285,7 @@ Xonomy.verifyDocSpecMenuItem=function(menuItem) { //make sure the menu item has 
 	menuItem.caption=Xonomy.asFunction(menuItem.caption, "?");
 	if(!menuItem.action || typeof(menuItem.action)!="function") menuItem.action=function(){};
 	if(!menuItem.hideIf) menuItem.hideIf=function(){return false;};
+	if(typeof(menuItem.expanded)!="function") menuItem.expanded=Xonomy.asFunction(menuItem.expanded, false);
 };
 
 Xonomy.nextID=function() {
@@ -1136,10 +1137,13 @@ Xonomy.internalMenu=function(htmlID, items, harvest, getter, indices) {
 			indices.push(i);
 			var icon=""; if(item.icon) icon="<span class='icon'><img src='"+item.icon+"'/></span> ";
 			if (item.menu) {
-				html+="<div class='menuItem'>";
-				html+="<div class='menuLabel focusme' tabindex='0' onclick='Xonomy.toggleSubmenu(this.parentNode)'>"+icon+Xonomy.formatCaption(Xonomy.textByLang(item.caption(jsMe)))+"</div>";
-				html+=Xonomy.internalMenu(htmlID, item.menu, harvest, getter, indices);
-				html+="</div>";
+				var internalHtml=Xonomy.internalMenu(htmlID, item.menu, harvest, getter, indices);
+				if(internalHtml!="<div class='submenu'></div>") {
+					html+="<div class='menuItem"+(item.expanded(jsMe)?" expanded":"")+"'>";
+					html+="<div class='menuLabel focusme' tabindex='0' onclick='Xonomy.toggleSubmenu(this.parentNode)'>"+icon+Xonomy.formatCaption(Xonomy.textByLang(item.caption(jsMe)))+"</div>";
+					html+=internalHtml;
+					html+="</div>";
+				}
 			} else {
 				html+="<div class='menuItem focusme' tabindex='0' onclick='Xonomy.callMenuFunction("+getter(indices)+", \""+htmlID+"\")'>";
 				html+=icon+Xonomy.formatCaption(Xonomy.textByLang(item.caption(jsMe)));

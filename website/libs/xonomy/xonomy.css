@@ -182,6 +182,7 @@
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem span.icon {display: inline-block; margin: -8px 0px -7px 0px; width: 18px;}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem span.icon img {max-height: 15px; max-width: 20px; display: inline-block;}
 #xonomyBubble.nerd #xonomyBubbleContent div.submenu { margin: 0px -20px -7px -10px; display: none; }
+#xonomyBubble.nerd #xonomyBubbleContent div.menuItem.expanded > div.submenu { display: block; }
 #xonomyBubble.nerd #xonomyBubbleContent div.submenu div.menuItem { padding-left: 30px; }
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem.expanded div.menuLabel {background-image: url(minus.gif);}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem.expanded > div.menuLabel {margin-bottom: 0px; padding-bottom: 7px;}
