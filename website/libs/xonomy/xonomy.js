@@ -1426,13 +1426,21 @@ Xonomy.mergeElements=function(elDead, elLive){
 			var atDead=elDead.attributes[i];
 			if(!elLive.hasAttribute(atDead.name) || elLive.getAttributeValue(atDead.name)==""){
 				elLive.setAttribute(atDead.name, atDead.value);
+				if(elLive.hasAttribute(atDead.name)) $("#"+elLive.getAttribute(atDead.name).htmlID).remove();
+				$("#"+elLive.htmlID).find(".attributes").first().append($("#"+elDead.attributes[i].htmlID));
 			}
 		}
 		var specDead=Xonomy.docSpec.elements[elDead.name];
 		var specLive=Xonomy.docSpec.elements[elLive.name];
 		if(specDead.hasText(elDead) || specLive.hasText(elLive)){ //if either element is meant to have text, concatenate their children
-			if(elLive.getText()!="" && elDead.getText()!="") elLive.addText(" ");
-			for(var i=0; i<elDead.children.length; i++) elLive.children.push(elDead.children[i]);
+			if(elLive.getText()!="" && elDead.getText()!="") {
+				elLive.addText(" ");
+				$("#"+elLive.htmlID).find(".children").first().append(Xonomy.renderText({type: "text", value: " "}));
+			}
+			for(var i=0; i<elDead.children.length; i++) {
+				elLive.children.push(elDead.children[i]);
+				$("#"+elLive.htmlID).find(".children").first().append($("#"+elDead.children[i].htmlID));
+			}
 		} else { //if no text, merge their children one by one
 			for(var i=0; i<elDead.children.length; i++){
 				var xmlDeadChild=Xonomy.js2xml(elDead.children[i]);
@@ -1441,14 +1449,16 @@ Xonomy.mergeElements=function(elDead, elLive){
 					var xmlLiveChild=Xonomy.js2xml(elLive.children[y]);
 					if(xmlDeadChild==xmlLiveChild){ has=true; break; }
 				}
-				if(!has) elLive.children.push(elDead.children[i]);
+				if(!has) {
+					elLive.children.push(elDead.children[i]);
+					$("#"+elLive.htmlID).find(".children").first().append($("#"+elDead.children[i].htmlID));
+					Xonomy.elementReorder(elDead.children[i].htmlID);
+				}
 			}
 		}
 		domDead.parentNode.removeChild(domDead);
-		Xonomy.setFocus(elLive.htmlID, "openingTagName");
-		Xonomy.replace(elLive.htmlID, elLive);
-		for(var i=0; i<elLive.children.length; i++) if(elLive.children[i].type=="element") Xonomy.elementReorder(elLive.children[i].htmlID);
 		Xonomy.changed();
+		window.setTimeout(function(){ Xonomy.setFocus(elLive.htmlID, "openingTagName"); }, 100);
 	} else {
 		window.setTimeout(function(){ Xonomy.setFocus(htmlID, "openingTagName"); }, 100);
 	}
