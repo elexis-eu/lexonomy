@@ -71,11 +71,15 @@ Xematron.xema2docspec=function(xema){
 			caption: "Merge this <"+elname+"> with the previous <"+elname+">",
 			action: Xonomy.mergeWithPrevious,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getPrecedingSibling() || jsMe.getPrecedingSibling().name!=elname },
+			keyTrigger: function(event){ return event.altKey && event.shiftKey && event.which==38 },
+			keyCaption: "Alt + Shift + Up",
 		});
 		submenu.push({
 			caption: "Merge this <"+elname+"> with the next <"+elname+">",
 			action: Xonomy.mergeWithNext,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getFollowingSibling() || jsMe.getFollowingSibling().name!=elname },
+			keyTrigger: function(event){ return event.altKey && event.shiftKey && event.which==40 },
+			keyCaption: "Alt + Shift + Down",
 		});
 
 		if(submenu.length>0) {
