@@ -25,7 +25,7 @@ Xematron.xema2docspec=function(xema){
 
 		//children of inl elements have a menu item to unwrap themselves:
 		submenu.push({
-			caption: "Unwrap this <"+elname+">",
+			caption: "Unwrap <"+elname+">",
 			action: Xonomy.unwrap,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling!="inl"; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
@@ -34,7 +34,7 @@ Xematron.xema2docspec=function(xema){
 
 		//all elements have a menu item to remove themselves, except the top-level element and except children of inl elements:
 		submenu.push({
-			caption: "Remove this <"+elname+">",
+			caption: "Remove <"+elname+">",
 			action: Xonomy.deleteElement,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
@@ -43,7 +43,7 @@ Xematron.xema2docspec=function(xema){
 
 		//all elements have a menu item to duplicate themselves, except the top-level element and except children of inl elements:
 		submenu.push({
-			caption: "Duplicate this <"+elname+">",
+			caption: "Duplicate <"+elname+">",
 			action: Xonomy.duplicateElement,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==68 },
@@ -52,14 +52,14 @@ Xematron.xema2docspec=function(xema){
 
 		//all elements have a menu item to move themselves up and down, except the top-level element, and except children of inl elements, and expect elements that have nowhere to move to:
 		submenu.push({
-			caption: "Move this <"+elname+"> up",
+			caption: "Move <"+elname+"> up",
 			action: Xonomy.moveElementUp,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementUp(jsMe.htmlID); },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==38 },
 			keyCaption: "Ctrl + Shift + Up",
 		});
 		submenu.push({
-			caption: "Move this <"+elname+"> down",
+			caption: "Move <"+elname+"> down",
 			action: Xonomy.moveElementDown,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementDown(jsMe.htmlID); },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==40 },
@@ -68,14 +68,14 @@ Xematron.xema2docspec=function(xema){
 
 		//all elements have a menu item to merge themselves with a sibling, except the top-level element, and except children of inl elements, and expect elements that have no-one to merge with:
 		submenu.push({
-			caption: "Merge this <"+elname+"> with the previous <"+elname+">",
+			caption: "Merge <"+elname+"> with previous",
 			action: Xonomy.mergeWithPrevious,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getPrecedingSibling() || jsMe.getPrecedingSibling().name!=elname },
 			keyTrigger: function(event){ return event.altKey && event.shiftKey && event.which==38 },
 			keyCaption: "Alt + Shift + Up",
 		});
 		submenu.push({
-			caption: "Merge this <"+elname+"> with the next <"+elname+">",
+			caption: "Merge <"+elname+"> with next",
 			action: Xonomy.mergeWithNext,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getFollowingSibling() || jsMe.getFollowingSibling().name!=elname },
 			keyTrigger: function(event){ return event.altKey && event.shiftKey && event.which==40 },
@@ -211,13 +211,13 @@ Xematron.xema2docspec=function(xema){
 			});
 		});
 		submenu.push({
-			caption: "Add another <"+elname+"> before this <"+elname+">",
+			caption: "Add another <"+elname+"> before",
 			action: Xonomy.newElementBefore,
 			actionParameter: Xematron.initialElement(xema, elname),
 			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl"; },
 		});
 		submenu.push({
-			caption: "Add another <"+elname+"> after this <"+elname+">",
+			caption: "Add another <"+elname+"> after",
 			action: Xonomy.newElementAfter,
 			actionParameter: Xematron.initialElement(xema, elname),
 			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl"; },
