@@ -56,7 +56,6 @@
 
 		<script type="text/javascript">
 			$("#viewer").find("a.xref").each(function(){
-				console.log(this);
 				var $a=$(this);
 				$a.attr("href", "../search/?q="+encodeURIComponent($a.attr("data-text")));
 			});

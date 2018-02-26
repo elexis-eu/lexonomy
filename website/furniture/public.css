@@ -149,8 +149,11 @@ div.createdict a {text-decoration: none; color: #09587e; background-image: url(l
 div.createdict a:hover {color: #2c7fba;}
 
 div.dict {margin-top: 13px;}
-div.dict a {display: inline-block; font-size: 1.2rem; padding: 5px 10px; background-color: #4c9ed9; color: #ffffff; border-radius: 4px; text-decoration: none; line-height: 1.5em;}
-div.dict a:hover {box-shadow: 0px 0px 2px #999999; color: #eeeeee;}
+div.dict a.dictTitle {display: inline-block; margin-right: 0.5em; font-size: 1.2rem; padding: 5px 10px; background-color: #4c9ed9; color: #ffffff; border-radius: 4px; text-decoration: none; line-height: 1.5em;}
+div.dict a.dictTitle:hover {box-shadow: 0px 0px 2px #999999; color: #eeeeee;}
+div.dict a.dictAction {visibility: hidden; display: inline-block; color: #cccccc; text-decoration: none;}
+div.dict:hover a.dictAction {visibility: visible;}
+div.dict a.dictAction:hover {color: #2c7fba;}
 
 div.adminlink {margin-top: 15px; color: #999999;}
 div.adminlink a {text-decoration: none; color: #09587e; background-image: url(cog.png); background-position: left center; background-repeat: no-repeat; padding-left: 25px; display: inline-block; min-height: 16px; margin-right: 0.75em;}

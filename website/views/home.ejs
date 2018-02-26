@@ -75,7 +75,10 @@
 						<div class="nodicts">You have no dictionaries yet.</div>
 					<%}else{%>
 						<%for(var i=0; i<dicts.length; i++){%>
-							<div class="dict"><a href="<%-dicts[i].id%>/"><%=dicts[i].title%></a></div>
+							<div class="dict">
+								<a class="dictTitle" href="<%-dicts[i].id%>/"><%=dicts[i].title%></a>
+								<!--<a class="dictAction" href="<%-dicts[i].id%>/">Delete</a>-->
+							</div>
 						<%}%>
 					<%}%>
 					<div class="createdict"><a href="make/">Create a dictionary</a></div>
