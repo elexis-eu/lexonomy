@@ -21,14 +21,20 @@ const libxslt=require("libxslt"); //https://www.npmjs.com/package/libxslt
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 
 const PORT=process.env.PORT||siteconfig.port||80;
-if(siteconfig.verbose) app.use(function (req, res, next) {
-  if(!/^\/(widgets|furniture|libs)\//.test(req.url) && !/^\/docs\/.*\.[a-zA-Z0-9]+$/.test(req.url)) { //do not log static files
-    var bodyCopy={}; for(var key in req.body) { bodyCopy[key]=req.body[key]; if(key=="password") bodyCopy[key]="******"; }
-    var delim="\t"; if(siteconfig.verbose.multiline) {delim="\n";}
-    var str=req.method+delim+req.url+delim+"COOKIES: "+JSON.stringify(req.cookies)+delim+"REQUEST BODY: "+JSON.stringify(bodyCopy)+"\n";
-    if(siteconfig.verbose.multiline && siteconfig.verbose.filename) str+="\n";
-    if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str, function(err){});
-    else console.log(str);
+app.use(function (req, res, next) {
+  if(!/^\/(widgets|furniture|libs)\//.test(req.url) && !/^\/docs\/.*\.[a-zA-Z0-9]+$/.test(req.url)) { //skip if the request is for a static file
+    //reload siteconfig:
+    siteconfig=JSON.parse(fs.readFileSync(path.join(__dirname, "siteconfig.json"), "utf8"));
+    ops.siteconfig=siteconfig;
+    //log request:
+    if(siteconfig.verbose){
+      var bodyCopy={}; for(var key in req.body) { bodyCopy[key]=req.body[key]; if(key=="password") bodyCopy[key]="******"; }
+      var delim="\t"; if(siteconfig.verbose.multiline) {delim="\n";}
+      var str=req.method+delim+req.url+delim+"COOKIES: "+JSON.stringify(req.cookies)+delim+"REQUEST BODY: "+JSON.stringify(bodyCopy)+"\n";
+      if(siteconfig.verbose.multiline && siteconfig.verbose.filename) str+="\n";
+      if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str, function(err){});
+      else console.log(str);
+    }
   }
   next();
 });

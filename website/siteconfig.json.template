@@ -1,4 +1,5 @@
 {
+  "readonly": false,
   "baseUrl": "http://localhost/",
   "rootPath": "/",
   "port": 80,

@@ -648,22 +648,26 @@ module.exports={
   },
 
   login: function(email, password, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    var hash=sha1(password);
-    db.get("select email from users where email=$email and passwordHash=$hash", {$email: email, $hash: hash}, function(err, row){
-      if(!row){
-        db.close();
-        callnext(false, "", "");
-      } else {
-        email=row.email;
-        var key=generateKey();
-        var now=(new Date()).toISOString();
-        db.run("update users set sessionKey=$key, sessionLast=$now where email=$email", {$key: key, $now: now, $email: email}, function(err, row){
+    if(module.exports.siteconfig.readonly){
+      callnext(false, "", "");
+    } else {
+      var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+      var hash=sha1(password);
+      db.get("select email from users where email=$email and passwordHash=$hash", {$email: email, $hash: hash}, function(err, row){
+        if(!row){
           db.close();
-          callnext(true, email, key);
-        });
-      }
-    });
+          callnext(false, "", "");
+        } else {
+          email=row.email;
+          var key=generateKey();
+          var now=(new Date()).toISOString();
+          db.run("update users set sessionKey=$key, sessionLast=$now where email=$email", {$key: key, $now: now, $email: email}, function(err, row){
+            db.close();
+            callnext(true, email, key);
+          });
+        }
+      });
+    }
   },
   changePwd: function(email, password, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
@@ -677,7 +681,7 @@ module.exports={
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
-      if(!row){
+      if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
@@ -696,7 +700,7 @@ module.exports={
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
-      if(!row){
+      if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
@@ -739,7 +743,7 @@ module.exports={
   verifyUserApiKey: function(email, apikey, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email and apiKey=$key", {$email: email, $key: apikey}, function(err, row){
-      if(!row){
+      if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({valid: false});
       } else {

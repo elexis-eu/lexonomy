@@ -28,7 +28,7 @@
 	</head>
 	<body class="sitehome">
 		<div id="header">
-			<a class="sitehome" href=""></a>
+			<a class="sitehome" href=""><%if(siteconfig.readonly){%><span class="readonly">READ-ONLY</span><%}%></a>
 		  <div class="email ScreenfulUser"></div>
 		</div>
 
@@ -39,54 +39,63 @@
 				</div>
 			</div>
 			<div class="rightie">
-				<%if(!user.loggedin){%>
-					<div class="usertop">
-						<div class="title">Registered user login</div>
-						<div class="subtitle"><a href="signup/">Get an account</a> | <a href="forgotpwd/">Forgot your password?</a></div>
+				<%if(siteconfig.readonly){%>
+					<div class="readonly">
+						<div class="readonlyTitle">READ-ONLY</div>
+						Lexonomy is undergoing maintenance and is currently in read-only mode.
+						Normal operation will resume as soon as possible.
+						Our apologies for the inconvenience.
 					</div>
-					<form id="login" onsubmit="return false">
-						<div class="field email"><div class="label">E-mail address</div><input class="textbox email"/></div>
-						<div class="field password"><div class="label">Password</div><input class="textbox password" type="password"/></div>
-						<div class="field submit"><button>Log in</button></div>
-						<div class="error" style="display: none">Invalid e-mail address or password.</div>
-					</form>
-					<script type="text/javascript">
-					$(window).ready(function(){
-						$("form#login").on("submit", function(e){
-				      var email=$("form#login div.field.email input").val();
-				      var password=$("form#login div.field.password input").val();
-				      if(email!="" && password!="") {
-								$.ajax({url: "login.json", dataType: "json", method: "POST", data: {email: email, password: password}}).done(function(data){
-						      if(data.success) window.location.reload();
-						      else $("form#login div.error").show();
-						    });
-							}
-				      return false;
-				    });
-					});
-					</script>
 				<%}else{%>
-					<div class="usertop">
-						<div class="title"><%=user.email%></div>
-						<div class="subtitle"><a href="logout/">Log out</a> | <a href="changepwd/">Change your password</a></div>
-					</div>
-					<div class="yourdicts">Your dictionaries</div>
-					<%if(dicts.length==0){%>
-						<div class="nodicts">You have no dictionaries yet.</div>
+					<%if(!user.loggedin){%>
+						<div class="usertop">
+							<div class="title">Registered user login</div>
+							<div class="subtitle"><a href="signup/">Get an account</a> | <a href="forgotpwd/">Forgot your password?</a></div>
+						</div>
+						<form id="login" onsubmit="return false">
+							<div class="field email"><div class="label">E-mail address</div><input class="textbox email"/></div>
+							<div class="field password"><div class="label">Password</div><input class="textbox password" type="password"/></div>
+							<div class="field submit"><button>Log in</button></div>
+							<div class="error" style="display: none">Invalid e-mail address or password.</div>
+						</form>
+						<script type="text/javascript">
+						$(window).ready(function(){
+							$("form#login").on("submit", function(e){
+					      var email=$("form#login div.field.email input").val();
+					      var password=$("form#login div.field.password input").val();
+					      if(email!="" && password!="") {
+									$.ajax({url: "login.json", dataType: "json", method: "POST", data: {email: email, password: password}}).done(function(data){
+							      if(data.success) window.location.reload();
+							      else $("form#login div.error").show();
+							    });
+								}
+					      return false;
+					    });
+						});
+						</script>
 					<%}else{%>
-						<%for(var i=0; i<dicts.length; i++){%>
-							<div class="dict">
-								<a class="dictTitle" href="<%-dicts[i].id%>/"><%=dicts[i].title%></a>
-								<!--<a class="dictAction" href="<%-dicts[i].id%>/">Delete</a>-->
-							</div>
+						<div class="usertop">
+							<div class="title"><%=user.email%></div>
+							<div class="subtitle"><a href="logout/">Log out</a> | <a href="changepwd/">Change your password</a></div>
+						</div>
+						<div class="yourdicts">Your dictionaries</div>
+						<%if(dicts.length==0){%>
+							<div class="nodicts">You have no dictionaries yet.</div>
+						<%}else{%>
+							<%for(var i=0; i<dicts.length; i++){%>
+								<div class="dict">
+									<a class="dictTitle" href="<%-dicts[i].id%>/"><%=dicts[i].title%></a>
+									<!--<a class="dictAction" href="<%-dicts[i].id%>/">Delete</a>-->
+								</div>
+							<%}%>
 						<%}%>
-					<%}%>
-					<div class="createdict"><a href="make/">Create a dictionary</a></div>
-					<div class="yourdicts">One-Click Dictionary settings</div>
-					<div class="adminlink"><a href="oneclick/">API key</a></div>
-					<%if(user.isAdmin){%>
-						<div class="yourdicts">Administration</div>
-						<div class="adminlink"><a href="users/">Users</a> <a href="dicts/">Dictionaries</a></div>
+						<div class="createdict"><a href="make/">Create a dictionary</a></div>
+						<div class="yourdicts">One-Click Dictionary settings</div>
+						<div class="adminlink"><a href="oneclick/">API key</a></div>
+						<%if(user.isAdmin){%>
+							<div class="yourdicts">Administration</div>
+							<div class="adminlink"><a href="users/">Users</a> <a href="dicts/">Dictionaries</a></div>
+						<%}%>
 					<%}%>
 				<%}%>
 			</div>

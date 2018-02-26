@@ -1,10 +1,14 @@
 body {background-image: url(header-back.gif); background-position: right top; background-repeat: no-repeat; font-family: sans-serif; background-color: #ffffff; margin: 0; padding: 0; line-height: 1.3em; font-size: 1rem;}
 
 #header {padding: 10px 10px; height: 38px;}
-#header a.sitehome {display: inline-block; width: 119px; height: 26px; background-image: url(lexonomy-brackets.png); margin-top: 5px; margin-left: 4px;}
-#header a.sitehome:hover {position: relative; top: -1px;}
+#header a.sitehome {display: inline-block; width: 119px; height: 26px; background-image: url(lexonomy-brackets.png); margin-top: 5px; margin-left: 4px; position: relative;}
+#header a.sitehome:hover {top: -1px;}
+#header a.sitehome span.readonly { display: inline-block; color: #bd6c73; font-size: 0.75rem; line-height: 1em; padding: 10px 5px; position: absolute; top: -15px; left: 120px; white-space: nowrap; text-shadow: 1px 1px 0px #ffffff;}
 #header div.email {display: inline-block; position: absolute; top: 18px; right: 20px; color: #666666;}
-@media (max-width: 800px){ #header span.email {display: none;} }
+@media (max-width: 800px){
+  #header div.email {display: none;}
+  #header a.sitehome span.readonly {display: none;}
+}
 
 .invelope {max-width: 1250px; margin: 0px auto; padding: 0px 10px; }
 .midlope {border-top: 1px solid #1e6bcf; padding-top: 30px; margin-top: 30px;}
@@ -163,3 +167,6 @@ body.doc div.markdown {max-width: 900px; margin-top: 70px; }
 @media (max-width: 800px){
   body.doc div.markdown {margin-top: 50px;}
 }
+
+div.readonly { text-align: center; padding: 115px 0px 0px 0px; background-image: url(maintenance.png); background-position: center top; background-repeat: no-repeat; line-height: 1.5em; color: #666666;}
+div.readonly div.readonlyTitle { color: #bd6c73; font-size: 1.25rem; margin-bottom: 0.75em;}
