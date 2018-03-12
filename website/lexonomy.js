@@ -867,6 +867,7 @@ app.get(siteconfig.rootPath+":dictID/skeget/", function(req, res){
       url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
       url+="&viewmode=sen";
       url+="&gdex_enabled=1";
+      url+="&attrs=word";
       https.get(url, function(getres){
         getres.setEncoding('utf8');
         var data="";
