@@ -864,7 +864,7 @@ app.get(siteconfig.rootPath+":dictID/skeget/", function(req, res){
       url+="&username="+req.query.username;
       url+="&api_key="+req.query.apikey;
       url+="&format=json";
-      url+="&q=q[lemma%3d%22"+req.query.lemma+"%22]";
+      url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
       url+="&viewmode=sen";
       url+="&gdex_enabled=1";
       https.get(url, function(getres){
