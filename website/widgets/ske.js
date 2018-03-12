@@ -87,7 +87,12 @@ Ske.searchExamples=function(){
   if(lemma!="") {
     $.get(rootPath+dictID+"/skeget/", {url: kex.url, corpus: kex.corpus, username: kex.username, apikey: kex.apikey, lemma: lemma}, function(json){
         $(".skebox .choices").html("");
-        if(json.Lines) {
+        if(json.error && json.error=="Empty result"){
+          $(".skebox .choices").html("<div class='error'>No results found.</div>");
+          $(".skebox .waiter").hide();
+          $(".skebox .choices").fadeIn();
+        }
+        else if(json.Lines) {
           for(var iLine=0; iLine<json.Lines.length; iLine++){ var line=json.Lines[iLine];
             var left=""; for(var i=0; i<line.Left.length; i++) left+=line.Left[i].str; left=left.replace(/\<[^\<\>]+\>/g, "");
             var kwic=""; for(var i=0; i<line.Kwic.length; i++) kwic+=line.Kwic[i].str; kwic=kwic.replace(/<[^\<\>]+\>/g, "");
