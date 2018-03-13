@@ -555,7 +555,8 @@ module.exports={
     res.setHeader("content-disposition", "attachment; filename="+dictID+".xml");
     res.write("<"+dictID+">\n");
     db.each("select id, xml from entries", {}, function(err, row){
-      var xml=row.xml.replace(/^\<[^\s\>]+/, function(found){return found+" xmlns:lxnm='http://www.lexonomy.eu/' lxnm:entryID='"+row.id+"'"});
+      if(/^\<[^\>]*xmlns:lxnm=['"]http:\/\/www\.lexonomy\.eu\/["']/.test(row.xml)) var xml=row.xml.replace(/^\<[^\s\>]+/, function(found){return found+" lxnm:entryID='"+row.id+"'"});
+      else var xml=row.xml.replace(/^\<[^\s\>]+/, function(found){return found+" xmlns:lxnm='http://www.lexonomy.eu/' lxnm:entryID='"+row.id+"'"});
       res.write(xml+"\n");
     }, function(err, rowCount){
       res.write("</"+dictID+">\n");
