@@ -4,7 +4,6 @@ const xmldom=require("xmldom"); //https://www.npmjs.com/package/xmldom
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 const sha1 = require('sha1'); //https://www.npmjs.com/package/sha1
 const markdown = require("markdown").markdown; //https://www.npmjs.com/package/markdown
-const xmlsplit = require("xmlsplit"); //https://www.npmjs.com/package/xmlsplit
 
 module.exports={
   siteconfig: {}, //populated by lexonomy.js on startup
