@@ -4,3 +4,4 @@ data/dicts/*
 data/uploads/*
 !data/uploads/README.md
 website/siteconfig.json
+website/node_modules/*
