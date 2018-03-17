@@ -448,7 +448,7 @@ app.get(siteconfig.rootPath+":dictID/entryeditor/", function(req, res){
       ops.readDictConfigs(db, req.params.dictID, function(configs){
         db.close();
         if(configs.xemplate._xsl) configs.xemplate._xsl="dummy";
-        res.render("entryeditor.ejs", {user: user, dictID: req.params.dictID, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css});
+        res.render("entryeditor.ejs", {user: user, dictID: req.params.dictID, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing});
       });
     }
   });
@@ -616,7 +616,8 @@ app.get(siteconfig.rootPath+":dictID/config/", function(req, res){
           res.render("config.ejs", {
             user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, needResave: (stats.needResave>0), siteconfig: siteconfig,
             hasXemaOverride: (configs.xema._xonomyDocSpec!=null),
-            hasXemplateOverride: (configs.xemplate._xsl!=null || configs.xemplate._css!=null)
+            hasXemplateOverride: (configs.xemplate._xsl!=null || configs.xemplate._css!=null),
+            hasEditingOverride: (configs.editing._js!=null),
           });
         });
       }

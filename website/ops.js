@@ -105,29 +105,33 @@ module.exports={
       configs.siteconfig=JSON.parse(content);
       db.all("select * from configs", {}, function(err, rows){
         for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
+        if(!configs.editing) configs.editing={xonomyMode: "nerd"}; //retrofit: some dicts don't have this config
         callnext(configs);
       });
     });
   },
   readDictConfig: function(db, dictID, configID, callnext){
     db.get("select * from configs where id=$id", {$id: configID}, function(err, row){
-      var config=JSON.parse(row.json);
+      if(!row && configID=="editing") var config={xonomyMode: "nerd"}; //retrofit: some dicts don't have this config
+      else var config=JSON.parse(row.json);
       callnext(config);
     });
   },
   updateDictConfig: function(db, dictID, configID, json, callnext){
-    db.run("update configs set json=$json where id=$id", {$id: configID, $json: JSON.stringify(json, null, "\t")}, function(err){ if(err) console.log(err);
-      if(configID=="ident" || configID=="users"){
-        module.exports.attachDict(db, dictID, function(){
+    db.run("delete from configs where id=$id", {$id: configID}, function(err){
+      db.run("insert into configs(id, json) values($id, $json)", {$id: configID, $json: JSON.stringify(json, null, "\t")}, function(err){
+        if(configID=="ident" || configID=="users"){
+          module.exports.attachDict(db, dictID, function(){
+            callnext(json, false);
+          });
+        } else if(configID=="titling" || configID=="searchability"){
+          module.exports.flagForResave(db, dictID, function(resaveNeeded){
+            callnext(json, resaveNeeded);
+          });
+        } else {
           callnext(json, false);
-        });
-      } else if(configID=="titling" || configID=="searchability"){
-        module.exports.flagForResave(db, dictID, function(resaveNeeded){
-          callnext(json, resaveNeeded);
-        });
-      } else {
-        callnext(json, false);
-      }
+        }
+      });
     });
   },
   readRandomOne: function(db, dictID, callnext){

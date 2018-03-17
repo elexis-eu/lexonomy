@@ -18,7 +18,15 @@
 		<script type="text/javascript" src="../../widgets/ske.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../widgets/ske.css" />
 		<script type="text/javascript" src="../../libs/js.cookie.js"></script>
-		<style><%-css%></style>
+		<style>
+			<%-css%>
+			<%-editing._css%>
+		</style>
+		<%if(editing._js){%>
+			<script type="text/javascript">var ownEditor=<%-editing._js%>;</script>
+		<%} else {%>
+			<script type="text/javascript">var ownEditor=null;</script>
+		<%}%>
 		<script type="text/javascript">
 		Screenful.Editor.createUrl="../../<%=dictID%>/entrycreate.json";
 		Screenful.Editor.readUrl="../../<%=dictID%>/entryread.json";
@@ -47,6 +55,7 @@
 		}
 
 		Screenful.Editor.editor=function(div, entry, uneditable){
+			<%if(!user.canEdit){%> uneditable=true;<%}%>
 			Xonomy.lang="en";
 			<%if(xema._xonomyDocSpec){%>
 				var docSpec=<%-xema._xonomyDocSpec%>;
@@ -59,27 +68,31 @@
 				var newXml=Xematron.xema2xml(xema);
 			<%}%>
 			docSpec.allowModeSwitching=true;
-			docSpec.onModeSwitch=function(mode){ Cookies.set("xonomyMode", mode); };
+			docSpec.onModeSwitch=function(mode){ Cookies.set("xonomyMode_<%=dictID%>", mode); };
 			if(!uneditable) {
 				docSpec.allowLayby=true;
 				docSpec.laybyMessage="This is your temporary lay-by for entry fragments. You can drag and drop XML elements here.";
 			}
-			Xonomy.setMode(Cookies.get("xonomyMode") || "nerd");
+			Xonomy.setMode(Cookies.get("xonomyMode_<%=dictID%>") || "<%-editing.xonomyMode%>");
 			Ske.extendDocspec(docSpec, xema);
 			docSpec.onchange=Screenful.Editor.changed;
 			if(uneditable) {
 				for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
 				if(docSpec.unknownElement) docSpec.unknownElement.isReadOnly=true;
 			}
-			<%if(!user.canEdit){%>
-				for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
-				docSpec.unknownElement.isReadOnly=true;
-			<%}%>
-			Xonomy.render((entry ? entry.content : newXml), div, docSpec);
-			if(!Xonomy.keyNav) Xonomy.startKeyNav(document, document.getElementById("container"));
+			if(!ownEditor){
+				Xonomy.render((entry ? entry.content : newXml), div, docSpec);
+				if(!Xonomy.keyNav) Xonomy.startKeyNav(document, document.getElementById("container"));
+			} else {
+				ownEditor.editor(div, entry ? entry : {content: newXml, id: 0}, uneditable);
+			}
 		};
 		Screenful.Editor.harvester=function(div){
-			return Xonomy.harvest();
+			if(!ownEditor){
+				return Xonomy.harvest();
+			} else {
+				return ownEditor.harvester(div);
+			}
 		};
 		Screenful.Editor.allowSourceCode=true;
 		Screenful.Editor.formatSourceCode=function(str){
