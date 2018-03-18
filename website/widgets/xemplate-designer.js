@@ -205,7 +205,7 @@ XemplateDesigner.renderElementStyles=function(elName){
 		var qualifies=true;
 		if((dim=="separation" || dim=="gutter") && XemaDesigner.xema.root==elName) qualifies=false;
 		if((dim=="innerPunc" || dim=="weight" || dim=="slant" || dim=="colour") && XemaDesigner.xema.elements[elName].filling=="chd") qualifies=false;
-
+		if((dim=="captioning") && XemaDesigner.xema.elements[elName].filling!="lst") qualifies=false;
 		if(qualifies) {
 	    var $row=$("<tr><td class='cell1'></td><td class='cell9'></td></tr>").appendTo($table);
 	    $row.find("td.cell1").append("<div class='caption'>"+Xemplatron.styles[dim].title+"</div>");
@@ -227,15 +227,19 @@ XemplateDesigner.renderAttributeStyles=function(elName, atName){
   var dims=[]; for(var dim in Xemplatron.styles) dims.push(dim); dims.reverse();
   for(var iDim=0; iDim<dims.length; iDim++){
     var dim=dims[iDim];
-    var $row=$("<tr><td class='cell1'></td><td class='cell9'></td></tr>").appendTo($table);
-    $row.find("td.cell1").append("<div class='caption'>"+Xemplatron.styles[dim].title+"</div>");
-    $row.find("td.cell9").append("<select name='"+dim+"' class='"+(!x[dim]?"none":"")+"'><option value=''>(none)</option></select>");
-    for(var styleID in Xemplatron.styles[dim]) if(styleID!="title") {
-      $row.find("select").append("<option value='"+styleID+"' "+(x[dim]&&x[dim]==styleID?"selected='selected'":"")+">"+Xemplatron.styles[dim][styleID].title+"</option>");
-      $row.find("select").on("change", function(event){
-        XemplateDesigner.changeAttributeStyle(elName, atName, $(event.target).prop("name"), $(event.target).val());
-      });
-    }
+		var qualifies=true;
+		if((dim=="captioning") && XemaDesigner.xema.elements[elName].attributes[atName].filling!="lst") qualifies=false;
+		if(qualifies) {
+	    var $row=$("<tr><td class='cell1'></td><td class='cell9'></td></tr>").appendTo($table);
+	    $row.find("td.cell1").append("<div class='caption'>"+Xemplatron.styles[dim].title+"</div>");
+	    $row.find("td.cell9").append("<select name='"+dim+"' class='"+(!x[dim]?"none":"")+"'><option value=''>(none)</option></select>");
+	    for(var styleID in Xemplatron.styles[dim]) if(styleID!="title") {
+	      $row.find("select").append("<option value='"+styleID+"' "+(x[dim]&&x[dim]==styleID?"selected='selected'":"")+">"+Xemplatron.styles[dim][styleID].title+"</option>");
+	      $row.find("select").on("change", function(event){
+	        XemplateDesigner.changeAttributeStyle(elName, atName, $(event.target).prop("name"), $(event.target).val());
+	      });
+	    }
+		}
   }
 };
 XemplateDesigner.changeElementStyle=function(elName, dim, val){

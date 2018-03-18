@@ -12,10 +12,10 @@ Xemplatron.xml2html=function(xml, xemplate, xema){
 Xemplatron.el2html=function(el, isFirst, isLast){
   if(!Xemplatron.getXemplate(el).shown) return "";
   var html="";
+  var caption="";
   var xema=Xemplatron.xema.elements[el.nodeName]; if(xema && xema.filling=="lst") {
     html=el.textContent;
-    if(xema.values) for(var i=0; i<xema.values.length; i++) if(xema.values[i].value==el.textContent) {html=xema.values[i].caption; break;}
-    if(!html) html=el.textContent;
+    if(xema.values) for(var i=0; i<xema.values.length; i++) if(xema.values[i].value==el.textContent) {caption=xema.values[i].caption; break;}
   } else {
     //obtain the child nodes we want to process, in the other we want to proceess them in:
     var nodes=[];
@@ -46,7 +46,7 @@ Xemplatron.el2html=function(el, isFirst, isLast){
   //add label:
   if(xemplate.label) html="<span class='label'>"+xemplate.label+"</span>&nbsp;"+html;
   //surround the processed nodes with markup:
-  for(var dimension in Xemplatron.styles) if(xemplate[dimension]) html=Xemplatron.getStyle(dimension, xemplate[dimension]).toHtml(xemplate.layout, html, el, isFirst, isLast);
+  for(var dimension in Xemplatron.styles) if(xemplate[dimension]) html=Xemplatron.getStyle(dimension, xemplate[dimension]).toHtml(xemplate.layout, html, el, isFirst, isLast, caption);
   //should this element inherit the font properties of its parent?
   var clearFont=true;
   if(el.parentNode && Xemplatron.xema.elements[el.parentNode.nodeName] && Xemplatron.xema.elements[el.parentNode.nodeName].filling=="inl") clearFont=false;
@@ -56,16 +56,16 @@ Xemplatron.el2html=function(el, isFirst, isLast){
 Xemplatron.at2html=function(at, isFirst, isLast){
   var xemplate=Xemplatron.getXemplate(at);
   var html="";
+  var caption="";
   var xema=Xemplatron.xema.elements[at.ownerElement.nodeName]; if(xema) xema=xema.attributes[at.nodeName]; else xema=null;
   if(xema && xema.filling=="lst") {
-    html=at.nodeValue;
-    if(xema.values) for(var i=0; i<xema.values.length; i++) if(xema.values[i].value==at.nodeValue) {html=xema.values[i].caption; break;}
-    if(!html) html=Xemplatron.xmlEscape(at.nodeValue);
+    html=Xemplatron.xmlEscape(at.nodeValue);
+    if(xema.values) for(var i=0; i<xema.values.length; i++) if(xema.values[i].value==at.nodeValue) {caption=xema.values[i].caption; break;}
   } else {
     html+=Xemplatron.xmlEscape(at.nodeValue);
   }
   if(xemplate.label) html="<span class='label'>"+xemplate.label+"</span>&nbsp;"+html;
-  for(var dimension in Xemplatron.styles) if(xemplate[dimension]) html=Xemplatron.getStyle(dimension, xemplate[dimension]).toHtml(xemplate.layout, html, at, isFirst, isLast);
+  for(var dimension in Xemplatron.styles) if(xemplate[dimension]) html=Xemplatron.getStyle(dimension, xemplate[dimension]).toHtml(xemplate.layout, html, at, isFirst, isLast, caption);
   if(xemplate.layout=="block") return "<div class='clearFont'>"+html+"</div>"; else return "<span class='clearFont'>"+html+"</span>";;
 };
 Xemplatron.tn2html=function(tn){
@@ -103,9 +103,14 @@ Xemplatron.getStyle=function(dimension, name){
 };
 Xemplatron.defaultStyle={toHtml: function(ly, html, n, isF, isL){return html}};
 Xemplatron.styles={ //the dimensions are ordered from innermost to outermost
+  captioning: {
+    "title": "Caption display",
+    "replace": {toHtml: function(ly, html, n, isF, isL, cap){return "<span>"+(cap?cap:html)+"</span>"}, title: "Show caption instead of value"},
+    "mouseover": {toHtml: function(ly, html, n, isF, isL, cap){return "<span class='caption' title='"+cap.replace("'", "&apos;")+"'>"+html+"</span>"}, title: "Show caption on mouse-over"},
+  },
   interactivity: {
     "title": "Interactivity",
-    "xref": {toHtml: function(ly, html, n, isF, isL){return "<a class='xref' href='#' data-text='"+n.textContent.replace("'", "&amp;")+"'>"+html+"</a>"}, title: "Clickable cross-reference"},
+    "xref": {toHtml: function(ly, html, n, isF, isL){return "<a class='xref' href='#' data-text='"+n.textContent.replace("'", "&apos;")+"'>"+html+"</a>"}, title: "Clickable cross-reference"},
   },
   innerPunc: {
     "title": "Inner punctuation",
@@ -159,6 +164,7 @@ Xemplatron.styles={ //the dimensions are ordered from innermost to outermost
     "diamond": {toHtml: function(ly, html, n, isF, isL){ return Xemplatron._bullet(ly, "diamond", html) }, title: "Diamond bullet"},
     "arrow": {toHtml: function(ly, html, n, isF, isL){ return Xemplatron._bullet(ly, "arrow", html) }, title: "Arrow bullet"},
     "indent": {toHtml: function(ly, html, n, isF, isL){ return "<"+(ly=="block"?"div":"span")+" class='indented'>"+html+"</"+(ly=="block"?"div":"span")+">" }, title: "Indent"},
+    "hanging": {toHtml: function(ly, html, n, isF, isL){ return "<"+(ly=="block"?"div":"span")+" class='hanging'>"+html+"</"+(ly=="block"?"div":"span")+">" }, title: "Hanging indent"},
     "sensenum0": {title: "Sense number I, II, III...", toHtml: function(ly, html, n, isF, isL){ return Xemplatron._senseNum(ly, html, n, 0); }},
     "sensenum1": {title: "Sense number 1, 2, 3...", toHtml: function(ly, html, n, isF, isL){ return Xemplatron._senseNum(ly, html, n, 1); }},
     "sensenum2": {title: "Sense number a, b, c...", toHtml: function(ly, html, n, isF, isL){ return Xemplatron._senseNum(ly, html, n, 2); }},

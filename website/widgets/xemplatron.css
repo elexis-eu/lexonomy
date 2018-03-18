@@ -1,8 +1,11 @@
 .viewer {font-size: 1.1rem; padding: 20px; line-height: 1.75em;}
 .viewer .clearFont {font-style: normal; font-weight: normal; color: #333333;}
 
-.viewer a.xref {color: inherit; text-decoration: inherit; border-bottom: 1px solid #cccccc;}
+.viewer a.xref {color: inherit; text-decoration: inherit; border-bottom: 2px solid #cccccc;}
 .viewer a.xref:hover {border-bottom: 2px solid #437de2; }
+
+.viewer span.caption {border-bottom: 1px dotted #cccccc; cursor: default;}
+.viewer span.caption:hover {background-color: #fffde3;}
 
 .viewer span.italic {font-style: italic;}
 .viewer span.bold {font-weight: bold;}
@@ -26,7 +29,10 @@
 .viewer .background.grey {background-color: #eeeeee; text-shadow: 1px 1px 0px #ffffff;}
 
 .viewer div.indented {margin-left: 40px;}
-.viewer span.indented {margin-left: 1.5em;}
+.viewer span.indented {margin-left: 0.5em; margin-right: 0.5em;}
+
+.viewer div.hanging {margin-left: 40px; text-indent: -40px;}
+.viewer span.hanging {margin-right: 0.5em;}
 
 .viewer div.bulleted {}
 .viewer div.bulleted > div.bullet {float: left; margin-left: 5px; color: #999999; text-align: center; width: 20px;}
