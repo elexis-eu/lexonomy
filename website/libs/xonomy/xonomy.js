@@ -382,7 +382,7 @@ Xonomy.refresh=function() {
 		if(elSpec.displayName) $(this).children(".tag").children(".name").html(Xonomy.textByLang(elSpec.displayName(Xonomy.harvestElement(this))));
 		if(elSpec.caption) {
 			var jsEl=Xonomy.harvestElement(this);
-			if(!jsEl.hasElements()) $(this).children(".inlinecaption").html("&nbsp;"+Xonomy.textByLang(elSpec.caption(jsEl))+"&nbsp;");
+			$(this).children(".inlinecaption").html(Xonomy.textByLang(elSpec.caption(jsEl)));
 		}
 		if(elSpec.displayValue) {
 			var jsEl=Xonomy.harvestElement(this);
@@ -571,6 +571,7 @@ Xonomy.renderElement=function(element) {
 			html+='<span class="punc slash">/</span>';
 			html+='<span class="punc">&gt;</span>';
 		html+='</span>';
+		if(spec.caption && !spec.oneliner(element)) html+="<span class='inlinecaption'>"+Xonomy.textByLang(spec.caption(element))+"</span>";
 		html+='<span class="childrenCollapsed focusable" onclick="Xonomy.plusminus(\''+htmlID+'\', true)">&middot;&middot;&middot;</span>';
 		html+='<div class="children">';
 			if(spec.displayValue && !element.hasElements()) {
@@ -600,7 +601,7 @@ Xonomy.renderElement=function(element) {
 			html+='<span class="name" onclick="Xonomy.click(\''+htmlID+'\', \'closingTagName\')">'+displayName+'</span>';
 			html+='<span class="punc">&gt;</span>';
 		html+='</span>';
-		if(spec.caption && !element.hasElements()) html+="<span class='inlinecaption'>"+Xonomy.textByLang(spec.caption(element))+"</span>";
+		if(spec.caption && spec.oneliner(element)) html+="<span class='inlinecaption'>"+Xonomy.textByLang(spec.caption(element))+"</span>";
 	html+='</div>';
 	element.htmlID = htmlID;
 	return html;

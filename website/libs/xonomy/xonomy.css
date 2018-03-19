@@ -166,7 +166,9 @@
 /*Caption beside attribute values and elements*/
 .xonomy.nerd .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.8em; color: #999999; font-weight: normal;
 	-webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text !important;
-	}
+}
+.xonomy.nerd .element > .inlinecaption {margin-left: 0.5em;}
+.xonomy.nerd .collapsed .inlinecaption {display: none}
 
 /*Pop-up box*/
 #xonomyBubble.nerd { display: none; position: absolute; z-index: 10; min-width: 100px; }
@@ -267,8 +269,8 @@
 /*Caption beside attribute values and elements*/
 .xonomy.laic .inlinecaption {-webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text !important;}
 .xonomy.laic .attribute > .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; margin-left: 5px; margin-right: 4px; }
-.xonomy.laic .element > .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; margin-left: 50px; margin-right: 0px; margin-top: 5px; display: block; }
-.xonomy.laic .element.oneliner > .inlinecaption { display: inline; margin-left: 5px; margin-right: 4px; }
+.xonomy.laic .element > .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; margin-left: 50px; margin-right: 0px; margin-top: 10px; display: block; }
+.xonomy.laic .element.oneliner > .inlinecaption { display: inline; margin-left: 1em; margin-right: 4px; }
 .xonomy.laic .element.collapsed > .inlinecaption { display: none; }
 
 /*Elements with no children*/
