@@ -74,8 +74,8 @@
 
 /*Block layout*/
 .xonomy.nerd .element { padding-left: 25px; margin-top: 5px; margin-bottom: 5px; }
-.xonomy.nerd .element .connector { border-top: 1px dotted #b6b6b6; width: 24px; height: 10px; position: absolute; top: 17px; left: 0px; }
-.xonomy.nerd .element.oneliner .connector { top: 17px; }
+.xonomy.nerd .element .connector { border-top: 1px dotted #b6b6b6; width: 24px; height: 10px; position: absolute; top: 1em; left: 0px; }
+.xonomy.nerd .element.oneliner .connector { top: 1em; }
 .xonomy.nerd .element .children { margin-left: 10px; border-left: 1px dotted #cccccc; padding-top: 1px; padding-bottom: 1px; }
 .xonomy.nerd .element .children .textnode { padding-left: 25px; margin-top: 5px; margin-bottom: 5px; }
 
@@ -164,7 +164,7 @@
 .xonomy.nerd .attribute.invalid > .warner { display: inline-block; }
 
 /*Caption beside attribute values and elements*/
-.xonomy.nerd .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.8rem; color: #999999; font-weight: normal;
+.xonomy.nerd .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.8em; color: #999999; font-weight: normal;
 	-webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text !important;
 	}
 
@@ -193,7 +193,7 @@
 #xonomyBubble.nerd #xonomyBubbleContent span.techno span.atValue { color: #666666; }
 #xonomyBubble.nerd #xonomyBubbleContent span.techno span.elName { color: #cc3333; }
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem.techno { padding-top: 6px; padding-bottom: 6px; font-family: monospace; font-size: 0.9rem; }
-#xonomyBubble.nerd #xonomyBubbleContent div.menuItem.techno span.explainer { font-family: Verdana, sans-serif; font-size: 0.8rem; color: #999999; font-weight: normal; margin-left: 3px; }
+#xonomyBubble.nerd #xonomyBubbleContent div.menuItem.techno span.explainer { font-family: Verdana, sans-serif; font-size: 0.8em; color: #999999; font-weight: normal; margin-left: 3px; }
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem.current { x-background-color: #ffffdd; }
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem:hover { background-color: #ffffcc; }
 
@@ -245,6 +245,9 @@
 .xonomy.laic .element.oneliner.hasInlineMenu > .children { padding: 0px 0px; line-height: inherit;}
 .xonomy.laic .element.oneliner.hasInlineMenu > .children > .textnode {  }
 .xonomy.laic .element.oneliner.hasInlineMenu > .children > .textnode > .value {  }
+
+.xonomy.laic .element .connector { position: absolute; top: -0.5em;}
+.xonomy.laic .element.oneliner .connector { position: relative; top: 0px;}
 
 /*Plus-minus collapsor*/
 .xonomy.laic .element > .connector > .plusminus { background-image: url(minus.gif); background-position: center center; background-repeat: no-repeat; width: 1rem; height: 1rem; background-color: #dddddd; position: absolute; top: 20px; left: -30px; cursor: pointer; }
@@ -398,7 +401,7 @@
 #xonomyBubble.laic #xonomyBubbleContent .techno span.atName { font-family: Verdana, sans-serif; font-weight: bold; color: #6385bf; }
 #xonomyBubble.laic #xonomyBubbleContent .techno span.atValue { font-family: monospace; font-size: 0.75rem; color: #444444; }
 #xonomyBubble.laic #xonomyBubbleContent span.techno span.elName { font-family: Verdana, sans-serif; font-weight: bold; color: #315696; }
-#xonomyBubble.laic #xonomyBubbleContent div.menuItem.techno span.explainer { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; margin-left: 0.5em; }
+#xonomyBubble.laic #xonomyBubbleContent div.menuItem.techno span.explainer { font-family: Verdana, sans-serif; font-size: 1em; color: #999999; font-weight: normal; margin-left: 0.5em; }
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem.techno span.explainer.alone {margin-left: 0px;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem.current { x-background-color: #ffffdd; }
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem:hover { background-color: #f6f6f6; }
