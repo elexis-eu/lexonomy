@@ -167,8 +167,7 @@
 .xonomy.nerd .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.8em; color: #999999; font-weight: normal;
 	-webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text !important;
 }
-.xonomy.nerd .element > .inlinecaption {margin-left: 0.5em;}
-.xonomy.nerd .collapsed .inlinecaption {display: none}
+.xonomy.nerd .element > .inlinecaption {margin-left: 0.5em; margin-right: 0.5em;}
 
 /*Pop-up box*/
 #xonomyBubble.nerd { display: none; position: absolute; z-index: 10; min-width: 100px; }
@@ -262,16 +261,15 @@
 .xonomy.laic .element.hasText .element.oneliner.collapsed > .tag { display: none; }
 
 /*The "collapsoid" (= rectangle that hides collapsed stuff)*/
-.xonomy.laic .element > .childrenCollapsed { display: none; border: 1px solid #cccccc; color: #999999; padding: 1px 5px; cursor: pointer; font-family: monospace; background-color: #ffffff; font-size: 0.85rem; z-index: 9; }
-.xonomy.laic .element.collapsed > .childrenCollapsed { display: block; position: absolute; top: 8px; right: 3px; }
+.xonomy.laic .element > .childrenCollapsed { display: none; color: #999999; padding: 1px 5px; cursor: pointer; font-family: monospace; font-size: 0.85rem; z-index: 9; text-shadow: 0px 0px 2px #ffffff;}
+.xonomy.laic .element.collapsed > .childrenCollapsed { display: block; margin-top: 5px; }
 .xonomy.laic .element.collapsed > .childrenCollapsed:hover { background-color: #f4f4f4; }
 
 /*Caption beside attribute values and elements*/
 .xonomy.laic .inlinecaption {-webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text !important;}
 .xonomy.laic .attribute > .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; margin-left: 5px; margin-right: 4px; }
-.xonomy.laic .element > .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; margin-left: 50px; margin-right: 0px; margin-top: 10px; display: block; }
-.xonomy.laic .element.oneliner > .inlinecaption { display: inline; margin-left: 1em; margin-right: 4px; }
-.xonomy.laic .element.collapsed > .inlinecaption { display: none; }
+.xonomy.laic .element > .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; display: block; position: absolute; top: 10px; right: 3px; z-index: 9; }
+.xonomy.laic .element.oneliner > .inlinecaption { display: inline; margin-left: 1em; margin-right: 4px; position: relative; top: auto; right: auto;}
 
 /*Elements with no children*/
 .xonomy.laic .element.noChildren > .connector > .plusminus { display: none; }
@@ -440,7 +438,7 @@
 .xonomy.nerd div.modeSwitcher span.nerd {background-color: #fbeb93; }
 .xonomy.laic div.modeSwitcher span.laic {background-color: #fbeb93; }
 
-.xonomy div.layby { position: fixed; bottom: 0px; top: 0px; right: 0px; padding: 10px 10px 0px 10px; background-color: #fffef4; z-index: 12; border-left: 2px solid #cccccc; z-index: 9}
+.xonomy div.layby { position: fixed; bottom: 0px; top: 0px; right: 0px; padding: 10px 10px 0px 10px; background-color: #fffef4; z-index: 12; border-left: 3px solid #cccccc; z-index: 9}
 .xonomy div.layby.closed { width: 0px; padding: 5px 10px 0px 5px; cursor: pointer; }
 .xonomy div.layby.closed:hover {background-color: #f9f6dc;}
 .xonomy div.layby span.button {display: inline-block; width: 30px; height: 30px; background-position: center center; background-repeat: no-repeat; background-color: #ffffff; border: 1px solid #cccccc; cursor: pointer;}
@@ -458,8 +456,8 @@
 .xonomy div.layby div.message { display: none; position: absolute; top: 40px; left: 20px; right: 20px; bottom: 0px; overflow: hidden; font-family: sans-serif; font-size: 1.25rem; line-height: 1.5em; text-align: center; padding-top: 100px; color: #cccccc;}
 .xonomy div.layby.empty.open div.message { display: block; }
 .xonomy div.layby.activeDropper {background-color: #f9f6dc;}
-.xonomy div.layby > div.content { position: absolute; top: 50px; left: 10px; right: 10px; bottom: 0px; overflow-x: hidden; overflow-y: auto;}
-.xonomy.laic div.layby > div.content { padding-right: 1px; }
+.xonomy div.layby > div.content { position: absolute; top: 50px; left: 10px; right: 10px; bottom: 0px; overflow-x: hidden; overflow-y: auto; white-space: nowrap;}
+.xonomy.laic div.layby > div.content { padding-right: 1px;}
 .xonomy.nerd div.layby > div.content > .element {margin-left: 10px;}
 .xonomy.laic div.layby > div.content > .element {margin-left: 35px;}
 .xonomy.laic div.layby > div.content .children {background-color: transparent !important;}

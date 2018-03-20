@@ -10,7 +10,6 @@ Xematron.xema2docspec=function(xema){
 				isInvisible: true,
 			};
 			return {
-				//oneliner: function(jsMe){ for(var i=0; i<jsMe.children.length; i++) if(jsMe.children[i].type=="text") return true; return false; },
 				oneliner: function(jsMe){ return !jsMe.hasElements(); },
 				menu: [{caption: "Delete", action: Xonomy.deleteElement, hideIf: function(jsMe){return !jsMe.parent();}}],
 			};
@@ -248,20 +247,6 @@ Xematron.xema2docspec=function(xema){
 				menu: submenu,
 			});
 		}
-
-		//FYI:
-		//xel=xema.elements[elname]; //the xema element from which we are creating a docSpec element
-		//del={}; docSpec.elements[elname]=del; //the docSpec element we are creating
-		del.caption=function(jsMe){
-			var cap="";
-			var subentryID=jsMe.getAttributeValue("lxnm:subentryID", 0);
-			var subentryParenthoods=jsMe.getChildElements("lxnm:subentryParenthood");
-			if(subentryID){
-				cap+="SUBENTRY ("+subentryParenthoods.length+") ▼";
-			}
-			if(cap) cap="<span class='lexonomySubentryCaption'>"+cap+"</span>";
-			return cap;
-		};
 
 	}); //end of loop over elements
 	return docSpec;

@@ -17,10 +17,11 @@
 		<link type="text/css" rel="stylesheet" href="../../widgets/xemplatron.css" />
 		<script type="text/javascript" src="../../widgets/ske.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../widgets/ske.css" />
+		<script type="text/javascript" src="../../widgets/sub.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../widgets/sub.css" />
 		<script type="text/javascript" src="../../libs/js.cookie.js"></script>
 		<style>
-			.lexonomySubentryCaption {white-space: nowrap; background-color: #eeeeee; color: #666666; border: 1px outset #cccccc; padding: 3px 10px; border-radius: 5px; cursor: pointer;}
-			.lexonomySubentryCaption:hover {color: #004f9b;}
+			.xonomy div.layby.open {width: 55%}
 			<%-css%>
 			<%-editing._css%>
 		</style>
@@ -77,6 +78,7 @@
 			}
 			Xonomy.setMode(Cookies.get("xonomyMode_<%=dictID%>") || "<%-editing.xonomyMode%>");
 			Ske.extendDocspec(docSpec, xema);
+			Sub.extendDocspec(docSpec, xema);
 			docSpec.onchange=Screenful.Editor.changed;
 			if(uneditable) {
 				for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
