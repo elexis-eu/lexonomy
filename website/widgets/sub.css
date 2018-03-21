@@ -1,8 +1,9 @@
 .xonomy .lexonomySubentryCaption {white-space: nowrap; background-color: #eeeeee; color: #666666; border: 1px outset #cccccc; padding: 3px 10px; border-radius: 5px; cursor: pointer; text-shadow: 1px 1px 0px #ffffff; position: relative; top: -2px;}
+.xonomy .readonly .lexonomySubentryCaption {cursor: pointer !important;}
 .xonomy .lexonomySubentryCaption:hover {color: #004f9b;}
 
 div.subinfobox {padding: 0px; position: relative; color: #333333; font-size: 0.9rem; }
-div.subinfobox div.topline {padding: 10px 8px; border-bottom: 1px solid #cccccc}
+div.subinfobox div.topline {padding: 8px 8px 10px 8px; border-bottom: 1px solid #cccccc}
 div.subinfobox div.topline:last-child {border-bottom: 0px; padding: 5px 10px;}
 div.subinfobox div.topline span.opener {margin-left: 0.25em; color: #004f9b; cursor: pointer; border-bottom: 1px dotted;}
 div.subinfobox div.topline span.opener:hover {color: #0065c6;}
@@ -11,15 +12,11 @@ div.subinfobox div.entrylines div.entryline {padding: 5px 10px; cursor: pointer;
 div.subinfobox div.entrylines div.entryline span.headword {font-weight: bold;}
 div.subinfobox div.entrylines div.entryline:hover { background-color: #f7f9ea; color: #004f9b; }
 
-
-
-
-
 div.subbox {padding: 0px; width: 600px; height: 300px; position: relative;}
 div.subbox form.topbar {position: absolute; top: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }
 div.subbox div.bottombar {position: absolute; bottom: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }
 
-div.subbox input.ske {background-image: url(../furniture/ske.png); background-position: center center; background-repeat: no-repeat; padding: 4px 0px 4px 0px; width: 40px; border-width: 1px; border-radius: 2px; cursor: pointer;}
+div.subbox input.sub {background-image: url(../furniture/favicon.png); background-position: center center; background-repeat: no-repeat; padding: 4px 0px 4px 0px; width: 40px; border-width: 1px; border-radius: 2px; cursor: pointer;}
 div.subbox button.insert {background-image: url(../furniture/add.png); background-position: 10px center; background-repeat: no-repeat; padding: 5px 10px 5px 30px; border-width: 1px; border-radius: 2px; cursor: pointer;}
 div.subbox button:hover {background-color: #eeeeee;}
 
@@ -27,9 +24,10 @@ div.subbox div.waiter {position: absolute; top: 43px; left: 0px; right: 0px; bot
 
 div.subbox div.choices {position: absolute; top: 43px; left: 0px; right: 0px; bottom: 45px; overflow-y: scroll; }
 div.subbox div.choices label {cursor: pointer; padding: 5px 5px; font-size: 0.9rem; display: block; position: relative;}
-div.subbox div.choices label input {position: absolute; top: 1px; left: 5px; }
+div.subbox div.choices label input {position: absolute; top: 4px; left: 5px; }
 div.subbox div.choices label span.inside {display: block; margin-left: 30px; }
 div.subbox div.choices label:hover {color: #333333; background-color: #ffffcc;}
 div.subbox div.choices label.selected {color: #002e88;}
+div.subbox div.choices label span.headword {font-weight: bold;}
 
 div.subbox div.choices div.error {text-align: center; margin-top: 50px;}

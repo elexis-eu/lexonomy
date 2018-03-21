@@ -10,7 +10,7 @@ div.skebox div.waiter {position: absolute; top: 43px; left: 0px; right: 0px; bot
 
 div.skebox div.choices {position: absolute; top: 43px; left: 0px; right: 0px; bottom: 45px; overflow-y: scroll; }
 div.skebox div.choices label {cursor: pointer; padding: 5px 5px; font-size: 0.9rem; display: block; position: relative;}
-div.skebox div.choices label input {position: absolute; top: 1px; left: 5px; }
+div.skebox div.choices label input {position: absolute; top: 4px; left: 5px; }
 div.skebox div.choices label span.inside {display: block; margin-left: 30px; }
 div.skebox div.choices label:hover {color: #333333; background-color: #ffffcc;}
 div.skebox div.choices label.selected {color: #002e88;}

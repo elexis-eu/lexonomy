@@ -29,7 +29,7 @@ Ske.extendDocspec=function(docspec, xema){
             if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
             docspec.elements[parName].menu.push({
               icon: rootPath+"furniture/ske.png",
-              caption: "Find examples...",
+              caption: "Find examples <"+xampl.container+">",
               action: Ske.menuExamples,
             });
           }
