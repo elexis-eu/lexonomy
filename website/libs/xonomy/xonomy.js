@@ -404,7 +404,7 @@ Xonomy.harvest=function() { //harvests the contents of an editor
 	var rootElement=$(".xonomy .element").first().toArray()[0];
 	var js=Xonomy.harvestElement(rootElement);
 	for(var key in Xonomy.namespaces) {
-		js.attributes.push({
+		if(!js.hasAttribute(key)) js.attributes.push({
 			type: "attribute",
 			name: key,
 			value: Xonomy.namespaces[key],
