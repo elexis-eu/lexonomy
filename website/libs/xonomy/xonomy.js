@@ -255,6 +255,7 @@ Xonomy.verifyDocSpecElement=function(name) { //make sure the DocSpec object has 
 	spec.localDropOnly=Xonomy.asFunction(spec.localDropOnly, false);
 	spec.isReadOnly=Xonomy.asFunction(spec.isReadOnly, false);
 	spec.isInvisible=Xonomy.asFunction(spec.isInvisible, false);
+	spec.backgroundColour=Xonomy.asFunction(spec.backgroundColour, "");
 	if(spec.displayName) spec.displayName=Xonomy.asFunction(spec.displayName, "");
 	if(spec.title) spec.title=Xonomy.asFunction(spec.title, "");
 	for(var i=0; i<spec.menu.length; i++) Xonomy.verifyDocSpecMenuItem(spec.menu[i]);
@@ -557,7 +558,7 @@ Xonomy.renderElement=function(element) {
 			html+='<span class="plusminus" onclick="Xonomy.plusminus(\''+htmlID+'\')"></span>';
 			html+='<span class="draghandle" draggable="true" ondragstart="Xonomy.drag(event)"></span>';
 		html+='</span>';
-		html+='<span class="tag opening focusable" style="background-color: '+spec.backgroundColour+';">';
+		html+='<span class="tag opening focusable" style="background-color: '+spec.backgroundColour(element)+';">';
 			html+='<span class="punc">&lt;</span>';
 			html+='<span class="warner"><span class="inside" onclick="Xonomy.click(\''+htmlID+'\', \'warner\')"></span></span>';
 			html+='<span class="name" title="'+title+'" onclick="Xonomy.click(\''+htmlID+'\', \'openingTagName\')">'+displayName+'</span>';
@@ -595,7 +596,7 @@ Xonomy.renderElement=function(element) {
 				}
 			}
 		html+='</div>';
-		html+='<span class="tag closing focusable" style="background-color: '+spec.backgroundColour+';">';
+		html+='<span class="tag closing focusable" style="background-color: '+spec.backgroundColour(element)+';">';
 			html+='<span class="punc">&lt;</span>';
 			html+='<span class="punc">/</span>';
 			html+='<span class="name" onclick="Xonomy.click(\''+htmlID+'\', \'closingTagName\')">'+displayName+'</span>';

@@ -1,49 +1,53 @@
+var subbing={
+  "entry": {persist: true},
+  "exampleContainer": {persist: true},
+};
+
 var Sub={};
 
 Sub.extendDocspec=function(docspec, xema){
+  //add background colour and captions to elements that can be subentries:
   for(var elName in xema.elements){
-    if(elName=="exampleContainer" || elName=="entry") {
+    if(subbing[elName]) {
+      docspec.elements[elName].backgroundColour=function(jsMe){
+        var id=jsMe.getAttributeValue("lxnm:subentryID", 0);
+        if(id) return "#eeeeee";
+        return "";
+      };
       docspec.elements[elName].caption=function(jsMe){
   			var cap="";
   			var id=jsMe.getAttributeValue("lxnm:subentryID", 0);
-  			var parents=jsMe.getChildElements("lxnm:subentryParent");
-  			if(id) cap+="SUBENTRY ("+parents.length+") ▼";
-  			if(cap) cap="<span class='lexonomySubentryCaption "+(parents.length>1?"moreThanOne":"")+"' onclick='Xonomy.notclick=true; Sub.menuSubentry(\""+jsMe.htmlID+"\")'>"+cap+"</span>";
+  			var parents=[]; jsMe.getChildElements("lxnm:subentryParent").map(function(p){if(p.getAttributeValue("id")!=Screenful.Editor.entryID) parents.push(p)});
+  			if(id) cap+="("+parents.length+") ▼";
+  			if(cap) cap="<span class='lexonomySubentryCaption' onclick='Xonomy.notclick=true; Sub.menuSubentry(\""+jsMe.htmlID+"\")'>"+cap+"</span>";
   			return cap;
   		};
     }
   }
+  //add menu items to parents that can have subentry children:
+
 };
 
 Sub.menuSubentry=function(htmlID){
   var jsMe=Xonomy.harvestElement($("#"+htmlID)[0]);
   var id=jsMe.getAttributeValue("lxnm:subentryID", 0);
-  var title=jsMe.getAttributeValue("lxnm:subentryTitle", id);
-  var parents=jsMe.getChildElements("lxnm:subentryParent");
+  var parents=[]; jsMe.getChildElements("lxnm:subentryParent").map(function(p){if(p.getAttributeValue("id")!=Screenful.Editor.entryID) parents.push(p)});
   var html="<div class='subinfobox'>";
   if(jsMe.parent() || $("#"+htmlID).closest(".xonomy .layby").length>0){
-    html+="<div class='topline'>";
-      html+="SUBENTRY";
-    html+="</div>";
-    html+="<div class='entrylines'>";
-      html+="<div class='entryline' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>";
-        html+=title;
-      html+="</div>";
-    html+="</div>";
+    if(parents.length==0) html+="<div class='topline'><span class='opener' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>This subentry</span> is not shared with any other entry.</div>";
+    else if(parents.length==1) html+="<div class='topline'><span class='opener' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>This subentry</span> is shared with one other entry.</div>";
+    else html+="<div class='topline'><span class='opener' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>This subentry</span> is shared with "+parents.length+" other entries.</div>";
+  } else {
+    if(parents.length==0) html+="<div class='topline'>This subentry is not embedded in any entries.</div>";
+    else if(parents.length==1) html+="<div class='topline'>This subentry is embedded in one entry.</div>";
+    else html+="<div class='topline'>This subentry is shared by "+parents.length+" entries.</div>";
   }
-  html+="<div class='topline'>";
-    html+=""+(parents.length>1?"SHARED BY":"EMBEDDED IN")+" "+parents.length+" "+(parents.length==1?"ENTRY":"ENTRIES")+"";
-  html+="</div>";
   if(parents.length>0) {
     html+="<div class='entrylines'>";
     parents.map(function(parent){
       var parentID=parent.getAttributeValue("id", 0);
       var parentTitle=parent.getAttributeValue("title", parentID);
-      var parentCount= parent.getAttributeValue("count", 0);
-      html+="<div class='entryline' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+parentID+")'>";
-      if(parentCount>1) html+="<span class='count'>&nbsp;("+parentCount+")</span>";
-        html+=parentTitle;
-      html+="</div>";
+      html+="<div class='entryline' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+parentID+")'>"+parentTitle+"</div>";
     });
     html+="</div>";
   }

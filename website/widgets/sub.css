@@ -1,15 +1,13 @@
-.xonomy .lexonomySubentryCaption {white-space: nowrap; background-color: #eeeeee; color: #666666; border: 1px outset #cccccc; padding: 3px 10px; border-radius: 5px; cursor: pointer; text-shadow: 1px 1px 0px #ffffff;}
-.xonomy .lexonomySubentryCaption.moreThanOne {background-color: #ffcccc;}
+.xonomy .lexonomySubentryCaption {white-space: nowrap; background-color: #eeeeee; color: #666666; border: 1px outset #cccccc; padding: 3px 10px; border-radius: 5px; cursor: pointer; text-shadow: 1px 1px 0px #ffffff; position: relative; top: -2px;}
 .xonomy .lexonomySubentryCaption:hover {color: #004f9b;}
 
 div.subinfobox {padding: 0px; position: relative; color: #333333; font-size: 0.9rem; }
-div.subinfobox div.topline {padding: 5px 10px; background-color: rgb(238, 238, 238); margin-top: 10px;}
-div.subinfobox div.topline:first-child {margin-top: 0px;}
-div.subinfobox div.topline span.opener {margin-left: 0.25em; color: #0065c6; cursor: pointer;}
-div.subinfobox div.topline span.opener:hover {color: #004f9b;}
+div.subinfobox div.topline {padding: 10px 8px; border-bottom: 1px solid #cccccc}
+div.subinfobox div.topline:last-child {border-bottom: 0px; padding: 5px 10px;}
+div.subinfobox div.topline span.opener {margin-left: 0.25em; color: #004f9b; cursor: pointer; border-bottom: 1px dotted;}
+div.subinfobox div.topline span.opener:hover {color: #0065c6;}
 div.subinfobox div.entrylines {margin-top: 5px;}
 div.subinfobox div.entrylines div.entryline {padding: 5px 10px; cursor: pointer;}
-div.subinfobox div.entrylines div.entryline span.count {color: #999999; float: right; }
 div.subinfobox div.entrylines div.entryline span.headword {font-weight: bold;}
 div.subinfobox div.entrylines div.entryline:hover { background-color: #f7f9ea; color: #004f9b; }
 
