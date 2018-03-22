@@ -32,7 +32,7 @@
 #envelope div.pillarform div.instro a:hover {color: #004f9b;}
 #envelope div.pillarform div.instro code {background-color: #fff8df; padding: 3px 4px; border-radius: 2px; text-shadow: 1px 1px 0px #ffffff;}
 #envelope div.pillarform div.instro.undercheck {margin-left: 30px; margin-top: 0px; margin-bottom: 5px;}
-#envelope div.pillarform div.instro.borderBelow {border-bottom: 1px solid #eeeeee; padding: 0px 0px 10px 0px;}
+#envelope div.pillarform div.instro.borderBelow {border-bottom: 1px solid #eeeeee; padding: 0px 0px 10px 5px;}
 
 #envelope div.pillarform div.scrollbox {height: 150px; overflow-y: scroll; resize: vertical; margin: 0px 0px 0px 0px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 10px 8px; }
 #envelope div.pillarform div.scrollbox.long {height: none; padding-bottom: 40px;}
@@ -48,7 +48,7 @@
 #envelope div.pillarform div.subelement {padding: 5px 5px 15px 5px; border-bottom: 1px solid #eeeeee; margin-bottom: 10px;}
 #envelope div.pillarform div.subelement div.elName {font-size: 1.1em;}
 #envelope div.pillarform div.subelement div.settings {margin-top: 10px; color: #666666;}
-#envelope div.pillarform div.subelement div.settings span.opener {font-size: 0.95em; padding-left: 18px; background-repeat: no-repeat; background-position: left center; cursor: pointer;}
+#envelope div.pillarform div.subelement div.settings span.opener {font-size: 0.95em; padding-left: 15px; background-repeat: no-repeat; background-position: left center; cursor: pointer;}
 #envelope div.pillarform div.subelement div.settings span.opener:hover {color: #004f9b;}
 #envelope div.pillarform div.subelement div.settings span.opener.closed {background-image: url(../furniture/plus.gif);}
 #envelope div.pillarform div.subelement div.settings span.opener.opened {background-image: url(../furniture/minus.gif);}

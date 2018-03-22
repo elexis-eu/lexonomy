@@ -10,7 +10,7 @@ Subbing.render=function(div, json){
   for(var elName in json) Subbing.addElement(elName, json[elName]);
   $div.append("<select class='halfwidth' id='elements_new'></select> <button class='iconAdd' onclick='Subbing.newElement()'>Add</button>");
   for(var elName in xema.elements){
-    if(elName!=xema.root) $("#elements_new").append("<option value='"+elName+"'>"+elName+"</option>");
+    $("#elements_new").append("<option value='"+elName+"'>"+elName+"</option>");
   }
 };
 
