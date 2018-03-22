@@ -106,6 +106,7 @@ module.exports={
       db.all("select * from configs", {}, function(err, rows){
         for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
         if(!configs.editing) configs.editing={xonomyMode: "nerd"}; //retrofit: some dicts don't have this config
+        if(!configs.subbing) configs.subbing={}; //retrofit: some dicts don't have this config
         callnext(configs);
       });
     });
@@ -113,6 +114,7 @@ module.exports={
   readDictConfig: function(db, dictID, configID, callnext){
     db.get("select * from configs where id=$id", {$id: configID}, function(err, row){
       if(!row && configID=="editing") var config={xonomyMode: "nerd"}; //retrofit: some dicts don't have this config
+      if(!row && configID=="subbing") var config={}; //retrofit: some dicts don't have this config
       else var config=JSON.parse(row.json);
       callnext(config);
     });

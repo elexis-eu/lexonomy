@@ -37,11 +37,10 @@ Sub.extendDocspec=function(docspec, xema){
               icon: rootPath+"furniture/favicon.png",
               caption: "Find subentries <"+elName+">",
               action: Sub.menuSubentries,
+              actionParameter: {elName: elName},
             });
           }
         }
-
-
       }
     }
   }
@@ -84,7 +83,7 @@ Sub.getHeadword=function(){
 
 Sub.menuSubentries=function(htmlID, param){
   Sub.htmlID=htmlID;
-  document.body.appendChild(Xonomy.makeBubble(Sub.boxSubentries())); //create bubble
+  document.body.appendChild(Xonomy.makeBubble(Sub.boxSubentries(param.elName))); //create bubble
   if(Xonomy.lastClickWhat=="openingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.opening > .name")); //anchor bubble to opening tag
   else if(Xonomy.lastClickWhat=="closingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.closing > .name")); //anchor bubble to closing tag
   else Xonomy.showBubble($("#"+htmlID));
@@ -95,10 +94,11 @@ Sub.menuSubentries=function(htmlID, param){
   }
 };
 
-Sub.boxSubentries=function(){
+Sub.boxSubentries=function(elName){
   var html="";
   html="<div class='subbox'>"
     html+="<form class='topbar' onsubmit='Sub.searchSubentries(); return false'>";
+      html+="<button class='creator' onclick='Sub.newSubentry(\""+elName+"\"); return false;'>New</button>";
   		html+="<input name='val' class='textbox focusme' value='"+Sub.getHeadword()+"'/> ";
       html+="<input type='submit' class='button sub' value='&nbsp;'/>";
     html+="</form>";
@@ -109,6 +109,12 @@ Sub.boxSubentries=function(){
     html+="</div>";
   html+="</div>";
   return html;
+};
+
+Sub.newSubentry=function(elName){
+  var xml=Xematron.initialElement(xema, elName);
+  Xonomy.newElementChild(Sub.htmlID, xml);
+  Xonomy.clickoff();
 };
 
 Sub.toggleSubentry=function(inp){

@@ -1,7 +1,14 @@
 #envelope div.pillarform {max-width: 1200px; margin: 30px auto 30px auto; font-size: 1rem; }
 @media(max-width: 1300px) {#envelope div.pillarform {margin: 0px 20px;}}
 
+#envelope div.pillarform span.tech {font-family: monospace;}
+#envelope div.pillarform span.tech span.brak {color: #669acc;}
+#envelope div.pillarform span.tech span.elm {color: #cc3333;}
+#envelope div.pillarform span.tech span.ats {color: #999999;}
+#envelope div.pillarform span.tech span.att {color: #ff4455;}
+
 #envelope div.pillarform select { margin: 0px 0px 0px 0px; font: inherit; padding: 1px 2px; display: inline-block; vertical-align: middle; width: 100%; cursor: pointer;}
+#envelope div.pillarform select.halfwidth {width: 40%; position: relative; top: 1px;}
 #envelope div.pillarform select option {padding: 4px 10px; color: #333333; }
 #envelope div.pillarform select.none {color: #999999;}
 #envelope div.pillarform input.textbox {box-sizing: border-box; width: 100%; margin: 0px 0px 0px 0px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 9px 8px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
@@ -25,6 +32,7 @@
 #envelope div.pillarform div.instro a:hover {color: #004f9b;}
 #envelope div.pillarform div.instro code {background-color: #fff8df; padding: 3px 4px; border-radius: 2px; text-shadow: 1px 1px 0px #ffffff;}
 #envelope div.pillarform div.instro.undercheck {margin-left: 30px; margin-top: 0px; margin-bottom: 5px;}
+#envelope div.pillarform div.instro.borderBelow {border-bottom: 1px solid #eeeeee; padding: 0px 0px 10px 0px;}
 
 #envelope div.pillarform div.scrollbox {height: 150px; overflow-y: scroll; resize: vertical; margin: 0px 0px 0px 0px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 10px 8px; }
 #envelope div.pillarform div.scrollbox.long {height: none; padding-bottom: 40px;}
@@ -36,6 +44,16 @@
 #envelope div.pillarform div.user div.email {font-size: 1.2em;}
 #envelope div.pillarform div.user div.rights {margin-top: 10px; color: #666666;}
 #envelope div.pillarform div.user .floatRight {float: right; margin: 12px 0px 0px 0px !important;}
+
+#envelope div.pillarform div.subelement {padding: 5px 5px 15px 5px; border-bottom: 1px solid #eeeeee; margin-bottom: 10px;}
+#envelope div.pillarform div.subelement div.elName {font-size: 1.1em;}
+#envelope div.pillarform div.subelement div.settings {margin-top: 10px; color: #666666;}
+#envelope div.pillarform div.subelement div.settings span.opener {font-size: 0.95em; padding-left: 18px; background-repeat: no-repeat; background-position: left center; cursor: pointer;}
+#envelope div.pillarform div.subelement div.settings span.opener:hover {color: #004f9b;}
+#envelope div.pillarform div.subelement div.settings span.opener.closed {background-image: url(../furniture/plus.gif);}
+#envelope div.pillarform div.subelement div.settings span.opener.opened {background-image: url(../furniture/minus.gif);}
+#envelope div.pillarform div.subelement div.settings div.inside {margin: 8px 0px 0px 18px;}
+#envelope div.pillarform div.subelement .floatRight {float: right; margin: 12px 0px 0px 0px !important;}
 
 #envelope div.pillarform div.apikey {font-size: 1.2em; font-family: monospace; margin: 20px 5px 25px 5px; }
 

@@ -448,7 +448,7 @@ app.get(siteconfig.rootPath+":dictID/entryeditor/", function(req, res){
       ops.readDictConfigs(db, req.params.dictID, function(configs){
         db.close();
         if(configs.xemplate._xsl) configs.xemplate._xsl="dummy";
-        res.render("entryeditor.ejs", {user: user, dictID: req.params.dictID, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing});
+        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
       });
     }
   });
