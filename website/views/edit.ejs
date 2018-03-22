@@ -54,6 +54,6 @@
 		<link type="text/css" rel="stylesheet" href="../../furniture/ui.css" />
 	</head>
 	<body>
-		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "edit", rootPath: "../../"})%>
+		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "edit", rootPath: "../../", doctype: "entry", doctypes: ["entry", "phraseme", "exampleContainer"] })%>
 	</body>
 </html>
