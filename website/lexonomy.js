@@ -940,8 +940,6 @@ app.post(siteconfig.rootPath+":dictID/history.json", function(req, res){
   })
 });
 
-
-
 //endpoint for finding existing subentries:
 app.get(siteconfig.rootPath+":dictID/subget/", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
@@ -961,8 +959,6 @@ app.get(siteconfig.rootPath+":dictID/subget/", function(req, res){
     }
   });
 });
-
-
 
 app.use(function(req, res){ res.status(404).render("404.ejs", {siteconfig: siteconfig}); });
 app.listen(PORT);

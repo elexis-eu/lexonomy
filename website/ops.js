@@ -155,16 +155,42 @@ module.exports={
 
   readEntry: function(db, dictID, entryID, callnext){
     db.get("select * from entries where id=$id", {$id: entryID}, function(err, row){
-      if(row) {
-        var entryID=row.id;
-        var xml=row.xml;
-        var title=row.title;
-      } else {
+      if(!row) {
         var entryID=0;
         var xml="";
         var title="";
+        callnext(entryID, xml, title);
+      } else {
+        var entryID=row.id;
+        var xml=row.xml;
+        var title=row.title;
+
+        //insert <lxnm:subentryParent> elements:
+        var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
+        var els=[];
+        var _els=doc.getElementsByTagName("*"); els.push(_els[0]); for(var i=1; i<_els.length; i++) {
+          if(_els[i].getAttributeNS("http://www.lexonomy.eu/", "subentryID")!="") els.push(_els[i]);
+        }
+        var go=function(){
+          if(els.length>0){
+            var el=els.pop();
+            var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
+            db.all("select s.parent_id, e.title from sub as s inner join entries as e on e.id=s.parent_id where s.child_id=$child_id", {$child_id: subentryID}, function(err, rows){
+              for(var i=0; i<rows.length; i++) {
+                var pel=doc.createElementNS("http://www.lexonomy.eu/", "lxnm:subentryParent");
+                pel.setAttribute("id", rows[i].parent_id);
+                pel.setAttribute("title", rows[i].title);
+                el.appendChild(pel);
+              }
+              go();
+            });
+          } else {
+            xml=(new xmldom.XMLSerializer()).serializeToString(doc);
+            callnext(entryID, xml, title);
+          }
+        };
+        go();
       }
-      callnext(entryID, xml, title);
     });
   },
   deleteEntry: function(db, dictID, entryID, email, historiography, callnext){
@@ -180,9 +206,7 @@ module.exports={
         $historiography: JSON.stringify(historiography),
       }, function(err){});
       module.exports.readDictConfigs(db, dictID, function(configs){
-        module.exports.saveSubentries(db, dictID, configs, entryID, null, email, historiography, function(){
-          callnext();
-        });
+        module.exports.saveSubentries(db, dictID, configs, entryID, null, email, historiography, callnext);
       });
     });
   },
@@ -220,9 +244,7 @@ module.exports={
             $level: (searchables[i]==headword ? 1 : 2),
           }, function(err){ if(err) console.log(err); });
         }
-        module.exports.saveSubentries(db, dictID, configs, entryID, doc, email, historiography, function(){
-          callnext(entryID, xml);
-        });
+        module.exports.saveSubentries(db, dictID, configs, entryID, doc, email, historiography, callnext);
       });
     })
   },
@@ -258,19 +280,80 @@ module.exports={
                   $level: (searchables[i]==headword ? 1 : 2),
                 });
               }
-              module.exports.saveSubentries(db, dictID, configs, entryID, doc, email, historiography, function(){
-                callnext(entryID, xml);
-              });
+              module.exports.saveSubentries(db, dictID, configs, entryID, doc, email, historiography, callnext);
             });
           });
         })
       }
     });
   },
+
   saveSubentries: function(db, dictID, configs, entryID, doc, email, historiography, callnext){
-    //doc can be null
-    console.log("saving subentries");
-    callnext();
+    if(!doc) { //doc is null: the entry has just been deleted: tell all its former parents that they need a refresh
+      db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
+        db.run("delete from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
+          callnext(entryID, "");
+        });
+      });
+    }
+    if(doc){ //doc is not null: the entry has just been created or updated
+      //remove all <lxnm:subentryParent>:
+      var _els=doc.getElementsByTagNameNS("http://www.lexonomy.eu/", "subentryParent");
+      var els=[]; for(var i=0; i<_els.length; i++) els.push(_els[i]);
+      for(var i=0; i<els.length; i++) els[i].parentNode.removeChild(els[i]);
+      //find elements which are subentries, and are not contained inside other subentries:
+      var els=[];
+      for(var doctype in configs.subbing){
+        var _els=doc.getElementsByTagName(doctype);
+        for(var i=0; i<_els.length; i++){ var el=_els[i];
+          if(el.parentNode && el.parentNode.nodeType==1){
+            var isSubSub=false; var p=el.parentNode;
+            while(p.parentNode && p.parentNode.nodeType==1){
+              if(configs.subbing[p.tagName]) isSubSub=true;
+              p=p.parentNode;
+            }
+            if(!isSubSub)  els.push(el);
+          }
+        }
+      }
+      //delete all existing parent-child connections where entryID is the parent:
+      db.run("delete from sub where parent_id=$parent_id", {$parent_id: entryID}, function(err){
+        //keep saving subentries until there are no more subentries to save:
+        var serializer=new xmldom.XMLSerializer();
+        var subentriesSaved=0;
+        var saveNextEl=function(){
+          if(els.length>0){
+            var el=els.pop();
+            subentriesSaved++;
+            var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
+            xml=serializer.serializeToString(el);
+            if(subentryID) module.exports.updateEntry(db, dictID, subentryID, xml, email, historiography, function(subentryID){
+              el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
+              db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", {$parent_id: entryID, $child_id: subentryID}, function(err){
+                db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: subentryID}, function(err){
+                  saveNextEl();
+                });
+              });
+            });
+            else module.exports.createEntry(db, dictID, null, xml, email, historiography, function(subentryID){
+              el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
+              db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", {$parent_id: entryID, $child_id: subentryID}, function(err){
+                db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: subentryID}, function(err){
+                  saveNextEl();
+                });
+              });
+            });
+          } else {
+            //console.log(`entryID=${entryID}, subentriesSaved=${subentriesSaved}`);
+            xml=serializer.serializeToString(doc);
+            db.run("update entries set xml=$xml where id=$id", {$id: entryID, $xml: xml}, function(err){
+              callnext(entryID, xml);
+            });
+          }
+        };
+        saveNextEl();
+      });
+    }
   },
 
   getDictStats: function(db, dictID, callnext){
