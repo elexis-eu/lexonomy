@@ -2,26 +2,26 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<link rel="icon" type="image/x-icon" href="../../furniture/favicon.ico"/>
+		<link rel="icon" type="image/x-icon" href="../../../furniture/favicon.ico"/>
 		<title><%=dictTitle%></title>
-		<script type="text/javascript" src="../../libs/jquery.js"></script>
-		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful.css" />
-		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
-		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
+		<script type="text/javascript" src="../../../libs/jquery.js"></script>
+		<script type="text/javascript" src="../../../libs/screenful/screenful.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
+		<script type="text/javascript" src="../../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../../libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-user.css" />
 		<script type="text/javascript">
 		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
 		Screenful.User.username="<%=user.email%>";
 		</script>
-		<script type="text/javascript">var rootPath="../../";</script>
-		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-navigator.css?2018-02-04" />
-		<script type="text/javascript" src="../../libs/screenful/screenful-navigator.js?2018-02-04"></script>
+		<script type="text/javascript">var rootPath="../../../";</script>
+		<script type="text/javascript" src="../../../furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-navigator.css?2018-02-04" />
+		<script type="text/javascript" src="../../../libs/screenful/screenful-navigator.js?2018-02-04"></script>
 		<script type="text/javascript">
-		Screenful.Navigator.listUrl="../../<%=dictID%>/entrylist.json";
+		Screenful.Navigator.listUrl="../../../<%=dictID%>/<%=doctype%>/entrylist.json";
 		Screenful.Navigator.stepSize=1000;
-		Screenful.Navigator.editorUrl="../../<%=dictID%>/entryeditor/";
+		Screenful.Navigator.editorUrl="../../../<%=dictID%>/<%=doctype%>/entryeditor/";
 		Screenful.Navigator.modifiers=[
 			{value: "start", caption: "starts like this"},
 			{value: "wordstart", caption: "contains a word that starts like this"},
@@ -51,9 +51,9 @@
 			$(div).html(text);
 		};
 		</script>
-		<link type="text/css" rel="stylesheet" href="../../furniture/ui.css" />
+		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
 	</head>
 	<body>
-		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "edit", rootPath: "../../", doctype: "entry", doctypes: ["entry", "phraseme", "exampleContainer"] })%>
+		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "edit", rootPath: "../../../", doctype: doctype, doctypes: doctypes })%>
 	</body>
 </html>

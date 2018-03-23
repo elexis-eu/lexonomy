@@ -16,7 +16,7 @@
 
 #header div.doctypes {height: 30px; position: absolute; top: 59px;}
 #header div.doctypes a.doctype {display: inline-block; height: 35px; float: left; margin-right: 10px; color: #999999}
-#header div.doctypes a.doctype:hover {color: #666666; font-weight: bold;}
+#header div.doctypes a.doctype:hover {color: #666666;}
 #header div.doctypes a.doctype.current {font-weight: bold; background-image: url(callout.gif); background-position: center bottom; background-repeat: no-repeat;}
 #header div.doctypes a.doctype span.tech {font-family: monospace; font-size: 0.95em; position: relative; top: -1px; line-height: 1em; margin: 0px 0.25em; }
 #header div.doctypes a.doctype.current span.tech span.brak {color: #669acc;}

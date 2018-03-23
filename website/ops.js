@@ -305,45 +305,48 @@ module.exports={
     });
   },
 
-  listEntries: function(db, dictID, searchtext, modifier, howmany, callnext){
+  listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, callnext){
     if(modifier=="start") {
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title
         from searchables as s
         inner join entries as e on e.id=s.entry_id
-        where s.txt like $like
+        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like
         group by e.id
         order by e.sortkey, s.level
         limit $howmany`;
       var params1={$howmany: howmany, $like: searchtext+"%"};
       var sql2=`select count(distinct s.entry_id) as total
         from searchables as s
-        where s.txt like $like`;
+        inner join entries as e on e.id=s.entry_id
+        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like`;
       var params2={$like: searchtext+"%"};
     } else if(modifier=="wordstart"){
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title
         from searchables as s
         inner join entries as e on e.id=s.entry_id
-        where s.txt like $like1 or s.txt like $like2
+        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and (s.txt like $like1 or s.txt like $like2)
         group by e.id
         order by e.sortkey, s.level
         limit $howmany`;
       var params1={$howmany: howmany, $like1: searchtext+"%", $like2: "% "+searchtext+"%"};
       var sql2=`select count(distinct s.entry_id) as total
         from searchables as s
-        where s.txt like $like1 or s.txt like $like2`;
+        inner join entries as e on e.id=s.entry_id
+        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and  (s.txt like $like1 or s.txt like $like2)`;
       var params2={$like1: searchtext+"%", $like2: "% "+searchtext+"%"};
     } else if(modifier=="substring"){
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title
         from searchables as s
         inner join entries as e on e.id=s.entry_id
-        where s.txt like $like
+        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like
         group by e.id
         order by e.sortkey, s.level
         limit $howmany`;
       var params1={$howmany: howmany, $like: "%"+searchtext+"%"};
       var sql2=`select count(distinct s.entry_id) as total
         from searchables as s
-        where s.txt like $like`;
+        inner join entries as e on e.id=s.entry_id
+        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like`;
       var params2={$like: "%"+searchtext+"%"};
     }
     db.all(sql1, params1, function(err, rows){

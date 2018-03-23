@@ -13,7 +13,7 @@
   <%if(current=="edit" && doctypes.length>1){%>
     <div class="doctypes">
       <%for(var i=0; i<doctypes.length; i++){%>
-        <a class="doctype <%if(doctypes[i]==doctype){%>current<%}%>" href="<%-rootPath%><%=dictID%>/edit/<%=doctypes[i]%>/"><span class="tech"><span class="brk">&lt;</span><span class="elm"><%=doctypes[i]%></span><span class="brk">&gt;</span></span></a>
+        <a class="doctype <%if(doctypes[i]==doctype){%>current<%}%>" href="<%-rootPath%><%=dictID%>/edit/<%=doctypes[i]%>/"><span class="tech"><span class="brak">&lt;</span><span class="elm"><%=doctypes[i]%></span><span class="brak">&gt;</span></span></a>
       <%}%>
     </div>
   <%}%>

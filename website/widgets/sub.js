@@ -14,7 +14,7 @@ Sub.extendDocspec=function(docspec, xema){
   			var cap="";
   			var id=jsMe.getAttributeValue("lxnm:subentryID", 0);
   			var parents=[]; jsMe.getChildElements("lxnm:subentryParent").map(function(p){if(p.getAttributeValue("id")!=Screenful.Editor.entryID) parents.push(p)});
-  			if(id) cap+=+parents.length+" ▼";
+  			if(id || parents.length>0 || (subbing[jsMe.name] && xema._root!=jsMe.name && Screenful.Editor.entryID)) cap+=+parents.length+" ▼";
   			if(cap) cap="<span class='lexonomySubentryCaption' onclick='Xonomy.notclick=true; Sub.menuSubentry(\""+jsMe.htmlID+"\")'>"+cap+"</span>";
   			return cap;
   		};

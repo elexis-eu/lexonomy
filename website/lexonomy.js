@@ -425,6 +425,14 @@ app.get(siteconfig.rootPath+":dictID/search/", function(req, res){
 app.get(siteconfig.rootPath+":dictID/edit/", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID, true);
+  ops.readDictConfig(db, req.params.dictID, "xema", function(xema){
+    db.close();
+    res.redirect(xema.root+"/");
+  });
+});
+app.get(siteconfig.rootPath+":dictID/edit/:doctype/", function(req, res){
+  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
+  var db=ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
     if(!user.dictAccess) {
       db.close();
@@ -432,12 +440,13 @@ app.get(siteconfig.rootPath+":dictID/edit/", function(req, res){
     } else {
       ops.readDictConfigs(db, req.params.dictID, function(configs){
         db.close();
-        res.render("edit.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, siteconfig: siteconfig});
+        var doctypes=[configs.xema.root]; for(var doctype in configs.subbing) if(doctypes.indexOf(doctype)==-1) doctypes.push(doctype);
+        res.render("edit.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, siteconfig: siteconfig, doctypes: doctypes, doctype: req.params.doctype});
       });
     }
   });
 });
-app.get(siteconfig.rootPath+":dictID/entryeditor/", function(req, res){
+app.get(siteconfig.rootPath+":dictID/:doctype/entryeditor/", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
@@ -448,14 +457,15 @@ app.get(siteconfig.rootPath+":dictID/entryeditor/", function(req, res){
       ops.readDictConfigs(db, req.params.dictID, function(configs){
         db.close();
         if(configs.xemplate._xsl) configs.xemplate._xsl="dummy";
-        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
+        configs.xema._root=configs.xema.root; if(configs.xema.elements[req.params.doctype]) configs.xema.root=req.params.doctype;
+        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
       });
     }
   });
 });
 
 //EDITING UI, JSON endpoints:
-app.post(siteconfig.rootPath+":dictID/entrylist.json", function(req, res){ //console.log(req.body.criteria, req.body.searchtext, req.body.howmany);
+app.post(siteconfig.rootPath+":dictID/:doctype/entrylist.json", function(req, res){ //console.log(req.body.criteria, req.body.searchtext, req.body.howmany);
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
@@ -463,7 +473,7 @@ app.post(siteconfig.rootPath+":dictID/entrylist.json", function(req, res){ //con
       db.close();
       res.json({success: false});
     } else {
-      ops.listEntries(db, req.params.dictID, req.body.searchtext, req.body.modifier, req.body.howmany, function(total, entries){
+      ops.listEntries(db, req.params.dictID, req.params.doctype, req.body.searchtext, req.body.modifier, req.body.howmany, function(total, entries){
         db.close();
         res.json({success: true, total: total, entries: entries});
       });
