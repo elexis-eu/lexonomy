@@ -518,13 +518,15 @@ app.post(siteconfig.rootPath+":dictID/entryread.json", function(req, res){
         ops.readEntry(db, req.params.dictID, req.body.id, function(adjustedEntryID, xml){
           db.close();
           var html="";
-          if(configs.xemplate._xsl) {
-            html=libxslt.parse(configs.xemplate._xsl).apply(xml);
-          } else if(configs.xemplate._css) {
-            html=xml;
-          } else {
-            var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
-            html=xemplatron.xml2html(doc, configs.xemplate, configs.xema);
+          if(xml){
+            if(configs.xemplate._xsl) {
+              html=libxslt.parse(configs.xemplate._xsl).apply(xml);
+            } else if(configs.xemplate._css) {
+              html=xml;
+            } else {
+              var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
+              html=xemplatron.xml2html(doc, configs.xemplate, configs.xema);
+            }
           }
           res.json({success: (adjustedEntryID>0), id: adjustedEntryID, content: xml, contentHtml: html});
         });

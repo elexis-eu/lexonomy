@@ -179,7 +179,11 @@ module.exports={
         $xml: null,
         $historiography: JSON.stringify(historiography),
       }, function(err){});
-      callnext();
+      module.exports.readDictConfigs(db, dictID, function(configs){
+        module.exports.saveSubentries(db, dictID, configs, entryID, null, email, historiography, function(){
+          callnext();
+        });
+      });
     });
   },
   createEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
@@ -216,7 +220,9 @@ module.exports={
             $level: (searchables[i]==headword ? 1 : 2),
           }, function(err){ if(err) console.log(err); });
         }
-        callnext(this.lastID, xml);
+        module.exports.saveSubentries(db, dictID, configs, entryID, doc, email, historiography, function(){
+          callnext(entryID, xml);
+        });
       });
     })
   },
@@ -252,12 +258,19 @@ module.exports={
                   $level: (searchables[i]==headword ? 1 : 2),
                 });
               }
-              callnext(entryID, xml);
+              module.exports.saveSubentries(db, dictID, configs, entryID, doc, email, historiography, function(){
+                callnext(entryID, xml);
+              });
             });
           });
         })
       }
     });
+  },
+  saveSubentries: function(db, dictID, configs, entryID, doc, email, historiography, callnext){
+    //doc can be null
+    console.log("saving subentries");
+    callnext();
   },
 
   getDictStats: function(db, dictID, callnext){
