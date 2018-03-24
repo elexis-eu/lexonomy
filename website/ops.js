@@ -175,6 +175,7 @@ module.exports={
           if(els.length>0){
             var el=els.pop();
             var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
+            if(el.parentNode.nodeType!=1) subentryID=entryID;
             db.all("select s.parent_id, e.title from sub as s inner join entries as e on e.id=s.parent_id where s.child_id=$child_id", {$child_id: subentryID}, function(err, rows){
               for(var i=0; i<rows.length; i++) {
                 var pel=doc.createElementNS("http://www.lexonomy.eu/", "lxnm:subentryParent");
@@ -297,6 +298,7 @@ module.exports={
       });
     }
     if(doc){ //doc is not null: the entry has just been created or updated
+      doc.documentElement.setAttributeNS("http://www.lexonomy.eu/", "lxnm:entryID", entryID);
       //remove all <lxnm:subentryParent>:
       var _els=doc.getElementsByTagNameNS("http://www.lexonomy.eu/", "subentryParent");
       var els=[]; for(var i=0; i<_els.length; i++) els.push(_els[i]);
@@ -320,11 +322,9 @@ module.exports={
       db.run("delete from sub where parent_id=$parent_id", {$parent_id: entryID}, function(err){
         //keep saving subentries until there are no more subentries to save:
         var serializer=new xmldom.XMLSerializer();
-        var subentriesSaved=0;
         var saveNextEl=function(){
           if(els.length>0){
             var el=els.pop();
-            subentriesSaved++;
             var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
             xml=serializer.serializeToString(el);
             if(subentryID) module.exports.updateEntry(db, dictID, subentryID, xml, email, historiography, function(subentryID){
@@ -344,7 +344,6 @@ module.exports={
               });
             });
           } else {
-            //console.log(`entryID=${entryID}, subentriesSaved=${subentriesSaved}`);
             xml=serializer.serializeToString(doc);
             db.run("update entries set xml=$xml where id=$id", {$id: entryID, $xml: xml}, function(err){
               callnext(entryID, xml);
@@ -403,7 +402,7 @@ module.exports={
 
   listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, callnext){
     if(modifier=="start") {
-      var sql1=`select s.txt, min(s.level) as level, e.id, e.title
+      var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
         inner join entries as e on e.id=s.entry_id
         where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like
@@ -417,7 +416,7 @@ module.exports={
         where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like`;
       var params2={$like: searchtext+"%"};
     } else if(modifier=="wordstart"){
-      var sql1=`select s.txt, min(s.level) as level, e.id, e.title
+      var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
         inner join entries as e on e.id=s.entry_id
         where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and (s.txt like $like1 or s.txt like $like2)
@@ -431,7 +430,7 @@ module.exports={
         where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and  (s.txt like $like1 or s.txt like $like2)`;
       var params2={$like1: searchtext+"%", $like2: "% "+searchtext+"%"};
     } else if(modifier=="substring"){
-      var sql1=`select s.txt, min(s.level) as level, e.id, e.title
+      var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
         inner join entries as e on e.id=s.entry_id
         where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like
@@ -448,7 +447,7 @@ module.exports={
     db.all(sql1, params1, function(err, rows){
       var entries=[];
       for(var i=0; i<rows.length; i++){
-        var item={id: rows[i].id, title: rows[i].title};
+        var item={id: rows[i].id, title: rows[i].title, xml: rows[i].xml};
         if(rows[i].level>1) item.title+=" ← <span class='redirector'>"+rows[i].txt+"</span>";
         entries.push(item);
       }

@@ -100,6 +100,7 @@ Sub.boxSubentries=function(elName){
     html+="<form class='topbar' onsubmit='Sub.searchSubentries(); return false'>";
       html+="<button class='creator' onclick='Sub.newSubentry(\""+elName+"\"); return false;'>New</button>";
   		html+="<input name='val' class='textbox focusme' value='"+Sub.getHeadword()+"'/> ";
+  		html+="<input name='doctype' type='hidden' value='"+elName+"'/> ";
       html+="<input type='submit' class='button sub' value='&nbsp;'/>";
     html+="</form>";
     html+="<div class='waiter'></div>";
@@ -126,26 +127,26 @@ Sub.searchSubentries=function(){
   $(".subbox .bottombar").hide();
   $(".subbox .waiter").show();
   var lemma=$.trim($(".subbox .textbox").val());
+  var doctype=$.trim($("input[name=\"doctype\"]").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/subget/", {lemma: lemma}, function(json){
+    $.get(rootPath+dictID+"/subget/", {lemma: lemma, doctype: doctype}, function(json){
         $(".subbox .choices").html("");
-        if(json!==null && json.length==0){
+        if(!json.success){
+          $(".subbox .choices").html("<div class='error'>There has been an error getting data from Lexonomy.</div>");
+          $(".subbox .waiter").hide();
+          $(".subbox .choices").fadeIn();
+        } else if(json.total==0){
           $(".subbox .choices").html("<div class='error'>No matches found.</div>");
           $(".subbox .waiter").hide();
           $(".subbox .choices").fadeIn();
-        }
-        else if(json!==null) {
-          for(var iLine=0; iLine<json.length; iLine++){ var line=json[iLine];
+        } else {
+          for(var iLine=0; iLine<json.entries.length; iLine++){ var line=json.entries[iLine];
             $(".subbox .choices").append("<label><input type='checkbox' onchange='Sub.toggleSubentry(this)'/><span class='inside'>"+line.title+"</span></label>");
             $(".subbox .choices label").last().data("xml", line.xml);
             $(".subbox .waiter").hide();
             $(".subbox .choices").fadeIn();
             $(".subbox .bottombar").show();
           }
-        } else {
-          $(".subbox .choices").html("<div class='error'>There has been an error getting data from Lexonomy.</div>");
-          $(".subbox .waiter").hide();
-          $(".subbox .choices").fadeIn();
         }
     });
   }
