@@ -321,7 +321,7 @@ module.exports={
       //delete all existing parent-child connections where entryID is the parent:
       db.run("delete from sub where parent_id=$parent_id", {$parent_id: entryID}, function(err){
         //keep saving subentries until there are no more subentries to save:
-        var serializer=new xmldom.XMLSerializer();
+        const serializer=new xmldom.XMLSerializer();
         var saveNextEl=function(){
           if(els.length>0){
             var el=els.pop();
@@ -359,9 +359,60 @@ module.exports={
     var ret={entryCount: 0, needResave: 0};
     db.get("select count(*) as entryCount from entries", {}, function(err, row){
       if(row) ret.entryCount=row.entryCount;
-      db.get("select count(*) as needResave from entries where needs_resave=1", {}, function(err, row){
+      db.get("select count(*) as needResave from entries where needs_resave=1 or needs_refresh=1", {}, function(err, row){
         if(row) ret.needResave=row.needResave;
         callnext(ret);
+      });
+    });
+  },
+  refresh: function(db, dictID, callnext){
+    module.exports.readDictConfigs(db, dictID, function(configs){
+      const domparser=new xmldom.DOMParser();
+      const serializer=new xmldom.XMLSerializer();
+      db.get("select pe.id, pe.xml from entries as pe left outer join sub as s on s.parent_id=pe.id left join entries as ce on ce.id=s.child_id where pe.needs_refresh=1 and (ce.needs_refresh is null or ce.needs_refresh=0) limit 1", function(err, row){
+        if(!row){
+          callnext();
+        } else {
+          var parentID=row.id; var parentXml=row.xml; console.log(parentID);
+          var parentDoc=domparser.parseFromString(parentXml, 'text/xml');
+
+          var go=function(){
+            var el=null;
+            for(var doctype in configs.subbing){
+              var els=parentDoc.documentElement.getElementsByTagName(doctype);
+              if(els.length>0) el=els[0];
+              if(el && !el.hasAttributeNS("http://www.lexonomy.eu/", "subentryID")) el=null;
+              if(el && el.hasAttributeNS("http://www.lexonomy.eu/", "done")) el=null;
+              if(el) break;
+            }
+            if(el){
+              //console.log(el.tagName, el.getAttributeNS("http://www.lexonomy.eu/", "subentryID"));
+              var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
+              db.get("select xml from entries where id=$id", {$id: subentryID}, function(err, row){
+                if(!row){
+                  el.parentNode.removeChild(el);
+                } else {
+                  var childXml=row.xml;
+                  var childDoc=domparser.parseFromString(childXml, 'text/xml');
+                  var elNew=childDoc.documentElement;
+                  el.parentNode.replaceChild(elNew, el);
+                  elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
+                  elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:done", "1");
+                }
+                go();
+              });
+            } else {
+              var els=parentDoc.documentElement.getElementsByTagName("*");
+              for(var i=0; i<els.length; i++) els[i].removeAttributeNS("http://www.lexonomy.eu/", "done");
+              parentXml=serializer.serializeToString(parentDoc);
+              db.run("update entries set xml=$xml, needs_refresh=0, needs_resave=1 where id=$id", {$id: parentID, $xml: parentXml}, function(){
+                callnext();
+              });
+            }
+          };
+          go();
+
+        }
       });
     });
   },
