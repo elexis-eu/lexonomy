@@ -602,15 +602,21 @@ app.post(siteconfig.rootPath+":dictID/resave.json", function(req, res){
       db.close();
       res.json({todo: 0});
     } else {
-      ops.refresh(db, req.params.dictID, function(){
-        ops.resave(db, req.params.dictID, function(){
-          ops.getDictStats(db, req.params.dictID, function(stats){
-            db.close(function(){
-              res.json({todo: stats.needResave});
-            });
+      ops.refac(db, req.params.dictID, function(any){
+        if(any) {
+          ops.getDictStats(db, req.params.dictID, function(stats){ db.close(function(){ res.json({todo: stats.needResave}); }); });
+        } else {
+          ops.refresh(db, req.params.dictID, function(any){
+            if(any) {
+              ops.getDictStats(db, req.params.dictID, function(stats){ db.close(function(){ res.json({todo: stats.needResave}); }); });
+            } else {
+              ops.resave(db, req.params.dictID, function(){
+                ops.getDictStats(db, req.params.dictID, function(stats){ db.close(function(){ res.json({todo: stats.needResave}); }); });
+              });
+            }
           });
-        });
-      });
+        }
+      })
     }
   });
 });
