@@ -278,26 +278,25 @@ module.exports={
       });
     });
   },
-  refac: function(db, dictID, callnext){
+  refac: function(db, dictID, callnext){ //takes the first entry that needs refactoring and extracts subentries from it
     module.exports.readDictConfigs(db, dictID, function(configs){
       //get the oldest entry that needs refactoring:
       db.get("select e.id, e.xml from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 order by h.[when] asc limit 1", function(err, row){
         if(!row){ //if no such entry, pass the buck:
           callnext(false);
-        } else { //if we have found an entry that needs refactoring:
+        } else { //if we have found an entry that needs refactoring; this becomes our current entry:
           const domparser=new xmldom.DOMParser();
           const serializer=new xmldom.XMLSerializer();
           var entryID=row.id; var xml=row.xml;
-          console.log("refactoring: "+entryID);
           var doc=domparser.parseFromString(xml, 'text/xml');
           doc.documentElement.setAttributeNS("http://www.lexonomy.eu/", "lxnm:entryID", entryID);
 
-          //remove all <lxnm:subentryParent>:
+          //in the current entry, remove all <lxnm:subentryParent>:
           var _els=doc.getElementsByTagNameNS("http://www.lexonomy.eu/", "subentryParent");
           var els=[]; for(var i=0; i<_els.length; i++) els.push(_els[i]);
           for(var i=0; i<els.length; i++) els[i].parentNode.removeChild(els[i]);
 
-          //find elements which are subentries, and are not contained inside other subentries:
+          //in the current entry, find elements which are subentries, and are not contained inside other subentries:
           var els=[];
           for(var doctype in configs.subbing){
             var _els=doc.getElementsByTagName(doctype);
@@ -314,15 +313,16 @@ module.exports={
           }
 
           db.run("delete from sub where parent_id=$parent_id", {$parent_id: entryID}, function(err){
-            //keep saving subentries until there are no more subentries to save:
+            //keep saving subentries of the current entry until there are no more subentries to save:
             var saveNextEl=function(){
-              if(els.length>0){
-                var el=els.pop();
+              if(els.length>0){ //yes, there are subentries in the current entry that we haven't saved yet
+                var el=els.pop(); //this is the subentry we'll save now
                 var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
                 xml=serializer.serializeToString(el);
                 if(subentryID) module.exports.updateEntry(db, dictID, subentryID, xml, "", {refactoredFrom: entryID}, function(subentryID){
                   el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
                   db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", {$parent_id: entryID, $child_id: subentryID}, function(err){
+                    //tell all parents of the subentry (including the current entry) that they need a refresh:
                     db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: subentryID}, function(err){
                       saveNextEl();
                     });
@@ -331,13 +331,15 @@ module.exports={
                 else module.exports.createEntry(db, dictID, null, xml, "", {refactoredFrom: entryID}, function(subentryID){
                   el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
                   db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", {$parent_id: entryID, $child_id: subentryID}, function(err){
+                    //tell all parents of the subentry (including the current entry) that they need a refresh:
                     db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: subentryID}, function(err){
                       saveNextEl();
                     });
                   });
                 });
-              } else {
+              } else { //no, there are no more subentries in the current entry that we haven't saved yet
                 xml=serializer.serializeToString(doc);
+                //tell the current entry that doesn't need refactoring any more:
                 db.run("update entries set xml=$xml, needs_refac=0 where id=$id", {$id: entryID, $xml: xml}, function(err){
                   callnext(true);
                 });
@@ -349,30 +351,34 @@ module.exports={
       });
     });
   },
-  refresh: function(db, dictID, callnext){
+  refresh: function(db, dictID, callnext){ //takes one entry that needs refreshing and sucks into it the latest versions of its subentries
     module.exports.readDictConfigs(db, dictID, function(configs){
+      //get one entry that needs refreshing where none of its children needs refreshing:
       db.get("select pe.id, pe.xml from entries as pe left outer join sub as s on s.parent_id=pe.id left join entries as ce on ce.id=s.child_id where pe.needs_refresh=1 and (ce.needs_refresh is null or ce.needs_refresh=0) limit 1", function(err, row){
-        if(!row){
+        if(!row){ //if no such entry, pass the buck:
           callnext(false);
         } else {
           const domparser=new xmldom.DOMParser();
           const serializer=new xmldom.XMLSerializer();
           var parentID=row.id; var parentXml=row.xml;
           var parentDoc=domparser.parseFromString(parentXml, 'text/xml');
-          console.log("refreshing: "+parentID);
 
+          //this will be called repeatedly till exhaustion
           var go=function(){
+            //find an element which is a subentry and which we haven't sucked in yet:
             var el=null;
             for(var doctype in configs.subbing){
               var els=parentDoc.documentElement.getElementsByTagName(doctype);
-              if(els.length>0) el=els[0];
-              if(el && !el.hasAttributeNS("http://www.lexonomy.eu/", "subentryID")) el=null;
-              if(el && el.hasAttributeNS("http://www.lexonomy.eu/", "done")) el=null;
+              for(var i=0; i<els.length; i++){
+                if(el && !el.hasAttributeNS("http://www.lexonomy.eu/", "subentryID")) el=null;
+                if(el && el.hasAttributeNS("http://www.lexonomy.eu/", "done")) el=null;
+                if(el) break;
+              }
               if(el) break;
             }
-            if(el){
-              //console.log(el.tagName, el.getAttributeNS("http://www.lexonomy.eu/", "subentryID"));
+            if(el){ //if such en element exists
               var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
+              //get the subentry from the database and inject it into the parent's xml:
               db.get("select xml from entries where id=$id", {$id: subentryID}, function(err, row){
                 if(!row){
                   el.parentNode.removeChild(el);
@@ -384,12 +390,13 @@ module.exports={
                   elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
                   elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:done", "1");
                 }
-                go();
+                go(); //recursion to the next subentry in the parent entry
               });
-            } else {
+            } else { //if no such element exists: we are done
               var els=parentDoc.documentElement.getElementsByTagName("*");
               for(var i=0; i<els.length; i++) els[i].removeAttributeNS("http://www.lexonomy.eu/", "done");
               parentXml=serializer.serializeToString(parentDoc);
+              //save the parent's xml (inyto whuch all subentries have been injected by now) and tell it that it needs a resave:
               db.run("update entries set xml=$xml, needs_refresh=0, needs_resave=1 where id=$id", {$id: parentID, $xml: parentXml}, function(){
                 callnext(true);
               });
@@ -401,14 +408,14 @@ module.exports={
       });
     });
   },
-  resave: function(db, dictID, callnext){
+  resave: function(db, dictID, callnext){ //updates an entry's display title, search keys and so on
     module.exports.readDictConfigs(db, dictID, function(configs){
       var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
       const domparser=new xmldom.DOMParser();
       db.all("select id, xml from entries where needs_resave=1 limit 12", {}, function(err, rows){
         for(var i=0; i<rows.length; i++){
           var entryID=rows[i].id; var xml=rows[i].xml;
-          console.log("resaving: "+entryID);
+          //console.log("resaving: "+entryID);
           var doc=domparser.parseFromString(xml, 'text/xml');
           (function(entryID, doc){
             db.run("update entries set needs_resave=0, title=$title, sortkey=$sortkey where id=$id", {
