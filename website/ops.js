@@ -130,6 +130,10 @@ module.exports={
           module.exports.flagForResave(db, dictID, function(resaveNeeded){
             callnext(json, resaveNeeded);
           });
+        } else if(configID=="subbing"){
+          module.exports.flagForRefac(db, dictID, function(resaveNeeded){
+            callnext(json, resaveNeeded);
+          });
         } else {
           callnext(json, false);
         }
@@ -148,6 +152,12 @@ module.exports={
   },
   flagForResave: function(db, dictID, callnext){
     db.run("update entries set needs_resave=1", {}, function(err){ if(err) console.log(err);
+      var resaveNeeded=(this.changes>0);
+      callnext(resaveNeeded);
+    });
+  },
+  flagForRefac: function(db, dictID, callnext){
+    db.run("update entries set needs_refac=1", {}, function(err){ if(err) console.log(err);
       var resaveNeeded=(this.changes>0);
       callnext(resaveNeeded);
     });
@@ -396,7 +406,7 @@ module.exports={
               var els=parentDoc.documentElement.getElementsByTagName("*");
               for(var i=0; i<els.length; i++) els[i].removeAttributeNS("http://www.lexonomy.eu/", "done");
               parentXml=serializer.serializeToString(parentDoc);
-              //save the parent's xml (inyto whuch all subentries have been injected by now) and tell it that it needs a resave:
+              //save the parent's xml (into which all subentries have been injected by now) and tell it that it needs a resave:
               db.run("update entries set xml=$xml, needs_refresh=0, needs_resave=1 where id=$id", {$id: parentID, $xml: parentXml}, function(){
                 callnext(true);
               });
