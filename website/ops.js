@@ -161,36 +161,39 @@ module.exports={
         var title="";
         callnext(entryID, xml, title);
       } else {
-        var entryID=row.id;
-        var xml=row.xml;
-        var title=row.title;
+        module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
+          var entryID=row.id;
+          var xml=row.xml;
+          var title=row.title;
+          xml=setHousekeepingAttributes(entryID, xml, subbing);
 
-        //insert <lxnm:subentryParent> elements:
-        var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
-        var els=[];
-        var _els=doc.getElementsByTagName("*"); els.push(_els[0]); for(var i=1; i<_els.length; i++) {
-          if(_els[i].getAttributeNS("http://www.lexonomy.eu/", "subentryID")!="") els.push(_els[i]);
-        }
-        var go=function(){
-          if(els.length>0){
-            var el=els.pop();
-            var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
-            if(el.parentNode.nodeType!=1) subentryID=entryID;
-            db.all("select s.parent_id, e.title from sub as s inner join entries as e on e.id=s.parent_id where s.child_id=$child_id", {$child_id: subentryID}, function(err, rows){
-              for(var i=0; i<rows.length; i++) {
-                var pel=doc.createElementNS("http://www.lexonomy.eu/", "lxnm:subentryParent");
-                pel.setAttribute("id", rows[i].parent_id);
-                pel.setAttribute("title", rows[i].title);
-                el.appendChild(pel);
-              }
-              go();
-            });
-          } else {
-            xml=(new xmldom.XMLSerializer()).serializeToString(doc);
-            callnext(entryID, xml, title);
+          //insert <lxnm:subentryParent> elements:
+          var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
+          var els=[];
+          var _els=doc.getElementsByTagName("*"); els.push(_els[0]); for(var i=1; i<_els.length; i++) {
+            if(_els[i].getAttributeNS("http://www.lexonomy.eu/", "subentryID")!="") els.push(_els[i]);
           }
-        };
-        go();
+          var go=function(){
+            if(els.length>0){
+              var el=els.pop();
+              var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
+              if(el.parentNode.nodeType!=1) subentryID=entryID;
+              db.all("select s.parent_id, e.title from sub as s inner join entries as e on e.id=s.parent_id where s.child_id=$child_id", {$child_id: subentryID}, function(err, rows){
+                for(var i=0; i<rows.length; i++) {
+                  var pel=doc.createElementNS("http://www.lexonomy.eu/", "lxnm:subentryParent");
+                  pel.setAttribute("id", rows[i].parent_id);
+                  pel.setAttribute("title", rows[i].title);
+                  el.appendChild(pel);
+                }
+                go();
+              });
+            } else {
+              xml=(new xmldom.XMLSerializer()).serializeToString(doc);
+              callnext(entryID, xml, title);
+            }
+          };
+          go();
+        });
       }
     });
   },
@@ -215,23 +218,26 @@ module.exports={
     });
   },
   createEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
-    var sql="insert into entries(xml, title, sortkey, needs_refac, needs_resave) values($xml, $title, $sortkey, 1, 1)";
-    var params={$xml: xml, $title: "", $sortkey: ""};
-    if(entryID) {
-      sql="insert into entries(id, xml, title, sortkey) values($id, $xml, $title, $sortkey)";
-      params.$id=entryID;
-    }
-    db.run(sql, params, function(err){ if(err) console.log(err);
-      if(!entryID) entryID=this.lastID;
-      db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
-        $entry_id: entryID,
-        $action: "create",
-        $when: (new Date()).toISOString(),
-        $email: email,
-        $xml: xml,
-        $historiography: JSON.stringify(historiography),
-      }, function(err){});
-      callnext(entryID, xml);;
+    module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
+      xml=setHousekeepingAttributes(entryID, xml, subbing);
+      var sql="insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values($xml, $title, $sortkey, 1, 1, $doctype)";
+      var params={$xml: xml, $title: "", $sortkey: "", $doctype: getDoctype(xml)};
+      if(entryID) {
+        sql="insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values($id, $xml, $title, $sortkey, 1, 1, $doctype)";
+        params.$id=entryID;
+      }
+      db.run(sql, params, function(err){ if(err) console.log(err);
+        if(!entryID) entryID=this.lastID;
+        db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
+          $entry_id: entryID,
+          $action: "create",
+          $when: (new Date()).toISOString(),
+          $email: email,
+          $xml: xml,
+          $historiography: JSON.stringify(historiography),
+        }, function(err){});
+        callnext(entryID, xml);;
+      });
     });
   },
   updateEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
@@ -239,20 +245,23 @@ module.exports={
       if(!row) { //an entry with that ID does not exist: recreate it with that ID:
         module.exports.createEntry(db, dictID, entryID, xml, email, historiography, callnext);
       } else {
-        //tell my parents that they need a refresh:
-        db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
-          //update me:
-          db.run("update entries set xml=$xml, title=$title, sortkey=$sortkey, needs_refac=1, needs_resave=1 where id=$id", { $id: entryID, $xml: xml, $title: "", $sortkey: ""}, function(err){
-            //tell history that I have been updated:
-            db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
-              $entry_id: entryID,
-              $action: "update",
-              $when: (new Date()).toISOString(),
-              $email: email,
-              $xml: xml,
-              $historiography: JSON.stringify(historiography),
-            }, function(err){});
-            callnext(entryID, xml);;
+        module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
+          xml=setHousekeepingAttributes(entryID, xml, subbing);
+          //tell my parents that they need a refresh:
+          db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
+            //update me:
+            db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=1, needs_resave=1 where id=$id", { $id: entryID, $xml: xml, $title: "", $sortkey: "", $doctype: getDoctype(xml)}, function(err){
+              //tell history that I have been updated:
+              db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
+                $entry_id: entryID,
+                $action: "update",
+                $when: (new Date()).toISOString(),
+                $email: email,
+                $xml: xml,
+                $historiography: JSON.stringify(historiography),
+              }, function(err){});
+              callnext(entryID, xml);;
+            });
           });
         });
       }
@@ -432,55 +441,58 @@ module.exports={
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
         inner join entries as e on e.id=s.entry_id
-        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like
+        where doctype=$doctype and s.txt like $like
         group by e.id
         order by e.sortkey, s.level
         limit $howmany`;
-      var params1={$howmany: howmany, $like: searchtext+"%"};
+      var params1={$howmany: howmany, $like: searchtext+"%", $doctype: doctype};
       var sql2=`select count(distinct s.entry_id) as total
         from searchables as s
         inner join entries as e on e.id=s.entry_id
-        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like`;
-      var params2={$like: searchtext+"%"};
+        where doctype=$doctype and s.txt like $like`;
+      var params2={$like: searchtext+"%", $doctype: doctype};
     } else if(modifier=="wordstart"){
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
         inner join entries as e on e.id=s.entry_id
-        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and (s.txt like $like1 or s.txt like $like2)
+        where doctype=$doctype and (s.txt like $like1 or s.txt like $like2)
         group by e.id
         order by e.sortkey, s.level
         limit $howmany`;
-      var params1={$howmany: howmany, $like1: searchtext+"%", $like2: "% "+searchtext+"%"};
+      var params1={$howmany: howmany, $like1: searchtext+"%", $like2: "% "+searchtext+"%", $doctype: doctype};
       var sql2=`select count(distinct s.entry_id) as total
         from searchables as s
         inner join entries as e on e.id=s.entry_id
-        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and  (s.txt like $like1 or s.txt like $like2)`;
-      var params2={$like1: searchtext+"%", $like2: "% "+searchtext+"%"};
+        where doctype=$doctype and (s.txt like $like1 or s.txt like $like2)`;
+      var params2={$like1: searchtext+"%", $like2: "% "+searchtext+"%", $doctype: doctype};
     } else if(modifier=="substring"){
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
         inner join entries as e on e.id=s.entry_id
-        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like
+        where doctype=$doctype and s.txt like $like
         group by e.id
         order by e.sortkey, s.level
         limit $howmany`;
-      var params1={$howmany: howmany, $like: "%"+searchtext+"%"};
+      var params1={$howmany: howmany, $like: "%"+searchtext+"%", $doctype: doctype};
       var sql2=`select count(distinct s.entry_id) as total
         from searchables as s
         inner join entries as e on e.id=s.entry_id
-        where (e.xml like '<${doctype}>%' or e.xml like '<${doctype} %') and s.txt like $like`;
-      var params2={$like: "%"+searchtext+"%"};
+        where doctype=$doctype and s.txt like $like`;
+      var params2={$like: "%"+searchtext+"%", $doctype: doctype};
     }
-    db.all(sql1, params1, function(err, rows){
-      var entries=[];
-      for(var i=0; i<rows.length; i++){
-        var item={id: rows[i].id, title: rows[i].title, xml: rows[i].xml};
-        if(rows[i].level>1) item.title+=" ← <span class='redirector'>"+rows[i].txt+"</span>";
-        entries.push(item);
-      }
-      db.get(sql2, params2, function(err, row){
-        var total=row.total;
-        callnext(total, entries);
+    module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
+      db.all(sql1, params1, function(err, rows){
+        var entries=[];
+        for(var i=0; i<rows.length; i++){
+          rows[i].xml=setHousekeepingAttributes(rows[i].id, rows[i].xml, subbing);
+          var item={id: rows[i].id, title: rows[i].title, xml: rows[i].xml};
+          if(rows[i].level>1) item.title+=" ← <span class='redirector'>"+rows[i].txt+"</span>";
+          entries.push(item);
+        }
+        db.get(sql2, params2, function(err, row){
+          var total=row.total;
+          callnext(total, entries);
+        });
       });
     });
   },
@@ -561,26 +573,28 @@ module.exports={
   },
 
   readNabesByEntryID: function(db, dictID, entryID, callnext){
-    var sql_before=`select e1.id, e1.title
-      from entries as e1
-      where e1.sortkey<=(select sortkey from entries where id=$id)
-      order by e1.sortkey desc
-      limit 8`;
-    var sql_after=`select e1.id, e1.title
-      from entries as e1
-      where e1.sortkey>(select sortkey from entries where id=$id)
-      order by e1.sortkey asc
-      limit 15`;
-    var nabes=[];
-    db.all(sql_before, {$id: entryID}, function(err, rows){
-      for(var i=0; i<rows.length; i++){
-        nabes.unshift({id: rows[i].id, title: rows[i].title});
-      }
-      db.all(sql_after, {$id: entryID}, function(err, rows){
+    module.exports.readDictConfig(db, dictID, "xema", function(xema){
+      var sql_before=`select e1.id, e1.title
+        from entries as e1
+        where e1.doctype=$doctype and e1.sortkey<=(select sortkey from entries where id=$id)
+        order by e1.sortkey desc
+        limit 8`;
+      var sql_after=`select e1.id, e1.title
+        from entries as e1
+        where e1.doctype=$doctype and e1.sortkey>(select sortkey from entries where id=$id)
+        order by e1.sortkey asc
+        limit 15`;
+      var nabes=[];
+      db.all(sql_before, {$id: entryID, $doctype: xema.root}, function(err, rows){
         for(var i=0; i<rows.length; i++){
-          nabes.push({id: rows[i].id, title: rows[i].title});
+          nabes.unshift({id: rows[i].id, title: rows[i].title});
         }
-        callnext(nabes);
+        db.all(sql_after, {$id: entryID, $doctype: xema.root}, function(err, rows){
+          for(var i=0; i<rows.length; i++){
+            nabes.push({id: rows[i].id, title: rows[i].title});
+          }
+          callnext(nabes);
+        });
       });
     });
   },
@@ -588,22 +602,22 @@ module.exports={
     module.exports.readDictConfigs(db, dictID, function(configs){
       var sql_before=`select e1.id, e1.title
         from entries as e1
-        where e1.sortkey<=$sortkey
+        where doctype=$doctype and e1.sortkey<=$sortkey
         order by e1.sortkey desc
         limit 8`;
       var sql_after=`select e1.id, e1.title
         from entries as e1
-        where e1.sortkey>$sortkey
+        where doctype=$doctype and e1.sortkey>$sortkey
         order by e1.sortkey asc
         limit 15`;
       var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
       var sortkey=module.exports.toSortkey(text, abc);
       var nabes=[];
-      db.all(sql_before, {$sortkey: sortkey}, function(err, rows){
+      db.all(sql_before, {$sortkey: sortkey, $doctype: configs.xema.root}, function(err, rows){
         for(var i=0; i<rows.length; i++){
           nabes.unshift({id: rows[i].id, title: rows[i].title});
         }
-        db.all(sql_after, {$sortkey: sortkey}, function(err, rows){
+        db.all(sql_after, {$sortkey: sortkey, $doctype: configs.xema.root}, function(err, rows){
           for(var i=0; i<rows.length; i++){
             nabes.push({id: rows[i].id, title: rows[i].title});
           }
@@ -613,40 +627,44 @@ module.exports={
     });
   },
   readRandoms: function(db, dictID, callnext){
-    var limit=75;
-    var sql_randoms="select id, title from entries where id in (select id from entries order by random() limit $limit) order by sortkey"
-    var sql_total="select count(*) as total from entries";
-    var randoms=[];
-    var more=false;
-    db.all(sql_randoms, {$limit: limit}, function(err, rows){
-      for(var i=0; i<rows.length; i++){
-        randoms.push({id: rows[i].id, title: rows[i].title});
-      }
-      db.get(sql_total, {}, function(err, row){
-        if(row.total>limit) more=true;
-        callnext(more, randoms);
+    module.exports.readDictConfig(db, dictID, "xema", function(xema){
+      var limit=75;
+      var sql_randoms="select id, title from entries where doctype=$doctype and id in (select id from entries order by random() limit $limit) order by sortkey"
+      var sql_total="select count(*) as total from entries";
+      var randoms=[];
+      var more=false;
+      db.all(sql_randoms, {$limit: limit, $doctype: xema.root}, function(err, rows){
+        for(var i=0; i<rows.length; i++){
+          randoms.push({id: rows[i].id, title: rows[i].title});
+        }
+        db.get(sql_total, {}, function(err, row){
+          if(row.total>limit) more=true;
+          callnext(more, randoms);
+        });
       });
     });
   },
   listEntriesPublic: function(db, dictID, searchtext, callnext){
-    var howmany=100;
-    var sql_list=`select s.txt, min(s.level) as level, e.id, e.title,
-      case when s.txt=$searchtext then 1 else 2 end as priority
-      from searchables as s
-      inner join entries as e on e.id=s.entry_id
-      where s.txt like $like
-      group by e.id
-      order by priority, level, e.sortkey, s.level
-      limit $howmany`;
-    var like="%"+searchtext+"%";
-    db.all(sql_list, {$howmany: howmany, $like: like, $searchtext: searchtext}, function(err, rows){
-      var entries=[];
-      for(var i=0; i<rows.length; i++){
-        var item={id: rows[i].id, title: rows[i].title, exactMatch: (rows[i].level==1 && rows[i].priority==1)};
-        if(rows[i].level>1) item.title+=" ← <span class='redirector'>"+rows[i].txt+"</span>";
-        entries.push(item);
-      }
-      callnext(entries);
+    module.exports.readDictConfig(db, dictID, "xema", function(xema){
+      var howmany=100;
+      var sql_list=`select s.txt, min(s.level) as level, e.id, e.title,
+        case when s.txt=$searchtext then 1 else 2 end as priority
+        from searchables as s
+        inner join entries as e on e.id=s.entry_id
+        where s.txt like $like and e.doctype=$doctype
+        group by e.id
+        order by priority, level, e.sortkey, s.level
+        limit $howmany`;
+      var like="%"+searchtext+"%";
+      db.all(sql_list, {$howmany: howmany, $like: like, $searchtext: searchtext, $doctype: xema.root}, function(err, rows){
+        var entries=[];
+        for(var i=0; i<rows.length; i++){
+          var item={id: rows[i].id, title: rows[i].title, exactMatch: (rows[i].level==1 && rows[i].priority==1)};
+          if(rows[i].level>1) item.title+=" ← <span class='redirector'>"+rows[i].txt+"</span>";
+          entries.push(item);
+        }
+        callnext(entries);
+      });
     });
   },
   exportEntryXml: function(baseUrl, db, dictID, entryID, callnext){
@@ -656,41 +674,45 @@ module.exports={
         var xml="";
         callnext(entryID, xml);
       } else {
-        var entryID=row.id;
-        var xml=row.xml;
-        var attribs=" this=\""+baseUrl+dictID+"/"+row.id+".xml"+"\"";
-        var sql_after=`select e1.id, e1.title
-            from entries as e1
-            where e1.sortkey>(select sortkey from entries where id=$id)
-            order by e1.sortkey asc
-            limit 15`;
-        db.get(sql_after, {$id: entryID}, function(err, row){
-          if(row) attribs+=" next=\""+baseUrl+dictID+"/"+row.id+".xml"+"\"";
-          var sql_before=`select e1.id, e1.title
-            from entries as e1
-            where e1.sortkey<(select sortkey from entries where id=$id)
-            order by e1.sortkey desc
-            limit 1`;
-            db.get(sql_before, {$id: entryID}, function(err, row){
-              if(row) attribs+=" previous=\""+baseUrl+dictID+"/"+row.id+".xml"+"\"";
-              xml="<lexonomy"+attribs+">"+xml+"</lexonomy>";
-              callnext(entryID, xml);
-            });
+        module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
+          var entryID=row.id;
+          var xml=row.xml;
+          xml=setHousekeepingAttributes(entryID, xml, subbing);
+          var attribs=" this=\""+baseUrl+dictID+"/"+row.id+".xml"+"\"";
+          var sql_after=`select e1.id, e1.title
+              from entries as e1
+              where e1.sortkey>(select sortkey from entries where id=$id)
+              order by e1.sortkey asc
+              limit 15`;
+          db.get(sql_after, {$id: entryID}, function(err, row){
+            if(row) attribs+=" next=\""+baseUrl+dictID+"/"+row.id+".xml"+"\"";
+            var sql_before=`select e1.id, e1.title
+              from entries as e1
+              where e1.sortkey<(select sortkey from entries where id=$id)
+              order by e1.sortkey desc
+              limit 1`;
+              db.get(sql_before, {$id: entryID}, function(err, row){
+                if(row) attribs+=" previous=\""+baseUrl+dictID+"/"+row.id+".xml"+"\"";
+                xml="<lexonomy"+attribs+">"+xml+"</lexonomy>";
+                callnext(entryID, xml);
+              });
+          });
         });
       }
     });
   },
   download: function(db, dictID, res){
-    res.setHeader("content-type", "text/xml; charset=utf-8");
-    res.setHeader("content-disposition", "attachment; filename="+dictID+".xml");
-    res.write("<"+dictID+">\n");
-    db.each("select id, xml from entries", {}, function(err, row){
-      if(/^\<[^\>]*xmlns:lxnm=['"]http:\/\/www\.lexonomy\.eu\/["']/.test(row.xml)) var xml=row.xml.replace(/^\<[^\s\>]+/, function(found){return found+" lxnm:entryID='"+row.id+"'"});
-      else var xml=row.xml.replace(/^\<[^\s\>]+/, function(found){return found+" xmlns:lxnm='http://www.lexonomy.eu/' lxnm:entryID='"+row.id+"'"});
-      res.write(xml+"\n");
-    }, function(err, rowCount){
-      res.write("</"+dictID+">\n");
-      res.end();
+    module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
+      res.setHeader("content-type", "text/xml; charset=utf-8");
+      res.setHeader("content-disposition", "attachment; filename="+dictID+".xml");
+      res.write("<"+dictID+">\n");
+      db.each("select id, xml from entries", {}, function(err, row){
+        xml=setHousekeepingAttributes(row.id, row.xml, subbing);
+        res.write(xml+"\n");
+      }, function(err, rowCount){
+        res.write("</"+dictID+">\n");
+        res.end();
+      });
     });
   },
   purge: function(db, dictID, email, historiography, callnext){
@@ -741,7 +763,9 @@ module.exports={
 
                 var root=doc.getElementsByTagName("*")[0];
                 var entryID=parseInt(root.getAttributeNS("http://www.lexonomy.eu/", "entryID"));
+                if(!entryID) entryID=parseInt(root.getAttributeNS("http://www.lexonomy.eu/", "subentryID"));
                 root.removeAttributeNS("http://www.lexonomy.eu/", "entryID");
+                root.removeAttributeNS("http://www.lexonomy.eu/", "subentryID");
                 xml=serializer.serializeToString(doc);
                 doc=null;
                 //console.log(xml.substring(0, 10)+"..."+xml.substring(xml.length-10));
@@ -1037,25 +1061,30 @@ module.exports={
   },
 
   readDictHistory: function(db, dictID, entryID, callnext){
-    db.all("select * from history where entry_id=$entryID order by [when] desc", {$entryID: entryID}, function(err, rows){
-      var history=[];
-      for(var i=0; i<rows.length; i++) {
-        var row=rows[i];
-        history.push({
-          "entry_id": row.entry_id,
-          "revision_id": row.id,
-          "content": row.xml,
-          "action": row.action,
-          "when": row.when,
-          "email": row.email,
-          "historiography": JSON.parse(row.historiography)
-        });
-      }
-      callnext(history);
+    module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
+      db.all("select * from history where entry_id=$entryID order by [when] desc", {$entryID: entryID}, function(err, rows){
+        var history=[];
+        for(var i=0; i<rows.length; i++) {
+          var row=rows[i];
+          row.xml=setHousekeepingAttributes(row.entry_id, row.xml, subbing);
+          history.push({
+            "entry_id": row.entry_id,
+            "revision_id": row.id,
+            "content": row.xml,
+            "action": row.action,
+            "when": row.when,
+            "email": row.email,
+            "historiography": JSON.parse(row.historiography)
+          });
+        }
+        callnext(history);
+      });
     });
   },
 
 }; //end of module.exports
+
+const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick"];
 
 function clean4xml(txt){
   return txt
@@ -1084,4 +1113,27 @@ function generateDictID(){
   return "z"+id;
 }
 
-const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick"];
+function setHousekeepingAttributes(entryID, xml, subbing){
+  //delete any housekeeping attributes that already exist in the XML:
+  xml=xml.replace(/^(\<[^\>\/]*)\s+xmlns:lxnm=['"]http:\/\/www\.lexonomy\.eu\/["']/, function(found, $1){return $1});
+  xml=xml.replace(/^(\<[^\>\/]*)\s+lxnm:entryID=['"][0-9]+["']/, function(found, $1){return $1});
+  xml=xml.replace(/^(\<[^\>\/]*)\s+lxnm:subentryID=['"][0-9]+["']/, function(found, $1){return $1});
+  //get name of the top-level element:
+  var root=""; xml.replace(/^\<([^\s\>\/]+)/, function(found, $1){root=$1});
+  //set housekeeping attributes:
+  if(subbing[root]) xml=xml.replace(/^\<[^\s\>\/]+/, function(found){return found+" lxnm:subentryID='"+entryID+"'"});
+  if(!subbing[root]) xml=xml.replace(/^\<[^\s\>\/]+/, function(found){return found+" lxnm:entryID='"+entryID+"'"});
+  xml=xml.replace(/^\<[^\s\>\/]+/, function(found){return found+" xmlns:lxnm='http://www.lexonomy.eu/'"});
+  return xml;
+}
+
+function getDoctype(xml){
+  var ret="";
+  xml=xml.replace(/^\<([^\>\/\s]+)/, function(found, $1){ ret=$1 });
+  return ret;
+}
+
+
+// var xml="<test></test>";
+// var s=getDoctype(xml);
+// console.log(s);

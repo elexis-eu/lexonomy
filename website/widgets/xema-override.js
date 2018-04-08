@@ -60,7 +60,7 @@ XemaOverride.harvest=function(div){
     ret.elements[elName]={};
   }
 
-  //understand what the top-level element:
+  //understand who the top-level element is:
   var match=ret._newXml.match(/^\<([^ \>\/]+)/);
   if(match) ret.root=match[1];
   if(!ret.elements[ret.root]) for(var elName in ret.elements) {ret.root=elName; break;}
