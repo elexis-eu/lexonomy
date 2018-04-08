@@ -18,6 +18,7 @@
 		<script type="text/javascript" src="../../../furniture/screenful-user-config.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-navigator.css?2018-02-04" />
 		<script type="text/javascript" src="../../../libs/screenful/screenful-navigator.js?2018-02-04"></script>
+		<script type="text/javascript" src="../../../libs/js.cookie.js"></script>
 		<script type="text/javascript">
 		Screenful.Navigator.listUrl="../../../<%=dictID%>/<%=doctype%>/entrylist.json";
 		Screenful.Navigator.stepSize=1000;
@@ -55,5 +56,9 @@
 	</head>
 	<body>
 		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "edit", rootPath: "../../../", doctype: doctype, doctypes: doctypes })%>
+		<script>
+	    var mode=Cookies.get("xonomyMode_<%=dictID%>") || "<%-xonomyMode%>";
+			$(".doctypes").addClass(mode);
+	  </script>
 	</body>
 </html>

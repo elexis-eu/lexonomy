@@ -18,14 +18,13 @@
 #header div.doctypes a.doctype {display: inline-block; height: 35px; float: left; margin-right: 10px; color: #999999}
 #header div.doctypes a.doctype:hover {color: #666666;}
 #header div.doctypes a.doctype.current {font-weight: bold; background-image: url(callout.gif); background-position: center bottom; background-repeat: no-repeat;}
-#header div.doctypes a.doctype span.tech {font-family: monospace; font-size: 0.95em; position: relative; top: -1px; line-height: 1em; margin: 0px 0.25em; }
-#header div.doctypes a.doctype.current span.tech span.brak {color: #669acc;}
-#header div.doctypes a.doctype.current span.tech span.elm {color: #cc3333;}
-#header div.doctypes a.doctype.current span.tech span.ats {color: #999999;}
-#header div.doctypes a.doctype.current span.tech span.att {color: #ff4455;}
-
+#header div.doctypes.nerd a.doctype span.tech {font-family: monospace; font-size: 0.95em; position: relative; top: -1px; line-height: 1em; margin: 0px 0.25em; }
+#header div.doctypes.nerd a.doctype.current span.tech span.brak {color: #669acc;}
+#header div.doctypes.nerd a.doctype.current span.tech span.elm {color: #cc3333;}
+#header div.doctypes.laic a.doctype span.tech {font-family: monospace; font-size: 0.95rem; position: relative; top: -1px; line-height: 1em; margin: 0px 0.25em; }
+#header div.doctypes.laic a.doctype span.tech span.brak {display: none}
+#header div.doctypes.laic a.doctype.current span.tech span.elm {font-weight: bold; color: #315696;}
 #header span.arrow {font-size: 0.75em;}
-
 
 #pagebody {position: absolute; top: 59px; left: 0px; right: 0px; bottom: 0px; overflow-x: hidden; overflow-y: auto;}
 #pagebody.notop { top: 0px; }

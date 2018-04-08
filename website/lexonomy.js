@@ -441,7 +441,7 @@ app.get(siteconfig.rootPath+":dictID/edit/:doctype/", function(req, res){
       ops.readDictConfigs(db, req.params.dictID, function(configs){
         db.close();
         var doctypes=[configs.xema.root]; for(var doctype in configs.subbing) if(doctypes.indexOf(doctype)==-1) doctypes.push(doctype);
-        res.render("edit.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, siteconfig: siteconfig, doctypes: doctypes, doctype: req.params.doctype});
+        res.render("edit.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, siteconfig: siteconfig, doctypes: doctypes, doctype: req.params.doctype, xonomyMode: configs.editing.xonomyMode});
       });
     }
   });
