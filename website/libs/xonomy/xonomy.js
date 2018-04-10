@@ -255,6 +255,7 @@ Xonomy.verifyDocSpecElement=function(name) { //make sure the DocSpec object has 
 	spec.localDropOnly=Xonomy.asFunction(spec.localDropOnly, false);
 	spec.isReadOnly=Xonomy.asFunction(spec.isReadOnly, false);
 	spec.isInvisible=Xonomy.asFunction(spec.isInvisible, false);
+	spec.backgroundColour=Xonomy.asFunction(spec.backgroundColour, "");
 	if(spec.displayName) spec.displayName=Xonomy.asFunction(spec.displayName, "");
 	if(spec.title) spec.title=Xonomy.asFunction(spec.title, "");
 	for(var i=0; i<spec.menu.length; i++) Xonomy.verifyDocSpecMenuItem(spec.menu[i]);
@@ -382,7 +383,7 @@ Xonomy.refresh=function() {
 		if(elSpec.displayName) $(this).children(".tag").children(".name").html(Xonomy.textByLang(elSpec.displayName(Xonomy.harvestElement(this))));
 		if(elSpec.caption) {
 			var jsEl=Xonomy.harvestElement(this);
-			if(!jsEl.hasElements()) $(this).children(".inlinecaption").html("&nbsp;"+Xonomy.textByLang(elSpec.caption(jsEl))+"&nbsp;");
+			$(this).children(".inlinecaption").html(Xonomy.textByLang(elSpec.caption(jsEl)));
 		}
 		if(elSpec.displayValue) {
 			var jsEl=Xonomy.harvestElement(this);
@@ -403,7 +404,7 @@ Xonomy.harvest=function() { //harvests the contents of an editor
 	var rootElement=$(".xonomy .element").first().toArray()[0];
 	var js=Xonomy.harvestElement(rootElement);
 	for(var key in Xonomy.namespaces) {
-		js.attributes.push({
+		if(!js.hasAttribute(key)) js.attributes.push({
 			type: "attribute",
 			name: key,
 			value: Xonomy.namespaces[key],
@@ -557,7 +558,7 @@ Xonomy.renderElement=function(element) {
 			html+='<span class="plusminus" onclick="Xonomy.plusminus(\''+htmlID+'\')"></span>';
 			html+='<span class="draghandle" draggable="true" ondragstart="Xonomy.drag(event)"></span>';
 		html+='</span>';
-		html+='<span class="tag opening focusable" style="background-color: '+spec.backgroundColour+';">';
+		html+='<span class="tag opening focusable" style="background-color: '+spec.backgroundColour(element)+';">';
 			html+='<span class="punc">&lt;</span>';
 			html+='<span class="warner"><span class="inside" onclick="Xonomy.click(\''+htmlID+'\', \'warner\')"></span></span>';
 			html+='<span class="name" title="'+title+'" onclick="Xonomy.click(\''+htmlID+'\', \'openingTagName\')">'+displayName+'</span>';
@@ -571,6 +572,7 @@ Xonomy.renderElement=function(element) {
 			html+='<span class="punc slash">/</span>';
 			html+='<span class="punc">&gt;</span>';
 		html+='</span>';
+		if(spec.caption && !spec.oneliner(element)) html+="<span class='inlinecaption'>"+Xonomy.textByLang(spec.caption(element))+"</span>";
 		html+='<span class="childrenCollapsed focusable" onclick="Xonomy.plusminus(\''+htmlID+'\', true)">&middot;&middot;&middot;</span>';
 		html+='<div class="children">';
 			if(spec.displayValue && !element.hasElements()) {
@@ -594,13 +596,13 @@ Xonomy.renderElement=function(element) {
 				}
 			}
 		html+='</div>';
-		html+='<span class="tag closing focusable" style="background-color: '+spec.backgroundColour+';">';
+		html+='<span class="tag closing focusable" style="background-color: '+spec.backgroundColour(element)+';">';
 			html+='<span class="punc">&lt;</span>';
 			html+='<span class="punc">/</span>';
 			html+='<span class="name" onclick="Xonomy.click(\''+htmlID+'\', \'closingTagName\')">'+displayName+'</span>';
 			html+='<span class="punc">&gt;</span>';
 		html+='</span>';
-		if(spec.caption && !element.hasElements()) html+="<span class='inlinecaption'>"+Xonomy.textByLang(spec.caption(element))+"</span>";
+		if(spec.caption && spec.oneliner(element)) html+="<span class='inlinecaption'>"+Xonomy.textByLang(spec.caption(element))+"</span>";
 	html+='</div>';
 	element.htmlID = htmlID;
 	return html;
@@ -1136,6 +1138,7 @@ Xonomy.toggleSubmenu=function(menuItem){
 	else { $menuItem.find(".submenu").first().slideDown("fast", function(){$menuItem.addClass("expanded");}); };
 }
 Xonomy.internalMenu=function(htmlID, items, harvest, getter, indices) {
+	Xonomy.harvestCache={};
 	indices = indices || [];
 	var fragments = items.map(function (item, i) {
 		Xonomy.verifyDocSpecMenuItem(item);
@@ -1169,6 +1172,7 @@ Xonomy.internalMenu=function(htmlID, items, harvest, getter, indices) {
 		: "";
 };
 Xonomy.attributeMenu=function(htmlID) {
+	Xonomy.harvestCache={};
 	var name=$("#"+htmlID).attr("data-name"); //obtain attribute's name
 	var elName=$("#"+htmlID).closest(".element").attr("data-name"); //obtain element's name
 	Xonomy.verifyDocSpecAttribute(elName, name);
@@ -1179,6 +1183,7 @@ Xonomy.attributeMenu=function(htmlID) {
 	return Xonomy.internalMenu(htmlID, spec.menu, Xonomy.harvestAttribute, getter);
 };
 Xonomy.elementMenu=function(htmlID) {
+	Xonomy.harvestCache={};
 	var elName=$("#"+htmlID).attr("data-name"); //obtain element's name
 	var spec=Xonomy.docSpec.elements[elName];
 	function getter(indices) {
@@ -1187,6 +1192,7 @@ Xonomy.elementMenu=function(htmlID) {
 	return Xonomy.internalMenu(htmlID, spec.menu, Xonomy.harvestElement, getter);
 };
 Xonomy.inlineMenu=function(htmlID) {
+	Xonomy.harvestCache={};
 	var elName=$("#"+htmlID).attr("data-name"); //obtain element's name
 	var spec=Xonomy.docSpec.elements[elName];
 	function getter(indices) {
@@ -1463,15 +1469,33 @@ Xonomy.mergeElements=function(elDead, elLive){
 		window.setTimeout(function(){ Xonomy.setFocus(htmlID, "openingTagName"); }, 100);
 	}
 };
+Xonomy.deleteEponymousSiblings=function(htmlID, parameter) {
+	var what=Xonomy.currentFocus;
+	Xonomy.clickoff();
+	var obj=document.getElementById(htmlID);
+	var parent=obj.parentNode.parentNode;
+	var _htmlChildren=$(parent).children(".children").toArray()[0].childNodes;
+	var htmlChildren=[]; for(var i=0; i<_htmlChildren.length; i++) htmlChildren.push(_htmlChildren[i]);
+	for(var i=0; i<htmlChildren.length; i++) {
+		var htmlChild=htmlChildren[i];
+		if($(htmlChild).hasClass("element")) {
+			if($(htmlChild).attr("data-name")==$(obj).attr("data-name") && htmlChild!=obj){
+				htmlChild.parentNode.removeChild(htmlChild);
+			}
+		}
+	}
+	Xonomy.changed();
+	window.setTimeout(function(){ Xonomy.setFocus(htmlID, what);  }, 100);
+};
 
 Xonomy.insertDropTargets=function(htmlID){
 	var $element=$("#"+htmlID);
 	$element.addClass("dragging");
 	var elementName=$element.attr("data-name");
 	var elSpec=Xonomy.docSpec.elements[elementName];
-	$(".xonomy .children:visible").append("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
-	$(".xonomy .children:visible > .element").before("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
-	$(".xonomy .children:visible > .text").before("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
+	$(".xonomy .element:visible > .children").append("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
+	$(".xonomy .element:visible > .children > .element").before("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
+	$(".xonomy .element:visible > .children > .text").before("<div class='elementDropper' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)'><div class='inside'></div></div>")
 	$(".xonomy .dragging .children:visible > .elementDropper").remove(); //remove drop targets fom inside the element being dragged
 	$(".xonomy .dragging").prev(".elementDropper").remove(); //remove drop targets from immediately before the element being dragged
 	$(".xonomy .dragging").next(".elementDropper").remove(); //remove drop targets from immediately after the element being dragged
@@ -1737,6 +1761,7 @@ Xonomy.key=function(event){
 	Xonomy.notKeyUp=false;
 };
 Xonomy.keyboardMenu=function(event){
+	Xonomy.harvestCache={};
 	var $obj=$("#"+Xonomy.currentHtmlId);
 	var jsMe=null;
 	var menu=null;
@@ -1751,6 +1776,7 @@ Xonomy.keyboardMenu=function(event){
 		menu=Xonomy.docSpec.elements[elName].attributes[atName].menu;
 	}
 	if(menu){
+		Xonomy.harvestCache={};
 		var findMenuItem=function(menu){
 			var ret=null;
 			for(var i=0; i<menu.length; i++){
