@@ -241,6 +241,13 @@ Xematron.xema2docspec=function(xema){
 				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingName) || (jsMe.getFollowingSibling() && jsMe.getFollowingSibling().name==jsMe.name) || del.mustBeBefore(jsMe).indexOf(siblingName)==-1; },
 			});
 		});
+		submenu.push({
+			caption: "Remove all <"+elname+"> siblings",
+			action: Xonomy.deleteEponymousSiblings,
+			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().getChildElements(jsMe.name).length<2; },
+			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==90 },
+			keyCaption: "Ctrl + Shift + Z",
+		});
 		if(submenu.length>0) {
 			del.menu.push({
 				caption: "Sibling elements",

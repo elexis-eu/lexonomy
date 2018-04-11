@@ -368,7 +368,7 @@
 .xonomy.laic .readonly .plusminus { cursor: pointer !important; }
 .xonomy.laic .readonly .childrenCollapsed { cursor: pointer !important; }
 .xonomy.laic .readonly .textnode .char > .selector > .inside:hover { background-color: transparent !important; }
-.xonomy.laic .invisible { display: none; }
+.xonomy.laic .invisible { display: none !important; }
 .xonomy.laic .readonly .textnode .value { border: 0px !important; }
 .xonomy.laic .readonly .textnode .value:hover { background-color: transparent !important; }
 
