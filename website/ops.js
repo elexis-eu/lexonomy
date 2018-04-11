@@ -230,14 +230,19 @@ module.exports={
   createEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
     module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
       xml=setHousekeepingAttributes(entryID, xml, subbing);
+      var params={$xml: xml, $title: "_", $sortkey: "", $doctype: getDoctype(xml)};
       var sql="insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values($xml, $title, $sortkey, 1, 1, $doctype)";
-      var params={$xml: xml, $title: "", $sortkey: "", $doctype: getDoctype(xml)};
       if(entryID) {
         sql="insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values($id, $xml, $title, $sortkey, 1, 1, $doctype)";
         params.$id=entryID;
       }
-      db.run(sql, params, function(err){ if(err) console.log(err);
+      db.run(sql, params, function(err){
         if(!entryID) entryID=this.lastID;
+        db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
+          $entry_id: entryID,
+          $txt: "_",
+          $level: 1,
+        });
         db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
           $entry_id: entryID,
           $action: "create",
@@ -260,7 +265,7 @@ module.exports={
           //tell my parents that they need a refresh:
           db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
             //update me:
-            db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=1, needs_resave=1 where id=$id", { $id: entryID, $xml: xml, $title: "", $sortkey: "", $doctype: getDoctype(xml)}, function(err){
+            db.run("update entries set doctype=$doctype, xml=$xml, needs_refac=1, needs_resave=1 where id=$id", { $id: entryID, $xml: xml, $doctype: getDoctype(xml)}, function(err){
               //tell history that I have been updated:
               db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
                 $entry_id: entryID,
@@ -442,7 +447,7 @@ module.exports={
                   $entry_id: entryID,
                   $txt: searchables[y],
                   $level: (searchables[y]==headword ? 1 : 2),
-                }, function(err){ if(err) console.log(err);  });
+                });
               }
              });
           })(entryID, doc);
