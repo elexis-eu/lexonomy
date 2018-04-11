@@ -11,10 +11,10 @@ Screenful.Loc={
   delete: "Scrios",
   listing: "Liosta á fháil...",
   listingFailed: "Níor éirigh liom liosta a fháil.",
-  reading: "Sonraí á fáil...",
+  reading: "Sonraí á bhfáil...",
   readingFailed: "Ní ann don iontráil.",
   saving: "Á shábháil...",
-  savingFailed: "Níor éirigh liom na sonraí a shǎbháil.",
+  savingFailed: "Níor éirigh liom na sonraí a shábháil.",
   deleting: "Á scrios...",
   deletingFailed: "Níor éirigh liom na sonraí a scrios.",
   deleteConfirm: "Cúramach anois! An bhfuil tú cinnte?",
@@ -59,4 +59,5 @@ Screenful.Loc={
   sourceCode: "Cód foinseach",
   invalidSourceCode: "Cód foinseach neamhbhailí",
   unsavedConfirm: "Tá athruithe déanta agat nach bhfuil sábháilte go fóill. An cuma leat go gcaillfear iad?",
+  doItLater: "Déan níos déanaí é",
 };

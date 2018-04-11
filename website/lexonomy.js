@@ -577,18 +577,18 @@ app.post(siteconfig.rootPath+":dictID/entrydelete.json", function(req, res){
 });
 
 //RESAVING:
-app.get(siteconfig.rootPath+":dictID/config/resave/", function(req, res){
+app.get(siteconfig.rootPath+":dictID/resave/", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID, true);
   ops.readDictConfigs(db, req.params.dictID, function(configs){
     ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
-      if(!user.canConfig) {
+      if(!user.canConfig && !user.canEdit && !user.canUpload) {
         db.close();
         res.redirect(siteconfig.baseUrl+req.params.dictID+"/edit/");
       } else {
         ops.getDictStats(db, req.params.dictID, function(stats){
           db.close();
-          res.render("resave.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, awayUrl: "../../../"+req.params.dictID+"/config/", todo: stats.entryCount, siteconfig: siteconfig});
+          res.render("resave.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, awayUrl: "../../"+req.params.dictID+"/edit/", todo: stats.entryCount, siteconfig: siteconfig});
         });
       }
     });
@@ -598,24 +598,16 @@ app.post(siteconfig.rootPath+":dictID/resave.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
-    if(!user.canEdit) {
+    if(!user.canConfig && !user.canEdit && !user.canUpload) {
       db.close();
       res.json({todo: 0});
     } else {
       ops.refac(db, req.params.dictID, function(any){
-        if(any) {
-          ops.getDictStats(db, req.params.dictID, function(stats){ db.close(function(){ res.json({todo: stats.needResave}); }); });
-        } else {
-          ops.refresh(db, req.params.dictID, function(any){
-            if(any) {
-              ops.getDictStats(db, req.params.dictID, function(stats){ db.close(function(){ res.json({todo: stats.needResave}); }); });
-            } else {
-              ops.resave(db, req.params.dictID, function(){
-                ops.getDictStats(db, req.params.dictID, function(stats){ db.close(function(){ res.json({todo: stats.needResave}); }); });
-              });
-            }
+        ops.refresh(db, req.params.dictID, function(any){
+          ops.resave(db, req.params.dictID, function(){
+            ops.getDictStats(db, req.params.dictID, function(stats){ db.close(function(){ res.json({todo: stats.needResave}); }); });
           });
-        }
+        });
       })
     }
   });
@@ -686,7 +678,7 @@ app.post(siteconfig.rootPath+":dictID/configupdate.json", function(req, res){
     } else {
       ops.updateDictConfig(db, req.params.dictID, req.body.id, JSON.parse(req.body.content), function(adjustedJson, resaveNeeded){
         db.close();
-        var redirUrl=null; if(resaveNeeded) redirUrl="../resave/";
+        var redirUrl=null; if(resaveNeeded) redirUrl="../../resave/";
         res.json({success: true, id: req.body.id, content: adjustedJson, redirUrl: redirUrl});
       });
     }

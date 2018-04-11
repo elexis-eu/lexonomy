@@ -20,3 +20,5 @@ div.interRevision > div.arrowTop {width: 16px; height: 16px; position: absolute;
 div.interRevision > div.arrowMiddle {width: 16px; position: absolute; top: 0px; bottom: 0px; left: -8px; background-image: url(resultset_up.png); background-position: center center; background-repeat: no-repeat;}
 div.interRevision:first-child > div.arrowTop {width: 16px; height: 16px; position: absolute; top: -4px; left: -8px; background-image: url(control_stop_blue.png);}
 div.interRevision > div.arrowBottom {width: 16px; height: 16px; position: absolute; bottom: -9px; left: -8px; background-image: url(control_stop_blue.png);}
+div.interRevision a {color: #004f9b; text-decoration: none;}
+div.interRevision a:hover {color: #0063c2}

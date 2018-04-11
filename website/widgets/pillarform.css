@@ -47,13 +47,7 @@
 
 #envelope div.pillarform div.subelement {padding: 5px 5px 15px 5px; border-bottom: 1px solid #eeeeee; margin-bottom: 10px;}
 #envelope div.pillarform div.subelement div.elName {font-size: 1.1em;}
-#envelope div.pillarform div.subelement div.settings {margin-top: 10px; color: #666666;}
-#envelope div.pillarform div.subelement div.settings span.opener {font-size: 0.95em; padding-left: 15px; background-repeat: no-repeat; background-position: left center; cursor: pointer;}
-#envelope div.pillarform div.subelement div.settings span.opener:hover {color: #004f9b;}
-#envelope div.pillarform div.subelement div.settings span.opener.closed {background-image: url(../furniture/plus.gif);}
-#envelope div.pillarform div.subelement div.settings span.opener.opened {background-image: url(../furniture/minus.gif);}
-#envelope div.pillarform div.subelement div.settings div.inside {margin: 8px 0px 0px 18px;}
-#envelope div.pillarform div.subelement .floatRight {float: right; margin: 12px 0px 0px 0px !important;}
+#envelope div.pillarform div.subelement .floatRight {float: right; margin: -7px 0px 0px 0px !important;}
 
 #envelope div.pillarform div.apikey {font-size: 1.2em; font-family: monospace; margin: 20px 5px 25px 5px; }
 

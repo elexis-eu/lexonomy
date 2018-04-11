@@ -176,33 +176,9 @@ module.exports={
           var xml=row.xml;
           var title=row.title;
           xml=setHousekeepingAttributes(entryID, xml, subbing);
-
-          //insert <lxnm:subentryParent> elements:
-          var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
-          var els=[];
-          var _els=doc.getElementsByTagName("*"); els.push(_els[0]); for(var i=1; i<_els.length; i++) {
-            if(_els[i].getAttributeNS("http://www.lexonomy.eu/", "subentryID")!="") els.push(_els[i]);
-          }
-          var go=function(){
-            if(els.length>0){
-              var el=els.pop();
-              var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
-              if(el.parentNode.nodeType!=1) subentryID=entryID;
-              db.all("select s.parent_id, e.title from sub as s inner join entries as e on e.id=s.parent_id where s.child_id=$child_id", {$child_id: subentryID}, function(err, rows){
-                for(var i=0; i<rows.length; i++) {
-                  var pel=doc.createElementNS("http://www.lexonomy.eu/", "lxnm:subentryParent");
-                  pel.setAttribute("id", rows[i].parent_id);
-                  pel.setAttribute("title", rows[i].title);
-                  el.appendChild(pel);
-                }
-                go();
-              });
-            } else {
-              xml=(new xmldom.XMLSerializer()).serializeToString(doc);
-              callnext(entryID, xml, title);
-            }
-          };
-          go();
+          module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
+            callnext(entryID, xml, title);
+          });
         });
       }
     });
@@ -230,6 +206,7 @@ module.exports={
   createEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
     module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
       xml=setHousekeepingAttributes(entryID, xml, subbing);
+      xml=module.exports.removeSubentryParentTags(xml);
       var params={$xml: xml, $title: "_", $sortkey: "", $doctype: getDoctype(xml)};
       var sql="insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values($xml, $title, $sortkey, 1, 1, $doctype)";
       if(entryID) {
@@ -251,7 +228,9 @@ module.exports={
           $xml: xml,
           $historiography: JSON.stringify(historiography),
         }, function(err){});
-        callnext(entryID, xml);;
+        module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
+          callnext(entryID, xml);
+        });
       });
     });
   },
@@ -262,6 +241,7 @@ module.exports={
       } else {
         module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
           xml=setHousekeepingAttributes(entryID, xml, subbing);
+          xml=module.exports.removeSubentryParentTags(xml);
           //tell my parents that they need a refresh:
           db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
             //update me:
@@ -275,12 +255,46 @@ module.exports={
                 $xml: xml,
                 $historiography: JSON.stringify(historiography),
               }, function(err){});
-              callnext(entryID, xml);;
+              module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
+                callnext(entryID, xml);
+              });
             });
           });
         });
       }
     });
+  },
+
+  removeSubentryParentTags: function(xml){
+    xml=xml.replace(/\<lxnm:subentryParent[^\>]*\>/g, "");
+    return xml;
+  },
+  addSubentryParentTags: function(db, entryID, xml, callnext){
+    var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
+    var els=[];
+    var _els=doc.getElementsByTagName("*"); els.push(_els[0]); for(var i=1; i<_els.length; i++) {
+      if(_els[i].getAttributeNS("http://www.lexonomy.eu/", "subentryID")!="") els.push(_els[i]);
+    }
+    var go=function(){
+      if(els.length>0){
+        var el=els.pop();
+        var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
+        if(el.parentNode.nodeType!=1) subentryID=entryID;
+        db.all("select s.parent_id, e.title from sub as s inner join entries as e on e.id=s.parent_id where s.child_id=$child_id", {$child_id: subentryID}, function(err, rows){
+          for(var i=0; i<rows.length; i++) {
+            var pel=doc.createElementNS("http://www.lexonomy.eu/", "lxnm:subentryParent");
+            pel.setAttribute("id", rows[i].parent_id);
+            pel.setAttribute("title", rows[i].title);
+            el.appendChild(pel);
+          }
+          go();
+        });
+      } else {
+        xml=(new xmldom.XMLSerializer()).serializeToString(doc);
+        callnext(xml);
+      }
+    };
+    go();
   },
 
   getDictStats: function(db, dictID, callnext){
@@ -296,13 +310,13 @@ module.exports={
   refac: function(db, dictID, callnext){ //takes the first entry that needs refactoring and extracts subentries from it
     module.exports.readDictConfigs(db, dictID, function(configs){
       //get the oldest entry that needs refactoring:
-      db.get("select e.id, e.xml from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 order by h.[when] asc limit 1", function(err, row){
+      db.get("select e.id, e.xml, h.email from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 order by h.[when] asc limit 1", function(err, row){
         if(!row){ //if no such entry, pass the buck:
           callnext(false);
         } else { //if we have found an entry that needs refactoring; this becomes our current entry:
           const domparser=new xmldom.DOMParser();
           const serializer=new xmldom.XMLSerializer();
-          var entryID=row.id; var xml=row.xml;
+          var entryID=row.id; var xml=row.xml; var email=row.email;
           var doc=domparser.parseFromString(xml, 'text/xml');
           doc.documentElement.setAttributeNS("http://www.lexonomy.eu/", "lxnm:entryID", entryID);
 
@@ -334,7 +348,7 @@ module.exports={
                 var el=els.pop(); //this is the subentry we'll save now
                 var subentryID=el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
                 xml=serializer.serializeToString(el);
-                if(subentryID) module.exports.updateEntry(db, dictID, subentryID, xml, "", {refactoredFrom: entryID}, function(subentryID){
+                if(subentryID) module.exports.updateEntry(db, dictID, subentryID, xml, email, {refactoredFrom: entryID}, function(subentryID){
                   el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
                   db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", {$parent_id: entryID, $child_id: subentryID}, function(err){
                     //tell all parents of the subentry (including the current entry) that they need a refresh:
@@ -343,7 +357,7 @@ module.exports={
                     });
                   });
                 });
-                else module.exports.createEntry(db, dictID, null, xml, "", {refactoredFrom: entryID}, function(subentryID){
+                else module.exports.createEntry(db, dictID, null, xml, email, {refactoredFrom: entryID}, function(subentryID){
                   el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
                   db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", {$parent_id: entryID, $child_id: subentryID}, function(err){
                     //tell all parents of the subentry (including the current entry) that they need a refresh:
@@ -385,6 +399,7 @@ module.exports={
             for(var doctype in configs.subbing){
               var els=parentDoc.documentElement.getElementsByTagName(doctype);
               for(var i=0; i<els.length; i++){
+                var el=els[i];
                 if(el && !el.hasAttributeNS("http://www.lexonomy.eu/", "subentryID")) el=null;
                 if(el && el.hasAttributeNS("http://www.lexonomy.eu/", "done")) el=null;
                 if(el) break;
@@ -1136,10 +1151,10 @@ function generateDictID(){
 }
 
 function setHousekeepingAttributes(entryID, xml, subbing){
-  //delete any housekeeping attributes that already exist in the XML:
+  //delete any housekeeping attributes and elements that already exist in the XML:
   xml=xml.replace(/^(\<[^\>\/]*)\s+xmlns:lxnm=['"]http:\/\/www\.lexonomy\.eu\/["']/, function(found, $1){return $1});
-  xml=xml.replace(/^(\<[^\>\/]*)\s+lxnm:entryID=['"][0-9]+["']/, function(found, $1){return $1});
-  xml=xml.replace(/^(\<[^\>\/]*)\s+lxnm:subentryID=['"][0-9]+["']/, function(found, $1){return $1});
+  xml=xml.replace(/^(\<[^\>\/]*)\s+lxnm:entryID=['"][^\"\']*["']/, function(found, $1){return $1});
+  xml=xml.replace(/^(\<[^\>\/]*)\s+lxnm:subentryID=['"][^\"\']*["']/, function(found, $1){return $1});
   //get name of the top-level element:
   var root=""; xml.replace(/^\<([^\s\>\/]+)/, function(found, $1){root=$1});
   //set housekeeping attributes:

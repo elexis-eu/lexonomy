@@ -21,8 +21,8 @@
 #toolbar button.iconYes#butNonew {background-image: url(arrow_left.png);}
 #toolbar button.iconYes#butDelete {background-image: url(delete.png);}
 #toolbar button.iconYes#butClone {background-image: url(lightning.png);}
-#toolbar button.iconYes#butSourceCode {background-image: url(page_white_text.png); float: right;}
-#toolbar button.iconYes#butHistory {background-image: url(time.png); float: right;}
+#toolbar button.iconOnly#butSourceCode {background-image: url(page_white_text.png); float: right;}
+#toolbar button.iconOnly#butHistory {background-image: url(time.png); float: right;}
 #toolbar span#errorMessage {float: right; padding: 6px 10px; margin: 10px 5px; min-height: 1.3em; display: inline-block; color: #aa0000; font-size: 0.85em;}
 
 #toolbar a {color: #004f9b; padding: 5px 0px; margin: 10px 5px; min-height: 1.3em; display: inline-block; padding-left: 35px; background-position: left+10px center; background-repeat: no-repeat; text-decoration: none;}

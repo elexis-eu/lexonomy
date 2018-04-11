@@ -42,7 +42,7 @@ Screenful.Navigator={
       Screenful.Navigator.critEditor(document.getElementById("editor"));
       Screenful.Navigator.critTemplate=Screenful.Navigator.critHarvester(document.getElementById("editor"));
     }
-    Screenful.Navigator.list();
+    window.setTimeout(Screenful.Navigator.list, 1000);
     $(document).on("click", function(){
       if(window.frames["editframe"] && window.frames["editframe"].Xonomy) window.frames["editframe"].Xonomy.clickoff();
     });

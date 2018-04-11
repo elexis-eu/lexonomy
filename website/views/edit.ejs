@@ -55,7 +55,7 @@
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
 	</head>
 	<body>
-		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "edit", rootPath: "../../../", doctype: doctype, doctypes: doctypes })%>
+		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "edit", rootPath: "../../../", doctype: doctype, doctypes: doctypes})%>
 		<script>
 	    var mode=Cookies.get("xonomyMode_<%=dictID%>") || "<%-xonomyMode%>";
 			$(".doctypes").addClass(mode);

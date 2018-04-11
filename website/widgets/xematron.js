@@ -395,9 +395,7 @@ Xematron.validate=function(xema, jsElement){
 
 		//if this is a lst element:
 		if(xel.filling=="lst") {
-			if(jsElement.hasElements()) {
-				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should not have any child elements."});
-			} else if(jsElement.getText()=="") { //does the element have text?
+			if(jsElement.getText()=="") { //does the element have text?
 					Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should not be empty."});
 			} else if(!Xematron.valuesHave(xel.values, jsElement.getText())) { //does the element have an allowed value?
 				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should not have the value @\""+jsElement.getText()+"\"."});
@@ -406,9 +404,7 @@ Xematron.validate=function(xema, jsElement){
 
 		//if this is a txt element:
 		if(xel.filling=="txt") {
-			if(jsElement.hasElements()) {
-				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should not have any child elements."});
-			} else if(jsElement.getText()=="") { //does the element have text?
+			if(jsElement.getText()=="") { //does the element have text?
 				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should have some text."});
 			}
 		}

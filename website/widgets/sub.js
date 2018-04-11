@@ -7,15 +7,20 @@ Sub.extendDocspec=function(docspec, xema){
     if(subbing[elName]) {
       docspec.elements[elName].backgroundColour=function(jsMe){
         var id=jsMe.getAttributeValue("lxnm:subentryID", 0);
-        if(id) return "#e6e6e6";
+        var parents=[]; jsMe.getChildElements("lxnm:subentryParent").map(function(p){if(p.getAttributeValue("id")!=Screenful.Editor.entryID) parents.push(p)});
+  			if(id && parents.length>0) {
+          return "#e6e6e6";
+        }
         return "";
       };
       docspec.elements[elName].caption=function(jsMe){
   			var cap="";
   			var id=jsMe.getAttributeValue("lxnm:subentryID", 0);
   			var parents=[]; jsMe.getChildElements("lxnm:subentryParent").map(function(p){if(p.getAttributeValue("id")!=Screenful.Editor.entryID) parents.push(p)});
-  			if(id || parents.length>0 || (subbing[jsMe.name] && xema._root!=jsMe.name && Screenful.Editor.entryID)) cap+=+parents.length+" ▼";
-  			if(cap) cap="<span class='lexonomySubentryCaption' onclick='Xonomy.notclick=true; Sub.menuSubentry(\""+jsMe.htmlID+"\")'>"+cap+"</span>";
+  			if(id && parents.length>0) {
+          cap+=+parents.length+" ▼";
+  			  cap="<span class='lexonomySubentryCaption' onclick='Xonomy.notclick=true; Sub.menuSubentry(\""+jsMe.htmlID+"\")'>"+cap+"</span>";
+        }
   			return cap;
   		};
     }
@@ -98,10 +103,10 @@ Sub.boxSubentries=function(elName){
   var html="";
   html="<div class='subbox'>"
     html+="<form class='topbar' onsubmit='Sub.searchSubentries(); return false'>";
-      html+="<button class='creator' onclick='Sub.newSubentry(\""+elName+"\"); return false;'>New</button>";
   		html+="<input name='val' class='textbox focusme' value='"+Sub.getHeadword()+"'/> ";
   		html+="<input name='doctype' type='hidden' value='"+elName+"'/> ";
       html+="<input type='submit' class='button sub' value='&nbsp;'/>";
+      html+="<button class='creator' onclick='Sub.newSubentry(\""+elName+"\"); return false;'>New</button>";
     html+="</form>";
     html+="<div class='waiter'></div>";
     html+="<div class='choices' style='display: none'></div>";

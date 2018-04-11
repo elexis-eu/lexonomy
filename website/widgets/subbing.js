@@ -19,16 +19,6 @@ Subbing.addElement=function(elName, details){
   var html="<div class='subelement' data-elname='"+elName+"'>";
   html+="<button class='iconOnly iconCross floatRight' onclick='Subbing.removeElement(\""+elName+"\")'>&nbsp;</button>";
   html+="<div class='elName'><span class='tech'><span class='brak'>&lt;</span><span class='elm'>"+elName+"</span><span class='brak'>&gt;</span></span></div>";
-  html+="<div class='settings'>";
-  html+="<span class='opener closed' onclick='Subbing.toggleSettings(\""+elName+"\")'>Settings...</span>";
-  html+="<div class='inside' style='display: none'>";
-  html+="TBD";
-  // html+="<label><input type='checkbox' class='canEdit' "+(details.canEdit?"checked='checked'":"")+" onchange='Users.change()'/> Edit</label>";
-  // html+="<label><input type='checkbox' class='canConfig' "+(details.canConfig?"checked='checked'":"")+" onchange='Users.change()'/> Configure</label>";
-  // html+="<label><input type='checkbox' class='canDownload' "+(details.canDownload?"checked='checked'":"")+" onchange='Users.change()'/> Download</label>";
-  // html+="<label><input type='checkbox' class='canUpload' "+(details.canUpload?"checked='checked'":"")+" onchange='Users.change()'/> Upload</label>";
-  html+="</div>";
-  html+="</div>";
   html+="</div>";
   $("#elements_list").append(html);
 };
@@ -41,17 +31,6 @@ Subbing.newElement=function(){
   if($("#elements_list .subelement[data-elname='"+elName+"']").length==0){
     Subbing.addElement(elName);
     Subbing.change();
-  }
-};
-
-Subbing.toggleSettings=function(elName){
-  var $el=$("#elements_list .subelement[data-elname='"+elName+"']");
-  if($el.find(".settings .inside:visible").length==0){
-    $el.find(".settings .inside").slideDown("fast");
-    $el.find(".settings .opener").removeClass("closed").addClass("opened");
-  } else {
-    $el.find(".settings .inside").slideUp("fast");
-    $el.find(".settings .opener").removeClass("opened").addClass("closed");
   }
 };
 

@@ -21,7 +21,7 @@
 	<body>
 		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "config", configTitle: "", configUrl: "", rootPath: "../../"})%>
 		<div id="pagebody">
-			<%if(needResave){%><div class="notification"><%=needResave%> <%=needResave==1?"entry":"entries"%> in your dictionary needs to be re-indexed. <a href="../../<%=dictID%>/config/resave/">Do it now&nbsp;»</a></div><%}%>
+			<%if(needResave){%><div class="notification"><%=needResave%> <%=needResave==1?"entry":"entries"%> in your dictionary needs to be re-indexed. <a href="../../<%=dictID%>/resave/">Do it now&nbsp;»</a></div><%}%>
 			<div class="field">
 				<div class="signposts">
 					<div class="title">Dictionary settings</div>
