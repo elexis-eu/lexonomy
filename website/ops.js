@@ -105,40 +105,56 @@ module.exports={
       configs.siteconfig=JSON.parse(content);
       db.all("select * from configs", {}, function(err, rows){
         for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
-        if(!configs.editing) configs.editing={xonomyMode: "nerd"}; //retrofit: some dicts don't have this config
-        if(!configs.subbing) configs.subbing={}; //retrofit: some dicts don't have this config
+        var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "xema", "xemplate", "editing", "subbing"];
+        ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
         callnext(configs);
       });
     });
   },
   readDictConfig: function(db, dictID, configID, callnext){
     db.get("select * from configs where id=$id", {$id: configID}, function(err, row){
-      if(!row && configID=="editing") var config={xonomyMode: "nerd"}; //retrofit: some dicts don't have this config
-      if(!row && configID=="subbing") var config={}; //retrofit: some dicts don't have this config
-      else var config=JSON.parse(row.json);
+      if(!row) config=module.exports.defaultDictConfig(configID); else var config=JSON.parse(row.json);
       callnext(config);
     });
   },
+  defaultDictConfig: function(id){
+    if(id=="editing") return {xonomyMode: "nerd"};
+    if(id=="searchability") return {searchableElements: []};
+    if(id=="xema") return {elements: {}};
+    if(id=="titling") return {headwordAnnotations: [], abc: module.exports.siteconfig.defaultAbc};
+    return {};
+  },
   updateDictConfig: function(db, dictID, configID, json, callnext){
-    db.run("delete from configs where id=$id", {$id: configID}, function(err){
-      db.run("insert into configs(id, json) values($id, $json)", {$id: configID, $json: JSON.stringify(json, null, "\t")}, function(err){
-        if(configID=="ident" || configID=="users"){
-          module.exports.attachDict(db, dictID, function(){
-            callnext(json, false);
+    db.get("select id from configs where id=$id", {$id: configID}, function(err, row){
+      if(row){
+        db.run("update configs set json=$json where id=$id", {$id: configID, $json: JSON.stringify(json, null, "\t")}, function(err){
+          afterwards();
+        });
+      } else {
+        db.run("delete from configs where id=$id", {$id: configID}, function(err){
+          db.run("insert into configs(id, json) values($id, $json)", {$id: configID, $json: JSON.stringify(json, null, "\t")}, function(err){
+            afterwards();
           });
-        } else if(configID=="titling" || configID=="searchability"){
-          module.exports.flagForResave(db, dictID, function(resaveNeeded){
-            callnext(json, resaveNeeded);
-          });
-        } else if(configID=="subbing"){
-          module.exports.flagForRefac(db, dictID, function(resaveNeeded){
-            callnext(json, resaveNeeded);
-          });
-        } else {
-          callnext(json, false);
-        }
-      });
+        });
+      }
     });
+    var afterwards=function(){
+      if(configID=="ident" || configID=="users"){
+        module.exports.attachDict(db, dictID, function(){
+          callnext(json, false);
+        });
+      } else if(configID=="titling" || configID=="searchability"){
+        module.exports.flagForResave(db, dictID, function(resaveNeeded){
+          callnext(json, resaveNeeded);
+        });
+      } else if(configID=="subbing"){
+        module.exports.flagForRefac(db, dictID, function(resaveNeeded){
+          callnext(json, resaveNeeded);
+        });
+      } else {
+        callnext(json, false);
+      }
+    };
   },
   readRandomOne: function(db, dictID, callnext){
     var sql_random="select id, title, xml from entries where id in (select id from entries order by random() limit 1)"
