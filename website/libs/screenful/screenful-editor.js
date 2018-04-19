@@ -289,9 +289,15 @@ Screenful.Editor={
           Screenful.status(Screenful.Loc.ready);
           Screenful.Editor.updateToolbar();
           Screenful.Editor.needsSaving=false;
-          if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
           if(data.redirUrl) window.location=data.redirUrl;
           if(Screenful.Editor.postCreateRedirUrl) window.location=Screenful.Editor.postCreateRedirUrl;
+          if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Aftersave){
+            window.parent.Screenful.Aftersave.batch();
+          } else if(Screenful.Aftersave){
+            Screenful.Aftersave.batch();
+          } else {
+            if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
+          }
         }
     	});
     } else { //we are updating an existing entry
@@ -319,9 +325,15 @@ Screenful.Editor={
           Screenful.status(Screenful.Loc.ready);
           Screenful.Editor.needsSaving=false;
           Screenful.Editor.updateToolbar();
-          if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
           if(data.redirUrl) window.location=data.redirUrl;
           if(Screenful.Editor.postUpdateRedirUrl) window.location=Screenful.Editor.postUpdateRedirUrl;
+          if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Aftersave){
+            window.parent.Screenful.Aftersave.batch();
+          } else if(Screenful.Aftersave){
+            Screenful.Aftersave.batch();
+          } else {
+            if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
+          }
         }
     	});
     }

@@ -52,6 +52,14 @@
 			$(div).html(text);
 		};
 		</script>
+		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-aftersave.css" />
+		<script type="text/javascript" src="../../../libs/screenful/screenful-aftersave.js"></script>
+		<script type="text/javascript">
+		Screenful.Aftersave.message="Indexing...";
+		Screenful.Aftersave.actionUrl="../../../<%=dictID%>/resave.json";
+		Screenful.Aftersave.maximizeUrl="../../../<%=dictID%>/resave/";
+		</script>
+
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
 	</head>
 	<body>

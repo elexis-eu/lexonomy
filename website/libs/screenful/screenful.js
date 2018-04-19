@@ -1,7 +1,7 @@
 var Screenful={
   createEnvelope: function(scrollable){
     var html="<div id='envelope' class='"+(scrollable?"scrollable":"")+"'></div>";
-    if(window.parent==window || (window.parent!=window && !window.parent.Screenful)) html+="<div id='statusbar'></div>";
+    if(window.parent==window || (window.parent!=window && !window.parent.Screenful)) html+="<div id='statusbar'><span class='statusmessage'></span></div>";
     if($("#footer").length>0) $("#footer").before(html); else $("body").append(html);
     Screenful.resize();
     $(window).on("resize", Screenful.resize);
@@ -20,7 +20,7 @@ var Screenful={
     else {
       if(style=="wait") str="<span class='wait'></span>"+str;
       if(style=="warn") str="<span class='warn'></span>"+str;
-      $("#statusbar").html(str);
+      $("#statusbar .statusmessage").html(str);
     }
   },
 
