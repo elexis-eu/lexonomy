@@ -543,7 +543,7 @@ app.post(siteconfig.rootPath+":dictID/entryupdate.json", function(req, res){
       res.json({success: false});
     } else {
       ops.readDictConfigs(db, req.params.dictID, function(configs){
-        ops.updateEntry(db, req.params.dictID, req.body.id, req.body.content, user.email, {}, function(adjustedEntryID, adjustedXml){
+        ops.updateEntry(db, req.params.dictID, req.body.id, req.body.content, user.email, {}, function(adjustedEntryID, adjustedXml, changed){
           db.close();
           var html="";
           if(configs.xemplate._xsl) {
