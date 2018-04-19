@@ -1246,7 +1246,7 @@ Xonomy.newAttribute=function(htmlID, parameter) {
 			$("#"+htmlID).children(".tag.opening").children(".attributes").addClass("rolledout").hide().slideDown("fast");
 		}
 	}
-	if(parameter.value=="") Xonomy.click($(html).prop("id"), "attributeValue"); else Xonomy.focus($(html).prop("id"), "attributeValue");
+	if(parameter.value=="") Xonomy.click($(html).prop("id"), "attributeValue"); else Xonomy.setFocus($(html).prop("id"), "attributeValue");
 };
 Xonomy.newElementChild=function(htmlID, parameter) {
 	Xonomy.clickoff();
