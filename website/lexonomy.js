@@ -5,7 +5,7 @@ const fs=require("fs");
 var siteconfig=JSON.parse(fs.readFileSync(path.join(__dirname, "siteconfig.json"), "utf8"));
 const https=require("https");
 const ops=require("./ops");
-ops.siteconfig=siteconfig;
+ ops.siteconfig=siteconfig;
 const xemplatron=require("./widgets/xemplatron.js");
 const xmldom=require("xmldom"); //https://www.npmjs.com/package/xmldom
 const bodyParser = require('body-parser');
@@ -19,14 +19,15 @@ const url=require("url");
 const querystring=require("querystring");
 const libxslt=require("libxslt"); //https://www.npmjs.com/package/libxslt
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
-
 const PORT=process.env.PORT||siteconfig.port||80;
+
+//Do this for each request:
 app.use(function (req, res, next) {
   if(!/^\/(widgets|furniture|libs)\//.test(req.url) && !/^\/docs\/.*\.[a-zA-Z0-9]+$/.test(req.url)) { //skip if the request is for a static file
-    //reload siteconfig:
+    //Reload my siteconfig:
     siteconfig=JSON.parse(fs.readFileSync(path.join(__dirname, "siteconfig.json"), "utf8"));
     ops.siteconfig=siteconfig;
-    //log request:
+    //Log the request:
     if(siteconfig.verbose){
       var bodyCopy={}; for(var key in req.body) { bodyCopy[key]=req.body[key]; if(key=="password") bodyCopy[key]="******"; }
       var delim="\t"; if(siteconfig.verbose.multiline) {delim="\n";}
@@ -38,10 +39,14 @@ app.use(function (req, res, next) {
   }
   next();
 });
+
+//Paths to our static files:
 app.use(siteconfig.rootPath+"widgets", express.static(path.join(__dirname, "widgets")));
 app.use(siteconfig.rootPath+"furniture", express.static(path.join(__dirname, "furniture")));
 app.use(siteconfig.rootPath+"libs", express.static(path.join(__dirname, "libs")));
 app.use(siteconfig.rootPath+"docs", express.static(path.join(__dirname, "docs")));
+
+//Path to our views:
 app.set('views', path.join(__dirname, "views")); app.set('view engine', 'ejs') //http://ejs.co/
 
 //REDIRECT OLD URLS FROM BETA VERSION:
