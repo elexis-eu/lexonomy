@@ -178,6 +178,12 @@ module.exports={
       callnext(resaveNeeded);
     });
   },
+  readDoctypesUsed: function(db, dictID, callnext){
+    db.all("select doctype from entries group by doctype order by count(*) desc", {}, function(err, rows){
+      var doctypes=rows.map(row => row.doctype);
+      callnext(doctypes);
+    });
+  },
 
   readEntry: function(db, dictID, entryID, callnext){
     db.get("select * from entries where id=$id", {$id: entryID}, function(err, row){
