@@ -8,6 +8,7 @@
   "admins": ["root@localhost"],
   "trackingCode": "",
   "welcome": "Welcome to your <a href='http://www.lexonomy.eu/'>Lexonomy</a> installation.",
+  "mailconfig": {"host": "smtp.server.example", "port": 465,"secure": true},
   "licences": {
     "cc-by-4.0": {
       "title": "Creative Commons Attribution 4.0 International",
