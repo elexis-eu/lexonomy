@@ -18,7 +18,7 @@ Screenful.Job={
         $("#middlebox .waiter").addClass("finished");
         $("#middlebox .buttons button").show();
       } else {
-        window.setTimeout(Screenful.Job.batch, 500); //500 ms = 0.5 second.
+        window.setTimeout(Screenful.Job.batch, 0); //500 ms = 0.5 second.
       }
     });
   },

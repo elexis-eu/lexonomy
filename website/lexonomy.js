@@ -611,13 +611,24 @@ app.post(siteconfig.rootPath+":dictID/resave.json", function(req, res){
       db.close();
       res.json({todo: 0});
     } else {
-      ops.refac(db, req.params.dictID, function(any){
-        ops.refresh(db, req.params.dictID, function(any){
-          ops.resave(db, req.params.dictID, function(){
-            ops.getDictStats(db, req.params.dictID, function(stats){ db.close(function(){ res.json({todo: stats.needResave}); }); });
+      var counter=0;
+      go();
+      function go(){
+        ops.refac(db, req.params.dictID, function(any){
+          ops.refresh(db, req.params.dictID, function(any){
+            ops.resave(db, req.params.dictID, function(){
+              ops.getDictStats(db, req.params.dictID, function(stats){
+                counter++;
+                if(stats.needResave && counter<10) {
+                  go();
+                } else {
+                  db.close(function(){ res.json({todo: stats.needResave}); });
+                }
+              });
+            });
           });
         });
-      })
+      }
     }
   });
 });
@@ -853,18 +864,29 @@ app.post(siteconfig.rootPath+":dictID/import.json", function(req, res){
         var offset=new Number(req.body.offset);
         var counter=req.body.counter || 0;
         var historiography={uploadStart: uploadStart, filename: filename};
-        ops.import(db, req.params.dictID, path.join(siteconfig.dataDir, "uploads/"+filename), offset, user.email, historiography, function(offset, success, finished){
-          db.close(function(){
-            if(success) counter++;
-            var progressMessage="Entries imported: "+counter;
-            var ret={
-              progressMessage: progressMessage,
-              finished: finished,
-              state: {filename: filename, uploadStart: uploadStart, offset: offset, counter: counter},
-            };
-            res.json(ret);
+
+        go();
+        var localCounter=0;
+        function go(){
+          ops.import(db, req.params.dictID, path.join(siteconfig.dataDir, "uploads/"+filename), offset, user.email, historiography, function(newOffset, success, finished){
+            offset=newOffset;
+            if(success) { localCounter++; counter++; }
+            if(!finished && localCounter<50){
+              go();
+            } else {
+              db.close(function(){
+                var progressMessage="Entries imported: "+counter;
+                var ret={
+                  progressMessage: progressMessage,
+                  finished: finished,
+                  state: {filename: filename, uploadStart: uploadStart, offset: offset, counter: counter},
+                };
+                res.json(ret);
+              });
+            }
           });
-        });
+        }
+
       }
     });
   });

@@ -23,7 +23,7 @@ Screenful.Aftersave={
         if(Screenful.Navigator) Screenful.Navigator.refresh();
       } else {
         $("#aftersave").show();
-        window.setTimeout(Screenful.Aftersave.batch, 1000); //1000 ms = 1 second
+        window.setTimeout(Screenful.Aftersave.batch, 0); //1000 ms = 1 second
       }
     });
   },

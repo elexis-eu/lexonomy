@@ -27,7 +27,7 @@ Screenful.Progress={
       if(!data.todo) {
         $("#middlebox .buttons button").addClass("finished").html(Screenful.Loc.finished);
       } else {
-        window.setTimeout(Screenful.Progress.batch, 1000); //1000 ms = 1 second
+        window.setTimeout(Screenful.Progress.batch, 0); //1000 ms = 1 second
       }
     });
   },

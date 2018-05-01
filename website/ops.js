@@ -262,7 +262,7 @@ module.exports={
         xml=setHousekeepingAttributes(entryID, xml, subbing);
         xml=module.exports.removeSubentryParentTags(xml);
         var newXml=xml.replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
-        var oldXml=(row.xml||"").replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
+        var oldXml=(row?row.xml:"").replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
         if(!row) { //an entry with that ID does not exist: recreate it with that ID:
           module.exports.createEntry(db, dictID, entryID, xml, email, historiography, callnext);
         } else if(oldXml==newXml) {
@@ -804,6 +804,7 @@ module.exports={
     var domparser=new xmldom.DOMParser({ errorHandler: {warning: function(){parseError=true;}, error: function(){parseError=true;}, fatalError: function(){parseError=true;} }});
     var serializer=new xmldom.XMLSerializer();
     var tagName="";
+    readStream.read(offset);
     readStream.on("data", function(chunk){
       //console.log(`incoming data: ${lengthRead} + ${chunk.length} = ${lengthRead+chunk.length}`);
       for(var pos=0; pos<chunk.length; pos++){
