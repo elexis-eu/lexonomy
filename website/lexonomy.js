@@ -19,6 +19,7 @@ const url=require("url");
 const querystring=require("querystring");
 const libxslt=require("libxslt"); //https://www.npmjs.com/package/libxslt
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
+const nodemailer = require('nodemailer');
 const PORT=process.env.PORT||siteconfig.port||80;
 
 //Do this for each request:
@@ -92,7 +93,15 @@ app.get(siteconfig.rootPath+"signup/", function(req, res){
 });
 app.get(siteconfig.rootPath+"forgotpwd/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    res.render("forgotpwd.ejs", {user: user, email: siteconfig.admins[0], siteconfig: siteconfig});
+    res.render("forgotpwd.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig});
+  });
+});
+app.get(siteconfig.rootPath+"recoverpwd/:token/", function(req, res){
+  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    ops.verifyToken(req.params.token, function(valid){
+      var tokenValid = valid;
+      res.render("recoverpwd.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid});
+    });
   });
 });
 app.get(siteconfig.rootPath+"changepwd/", function(req, res){
@@ -133,6 +142,18 @@ app.post(siteconfig.rootPath+"changepwd.json", function(req, res){
         res.json({success: success});
       });
     }
+  });
+});
+app.post(siteconfig.rootPath+"forgotpwd.json", function(req, res){
+  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
+  ops.sendToken(req.body.email, remoteip, req.body.mailSubject, req.body.mailText, function(success){
+    res.json({success: success});
+  });
+});
+app.post(siteconfig.rootPath+"recoverpwd.json", function(req, res){
+  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
+  ops.resetPwd(req.body.token, req.body.password, remoteip, function(success){
+    res.json({success: success});
   });
 });
 

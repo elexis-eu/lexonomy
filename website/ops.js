@@ -4,9 +4,11 @@ const xmldom=require("xmldom"); //https://www.npmjs.com/package/xmldom
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 const sha1 = require('sha1'); //https://www.npmjs.com/package/sha1
 const markdown = require("markdown").markdown; //https://www.npmjs.com/package/markdown
+const nodemailer = require('nodemailer');
 
 module.exports={
   siteconfig: {}, //populated by lexonomy.js on startup
+  mailtransporter: null,
   getDB: function(dictID, readonly){
     var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE)
     var db=new sqlite3.Database(
@@ -900,6 +902,50 @@ module.exports={
       callnext(true);
     });
   },
+  sendToken: function(email, remoteip, mailSubject, mailText, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select email from users where email=$email", {$email: email}, function(err, row){
+      if (row) {
+        var expireDate = (new Date()); expireDate.setHours(expireDate.getHours()+48);
+        expireDate = expireDate.toISOString();
+        var token = sha1(sha1(Math.random()));
+        var tokenurl = module.exports.siteconfig.baseUrl + 'recoverpwd/' + token;
+        mailText = mailText
+          .replace('<%=remoteip%>',remoteip)
+          .replace('<%=email%>',email)
+          .replace('<%=expiredate%>',expireDate)
+          .replace('<%=tokenurl%>', tokenurl);
+        db.run("insert into recovery_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email, $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
+          module.exports.mailtransporter.sendMail({from: 'xrambous@fi.muni.cz', to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          db.close();
+        });
+      }
+    });
+    callnext(true);
+  },
+  verifyToken: function(token, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select * from recovery_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
+      db.close();
+      if (!row) callnext(false);
+      else callnext(true);
+    });
+  },
+  resetPwd: function(token, password, remoteip, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select * from recovery_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
+      if (row) {
+        var email = row.email;
+        var hash = sha1(password);
+        db.run("update users set passwordHash=$hash where email=$email", {$hash: hash, $email: email}, function(err, row){
+          db.run("update recovery_tokens set usedDate=datetime('now'), usedAddress=$remoteip where token=$token", {$remoteip: remoteip, $token: token}, function(err, row){
+            db.close();
+            callnext(true);
+          });
+        });
+      }
+    });
+  },
   verifyLogin: function(email, sessionkey, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
@@ -1152,8 +1198,6 @@ module.exports={
 
 }; //end of module.exports
 
-const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick"];
-
 function clean4xml(txt){
   return txt
 		.replace(/&/g, '&amp;')
@@ -1201,7 +1245,4 @@ function getDoctype(xml){
   return ret;
 }
 
-
-// var xml="<test></test>";
-// var s=getDoctype(xml);
-// console.log(s);
+const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd"];

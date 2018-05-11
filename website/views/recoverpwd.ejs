@@ -3,13 +3,13 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<link rel="icon" type="image/x-icon" href="../furniture/favicon.ico"/>
-		<title>Forgot your password?</title>
+		<title>Reset your password</title>
 		<script type="text/javascript" src="../libs/jquery.js"></script>
 		<script type="text/javascript" src="../libs/screenful/screenful.js"></script>
 		<script type="text/javascript" src="../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../libs/screenful/screenful-user.css" />
 		<link type="text/css" rel="stylesheet" href="../libs/screenful/screenful.css" />
-    <link type="text/css" rel="stylesheet" href="../libs/screenful/screenful-forgotpwd.css" />
+    <link type="text/css" rel="stylesheet" href="../libs/screenful/screenful-recoverpwd.css" />
 		<link type="text/css" rel="stylesheet" href="../furniture/public.css" />
 		<script type="text/javascript">
 		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
@@ -17,16 +17,18 @@
 		</script>
 		<script type="text/javascript">var rootPath="../";</script>
 		<script type="text/javascript" src="../furniture/screenful-user-config.js"></script>
-		<script type="text/javascript" src="../libs/screenful/screenful-forgotpwd.js"></script>
+		<script type="text/javascript" src="../libs/screenful/screenful-recoverpwd.js"></script>
 		<script type="text/javascript" src="../libs/screenful/screenful-loc-en.js"></script>
 		<script type="text/javascript">
-		Screenful.ForgotPwd.actionUrl="../forgotpwd.json";
-		Screenful.ForgotPwd.returnUrl="<%=redirectUrl%>";
+		Screenful.RecoverPwd.actionUrl="../recoverpwd.json";
+		Screenful.RecoverPwd.returnUrl="<%=redirectUrl%>";
+		Screenful.RecoverPwd.token="<%=token%>";
+		Screenful.RecoverPwd.tokenValid=<%=tokenValid%>;
 		</script>
 	</head>
 	<body>
 		<div id="header">
-			<a class="sitehome" href="../"><%if(siteconfig.readonly){%><span class="readonly">READ-ONLY</span><%}%></a>
+			<a class="sitehome" href="../"></a>
 		  <div class="email ScreenfulUser"></div>
 		</div>
 	</body>
