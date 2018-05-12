@@ -146,7 +146,7 @@ app.post(siteconfig.rootPath+"changepwd.json", function(req, res){
 });
 app.post(siteconfig.rootPath+"forgotpwd.json", function(req, res){
   var remoteip = req.connection.remoteAddress.replace('::ffff:','');
-  ops.sendToken(req.body.email, remoteip, req.body.mailSubject, req.body.mailText, function(success){
+  ops.sendToken(req.body.email, remoteip, function(success){
     res.json({success: success});
   });
 });

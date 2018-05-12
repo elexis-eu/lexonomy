@@ -902,7 +902,7 @@ module.exports={
       callnext(true);
     });
   },
-  sendToken: function(email, remoteip, mailSubject, mailText, callnext){
+  sendToken: function(email, remoteip, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", {$email: email}, function(err, row){
       if (row) {
@@ -910,25 +910,28 @@ module.exports={
         expireDate = expireDate.toISOString();
         var token = sha1(sha1(Math.random()));
         var tokenurl = module.exports.siteconfig.baseUrl + 'recoverpwd/' + token;
-        mailText = mailText
-          .replace('<%=remoteip%>',remoteip)
-          .replace('<%=email%>',email)
-          .replace('<%=expiredate%>',expireDate)
-          .replace('<%=tokenurl%>', tokenurl);
+        var mailSubject="Lexonomy password reset";
+        var mailText = `Dear Lexonomy user,\n\n`;
+        mailText+=`Somebody (hopefully you, from the address ${remoteip}) requested a new password for the Lexonomy account ${email}. You can reset your password by clicking the link below:\n\n`
+        mailText+=`${tokenurl}\n\n`;
+        mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request a password reset, you can safely ignore this message. No changes have been made to your account.\n\n`;
+        mailText+=`Yours,\nThe Lexonomy team`;
         db.run("insert into recovery_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email, $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
-          module.exports.mailtransporter.sendMail({from: 'xrambous@fi.muni.cz', to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.admins[0], to: email, subject: mailSubject, text: mailText}, (err, info) => {});
           db.close();
+          callnext(true);
         });
+      } else {
+        db.close();
+        callnext(false);
       }
     });
-    callnext(true);
   },
   verifyToken: function(token, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select * from recovery_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
       db.close();
-      if (!row) callnext(false);
-      else callnext(true);
+      if(!row) callnext(false); else callnext(true);
     });
   },
   resetPwd: function(token, password, remoteip, callnext){

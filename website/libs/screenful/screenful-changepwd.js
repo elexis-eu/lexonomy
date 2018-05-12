@@ -2,6 +2,7 @@ Screenful.ChangePwd={
   start: function(){
     Screenful.createEnvelope(true);
     $("#envelope").html("<form id='middlebox'><div class='one'></div><div class='two' style='display: none'></div></form>");
+    $("#middlebox .one").append("<div class='message'>"+Screenful.Loc.changePwdMsg+"</div>");
     $("#middlebox .one").append("<div class='field password'><div class='label'>"+Screenful.Loc.newPassword+"</div><input class='textbox' type='password'/></div>");
     $("#middlebox .one").append("<div class='field submit'><input class='button' type='submit' value='"+Screenful.Loc.change+"'/></div>");
     $("#middlebox .one").append("<div class='error' style='display: none'></div>");

@@ -10,7 +10,8 @@ Screenful.RecoverPwd={
       $("#middlebox .two").append("<div class='message'>"+Screenful.Loc.passwordChanged+"</div>");
       $("#middlebox .two").append("<div class='field submit'><button class='return'>"+Screenful.Loc.ok+"</button></div>");
     } else {
-      $("#middlebox .one").append("<div class='error'>"+Screenful.Loc.invalidToken+"</div>");
+      $("#middlebox .one").append("<div class='bigerror'>"+Screenful.Loc.invalidToken+"</div>");
+      $("#middlebox .one").append("<div class='field submit'><button class='return'>"+Screenful.Loc.ok+"</button></div>");
     }
 
     $("#middlebox div.field.password input").focus();
@@ -26,6 +27,7 @@ Screenful.RecoverPwd={
 
     $("#middlebox button.return").on("click", function(e){
       window.location=Screenful.RecoverPwd.returnUrl;
+      return false;
     });
   },
 

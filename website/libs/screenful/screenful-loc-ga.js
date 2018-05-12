@@ -39,7 +39,6 @@ Screenful.Loc={
   signup: "Faigh cuntas duit féin",
   forgotPwd: "Pasfhocal dearmadta",
   signupEmail: "Chun cuntas a iarraidh, cuir ríomhphost chuig",
-  forgotPwdEmail: "Má tá do phasfhocal dearmadta agat, cuir ríomhphost chuig",
   newPassword: "Pasfhocal nua",
   change: "Athraigh",
   passwordChanged: "Tá do phasfhocal athraithe.",
@@ -60,4 +59,13 @@ Screenful.Loc={
   invalidSourceCode: "Cód foinseach neamhbhailí",
   unsavedConfirm: "Tá athruithe déanta agat nach bhfuil sábháilte go fóill. An cuma leat go gcaillfear iad?",
   doItLater: "Déan níos déanaí é",
+
+  forgotPwdEmail: "Má tá do phasfhocal dearmadta agat, cuir do sheoladh ríomhphoist isteach anseo. Cuirfidh muidne treoracha chugat maidir leis an dóigh chun do phasfhocal a athrú.",
+  recoverPwd: "Faigh pasfhocal nua",
+  forgotPwdError: "Seoladh ríomhphoist mícheart.",
+  tokenSent: "Tá treoracha seolta againn chugat maidir leis an dóigh chun do phasfhocal a athrú.",
+  recoverPwdMsg: "Is féidir leat do phasfhocal a athrú anois.",
+  changePwdMsg: "Is féidir leat do phasfhocal a athrú anseo.",
+  invalidToken: "Níl an nasc seo bailí. Seans go bhfuil sé imithe in éag, nó b'fhéidir gur baineadh úsáid as cheana.",
+
 };

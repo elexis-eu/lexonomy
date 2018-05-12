@@ -38,14 +38,7 @@ Screenful.Loc={
   changePwd: "Change your password",
   signup: "Get an account",
   forgotPwd: "Forgot your password?",
-  recoverPwd: "Get new password",
-  recoverEmailSubject: "Lexonomy, password recovery",
-  recoverEmailText: "Dear Lexonomy user,\nsomebody (hopefully you, from the address <%=remoteip%>) requested a new password for Lexonomy account <%=email%>. No changes have been made to your account yet.\n\nYou can reset your password by clicking the link below:\n\n <%=tokenurl%>\n\nFor security reason, this link is only valid until <%=expiredate%>.\n\nIf you did not request this password reset, please feel free to ignore this message.\n\nYours,\nLexonomy team",
-  recoverPwdMsg: "Please, enter your new password.",
-  invalidToken: "This recovery token is invalid, either it expired, or was already used to reset password. If you need to change your password, please request new recover token <a href='../forgotpwd'>here</a>.",
   signupEmail: "To get an account send an e-mail to",
-  forgotPwdEmail: "If you have forgotten your password, enter your e-mail and we will send you information how to create a new one.",
-  tokenSent: "We have sent e-mail with further instructions to specified address.",
   newPassword: "New password",
   change: "Change",
   passwordChanged: "Your password has been changed.",
@@ -66,4 +59,13 @@ Screenful.Loc={
   invalidSourceCode: "Invalid source code",
   unsavedConfirm: "You have unsaved changes. Are you sure you want to lose them?",
   doItLater: "Do it later",
+
+  forgotPwdEmail: "If you have forgotten your password, enter your e-mail address and we will send you instructions on how to create a new one.",
+  recoverPwd: "Get a new password",
+  forgotPwdError: "Incorrect e-mail address.",
+  tokenSent: "We have sent you an e-mail with instructions on how to reset your password.",
+  recoverPwdMsg: "You can change your password now.",
+  changePwdMsg: "You can change your password here.",
+  invalidToken: "This password reset link is invalid. It may have expired or has been used before.",
+
 };

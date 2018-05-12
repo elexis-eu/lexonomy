@@ -39,7 +39,6 @@ Screenful.Loc={
   signup: "Zřǐdit si účet",
   forgotPwd: "Zapomenuté heslo",
   signupEmail: "Chcete-li si nechat zřídit účet, napište e-mail na adresu",
-  forgotPwdEmail: "Zapomněli-li jste své heslo, napište e-mail na adresu",
   newPassword: "Nové heslo",
   change: "Změnit",
   passwordChanged: "Vaše heslo bylo změněno.",
@@ -60,4 +59,13 @@ Screenful.Loc={
   invalidSourceCode: "Neplatný zdrojový kód",
   unsavedConfirm: "Más neuložené změny. Opravdu o ně chceš přijít?",
   doItLater: "Udělej to jindy",
+
+  forgotPwdEmail: "Zapomněli-li jste svoje heslo, zadejte tady svoji e-mailovou adresu a my vám pošleme instrukce, jak si získat nové heslo.",
+  recoverPwd: "Chci nové heslo",
+  forgotPwdError: "Nesprávná e-mailová adresa.",
+  tokenSent: "Poslali jsme vám instrukce, jak si získat nové heslo.",
+  recoverPwdMsg: "Nyní si můžete změnit heslo.",
+  changePwdMsg: "Tady si můžete změnit heslo.",
+  invalidToken: "Tento odkaz je neplatný. Možná už vypršel, nebo byl už použit.",
+
 };
