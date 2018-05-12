@@ -3,7 +3,7 @@ const fs=require("fs-extra");
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 const sha1 = require('sha1'); //https://www.npmjs.com/package/sha1
 
-fs.readFile(path.join(__dirname, "siteconfig.json"), "utf8", function(err, content){
+fs.readFile(path.join(__dirname, "../siteconfig.json"), "utf8", function(err, content){
   var siteconfig=JSON.parse(content);
   var password="lexonomy";
   var passwordHash=sha1(password);
