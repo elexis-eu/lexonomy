@@ -21,12 +21,17 @@ Xemplatron.el2html=function(el, isFirst, isLast){
     var nodes=[];
     for(var iNode=0; iNode<el.attributes.length; iNode++){
       var node=el.attributes[iNode];
-      if(node.nodeName.indexOf("xml:")!=0){var xemplate=Xemplatron.getXemplate(node); if(xemplate.order=="before" && xemplate.shown) nodes.push(node);}
+      if(node.nodeName.indexOf("xml:")!=0 && node.nodeName.indexOf("lxnm:")!=0){
+        var xemplate=Xemplatron.getXemplate(node);
+        if(xemplate.order=="before" && xemplate.shown) nodes.push(node);
+      }
     }
     for(var iNode=0; iNode<el.childNodes.length; iNode++){
       var node=el.childNodes[iNode];
-      if(node.nodeType==3) nodes.push(node);
-      if(node.nodeType==1){var xemplate=Xemplatron.getXemplate(node); if(xemplate.shown) nodes.push(node);}
+      if(node.nodeName.indexOf("xml:")!=0 && node.nodeName.indexOf("lxnm:")!=0){
+        if(node.nodeType==3) nodes.push(node);
+        if(node.nodeType==1){var xemplate=Xemplatron.getXemplate(node); if(xemplate.shown) nodes.push(node);}
+      }
     }
     for(var iNode=0; iNode<el.attributes.length; iNode++){
       var node=el.attributes[iNode];
