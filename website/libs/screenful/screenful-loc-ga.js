@@ -20,7 +20,7 @@ Screenful.Loc={
   deleteConfirm: "Cúramach anois! An bhfuil tú cinnte?",
   username: "Seoladh ríomhphoist",
   password: "Pasfhocal",
-  login: "logáil isteach",
+  login: "Logáil isteach",
   loginError: "Seoladh ríomhphoist mícheart nó pasfhocal mícheart.",
   logout: "Logáil amach",
   anonymous: "úsáideoir anaithnid",
