@@ -59,10 +59,10 @@ Screenful.Loc={
   invalidSourceCode: "Cód foinseach neamhbhailí",
   unsavedConfirm: "Tá athruithe déanta agat nach bhfuil sábháilte go fóill. An cuma leat go gcaillfear iad?",
   doItLater: "Déan níos déanaí é",
+  badEmailError: "Seoladh ríomhphoist mícheart.",
 
   forgotPwdEmail: "Má tá do phasfhocal dearmadta agat, cuir do sheoladh ríomhphoist isteach anseo. Cuirfidh muidne treoracha chugat maidir leis an dóigh chun do phasfhocal a athrú.",
   recoverPwd: "Faigh pasfhocal nua",
-  forgotPwdError: "Seoladh ríomhphoist mícheart.",
   tokenSent: "Tá treoracha seolta againn chugat maidir leis an dóigh chun do phasfhocal a athrú.",
   recoverPwdMsg: "Is féidir leat do phasfhocal a athrú anois.",
   changePwdMsg: "Is féidir leat do phasfhocal a athrú anseo.",

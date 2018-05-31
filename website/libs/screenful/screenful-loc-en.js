@@ -59,10 +59,10 @@ Screenful.Loc={
   invalidSourceCode: "Invalid source code",
   unsavedConfirm: "You have unsaved changes. Are you sure you want to lose them?",
   doItLater: "Do it later",
+  badEmailError: "Incorrect e-mail address.",
 
   forgotPwdEmail: "If you have forgotten your password, enter your e-mail address and we will send you instructions on how to create a new one.",
   recoverPwd: "Get a new password",
-  forgotPwdError: "Incorrect e-mail address.",
   tokenSent: "We have sent you an e-mail with instructions on how to reset your password.",
   recoverPwdMsg: "You can change your password now.",
   changePwdMsg: "You can change your password here.",

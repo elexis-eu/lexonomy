@@ -59,10 +59,10 @@ Screenful.Loc={
   invalidSourceCode: "Neplatný zdrojový kód",
   unsavedConfirm: "Más neuložené změny. Opravdu o ně chceš přijít?",
   doItLater: "Udělej to jindy",
+  badEmailError: "Nesprávná e-mailová adresa.",
 
   forgotPwdEmail: "Zapomněli-li jste svoje heslo, zadejte tady svoji e-mailovou adresu a my vám pošleme instrukce, jak si získat nové heslo.",
   recoverPwd: "Chci nové heslo",
-  forgotPwdError: "Nesprávná e-mailová adresa.",
   tokenSent: "Poslali jsme vám instrukce, jak si získat nové heslo.",
   recoverPwdMsg: "Nyní si můžete změnit heslo.",
   changePwdMsg: "Tady si můžete změnit heslo.",
