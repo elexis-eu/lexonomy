@@ -89,7 +89,7 @@ app.get(siteconfig.rootPath+"make/", function(req, res){
 });
 app.get(siteconfig.rootPath+"signup/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    res.render("signup.ejs", {user: user, email: siteconfig.admins[0], siteconfig: siteconfig});
+    res.render("signup.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig});
   });
 });
 app.get(siteconfig.rootPath+"forgotpwd/", function(req, res){
@@ -97,9 +97,17 @@ app.get(siteconfig.rootPath+"forgotpwd/", function(req, res){
     res.render("forgotpwd.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig});
   });
 });
+app.get(siteconfig.rootPath+"createaccount/:token/", function(req, res){
+  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    ops.verifyToken(req.params.token, "register", function(valid){
+      var tokenValid = valid;
+      res.render("createaccount.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid});
+    });
+  });
+});
 app.get(siteconfig.rootPath+"recoverpwd/:token/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    ops.verifyToken(req.params.token, function(valid){
+    ops.verifyToken(req.params.token, "recovery", function(valid){
       var tokenValid = valid;
       res.render("recoverpwd.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid});
     });
@@ -145,9 +153,21 @@ app.post(siteconfig.rootPath+"changepwd.json", function(req, res){
     }
   });
 });
+app.post(siteconfig.rootPath+"signup.json", function(req, res){
+  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
+  ops.sendSignupToken(req.body.email, remoteip, function(success){
+    res.json({success: success});
+  });
+});
 app.post(siteconfig.rootPath+"forgotpwd.json", function(req, res){
   var remoteip = req.connection.remoteAddress.replace('::ffff:','');
   ops.sendToken(req.body.email, remoteip, function(success){
+    res.json({success: success});
+  });
+});
+app.post(siteconfig.rootPath+"createaccount.json", function(req, res){
+  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
+  ops.createAccount(req.body.token, req.body.password, remoteip, function(success){
     res.json({success: success});
   });
 });

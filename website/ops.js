@@ -902,6 +902,31 @@ module.exports={
       callnext(true);
     });
   },
+  sendSignupToken: function(email, remoteip, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select email from users where email=$email", {$email: email}, function(err, row){
+      if (row==undefined) {
+        var expireDate = (new Date()); expireDate.setHours(expireDate.getHours()+48);
+        expireDate = expireDate.toISOString();
+        var token = sha1(sha1(Math.random()));
+        var tokenurl = module.exports.siteconfig.baseUrl + 'createaccount/' + token;
+        var mailSubject="Lexonomy signup";
+        var mailText = `Dear Lexonomy user,\n\n`;
+        mailText+=`Somebody (hopefully you, from the address ${remoteip}) requested to create a new account for Lexonomy. Please follow the link below to create your account:\n\n`
+        mailText+=`${tokenurl}\n\n`;
+        mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request an account, you can safely ignore this message. \n\n`;
+        mailText+=`Yours,\nThe Lexonomy team`;
+        db.run("insert into register_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email, $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
+          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.admins[0], to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          db.close();
+          callnext(true);
+        });
+      } else {
+        db.close();
+        callnext(false);
+      }
+    });
+  },
   sendToken: function(email, remoteip, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", {$email: email}, function(err, row){
@@ -927,11 +952,32 @@ module.exports={
       }
     });
   },
-  verifyToken: function(token, callnext){
+  verifyToken: function(token, type, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select * from recovery_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
+    db.get("select * from "+type+"_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
       db.close();
       if(!row) callnext(false); else callnext(true);
+    });
+  },
+  createAccount: function(token, password, remoteip, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select * from register_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
+      if (row) {
+        var email = row.email;
+        db.get("select * from users where email=$email", {$email: email}, function(err, row){
+          if (row==undefined) {
+            var hash = sha1(password);
+            db.run("insert into users (email,passwordHash) values ($email,$hash)", {$hash: hash, $email: email}, function(err, row){
+              db.run("update register_tokens set usedDate=datetime('now'), usedAddress=$remoteip where token=$token", {$remoteip: remoteip, $token: token}, function(err, row){
+                db.close();
+                callnext(true);
+              });
+            });
+          } else {
+            callnext(false);
+          }
+        });
+      }
     });
   },
   resetPwd: function(token, password, remoteip, callnext){
@@ -1248,4 +1294,4 @@ function getDoctype(xml){
   return ret;
 }
 
-const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd"];
+const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd","createaccount"];

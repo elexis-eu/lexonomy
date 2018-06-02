@@ -68,4 +68,11 @@ Screenful.Loc={
   changePwdMsg: "Is féidir leat do phasfhocal a athrú anseo.",
   invalidToken: "Níl an nasc seo bailí. Seans go bhfuil sé imithe in éag, nó b'fhéidir gur baineadh úsáid as cheana.",
 
+  signupInfoEmail: "To get a new account, enter your e-mail address and we will send you instructions.",
+  signupButton: "Create new account",
+  signupTokenSent: "We have sent you an e-mail with instructions on how to reset your password.",
+  invalidSignupToken: "This signup link is invalid. It may have expired or has been used before.",
+  setPwdMsg: "Please, set your password now.",
+  accountCreated: "We have created your account. You may now log-in with your e-mail and password.",
+  signupAccountExists: "You are trying to create account for e-mail that is already existing. Did you <a href='/forgotpwd/'>forget your password?</a>",
 };
