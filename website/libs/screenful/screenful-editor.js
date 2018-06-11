@@ -166,7 +166,7 @@ Screenful.Editor={
       $("#container").removeClass("empty").removeClass("withHistory").removeClass("withSourceCode").html("<div id='editor'></div>");
       var fakeentry=null; if(content) fakeentry={id: null, content: content};
       Screenful.Editor.editor(document.getElementById("editor"), fakeentry);
-      if("#container #editor .xonomy .layby") $("#container").remove(".withHistory").css("right", "15px"); //make room for xonomy layby
+      if($("#container #editor .xonomy .layby").length>0) $("#container").remove(".withHistory").css("right", "15px"); //make room for xonomy layby
       $("#container").hide().fadeIn();
       Screenful.status(Screenful.Loc.ready);
       Screenful.Editor.updateToolbar();
