@@ -995,20 +995,63 @@ module.exports={
       }
     });
   },
+  processJWT: function(user, jwtData, callnext){
+    var db = new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    if (user.loggedin) {
+      //user logged in = save SkE ID in database
+      var key = generateKey();
+      var now = (new Date()).toISOString();
+      db.run("update users set ske_id=$ske_id, ske_username=$ske_username, sessionKey=$key, sessionLast=$now where email=$email", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email:user.email, $key:key, $now:now}, function(err, row){
+        db.close();
+        callnext(true, user.email, key);
+      });
+    } else {
+      //user not logged in = 
+      // if SkE ID in database = log in user
+      // if SkE ID not in database = register and log in user
+      db.get("select email from users where ske_id=$ske_id", {$ske_id: jwtData.user.id}, function(err, row){
+        if (!row) {
+          var email = jwtData.user.username + '@sketchengine.co.uk';
+          db.get("select * from users where email=$email", {$email: email}, function(err, row){
+            if (row == undefined) {
+              var key = generateKey();
+              var now = (new Date()).toISOString();
+              db.run("insert into users (email, passwordHash, ske_id, ske_username, sessionKey, sessionLast) values ($email, null, $ske_id, $ske_username, $key, $now)", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email: email, $key:key, $now:now}, function(err, row){
+                db.close();
+                callnext(true, email, key);
+              });
+            } else {
+              db.close();
+              callnext(false, "user already exists "+email, "");
+            }
+          });
+        } else {
+          var email = row.email;
+          var key = generateKey();
+          var now = (new Date()).toISOString();
+          db.run("update users set sessionKey=$key, sessionLast=$now where ske_id=$ske_id", {$key: key, $now: now, $ske_id: jwtData.user.id}, function(err, row){
+            db.close();
+            callnext(true, email, key);
+          });
+        }
+      });
+    }
+  },
   verifyLogin: function(email, sessionkey, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select email from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
+    db.get("select email, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
       if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
         email=row.email;
+        var ske_username = row.ske_username;
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
           module.exports.readSiteConfig(function(siteconfig){
-            callnext({loggedin: true, email: email, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
+            callnext({loggedin: true, email: email, ske_username: ske_username, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
           });
         });
       }

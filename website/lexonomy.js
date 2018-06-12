@@ -22,6 +22,7 @@ const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sq
 const nodemailer = require('nodemailer');
 ops.mailtransporter = nodemailer.createTransport(siteconfig.mailconfig);
 const PORT=process.env.PORT||siteconfig.port||80;
+const jwt = require("jsonwebtoken");
 
 //Do this for each request:
 app.use(function (req, res, next) {
@@ -60,7 +61,12 @@ app.get(siteconfig.rootPath+":dictID/en/", function(req, res){ res.redirect("/"+
 app.get(siteconfig.rootPath, function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     ops.getDictsByUser(user.email, function(dicts){
-      res.render("home.ejs", {siteconfig: siteconfig, user: user, dicts: dicts});
+      var error = null;
+      if (req.cookies.jwt_error) {
+        error = req.cookies.jwt_error;
+        res.clearCookie('jwt_error');
+      }
+      res.render("home.ejs", {siteconfig: siteconfig, user: user, dicts: dicts, error: error});
     });
   });
 });
@@ -285,6 +291,35 @@ app.post(siteconfig.rootPath+"dicts/dictread.json", function(req, res){
     }
   });
 });
+
+//SKETCHENGINE LOGIN JSON endpoint:
+app.get(siteconfig.rootPath+"skelogin.json/:token", function(req, res){
+  //var token = req.headers.authorization.replace('Bearer ', '');
+  var token = req.params.token;
+  var secret = siteconfig.sketchengineKey;
+  jwt.verify(token, secret, {audience:'lexonomy.eu'}, function(err, decoded) {
+    if (err == null) {
+      console.log(decoded)
+      ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+        ops.processJWT(user, decoded, function(success, email, sessionkey){
+          if (success) {
+            res.cookie("email", email, {});
+            res.cookie("sessionkey", sessionkey, {});
+            res.redirect(siteconfig.baseUrl)
+          } else {
+            res.cookie("jwt_error", email, {});
+            res.redirect(siteconfig.baseUrl)
+          }
+        });
+      });
+    } else {
+      //JWT not verified, error
+      res.cookie("jwt_error",err.message,{})
+      res.redirect(siteconfig.baseUrl)
+    }
+  });
+});
+
 
 //ONE-CLICK UI and JSON endpoints:
 app.get(siteconfig.rootPath+"oneclick/", function(req, res){

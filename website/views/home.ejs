@@ -73,6 +73,12 @@
 					    });
 						});
 						</script>
+            <%if(error){%><div class="error">Sketch Engine login error: <%=error%></div><%}%>
+            <%if(siteconfig.sketchengineLoginPage){%>
+            <div class="skelogin">
+              <a href="<%=siteconfig.sketchengineLoginPage%>">Log in / register with <img alt="SketchEngine" title="SketchEngine" src="furniture/logo_ske.png"/></a>
+            </div>
+            <%}%>
 					<%}else{%>
 						<div class="usertop">
 							<div class="title"><%=user.email%></div>
@@ -92,6 +98,16 @@
 						<div class="createdict"><a href="make/">Create a dictionary</a></div>
 						<div class="yourdicts">One-Click Dictionary settings</div>
 						<div class="adminlink"><a href="oneclick/">API key</a></div>
+            <%if(siteconfig.sketchengineLoginPage){%>            
+  						<div class="yourdicts">SketchEngine login</div>
+	  					<div class="adminlink">
+              <%if(user.ske_username){%>
+                Connected with account: <%=user.ske_username%> (<a href="<%=siteconfig.sketchengineLoginPage%>">Change to another account</a>)
+              <%} else {%>
+                <a href="<%=siteconfig.sketchengineLoginPage%>">Connect to SketchEngine account</a>
+              <%}%>
+              </div>
+						<%}%>
 						<%if(user.isAdmin){%>
 							<div class="yourdicts">Administration</div>
 							<div class="adminlink"><a href="users/">Users</a> <a href="dicts/">Dictionaries</a></div>
