@@ -20,7 +20,7 @@ const querystring=require("querystring");
 const libxslt=require("libxslt"); //https://www.npmjs.com/package/libxslt
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 const nodemailer = require('nodemailer');
-ops.mailtransporter = nodemailer.createTransport(siteconfig.mailconfig);
+  ops.mailtransporter = nodemailer.createTransport(siteconfig.mailconfig);
 const PORT=process.env.PORT||siteconfig.port||80;
 const jwt = require("jsonwebtoken");
 
