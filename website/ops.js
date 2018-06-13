@@ -902,6 +902,31 @@ module.exports={
       callnext(true);
     });
   },
+  sendSignupToken: function(email, remoteip, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select email from users where email=$email", {$email: email}, function(err, row){
+      if (row==undefined) {
+        var expireDate = (new Date()); expireDate.setHours(expireDate.getHours()+48);
+        expireDate = expireDate.toISOString();
+        var token = sha1(sha1(Math.random()));
+        var tokenurl = module.exports.siteconfig.baseUrl + 'createaccount/' + token;
+        var mailSubject="Lexonomy signup";
+        var mailText = `Dear Lexonomy user,\n\n`;
+        mailText+=`Somebody (hopefully you, from the address ${remoteip}) requested to create a new account for Lexonomy. Please follow the link below to create your account:\n\n`
+        mailText+=`${tokenurl}\n\n`;
+        mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request an account, you can safely ignore this message. \n\n`;
+        mailText+=`Yours,\nThe Lexonomy team`;
+        db.run("insert into register_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email, $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
+          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.admins[0], to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          db.close();
+          callnext(true);
+        });
+      } else {
+        db.close();
+        callnext(false);
+      }
+    });
+  },
   sendToken: function(email, remoteip, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", {$email: email}, function(err, row){
@@ -927,11 +952,32 @@ module.exports={
       }
     });
   },
-  verifyToken: function(token, callnext){
+  verifyToken: function(token, type, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select * from recovery_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
+    db.get("select * from "+type+"_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
       db.close();
       if(!row) callnext(false); else callnext(true);
+    });
+  },
+  createAccount: function(token, password, remoteip, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select * from register_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
+      if (row) {
+        var email = row.email;
+        db.get("select * from users where email=$email", {$email: email}, function(err, row){
+          if (row==undefined) {
+            var hash = sha1(password);
+            db.run("insert into users (email,passwordHash) values ($email,$hash)", {$hash: hash, $email: email}, function(err, row){
+              db.run("update register_tokens set usedDate=datetime('now'), usedAddress=$remoteip where token=$token", {$remoteip: remoteip, $token: token}, function(err, row){
+                db.close();
+                callnext(true);
+              });
+            });
+          } else {
+            callnext(false);
+          }
+        });
+      }
     });
   },
   resetPwd: function(token, password, remoteip, callnext){
@@ -949,20 +995,63 @@ module.exports={
       }
     });
   },
+  processJWT: function(user, jwtData, callnext){
+    var db = new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    if (user.loggedin) {
+      //user logged in = save SkE ID in database
+      var key = generateKey();
+      var now = (new Date()).toISOString();
+      db.run("update users set ske_id=$ske_id, ske_username=$ske_username, sessionKey=$key, sessionLast=$now where email=$email", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email:user.email, $key:key, $now:now}, function(err, row){
+        db.close();
+        callnext(true, user.email, key);
+      });
+    } else {
+      //user not logged in = 
+      // if SkE ID in database = log in user
+      // if SkE ID not in database = register and log in user
+      db.get("select email from users where ske_id=$ske_id", {$ske_id: jwtData.user.id}, function(err, row){
+        if (!row) {
+          var email = jwtData.user.username + '@sketchengine.co.uk';
+          db.get("select * from users where email=$email", {$email: email}, function(err, row){
+            if (row == undefined) {
+              var key = generateKey();
+              var now = (new Date()).toISOString();
+              db.run("insert into users (email, passwordHash, ske_id, ske_username, sessionKey, sessionLast) values ($email, null, $ske_id, $ske_username, $key, $now)", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email: email, $key:key, $now:now}, function(err, row){
+                db.close();
+                callnext(true, email, key);
+              });
+            } else {
+              db.close();
+              callnext(false, "user already exists "+email, "");
+            }
+          });
+        } else {
+          var email = row.email;
+          var key = generateKey();
+          var now = (new Date()).toISOString();
+          db.run("update users set sessionKey=$key, sessionLast=$now where ske_id=$ske_id", {$key: key, $now: now, $ske_id: jwtData.user.id}, function(err, row){
+            db.close();
+            callnext(true, email, key);
+          });
+        }
+      });
+    }
+  },
   verifyLogin: function(email, sessionkey, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select email from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
+    db.get("select email, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
       if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
         email=row.email;
+        var ske_username = row.ske_username;
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
           module.exports.readSiteConfig(function(siteconfig){
-            callnext({loggedin: true, email: email, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
+            callnext({loggedin: true, email: email, ske_username: ske_username, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
           });
         });
       }
@@ -1248,4 +1337,4 @@ function getDoctype(xml){
   return ret;
 }
 
-const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd"];
+const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd","createaccount"];

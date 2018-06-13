@@ -7,7 +7,7 @@ Screenful.ForgotPwd={
     $("#middlebox .one").append("<div class='field submit'><input class='button' type='submit' value='"+Screenful.Loc.recoverPwd+"'/></div>");
     $("#middlebox .two").append("<div class='message'>"+Screenful.Loc.tokenSent+"</div>");
     $("#middlebox .two").append("<div class='field submit'><button class='return'>"+Screenful.Loc.ok+"</button></div>");
-    $("#middlebox").append("<div class='error' style='display: none'>"+Screenful.Loc.forgotPwdError+"</div>");
+    $("#middlebox").append("<div class='error' style='display: none'>"+Screenful.Loc.badEmailError+"</div>");
 
     $("#middlebox div.field.email input").focus();
     $("#middlebox").on("submit", function(e){
