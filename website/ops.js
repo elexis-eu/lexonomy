@@ -942,7 +942,7 @@ module.exports={
         mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request a password reset, you can safely ignore this message. No changes have been made to your account.\n\n`;
         mailText+=`Yours,\nThe Lexonomy team`;
         db.run("insert into recovery_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email, $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
-          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.admins[0], to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.mailconfig.from, to: email, subject: mailSubject, text: mailText}, (err, info) => {});
           db.close();
           callnext(true);
         });
