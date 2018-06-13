@@ -912,7 +912,7 @@ module.exports={
         var tokenurl = module.exports.siteconfig.baseUrl + 'createaccount/' + token;
         var mailSubject="Lexonomy signup";
         var mailText = `Dear Lexonomy user,\n\n`;
-        mailText+=`Somebody (hopefully you, from the address ${remoteip}) requested to create a new account for Lexonomy. Please follow the link below to create your account:\n\n`
+        mailText+=`Somebody (hopefully you, from the address ${remoteip}) requested to create a new Lexonomy account. Please follow the link below to create your account:\n\n`
         mailText+=`${tokenurl}\n\n`;
         mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request an account, you can safely ignore this message. \n\n`;
         mailText+=`Yours,\nThe Lexonomy team`;
@@ -1006,7 +1006,7 @@ module.exports={
         callnext(true, user.email, key);
       });
     } else {
-      //user not logged in = 
+      //user not logged in =
       // if SkE ID in database = log in user
       // if SkE ID not in database = register and log in user
       db.get("select email from users where ske_id=$ske_id", {$ske_id: jwtData.user.id}, function(err, row){

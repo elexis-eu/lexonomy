@@ -72,7 +72,7 @@ Screenful.Loc={
   signupButton: "Create new account",
   signupTokenSent: "We have sent you an e-mail with instructions on how to reset your password.",
   invalidSignupToken: "This signup link is invalid. It may have expired or has been used before.",
-  setPwdMsg: "Please, set your password now.",
-  accountCreated: "We have created your account. You may now log-in with your e-mail and password.",
-  signupAccountExists: "You are trying to create account for e-mail that is already existing. Did you <a href='/forgotpwd/'>forget your password?</a>",
+  setPwdMsg: "Please set your password now.",
+  accountCreated: "We have created your account. You can now log in with your e-mail address and password.",
+  signupAccountExists: "You are trying to create an account for e-mail address that already has an account.",
 };

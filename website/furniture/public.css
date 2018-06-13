@@ -136,10 +136,12 @@ div.usertop a:hover {color: #2c7fba; }
 div.usertop > div.title {font-size: 1.5rem; padding-top: 10px;}
 div.usertop > div.subtitle {margin-top: 10px; color: #666666;}
 
-div.skelogin a {text-decoration: none; color: #09587e;}
-div.skelogin a:hover {color: #2c7fba; }
-div.skelogin {font-weight: bold; text-align: center; padding: 10px; margin: 20px 0px 0px 0px; border-radius: 4px; border: 1px solid #279FD2;}
-div.skelogin img {vertical-align: middle;}
+div.orline {border-bottom: 1px solid #dddddd; margin-top: 20px;}
+div.orline span {background-color: #ffffff; color: #666666; padding: 0px 10px; margin-left: 20px; position: relative; top: 0.7em;}
+div.skelogin {font-weight: bold; text-align: right; margin: 20px 0px 0px 0px; }
+div.skelogin a {text-decoration: none; color: #09587e; display: inline-block; padding: 12px 10px 8px 20px; border-radius: 4px; }
+div.skelogin a:hover {color: #2c7fba; background-color: #e9f5fe;}
+div.skelogin img {vertical-align: middle; margin: 0px 10px; position: relative; top: -2px;}
 
 div.field {margin-top: 10px;}
 div.field:first-child {margin-top: 0px;}

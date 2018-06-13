@@ -63,6 +63,7 @@
 							$("form#login").on("submit", function(e){
 					      var email=$("form#login div.field.email input").val();
 					      var password=$("form#login div.field.password input").val();
+								console.log(email, password);
 					      if(email!="" && password!="") {
 									$.ajax({url: "login.json", dataType: "json", method: "POST", data: {email: email, password: password}}).done(function(data){
 							      if(data.success) window.location.reload();
@@ -73,10 +74,11 @@
 					    });
 						});
 						</script>
+						<div class="orline"><span>Other ways to log in</span></div>
             <%if(error){%><div class="error">Sketch Engine login error: <%=error%></div><%}%>
             <%if(siteconfig.sketchengineLoginPage){%>
             <div class="skelogin">
-              <a href="<%=siteconfig.sketchengineLoginPage%>">Log in / register with <img alt="SketchEngine" title="SketchEngine" src="furniture/logo_ske.png"/></a>
+              <a href="<%=siteconfig.sketchengineLoginPage%>">Sign up or log in with <img alt="Sketch Engine" title="Sketch Engine" src="furniture/logo_ske.png"/> »</a>
             </div>
             <%}%>
 					<%}else{%>
@@ -98,13 +100,13 @@
 						<div class="createdict"><a href="make/">Create a dictionary</a></div>
 						<div class="yourdicts">One-Click Dictionary settings</div>
 						<div class="adminlink"><a href="oneclick/">API key</a></div>
-            <%if(siteconfig.sketchengineLoginPage){%>            
-  						<div class="yourdicts">SketchEngine login</div>
+            <%if(siteconfig.sketchengineLoginPage){%>
+  						<div class="yourdicts">Sketch Engine login</div>
 	  					<div class="adminlink">
               <%if(user.ske_username){%>
-                Connected with account: <%=user.ske_username%> (<a href="<%=siteconfig.sketchengineLoginPage%>">Change to another account</a>)
+                Your Lexonomy account is linked to your Sketch Engine account <b><%=user.ske_username%></b>. <a href="<%=siteconfig.sketchengineLoginPage%>">Link to a different Sketch Engine account&nbsp;»</a>
               <%} else {%>
-                <a href="<%=siteconfig.sketchengineLoginPage%>">Connect to SketchEngine account</a>
+                <a href="<%=siteconfig.sketchengineLoginPage%>">Link your Lexonomy account to your Sketch Engine account&nbsp;»</a>
               <%}%>
               </div>
 						<%}%>
