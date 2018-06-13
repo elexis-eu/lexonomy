@@ -917,7 +917,7 @@ module.exports={
         mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request an account, you can safely ignore this message. \n\n`;
         mailText+=`Yours,\nThe Lexonomy team`;
         db.run("insert into register_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email, $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
-          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.admins[0], to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.mailconfig.from, to: email, subject: mailSubject, text: mailText}, (err, info) => {});
           db.close();
           callnext(true);
         });

@@ -70,7 +70,7 @@ Screenful.Loc={
 
   signupInfoEmail: "To get a new account, enter your e-mail address and we will send you instructions.",
   signupButton: "Create new account",
-  signupTokenSent: "We have sent you an e-mail with instructions on how to reset your password.",
+  signupTokenSent: "We have sent you an e-mail with instructions on how to create a new account.",
   invalidSignupToken: "This signup link is invalid. It may have expired or has been used before.",
   setPwdMsg: "Please set your password now.",
   accountCreated: "We have created your account. You can now log in with your e-mail address and password.",
