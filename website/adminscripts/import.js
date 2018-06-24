@@ -1,57 +1,66 @@
 const fs=require("fs-extra");
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 
-const filepath="/home/mbm/Downloads/Iztok/draft_entries2.xml";
+const filepath="/home/mbm/Downloads/vojta/dk_ipa.xml";
 var readStream=fs.createReadStream(filepath).setEncoding("utf8");
 
-const dbpath="/home/mbm/lexonomy/data/dicts/zdpcsy6gx.sqlite";
+const dbpath="/home/mbm/lexonomy/data/dicts/zg6iqmitk.sqlite";
 var db=new sqlite3.Database(dbpath, sqlite3.OPEN_READWRITE);
 
-var buffer="";
 var entryCount=0;
-readStream.on("data", function(chunk){
-  for(var pos=0; pos<chunk.length; pos++){
-    buffer+=chunk[pos];
-    if(buffer.endsWith("<entry>")){
-      buffer="<entry>";
+
+//db.serialize();
+db.exec("delete from entries; delete from history; delete from searchables; delete from sub; delete from sqlite_sequence", function(err){
+  console.log(`database emptied`);
+  db.run("BEGIN TRANSACTION");
+  var buffer="";
+  readStream.on("data", function(chunk){
+    for(var pos=0; pos<chunk.length; pos++){
+      buffer+=chunk[pos];
+      if(buffer.endsWith("<entry>")){
+        buffer="<entry>";
+      }
+      if(buffer.endsWith("</entry>")){
+        entryCount++;
+        insertEntry(entryCount, buffer);
+      }
     }
-    if(buffer.endsWith("</entry>")){
-      insertEntry(buffer);
-    }
-  }
-});
-readStream.on("end", function(){
-  readStream.destroy();
-  //console.log(`Done: ${entryCount} entries.`);
+  });
+  readStream.on("end", function(){
+    db.run("COMMIT");
+    db.close();
+    readStream.destroy();
+  });
 });
 
 //---
 
-function insertEntry(buffer){
+function insertEntry(entryID, buffer){
   var xml=buffer.replace(/\>[\r\n]+\s*\</g, "><"); buffer="";
   var headword=""; xml.replace(/\<headword\>(.*)\<\/headword\>/, function(s, $1){headword=$1});
   var status=""; xml.replace(/\<status\>(.*)\<\/status\>/, function(s, $1){status=$1});
+  var pos=""; xml.replace(/\<partOfSpeech\>(.*)\<\/partOfSpeech\>/, function(s, $1){status+=" "+$1});
   var title=headword+" "+status;
   var titleHtml="<span class='headword'>"+headword+"</span> "+status;
   var sortkey=toSortkey(title, abc);
-  db.run("insert into entries(xml, title, sortkey) values($xml, $title, $sortkey)", {$xml: xml, $title: titleHtml, $sortkey: sortkey}, function(err){
+  db.run("insert into entries(id, doctype, xml, title, sortkey) values($id, $doctype, $xml, $title, $sortkey)", {$id: entryID, $doctype: "entry", $xml: xml, $title: titleHtml, $sortkey: sortkey}, function(err){
     if(err) console.log(err);
-    var entryID=this.lastID;
-    db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {$entry_id: entryID, $txt: headword, $level: 1}, function(err){
-      if(err) console.log(err);
-      db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
-        $entry_id: entryID,
-        $action: "create",
-        $when: (new Date()).toISOString(),
-        $email: "valselob@gmail.com",
-        $xml: xml,
-        $historiography: JSON.stringify({}),
-      }, function(err){
-        if(err) console.log(err);
-        entryCount++;
-        console.log(`${entryCount} #${entryID}`);
-      });
-    });
+    console.log(`entryID ${entryID} inserted into table entries`);
+  });
+  db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {$entry_id: entryID, $txt: headword, $level: 1}, function(err){
+    if(err) console.log(err);
+    console.log(`entryID ${entryID} inserted into table searchables`);
+  });
+  db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
+    $entry_id: entryID,
+    $action: "create",
+    $when: (new Date()).toISOString(),
+    $email: "valselob@gmail.com",
+    $xml: xml,
+    $historiography: JSON.stringify({}),
+  }, function(err){
+    if(err) console.log(err);
+    console.log(`entryID ${entryID} inserted into table history`);
   });
 }
 
