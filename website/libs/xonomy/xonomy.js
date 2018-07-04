@@ -1349,7 +1349,10 @@ Xonomy.editRaw=function(htmlID, parameter) {
 };
 Xonomy.duplicateElement=function(htmlID) {
 	Xonomy.clickoff();
-	var html=document.getElementById(htmlID).outerHTML.replace(/ id=['"]/g, function(x){return x+"d_"});
+	var html=document.getElementById(htmlID).outerHTML;
+		  html=html.replace(/ id=['"]/g, function(x){return x+"d_"});
+		  html=html.replace(/Xonomy\.click\(['"]/g, function(x){return x+"d_"});
+		  html=html.replace(/Xonomy\.plusminus\(['"]/g, function(x){return x+"d_"});
 	var $html=$(html).hide();
 	$("#"+htmlID).after($html);
 	Xonomy.changed();
