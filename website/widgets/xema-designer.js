@@ -68,7 +68,7 @@ XemaDesigner.listNodes=function(){
 	$list.scrollTop(scrollTop);
 }
 XemaDesigner.listElement=function(elName, $list){
-	var hasEponymousAscendant=($list.closest(".container."+elName).length>0);
+	var hasEponymousAscendant=($list.closest(".container."+elName.replace(/\./g, "\\.")).length>0);
 	var collapsed="";
 		if((XemaDesigner.hasAttributes(elName) || XemaDesigner.hasChildren(elName)) && !hasEponymousAscendant) collapsed+=" hasChildren";
 		var parName=$list.closest(".container").find(".element").first().data("elName");
