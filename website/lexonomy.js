@@ -388,6 +388,7 @@ app.post(siteconfig.rootPath+"push.api", function(req, res){
         var dictID=json.dictID;
         var entryXmls=json.entryXmls;
         var db=ops.getDB(dictID);
+        db.run("BEGIN TRANSACTION");
         db.serialize(function(){
           var doneCount=0;
           for(var i=0; i<entryXmls.length; i++){
@@ -395,6 +396,7 @@ app.post(siteconfig.rootPath+"push.api", function(req, res){
             ops.createEntry(db, dictID, null, xml, email, {apikey: apikey}, function(){
               doneCount++;
               if(doneCount>=entryXmls.length){
+                db.run("COMMIT");
                 db.close(function(){
                   res.json({success: true});
                 });
@@ -683,8 +685,10 @@ app.get(siteconfig.rootPath+":dictID/resave/", function(req, res){
 app.post(siteconfig.rootPath+":dictID/resave.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID);
+  db.run("BEGIN TRANSACTION");
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
     if(!user.canConfig && !user.canEdit && !user.canUpload) {
+      db.run("COMMIT");
       db.close();
       res.json({todo: 0});
     } else {
@@ -696,9 +700,10 @@ app.post(siteconfig.rootPath+":dictID/resave.json", function(req, res){
             ops.resave(db, req.params.dictID, function(){
               ops.getDictStats(db, req.params.dictID, function(stats){
                 counter++;
-                if(stats.needResave && counter<10) {
+                if(stats.needResave && counter<=127) {
                   go();
                 } else {
+                  db.run("COMMIT");
                   db.close(function(){ res.json({todo: stats.needResave}); });
                 }
               });
@@ -930,9 +935,11 @@ app.get(siteconfig.rootPath+":dictID/import/", function(req, res){
 app.post(siteconfig.rootPath+":dictID/import.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID);
+  db.run("BEGIN TRANSACTION");
   ops.readDictConfigs(db, req.params.dictID, function(configs){
     ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
       if(!user.canUpload) {
+        db.run("COMMIT");
         db.close();
         res.redirect("edit/");
       } else {
@@ -948,9 +955,10 @@ app.post(siteconfig.rootPath+":dictID/import.json", function(req, res){
           ops.import(db, req.params.dictID, path.join(siteconfig.dataDir, "uploads/"+filename), offset, user.email, historiography, function(newOffset, success, finished){
             offset=newOffset;
             if(success) { localCounter++; counter++; }
-            if(!finished && localCounter<50){
+            if(!finished && localCounter<127){
               go();
             } else {
+              db.run("COMMIT");
               db.close(function(){
                 var progressMessage="Entries imported: "+counter;
                 var ret={
