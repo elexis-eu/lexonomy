@@ -102,16 +102,19 @@ module.exports={
     });
   },
   readDictConfigs: function(db, dictID, callnext){
-    fs.readFile("siteconfig.json", "utf8", function(err, content){
-      var configs={};
-      configs.siteconfig=JSON.parse(content);
-      db.all("select * from configs", {}, function(err, rows){
-        for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
-        var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "xema", "xemplate", "editing", "subbing"];
-        ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
-        callnext(configs);
+    if(db.dictConfigs) callnext(db.dictConfigs); else {
+      fs.readFile("siteconfig.json", "utf8", function(err, content){
+        var configs={};
+        configs.siteconfig=JSON.parse(content);
+        db.all("select * from configs", {}, function(err, rows){
+          for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
+          var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "xema", "xemplate", "editing", "subbing"];
+          ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
+          db.dictConfigs=configs;
+          callnext(configs);
+        });
       });
-    });
+    }
   },
   readDictConfig: function(db, dictID, configID, callnext){
     db.get("select * from configs where id=$id", {$id: configID}, function(err, row){
@@ -228,20 +231,28 @@ module.exports={
     });
   },
   createEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
-    module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
-      xml=setHousekeepingAttributes(entryID, xml, subbing);
+    module.exports.readDictConfigs(db, dictID, function(configs){
+      var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+      xml=setHousekeepingAttributes(entryID, xml, configs.subbing);
       xml=module.exports.removeSubentryParentTags(xml);
-      var params={$xml: xml, $title: "_", $sortkey: "", $doctype: getDoctype(xml)};
-      var sql="insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values($xml, $title, $sortkey, 1, 1, $doctype)";
+      var params={
+        $xml: xml,
+        $title: module.exports.getEntryTitle(xml, configs.titling),
+        $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+        $doctype: getDoctype(xml),
+        $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
+        $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
+      };
+      var sql="insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values($xml, $title, $sortkey, $needs_refac, $needs_resave, $doctype)";
       if(entryID) {
-        sql="insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values($id, $xml, $title, $sortkey, 1, 1, $doctype)";
+        sql="insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values($id, $xml, $title, $sortkey, $needs_refac, $needs_resave, $doctype)";
         params.$id=entryID;
       }
       db.run(sql, params, function(err){
         if(!entryID) entryID=this.lastID;
         db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
           $entry_id: entryID,
-          $txt: "_",
+          $txt: module.exports.getEntryTitle(xml, configs.titling, true),
           $level: 1,
         });
         db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
@@ -260,8 +271,9 @@ module.exports={
   },
   updateEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
     db.get("select id, xml from entries where id=$id", {$id: entryID}, function(err, row){
-      module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
-        xml=setHousekeepingAttributes(entryID, xml, subbing);
+      module.exports.readDictConfigs(db, dictID, function(configs){
+        var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+        xml=setHousekeepingAttributes(entryID, xml, configs.subbing);
         xml=module.exports.removeSubentryParentTags(xml);
         var newXml=xml.replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
         var oldXml=(row?row.xml:"").replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
@@ -273,7 +285,18 @@ module.exports={
           //tell my parents that they need a refresh:
           db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
             //update me:
-            db.run("update entries set doctype=$doctype, xml=$xml, needs_refac=1, needs_resave=1 where id=$id", { $id: entryID, $xml: xml, $doctype: getDoctype(xml)}, function(err){
+            db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
+              $id: entryID,
+              $title: module.exports.getEntryTitle(xml, configs.titling),
+              $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+              $xml: xml, $doctype: getDoctype(xml),
+              $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
+              $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
+            }, function(err){
+              db.run("update searchables set txt=$txt where entry_id=$entry_id and level=1", {
+                $entry_id: entryID,
+                $txt: module.exports.getEntryTitle(xml, configs.titling, true)
+              }, function(err){});
               //tell history that I have been updated:
               db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
                 $entry_id: entryID,
@@ -567,37 +590,28 @@ module.exports={
   },
 
   getEntryTitle: function(xml, titling, plaintext){
-    if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
-    if(plaintext) var ret=module.exports.getEntryHeadword(doc, titling); else var ret="<span class='headword'>"+module.exports.getEntryHeadword(doc, titling)+"</span>";
+    if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
+    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
+    if(plaintext) var ret=module.exports.getEntryHeadword(xml, titling); else var ret="<span class='headword'>"+module.exports.getEntryHeadword(xml, titling)+"</span>";
     if(titling.headwordAnnotations) for(var i=0; i<titling.headwordAnnotations.length; i++){
-      var els=doc.getElementsByTagName(titling.headwordAnnotations[i]);
-      for(var y=0; y<els.length; y++){
-        var txt=els[y].textContent;
-        if(txt!="") {
-          if(ret!="") ret+=" ";
-          ret+=txt;
-        }
-      }
+      if(ret!="") ret+=" ";
+      ret+=extractText(xml, titling.headwordAnnotations[i]).join(" ");
     }
+    //console.log(ret);
     return ret;
   },
   getEntryHeadword: function(xml, titling){
-    if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
+    if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
+    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret="";
-    var els=doc.getElementsByTagName(titling.headword);
-    for(var y=0; y<els.length; y++){
-      var txt=els[y].textContent;
-      if(txt!="") {if(ret!="") ret+=" "; ret+=txt;}
-    }
+    var arr=extractText(xml, titling.headword);
+    if(arr.length>0) ret=arr[0];
     if(ret==""){
-      var els=doc.getElementsByTagName("*");
-      for(var y=0; y<els.length; y++){
-        var hasTextNode=false; for(var i=0; i<els[y].childNodes.length; i++) if(els[y].childNodes[i].nodeType==3) hasTextNode=true;
-        if(hasTextNode) { ret=els[y].textContent; break; }
-      }
+      ret=extractFirstText(xml);
     }
     if(ret=="") ret="?";
     if(ret.length>255) ret=ret.substring(0, 255); //keeping headwords under 255 characters is probably a reeasonable limitation
+    //console.log(ret);
     return ret;
   },
   toSortkey: function(s, abc){
@@ -628,16 +642,15 @@ module.exports={
     return ret;
   },
   getEntrySearchables: function(xml, searchability, titling){
-    if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
+    if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
+    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret=[];
-    ret.push(module.exports.getEntryHeadword(doc, titling));
+    ret.push(module.exports.getEntryHeadword(xml, titling));
     if(searchability.searchableElements) for(var i=0; i<searchability.searchableElements.length; i++){
-      var els=doc.getElementsByTagName(searchability.searchableElements[i]);
-      for(var y=0; y<els.length; y++){
-        var txt=els[y].textContent;
-        if(txt!="" && ret.indexOf(txt)==-1) ret.push(txt);
-      }
+      var arr=extractText(xml, searchability.searchableElements[i]);
+      arr.map(txt => { if(txt!="" && ret.indexOf(txt)==-1) ret.push(txt); });
     }
+    //console.log(ret);
     return ret;
   },
 
@@ -795,79 +808,53 @@ module.exports={
       });
     });
   },
-  import: function(db, dictID, filepath, offset, email, historiography, callnext){
-    var regexOpeningTag=new RegExp("\<[^\!\?\>\<][^\>\<]*\>");
-    var readStream=fs.createReadStream(filepath).setEncoding("utf8");
-    var tempFilePath=filepath+"_temp";
-    fs.writeFileSync(tempFilePath, "");
-    var extract="";
-    var lengthRead=0;
-    var parseError=false;
-    var domparser=new xmldom.DOMParser({ errorHandler: {warning: function(){parseError=true;}, error: function(){parseError=true;}, fatalError: function(){parseError=true;} }});
-    var serializer=new xmldom.XMLSerializer();
-    var tagName="";
-    readStream.read(offset);
-    readStream.on("data", function(chunk){
-      //console.log(`incoming data: ${lengthRead} + ${chunk.length} = ${lengthRead+chunk.length}`);
-      for(var pos=0; pos<chunk.length; pos++){
-        lengthRead++;
-        if(lengthRead>=offset) {
-          extract+=chunk[pos]; if(extract.length>255) extract=extract.substring(extract.length-255);
-          if(offset==0){
-            if(regexOpeningTag.test(extract)){ offset=lengthRead+1; extract=""; }
-          } else {
-            if(tagName==""){
-              var found=extract.match(/^\s*\<\s*([^\<\>\s\/]+)[\/\>\s]/);
-              if(found) tagName=found[1];
-            }
-            fs.appendFileSync(tempFilePath, chunk[pos]);
-            if(extract.endsWith("</"+tagName+">") || extract.endsWith("<"+tagName+"/>")) {
-              var xml=fs.readFileSync(tempFilePath, "utf8").trim().replace(/\>[\r\n]+\s*\</g, "><");
-              parseError=false;
-              var doc=domparser.parseFromString(xml, 'text/xml');
-              if(!parseError && doc.getElementsByTagName("*")[0]) {
-                var success=true;
-                var finished=false;
-                offset=lengthRead+1;
-                readStream.destroy();
 
-                var root=doc.getElementsByTagName("*")[0];
-                var entryID=parseInt(root.getAttributeNS("http://www.lexonomy.eu/", "entryID"));
-                if(!entryID) entryID=parseInt(root.getAttributeNS("http://www.lexonomy.eu/", "subentryID"));
-                root.removeAttributeNS("http://www.lexonomy.eu/", "entryID");
-                root.removeAttributeNS("http://www.lexonomy.eu/", "subentryID");
-                xml=serializer.serializeToString(doc);
-                doc=null;
-                //console.log(xml.substring(0, 10)+"..."+xml.substring(xml.length-10));
-                if(entryID) {
-                  //console.log("about to update entry");
-                  module.exports.updateEntry(db, dictID, entryID, xml, email, historiography, function(entryID, adjustedXml, changed){
-                    //console.log("entry updated");
-                    callnext(offset, success, finished);
-                  });
-                } else {
-                  //console.log("about to create entry");
-                  module.exports.createEntry(db, dictID, null, xml, email, historiography, function(){
-                    //console.log("entry created");
-                    callnext(offset, success, finished);
-                  });
-                }
-                break;
-              }
+  import: function(db, dictID, filepath, email, historiography, callnext){
+    var tagName="";
+    var tagNameLevel=0;
+    var readStream=fs.createReadStream(filepath).setEncoding("utf8");
+    var buffer="";
+    var entryCount=0;
+    var regexOpeningTag=null;
+    readStream.on("data", function(chunk){
+      for(var pos=0; pos<chunk.length; pos++){
+        buffer+=chunk[pos];
+        if(tagName=="" || tagNameLevel<2){
+          var found=buffer.match(/^\s*\<\s*([^\<\>\s\/]+)[\/\>\s]/);
+          if(found) {
+            tagNameLevel++;
+            tagName=found[1];
+            if(tagNameLevel<2) {
+              buffer="";
+            } else {
+              regexOpeningTag=new RegExp("\<"+tagName+"[^\>\<]*\>$");
+            }
+          }
+        } else {
+          var found=buffer.match(regexOpeningTag);
+          if(found){
+            buffer=found[0];
+          }
+          if(buffer.endsWith("</"+tagName+">")){
+            entryCount++;
+            buffer=buffer.replace(/\>[\r\n]+\s*\</g, "><").trim();
+            var found=buffer.match(/^\<[^\>]*\s+lxnm:(sub)?entryID=['"]([0-9]+)["']/);
+            var entryID=null; if(found) {
+              entryID=parseInt(found[2]);
+              //console.log("going to update");
+              module.exports.updateEntry(db, dictID, entryID, buffer, email, historiography, function(newentryID, xml){ /*console.log("UPDATED "+newentryID);*/ });
+            } else {
+              //console.log("going to create");
+              module.exports.createEntry(db, dictID, entryID, buffer, email, historiography, function(newentryID, xml){ /*console.log("CREATED "+newentryID);*/ });
             }
           }
         }
       }
-      //console.log("incoming data done");
     });
     readStream.on("end", function(){
       readStream.destroy();
       fs.remove(filepath, function(){
-        fs.remove(tempFilePath, function(){
-          var success=false;
-          var finished=true;
-          callnext(offset, success, finished);
-        });
+        callnext(entryCount);
       });
     });
   },
@@ -1272,7 +1259,7 @@ module.exports={
         var history=[];
         for(var i=0; i<rows.length; i++) {
           var row=rows[i];
-          row.xml=setHousekeepingAttributes(row.entry_id, row.xml, subbing);
+          if(row.xml) row.xml=setHousekeepingAttributes(row.entry_id, row.xml, subbing);
           history.push({
             "entry_id": row.entry_id,
             "revision_id": row.id,
@@ -1334,6 +1321,27 @@ function setHousekeepingAttributes(entryID, xml, subbing){
 function getDoctype(xml){
   var ret="";
   xml=xml.replace(/^\<([^\>\/\s]+)/, function(found, $1){ ret=$1 });
+  return ret;
+}
+
+function extractText(xml, elName){ //extract the text contents from thusly named elements, return as array of strings
+  var ret=[];
+  var pat=new RegExp("\\<"+elName+"[^\>]*\>(.*?)\\</"+elName+"\\>", "g");
+  xml.replace(pat, function(found, $1){
+    var s=$1.replace(/\<[^\>]*\>/g, "").trim();
+    if(s!="") ret.push(s);
+  });
+  return ret;
+}
+function extractFirstText(xml){ //extract the text content from the first element that has text content and no child nodes
+  var ret="";
+  var pat=new RegExp("\\<([^\\s\\>]+)[^\>]*\>([^\\<\\>]*?)\\</([^\\s\\>]+)\\>", "g");
+  xml.replace(pat, function(found, $1, $2, $3){
+    if(ret=="" && $1==$3) {
+      var s=$2.trim();
+      if(s!="") ret=s;
+    }
+  });
   return ret;
 }
 

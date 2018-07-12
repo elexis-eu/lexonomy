@@ -945,33 +945,21 @@ app.post(siteconfig.rootPath+":dictID/import.json", function(req, res){
       } else {
         var filename=req.body.filename;
         var uploadStart=req.body.uploadStart;
-        var offset=new Number(req.body.offset);
-        var counter=req.body.counter || 0;
         var historiography={uploadStart: uploadStart, filename: filename};
-
-        go();
-        var localCounter=0;
-        function go(){
-          ops.import(db, req.params.dictID, path.join(siteconfig.dataDir, "uploads/"+filename), offset, user.email, historiography, function(newOffset, success, finished){
-            offset=newOffset;
-            if(success) { localCounter++; counter++; }
-            if(!finished && localCounter<127){
-              go();
-            } else {
-              db.run("COMMIT");
-              db.close(function(){
-                var progressMessage="Entries imported: "+counter;
-                var ret={
-                  progressMessage: progressMessage,
-                  finished: finished,
-                  state: {filename: filename, uploadStart: uploadStart, offset: offset, counter: counter},
-                };
-                res.json(ret);
-              });
-            }
+        ops.import(db, req.params.dictID, path.join(siteconfig.dataDir, "uploads/"+filename), user.email, historiography, function(entryCount){
+          //console.log("going to commit and close");
+          db.run("COMMIT");
+          db.close(function(){
+            //console.log("committed and closed");
+            var ret={
+              progressMessage: "Entries imported: "+entryCount,
+              finished: true,
+              state: {filename: filename, uploadStart: uploadStart},
+            };
+            res.json(ret);
           });
-        }
 
+        });
       }
     });
   });
