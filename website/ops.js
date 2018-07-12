@@ -1081,12 +1081,28 @@ module.exports={
   getDictsByUser: function(email, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     var sql="select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email=$email order by d.title"
+    var dicts=[];
     db.all(sql, {$email: email}, function(err, rows){
-      var dicts=[];
       if(rows) for(var i=0; i<rows.length; i++) dicts.push({id: rows[i].id, title: rows[i].title});
       db.close();
-      callnext(dicts);
+      lookup();
     });
+    function lookup(){
+      for(var i = 0; i < dicts.length; i++) {
+        if(dicts[i].currentUserCanDelete===undefined){
+          var dictDB=module.exports.getDB(dicts[i].id, true);
+          module.exports.readDictConfig(dictDB, dicts[i].id, "users", function(users){
+            dictDB.close();
+            dicts[i].currentUserCanDelete=users[email].canConfig;
+            lookup();
+          });
+          break;
+        }
+      }
+      if(i>=dicts.length){
+        callnext(dicts);
+      }
+    }
   },
   verifyUserApiKey: function(email, apikey, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);

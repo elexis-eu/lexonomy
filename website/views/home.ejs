@@ -87,16 +87,23 @@
 							<div class="subtitle"><a href="logout/">Log out</a> | <a href="changepwd/">Change your password</a></div>
 						</div>
 						<div class="yourdicts">Your dictionaries</div>
-						<%if(dicts.length==0){%>
-							<div class="nodicts">You have no dictionaries yet.</div>
-						<%}else{%>
-							<%for(var i=0; i<dicts.length; i++){%>
-								<div class="dict">
-									<a class="dictTitle" href="<%-dicts[i].id%>/"><%=dicts[i].title%></a>
-									<!--<a class="dictAction" href="<%-dicts[i].id%>/">Delete</a>-->
-								</div>
-							<%}%>
+						<%for(var i=0; i<dicts.length; i++){%>
+							<div class="dict" id="dict_<%-dicts[i].id%>">
+								<a class="dictTitle" href="<%-dicts[i].id%>/"><%=dicts[i].title%></a>
+								<%if(dicts[i].currentUserCanDelete){%><a class="dictAction" href="javascript:void(null)" onclick="destroyDict('<%-dicts[i].id%>')">Delete</a><%}%>
+							</div>
 						<%}%>
+						<script type="text/javascript">
+						function destroyDict(dictID){
+							if(confirm("Careful now! You will not be able to undo this.")){
+								$.ajax({url: "./"+dictID+"/destroy.json", dataType: "json", method: "POST", data: {}}).done(function(data){
+									if(data.success) {
+										$("#dict_"+dictID).slideUp("fast", function(){ $("#dict_"+dictID).remove() });
+									};
+								});
+							}
+						}
+						</script>
 						<div class="createdict"><a href="make/">Create a dictionary</a></div>
 						<div class="yourdicts">One-Click Dictionary settings</div>
 						<div class="adminlink"><a href="oneclick/">API key</a></div>
