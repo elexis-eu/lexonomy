@@ -84,6 +84,9 @@ Screenful.Editor={
     if(!Screenful.Editor.singleton && Screenful.Editor.deleteUrl) {
       $("<button id='butDelete' class='iconYes'>"+Screenful.Loc.delete+"</button>").appendTo($toolbar).on("click", Screenful.Editor.delete);
     }
+    if(Screenful.Editor.allowAutosave) {
+      $("<label id='labAutosave'><input type='checkbox' "+(Screenful.Editor.autosaveOn?"checked":"")+" id='chkAutosave'/> "+Screenful.Loc.autosave+"</label>").appendTo($toolbar);
+    }
     if(Screenful.Editor.toolbarLinks){
       for(var i=0; i<Screenful.Editor.toolbarLinks.length; i++){
         var link=Screenful.Editor.toolbarLinks[i];
@@ -100,6 +103,7 @@ Screenful.Editor={
       $("#butView").hide();
       $("#butNonew").hide();
       $("#butSave").hide(); $("#butSave .star").hide();
+      $("#labAutosave").hide();
       $("#butDelete").hide();
       $("#butSourceCode").hide();
       $("#butClone").hide();
@@ -109,6 +113,7 @@ Screenful.Editor={
       $("#butView").hide();
       $("#butNonew").hide();
       $("#butSave").hide(); $("#butSave .star").hide();
+      $("#labAutosave").hide();
       $("#butDelete").hide();
       if(Screenful.Editor.entryID) $("#butHistory").show(); else $("#butHistory").hide();
       $("#butClone").hide();
@@ -118,6 +123,7 @@ Screenful.Editor={
       $("#butView").hide();
       $("#butNonew").hide();
       $("#butSave").hide(); $("#butSave .star").hide();
+      $("#labAutosave").hide();
       $("#butDelete").hide();
       $("#butSourceCode").hide();
       $("#butClone").hide();
@@ -127,6 +133,7 @@ Screenful.Editor={
       $("#butView").hide();
       $("#butNonew").show();
       $("#butSave").show(); $("#butSave .star").hide();
+      $("#labAutosave").show();
       $("#butDelete").hide();
       $("#butClone").hide();
       $("#butSourceCode").show();
@@ -136,6 +143,7 @@ Screenful.Editor={
       $("#butView").hide();
       $("#butNonew").hide();
       $("#butSave").hide(); $("#butSave .star").hide();
+      $("#labAutosave").hide();
       $("#butDelete").show();
       $("#butSourceCode").hide();
       $("#butClone").show();
@@ -145,6 +153,7 @@ Screenful.Editor={
       $("#butView").show();
       $("#butNonew").hide();
       $("#butSave").show(); $("#butSave .star").hide();
+      $("#labAutosave").show();
       $("#butDelete").show();
       $("#butSourceCode").show();
       $("#butClone").show();
@@ -278,7 +287,7 @@ Screenful.Editor={
         } else {
           Screenful.Editor.entryID=data.id;
           $("#idbox").val(data.id);
-          if(Screenful.Editor.viewer) {
+          if(Screenful.Editor.viewer && !$("#chkAutosave").prop("checked")) {
       			$("#container").removeClass("empty").html("<div id='viewer'></div>");
             Screenful.Editor.viewer(document.getElementById("viewer"), data);
     		  } else {
@@ -314,7 +323,7 @@ Screenful.Editor={
         } else {
           Screenful.Editor.entryID=data.id;
           $("#idbox").val(data.id);
-          if(Screenful.Editor.viewer) {
+          if(Screenful.Editor.viewer && !$("#chkAutosave").prop("checked")) {
             $("#container").removeClass("empty").html("<div id='viewer'></div>");
             Screenful.Editor.viewer(document.getElementById("viewer"), data);
 		      } else {
@@ -364,6 +373,7 @@ Screenful.Editor={
   changed: function(){
     Screenful.Editor.needsSaving=true;
     $("#butSave .star").show();
+    if($("#chkAutosave").prop("checked")) Screenful.Editor.save();
   },
   history: function(){
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"

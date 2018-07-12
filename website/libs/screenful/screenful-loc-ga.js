@@ -75,4 +75,6 @@ Screenful.Loc={
   setPwdMsg: "Please set your password now.",
   accountCreated: "We have created your account. You can now log in with your e-mail address and password.",
   signupAccountExists: "You are trying to create an account for e-mail address that already has an account.",
+
+  autosave: "Sábháil uathoibríoch",
 };
