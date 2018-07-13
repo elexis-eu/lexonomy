@@ -362,8 +362,14 @@ Screenful.Editor={
           $("#container").addClass("empty deleted").html("");
           Screenful.status(Screenful.Loc.ready);
           Screenful.Editor.updateToolbar();
-          if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
           if(Screenful.Editor.postDeleteRedirUrl) window.location=Screenful.Editor.postDeleteRedirUrl;
+          if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Aftersave){
+            window.parent.Screenful.Aftersave.batch();
+          } else if(Screenful.Aftersave){
+            Screenful.Aftersave.batch();
+          } else {
+            if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
+          }
         }
     	});
     }

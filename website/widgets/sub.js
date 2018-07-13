@@ -13,6 +13,7 @@ Sub.extendDocspec=function(docspec, xema){
         }
         return "";
       };
+      var incaption=docspec.elements[elName].caption;
       docspec.elements[elName].caption=function(jsMe){
   			var cap="";
   			var id=jsMe.getAttributeValue("lxnm:subentryID", 0);
@@ -21,6 +22,8 @@ Sub.extendDocspec=function(docspec, xema){
           cap+=+parents.length+" ▼";
   			  cap="<span class='lexonomySubentryCaption' onclick='Xonomy.notclick=true; Sub.menuSubentry(\""+jsMe.htmlID+"\")'>"+cap+"</span>";
         }
+        if(typeof(incaption)=="function") cap=incaption(jsMe)+cap;
+        if(typeof(incaption)=="string") cap=incaption+cap;
   			return cap;
   		};
     }

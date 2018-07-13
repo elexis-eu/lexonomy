@@ -1,3 +1,7 @@
+.xonomy .lexonomySkeCaption {margin-right: 10px; white-space: nowrap; background-color: #eeeeee; color: #666666; border: 1px outset #cccccc; padding: 7px 10px 6px 40px; border-radius: 5px; cursor: pointer; text-shadow: 1px 1px 0px #ffffff; position: relative; top: -2px; background-image: url(../furniture/ske.png); background-position: 10px center; background-repeat: no-repeat;}
+.xonomy .readonly .lexonomySkeCaption {display: none;}
+.xonomy .lexonomySkeCaption:hover {color: #004f9b; }
+
 div.skebox {padding: 0px; width: 600px; height: 300px; position: relative;}
 div.skebox form.topbar {position: absolute; top: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }
 div.skebox div.bottombar {position: absolute; bottom: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }

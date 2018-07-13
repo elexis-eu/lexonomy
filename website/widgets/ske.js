@@ -13,8 +13,27 @@ Ske.makeSettings=function(){
     if(rollo[elName].exampleHeadwordMarkup && !Ske.settings.examples.markupElement) Ske.settings.examples.markupElement=elName;
   }
 }
-
+Ske.getHeadword=function(){
+  var $xml=$($.parseXML(Xonomy.harvest()));
+  var hwd=$xml.find(titling.headword).html();
+  if(!hwd) hwd="";
+  return hwd;
+};
 Ske.extendDocspec=function(docspec, xema){
+  if(kex.corpus) {
+    if(!subbing[xema.root]) {
+      var elSpec=docspec.elements[xema.root];
+      var incaption=elSpec.caption;
+      elSpec.caption=function(jsMe){
+        var cap="";
+        cap="<span class='lexonomySkeCaption' onclick='Xonomy.notclick=true; Ske.menuRoot(\""+jsMe.htmlID+"\")'>▼</span>";
+        if(typeof(incaption)=="function") cap=incaption(jsMe)+cap;
+        if(typeof(incaption)=="string") cap=incaption+cap;
+        return cap;
+      };
+    }
+  }
+
   if(kex.url && kex.corpus && kex.username && kex.apikey) {
     for(var parName in xema.elements){
       if(xema.elements[parName].children){
@@ -39,15 +58,21 @@ Ske.extendDocspec=function(docspec, xema){
   }
 };
 
-Ske.getHeadword=function(){
-  var $xml=$($.parseXML(Xonomy.harvest()));
-  var hwd=$xml.find(titling.headword).html();
-  if(!hwd) hwd="";
-  return hwd;
+Ske.menuRoot=function(htmlID){
+  var html="<div class='menu'>";
+  if(xampl.container) {
+    html+="<div class='menuItem' onclick='Ske.menuExamples(\""+htmlID+"\", \"layby\")'>";
+      html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
+      html+="Find examples <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+xampl.container+"</span><span class='punc'>&gt;</span></span>";
+    html+="</div>";
+  }
+  html+="</div>";
+  document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
+  Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
 };
 
 Ske.menuExamples=function(htmlID, param){
-  Ske.htmlID=htmlID;
+  if(param=="layby") Ske.htmlID=null; else  Ske.htmlID=htmlID;
   document.body.appendChild(Xonomy.makeBubble(Ske.boxExamples())); //create bubble
   if(Xonomy.lastClickWhat=="openingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.opening > .name")); //anchor bubble to opening tag
   else if(Xonomy.lastClickWhat=="closingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.closing > .name")); //anchor bubble to closing tag
@@ -58,7 +83,6 @@ Ske.menuExamples=function(htmlID, param){
     $(".skebox .waiter").hide();
   }
 };
-
 Ske.boxExamples=function(){
   var html="";
   html="<div class='skebox'>"
@@ -76,11 +100,9 @@ Ske.boxExamples=function(){
   html+="</div>";
   return html;
 };
-
 Ske.toggleExample=function(inp){
   if($(inp).prop("checked")) $(inp.parentNode).addClass("selected"); else $(inp.parentNode).removeClass("selected");
 };
-
 Ske.searchExamples=function(fromp){
   $("#butSkePrev").hide();
   $("#butSkeNext").hide();
@@ -119,7 +141,6 @@ Ske.searchExamples=function(fromp){
     });
   }
 };
-
 Ske.insertExamples=function(){
   $(".skebox div.choices label").each(function(){
     var $label=$(this);
@@ -133,7 +154,7 @@ Ske.insertExamples=function(){
         txt=txt.replace("</b>", "");
       }
       var xml=xampl.template.replace("$text", txt);
-      Xonomy.newElementChild(Ske.htmlID, xml);
+      if(Ske.htmlID) Xonomy.newElementChild(Ske.htmlID, xml); else Xonomy.newElementLayby(xml);
     }
   });
 };

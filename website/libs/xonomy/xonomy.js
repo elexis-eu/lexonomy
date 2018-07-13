@@ -1644,6 +1644,16 @@ Xonomy.recomputeLayby=function(){
 		$(".xonomy .layby").removeClass("nonempty").addClass("empty");
 	}
 }
+Xonomy.newElementLayby=function(xml) {
+	Xonomy.clickoff();
+	var html=Xonomy.renderElement(Xonomy.xml2js(xml));
+	var $html=$(html).hide();
+	$(".xonomy .layby > .content").append($html);
+	Xonomy.refresh();
+	$html.fadeIn();
+	Xonomy.openCloseLayby();
+	Xonomy.recomputeLayby();
+};
 
 Xonomy.changed=function(jsElement) { //called when the document changes
 	Xonomy.harvestCache={};
