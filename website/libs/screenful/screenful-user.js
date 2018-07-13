@@ -13,12 +13,13 @@ Screenful.User={
       if(Screenful.User.forgotPwdUrl) $(".ScreenfulUser .menu").append("<a href='"+Screenful.User.forgotPwdUrl+"'>"+Screenful.Loc.forgotPwd+"</a>");
     }
     $(".ScreenfulUser .clickable").on("click", function(e){
-      $(e.delegateTarget).closest(".ScreenfulUser").find(".menu").hide().slideDown();
-      $("#navbox .lineModifiers .menu").slideUp();
+      var $mymenu=$(e.delegateTarget).closest(".ScreenfulUser").find(".menu");
+      $(".menu").remove($mymenu[0]).slideUp();
+      $mymenu.hide().slideDown();
       e.stopPropagation();
     });
     $(document).on("click", function(e){
-      $(".ScreenfulUser .menu").slideUp();
+      $(".menu").slideUp();
     });
   },
 };

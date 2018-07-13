@@ -45,8 +45,7 @@ Screenful.Editor={
 
     $(document).on("click", function(e){
       if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.User){
-        window.parent.$(".ScreenfulUser .menu").slideUp();
-        window.parent.$("#navbox .lineModifiers .menu").slideUp();
+        window.parent.$(".menu").slideUp();
       }
     });
 
