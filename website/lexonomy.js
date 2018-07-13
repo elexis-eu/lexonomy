@@ -985,6 +985,7 @@ app.get(siteconfig.rootPath+":dictID/skeget/", function(req, res){
       url+="&viewmode=sen";
       url+="&gdex_enabled=1";
       url+="&attrs=word";
+      if(req.query.fromp) url+="&"+req.query.fromp;
       https.get(url, function(getres){
         getres.setEncoding('utf8');
         var data="";

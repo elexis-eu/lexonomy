@@ -4,6 +4,7 @@ div.skebox div.bottombar {position: absolute; bottom: 0px; left: 0px; right: 0px
 
 div.skebox input.ske {background-image: url(../furniture/ske.png); background-position: center center; background-repeat: no-repeat; padding: 4px 0px 4px 0px; width: 40px; border-width: 1px; border-radius: 2px; cursor: pointer;}
 div.skebox button.insert {background-image: url(../furniture/add.png); background-position: 10px center; background-repeat: no-repeat; padding: 5px 10px 5px 30px; border-width: 1px; border-radius: 2px; cursor: pointer;}
+div.skebox button.prevnext {padding: 5px 10px 5px 10px; border-width: 1px; border-radius: 2px; cursor: pointer; float: right;}
 div.skebox button:hover {background-color: #eeeeee;}
 
 div.skebox div.waiter {position: absolute; top: 43px; left: 0px; right: 0px; bottom: 0px; background-color: #ffffff; background-image: url(../furniture/loader.gif); background-position: center center; background-repeat: no-repeat;}

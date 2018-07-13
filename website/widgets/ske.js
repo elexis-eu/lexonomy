@@ -69,6 +69,8 @@ Ske.boxExamples=function(){
     html+="<div class='waiter'></div>";
     html+="<div class='choices' style='display: none'></div>";
     html+="<div class='bottombar' style='display: none;'>";
+      html+="<button class='prevnext' id='butSkeNext'>More »</button>";
+      html+="<button class='prevnext' id='butSkePrev'>«</button>";
       html+="<button class='insert' onclick='Ske.insertExamples()'>Insert</button>";
     html+="</div>";
   html+="</div>";
@@ -79,13 +81,15 @@ Ske.toggleExample=function(inp){
   if($(inp).prop("checked")) $(inp.parentNode).addClass("selected"); else $(inp.parentNode).removeClass("selected");
 };
 
-Ske.searchExamples=function(){
+Ske.searchExamples=function(fromp){
+  $("#butSkePrev").hide();
+  $("#butSkeNext").hide();
   $(".skebox .choices").hide();
   $(".skebox .bottombar").hide();
   $(".skebox .waiter").show();
   var lemma=$.trim($(".skebox .textbox").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/skeget/", {url: kex.url, corpus: kex.corpus, username: kex.username, apikey: kex.apikey, lemma: lemma}, function(json){
+    $.get(rootPath+dictID+"/skeget/", {url: kex.url, corpus: kex.corpus, username: kex.username, apikey: kex.apikey, lemma: lemma, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");
@@ -93,6 +97,8 @@ Ske.searchExamples=function(){
           $(".skebox .choices").fadeIn();
         }
         else if(json.Lines) {
+          if(json.prevlink) $("#butSkePrev").show().on("click", function(){ Ske.searchExamples(json.prevlink); $("div.skebox button.prevnext").off("click"); });
+          if(json.nextlink) $("#butSkeNext").show().on("click", function(){ Ske.searchExamples(json.nextlink); $("div.skebox button.prevnext").off("click"); });
           for(var iLine=0; iLine<json.Lines.length; iLine++){ var line=json.Lines[iLine];
             var left=""; for(var i=0; i<line.Left.length; i++) left+=line.Left[i].str; left=left.replace(/\<[^\<\>]+\>/g, "");
             var kwic=""; for(var i=0; i<line.Kwic.length; i++) kwic+=line.Kwic[i].str; kwic=kwic.replace(/<[^\<\>]+\>/g, "");
