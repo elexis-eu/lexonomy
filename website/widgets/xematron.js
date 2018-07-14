@@ -183,8 +183,10 @@ Xematron.xema2docspec=function(xema){
 					menu: submenu,
 				});
 			}
-			del.collapsible=function(jsMe){ return (jsMe.internalParent ? true : false); };
-			del.collapsed=true;
+			//del.collapsible=function(jsMe){ return (jsMe.internalParent ? true : false); };
+			//del.collapsed=true;
+			del.collapsible=true;
+			del.collapsed=function(jsMe){ return (jsMe.internalParent ? true : false); };
 		}
 
 		//inl elements have inline menu items for wrapping:

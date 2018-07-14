@@ -66,6 +66,26 @@ Ske.menuRoot=function(htmlID){
       html+="Find examples <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+xampl.container+"</span><span class='punc'>&gt;</span></span>";
     html+="</div>";
   }
+  if(Ske.getHeadword() && (kex.url.indexOf("sketchengine.co.uk")>-1 || kex.url.indexOf("sketchengine.eu")>-1)) {
+    html+="<div class='menuItem')'>";
+      html+="<a target='_blank' href='https://app.sketchengine.eu/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"'>";
+        html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
+        html+="Show word sketch...";
+      html+="</a>";
+    html+="</div>";
+    html+="<div class='menuItem')'>";
+      html+="<a target='_blank' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&keyword="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+        html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
+        html+="Show concordance...";
+      html+="</a>";
+    html+="</div>";
+    html+="<div class='menuItem')'>";
+      html+="<a target='_blank' href='https://app.sketchengine.eu/#thesaurus?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+        html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
+        html+="Show thesaurus...";
+      html+="</a>";
+    html+="</div>";
+  }
   html+="</div>";
   document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
