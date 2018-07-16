@@ -66,7 +66,7 @@ Ske.extendDocspec=function(docspec, xema){
             if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
             docspec.elements[parName].menu.push({
               icon: rootPath+"furniture/ske.png",
-              caption: "Find related words <"+thes.container+">",
+              caption: "Find thesaurus items <"+thes.container+">",
               action: Ske.menuThes,
             });
           }
@@ -89,7 +89,7 @@ Ske.menuRoot=function(htmlID){
   if(thes.container) {
     html+="<div class='menuItem' onclick='Ske.menuThes(\""+htmlID+"\", \"layby\")'>";
       html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-      html+="Find related words <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+thes.container+"</span><span class='punc'>&gt;</span></span>";
+      html+="Find thesaurus items <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+thes.container+"</span><span class='punc'>&gt;</span></span>";
     html+="</div>";
   }
   if(Ske.getHeadword() && (kex.url.indexOf("sketchengine.co.uk")>-1 || kex.url.indexOf("sketchengine.eu")>-1)) {
