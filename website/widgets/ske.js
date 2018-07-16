@@ -37,6 +37,7 @@ Ske.extendDocspec=function(docspec, xema){
   if(kex.url && kex.corpus && kex.username && kex.apikey) {
     for(var parName in xema.elements){
       if(xema.elements[parName].children){
+
         canHaveExamples=false;
         for(var iChild=0; iChild<xema.elements[parName].children.length; iChild++){
           if(xema.elements[parName].children[iChild].name==xampl.container){
@@ -53,6 +54,25 @@ Ske.extendDocspec=function(docspec, xema){
             });
           }
         }
+
+        canHaveThes=false;
+        for(var iChild=0; iChild<xema.elements[parName].children.length; iChild++){
+          if(xema.elements[parName].children[iChild].name==thes.container){
+            canHaveThes=true; break;
+          }
+        }
+        if(canHaveThes){
+          if(docspec.elements[parName]){
+            if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
+            docspec.elements[parName].menu.push({
+              icon: rootPath+"furniture/ske.png",
+              caption: "Find related words <"+thes.container+">",
+              action: Ske.menuThes,
+            });
+          }
+        }
+
+
       }
     }
   }
@@ -64,6 +84,12 @@ Ske.menuRoot=function(htmlID){
     html+="<div class='menuItem' onclick='Ske.menuExamples(\""+htmlID+"\", \"layby\")'>";
       html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
       html+="Find examples <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+xampl.container+"</span><span class='punc'>&gt;</span></span>";
+    html+="</div>";
+  }
+  if(thes.container) {
+    html+="<div class='menuItem' onclick='Ske.menuThes(\""+htmlID+"\", \"layby\")'>";
+      html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
+      html+="Find related words <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+thes.container+"</span><span class='punc'>&gt;</span></span>";
     html+="</div>";
   }
   if(Ske.getHeadword() && (kex.url.indexOf("sketchengine.co.uk")>-1 || kex.url.indexOf("sketchengine.eu")>-1)) {
@@ -131,7 +157,7 @@ Ske.searchExamples=function(fromp){
   $(".skebox .waiter").show();
   var lemma=$.trim($(".skebox .textbox").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/skeget/", {url: kex.url, corpus: kex.corpus, username: kex.username, apikey: kex.apikey, lemma: lemma, fromp: fromp}, function(json){
+    $.get(rootPath+dictID+"/skeget/xampl/", {url: kex.url, corpus: kex.corpus, username: kex.username, apikey: kex.apikey, lemma: lemma, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");
@@ -174,6 +200,87 @@ Ske.insertExamples=function(){
         txt=txt.replace("</b>", "");
       }
       var xml=xampl.template.replace("$text", txt);
+      if(Ske.htmlID) Xonomy.newElementChild(Ske.htmlID, xml); else Xonomy.newElementLayby(xml);
+    }
+  });
+};
+
+Ske.menuThes=function(htmlID, param){
+  if(param=="layby") Ske.htmlID=null; else  Ske.htmlID=htmlID;
+  document.body.appendChild(Xonomy.makeBubble(Ske.boxThes())); //create bubble
+  if(Xonomy.lastClickWhat=="openingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.opening > .name")); //anchor bubble to opening tag
+  else if(Xonomy.lastClickWhat=="closingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.closing > .name")); //anchor bubble to closing tag
+  else Xonomy.showBubble($("#"+htmlID));
+  if(Ske.getHeadword()) {
+    Ske.searchThes();
+  } else {
+    $(".skebox .waiter").hide();
+  }
+};
+Ske.boxThes=function(){
+  var html="";
+  html="<div class='skebox'>"
+    html+="<form class='topbar' onsubmit='Ske.searchThes(); return false'>";
+  		html+="<input name='val' class='textbox focusme' value='"+Ske.getHeadword()+"'/> ";
+      html+="<input type='submit' class='button ske' value='&nbsp;'/>";
+    html+="</form>";
+    html+="<div class='waiter'></div>";
+    html+="<div class='choices' style='display: none'></div>";
+    html+="<div class='bottombar' style='display: none;'>";
+      html+="<button class='prevnext' id='butSkeNext'>More »</button>";
+      html+="<button class='prevnext' id='butSkePrev'>«</button>";
+      html+="<button class='insert' onclick='Ske.insertThes()'>Insert</button>";
+    html+="</div>";
+  html+="</div>";
+  return html;
+};
+Ske.toggleThes=function(inp){
+  if($(inp).prop("checked")) $(inp.parentNode).addClass("selected"); else $(inp.parentNode).removeClass("selected");
+};
+Ske.searchThes=function(fromp){
+  $("#butSkePrev").hide();
+  $("#butSkeNext").hide();
+  $(".skebox .choices").hide();
+  $(".skebox .bottombar").hide();
+  $(".skebox .waiter").show();
+  var lemma=$.trim($(".skebox .textbox").val());
+  if(lemma!="") {
+    $.get(rootPath+dictID+"/skeget/thes/", {url: kex.url, corpus: kex.corpus, username: kex.username, apikey: kex.apikey, lemma: lemma, fromp: fromp}, function(json){
+        $(".skebox .choices").html("");
+        if(json.error && json.error=="Empty result"){
+          $(".skebox .choices").html("<div class='error'>No results found.</div>");
+          $(".skebox .waiter").hide();
+          $(".skebox .choices").fadeIn();
+        }
+
+        // $(".skebox .choices").append(JSON.stringify(json, null, "  "));
+        // $(".skebox .waiter").hide();
+        // $(".skebox .choices").fadeIn();
+
+        else if(json.Words) {
+          // if(json.prevlink) $("#butSkePrev").show().on("click", function(){ Ske.searchExamples(json.prevlink); $("div.skebox button.prevnext").off("click"); });
+          // if(json.nextlink) $("#butSkeNext").show().on("click", function(){ Ske.searchExamples(json.nextlink); $("div.skebox button.prevnext").off("click"); });
+          for(var iLine=0; iLine<json.Words.length; iLine++){ var line=json.Words[iLine];
+            var txt=line.word;
+            $(".skebox .choices").append("<label><input type='checkbox' onchange='Ske.toggleThes(this)'/><span class='inside'>"+txt+"</span></label>");
+            $(".skebox .waiter").hide();
+            $(".skebox .choices").fadeIn();
+            $(".skebox .bottombar").show();
+          }
+        } else {
+          $(".skebox .choices").html("<div class='error'>There has been an error getting data from Sketch Engine.</div>");
+          $(".skebox .waiter").hide();
+          $(".skebox .choices").fadeIn();
+        }
+    });
+  }
+};
+Ske.insertThes=function(){
+  $(".skebox div.choices label").each(function(){
+    var $label=$(this);
+    if($label.hasClass("selected")){
+      var txt=$label.find("span.inside").html();
+      var xml=thes.template.replace("$text", txt);
       if(Ske.htmlID) Xonomy.newElementChild(Ske.htmlID, xml); else Xonomy.newElementLayby(xml);
     }
   });

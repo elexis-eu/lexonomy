@@ -546,7 +546,7 @@ app.get(siteconfig.rootPath+":dictID/:doctype/entryeditor/", function(req, res){
         db.close();
         if(configs.xemplate._xsl) configs.xemplate._xsl="dummy";
         configs.xema._root=configs.xema.root; if(configs.xema.elements[req.params.doctype]) configs.xema.root=req.params.doctype;
-        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
+        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, thes: configs.thes, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
       });
     }
   });
@@ -966,7 +966,7 @@ app.post(siteconfig.rootPath+":dictID/import.json", function(req, res){
 });
 
 //SKETCH ENGINE PROXY:
-app.get(siteconfig.rootPath+":dictID/skeget/", function(req, res){
+app.get(siteconfig.rootPath+":dictID/skeget/xampl/", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
@@ -985,6 +985,40 @@ app.get(siteconfig.rootPath+":dictID/skeget/", function(req, res){
       url+="&viewmode=sen";
       url+="&gdex_enabled=1";
       url+="&attrs=word";
+      if(req.query.fromp) url+="&"+req.query.fromp;
+      https.get(url, function(getres){
+        getres.setEncoding('utf8');
+        var data="";
+        getres.on("data", function(chunk) {data+=chunk});
+        getres.on("end", function(){
+          try { var json=JSON.parse(data); } catch (e) { json={}; }
+          res.json(json);
+        });
+      });
+      // res.json({Lines: [
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      // ]});
+    }
+  });
+});
+app.get(siteconfig.rootPath+":dictID/skeget/thes/", function(req, res){
+  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
+  var db=ops.getDB(req.params.dictID, true);
+  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
+    if(!user.canEdit) {
+      db.close();
+      res.json({success: false});
+    } else {
+      db.close();
+      var url=req.query.url;
+      url+="/thes";
+      url+="?corpname="+req.query.corpus;
+      url+="&username="+req.query.username;
+      url+="&api_key="+req.query.apikey;
+      url+="&format=json";
+      url+="&lemma="+encodeURIComponent(req.query.lemma);
       if(req.query.fromp) url+="&"+req.query.fromp;
       https.get(url, function(getres){
         getres.setEncoding('utf8');

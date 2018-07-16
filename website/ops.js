@@ -108,7 +108,7 @@ module.exports={
         configs.siteconfig=JSON.parse(content);
         db.all("select * from configs", {}, function(err, rows){
           for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
-          var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "xema", "xemplate", "editing", "subbing"];
+          var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "thes", "xema", "xemplate", "editing", "subbing"];
           ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
           db.dictConfigs=configs;
           callnext(configs);
