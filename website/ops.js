@@ -10,11 +10,13 @@ module.exports={
   siteconfig: {}, //populated by lexonomy.js on startup
   mailtransporter: null,
   getDB: function(dictID, readonly){
-    var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE)
+    var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE);
     var db=new sqlite3.Database(
       path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"),
       mode,
-      function(){db.run('PRAGMA foreign_keys=on')}
+      function(err){
+        if(err) db={err: err}; else db.run('PRAGMA foreign_keys=on');
+      }
      );
     return db;
   },
@@ -107,7 +109,7 @@ module.exports={
         var configs={};
         configs.siteconfig=JSON.parse(content);
         db.all("select * from configs", {}, function(err, rows){
-          for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
+          if(!err) for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
           var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "thes", "xema", "xemplate", "editing", "subbing"];
           ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
           db.dictConfigs=configs;
@@ -118,7 +120,7 @@ module.exports={
   },
   readDictConfig: function(db, dictID, configID, callnext){
     db.get("select * from configs where id=$id", {$id: configID}, function(err, row){
-      if(!row) config=module.exports.defaultDictConfig(configID); else var config=JSON.parse(row.json);
+      if(err || !row) config=module.exports.defaultDictConfig(configID); else var config=JSON.parse(row.json);
       callnext(config);
     });
   },
@@ -1089,11 +1091,11 @@ module.exports={
     });
     function lookup(){
       for(var i = 0; i < dicts.length; i++) {
-        if(dicts[i].currentUserCanDelete===undefined){
+        if(dicts[i].currentUserCanDelete===undefined && module.exports.dictExists(dicts[i].id)){
           var dictDB=module.exports.getDB(dicts[i].id, true);
           module.exports.readDictConfig(dictDB, dicts[i].id, "users", function(users){
             dictDB.close();
-            dicts[i].currentUserCanDelete=users[email].canConfig;
+            dicts[i].currentUserCanDelete=(users[email] && users[email].canConfig) ? true : false;
             lookup();
           });
           break;
