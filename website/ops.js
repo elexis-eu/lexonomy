@@ -512,15 +512,23 @@ module.exports={
             }, function(err){ if(err) console.log(err); });
 
             db.run("delete from searchables where entry_id=$entry_id", {$entry_id: entryID}, function(err){ if(err) console.log(err);
-              var searchables=module.exports.getEntrySearchables(doc, configs.searchability, configs.titling);
-              var headword=module.exports.getEntryHeadword(doc, configs.titling);
-              for(var y=0; y<searchables.length; y++){
-                db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
-                  $entry_id: entryID,
-                  $txt: searchables[y],
-                  $level: (searchables[y]==headword ? 1 : 2),
-                });
-              }
+              db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
+                $entry_id: entryID,
+                $txt: module.exports.getEntryTitle(doc, configs.titling, true),
+                $level: 1,
+              }, function(){
+                var searchables=module.exports.getEntrySearchables(doc, configs.searchability, configs.titling);
+                var headword=module.exports.getEntryHeadword(doc, configs.titling);
+                for(var y=0; y<searchables.length; y++){
+                  if(searchables[y]!=headword){
+                    db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
+                      $entry_id: entryID,
+                      $txt: searchables[y],
+                      $level: 2,
+                    });
+                  }
+                }
+              });
              });
           })(entryID, doc);
 
