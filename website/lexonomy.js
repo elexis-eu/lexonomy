@@ -160,25 +160,25 @@ app.post(siteconfig.rootPath+"changepwd.json", function(req, res){
   });
 });
 app.post(siteconfig.rootPath+"signup.json", function(req, res){
-  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
+  var remoteip = ops.getRemoteAddress(req);
   ops.sendSignupToken(req.body.email, remoteip, function(success){
     res.json({success: success});
   });
 });
 app.post(siteconfig.rootPath+"forgotpwd.json", function(req, res){
-  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
+  var remoteip = ops.getRemoteAddress(req);
   ops.sendToken(req.body.email, remoteip, function(success){
     res.json({success: success});
   });
 });
 app.post(siteconfig.rootPath+"createaccount.json", function(req, res){
-  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
+  var remoteip = ops.getRemoteAddress(req);
   ops.createAccount(req.body.token, req.body.password, remoteip, function(success){
     res.json({success: success});
   });
 });
 app.post(siteconfig.rootPath+"recoverpwd.json", function(req, res){
-  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
+  var remoteip = ops.getRemoteAddress(req);
   ops.resetPwd(req.body.token, req.body.password, remoteip, function(success){
     res.json({success: success});
   });
