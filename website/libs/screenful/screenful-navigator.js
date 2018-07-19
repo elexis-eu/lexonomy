@@ -30,7 +30,7 @@ Screenful.Navigator={
       }
       $("#navbox .lineModifiers .clickable").on("click", function(e){
         var $mymenu=$(e.delegateTarget).closest(".lineModifiers").find(".menu");
-        $(".menu").remove($mymenu[0]).slideUp();
+        $(".menu").not($mymenu).slideUp();
         $mymenu.hide().slideDown();
         e.stopPropagation();
       });
@@ -242,8 +242,8 @@ Screenful.Navigator={
     var $entry=$menuLink.closest(".entry");
     var entryID=$entry.attr("data-id");
     var $menu=$entry.find(".menu");
-    $("#listbox .menu").remove($menu[0]).hide();
-    $(".menu").remove($menu[0]).slideUp();
+    $("#listbox .menu").not($menu).hide();
+    $(".menu").not($menu).slideUp();
     $menu.hide().slideDown();
     e.stopPropagation();
   },
