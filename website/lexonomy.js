@@ -320,7 +320,6 @@ app.get(siteconfig.rootPath+"skelogin.json/:token", function(req, res){
   });
 });
 
-
 //ONE-CLICK UI and JSON endpoints:
 app.get(siteconfig.rootPath+"oneclick/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
@@ -546,7 +545,7 @@ app.get(siteconfig.rootPath+":dictID/:doctype/entryeditor/", function(req, res){
         db.close();
         if(configs.xemplate._xsl) configs.xemplate._xsl="dummy";
         configs.xema._root=configs.xema.root; if(configs.xema.elements[req.params.doctype]) configs.xema.root=req.params.doctype;
-        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, thes: configs.thes, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
+        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, thes: configs.thes, collx: configs.collx, defo: configs.defo, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
       });
     }
   });
@@ -981,7 +980,8 @@ app.get(siteconfig.rootPath+":dictID/skeget/xampl/", function(req, res){
       url+="&username="+req.query.username;
       url+="&api_key="+req.query.apikey;
       url+="&format=json";
-      url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
+      //url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
+      url+="&q="+encodeURIComponent(makeQ(req.query.lemma));
       url+="&viewmode=sen";
       url+="&gdex_enabled=1";
       url+="&attrs=word";
@@ -1000,6 +1000,13 @@ app.get(siteconfig.rootPath+":dictID/skeget/xampl/", function(req, res){
       //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
       //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
       // ]});
+    }
+    function makeQ(str){
+      var ret="";
+      str.split(' ').map(word => {
+        if(word!="") ret+=`[lemma="${word}"|word="${word}"]`;
+      });
+      return "q"+ret;
     }
   });
 });
@@ -1034,6 +1041,87 @@ app.get(siteconfig.rootPath+":dictID/skeget/thes/", function(req, res){
       //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
       //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
       // ]});
+    }
+  });
+});
+app.get(siteconfig.rootPath+":dictID/skeget/collx/", function(req, res){
+  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
+  var db=ops.getDB(req.params.dictID, true);
+  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
+    if(!user.canEdit) {
+      db.close();
+      res.json({success: false});
+    } else {
+      db.close();
+      var url=req.query.url;
+      url+="/wsketch";
+      url+="?corpname="+req.query.corpus;
+      url+="&username="+req.query.username;
+      url+="&api_key="+req.query.apikey;
+      url+="&format=json";
+      url+="&lemma="+encodeURIComponent(req.query.lemma);
+      url+="&structured=0";
+      if(req.query.fromp) url+="&"+req.query.fromp;
+      https.get(url, function(getres){
+        getres.setEncoding('utf8');
+        var data="";
+        getres.on("data", function(chunk) {data+=chunk});
+        getres.on("end", function(){
+          try { var json=JSON.parse(data); } catch (e) { json={}; }
+          res.json(json);
+        });
+      });
+      // res.json({Lines: [
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      // ]});
+    }
+  });
+});
+app.get(siteconfig.rootPath+":dictID/skeget/defo/", function(req, res){
+  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
+  var db=ops.getDB(req.params.dictID, true);
+  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
+    if(!user.canEdit) {
+      db.close();
+      res.json({success: false});
+    } else {
+      db.close();
+      var url=req.query.url;
+      url+="/view";
+      url+="?corpname="+req.query.corpus;
+      url+="&username="+req.query.username;
+      url+="&api_key="+req.query.apikey;
+      url+="&format=json";
+      //url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
+      url+="&iquery="+makeQ(req.query.lemma);
+      url+="&viewmode=sen";
+      //url+="&gdex_enabled=1";
+      //url+="&attrs=word";
+      if(req.query.fromp) url+="&"+req.query.fromp;
+      https.get(url, function(getres){
+        getres.setEncoding('utf8');
+        var data="";
+        getres.on("data", function(chunk) {data+=chunk});
+        getres.on("end", function(){
+          try { var json=JSON.parse(data); } catch (e) { json={}; }
+          res.json(json);
+        });
+      });
+      // res.json({Lines: [
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      // ]});
+    }
+    function makeQ(str){
+      var ret="";
+      str.split(' ').map(word => {
+        if(word!="") ret+=`[lc="${word}"+|+lemma_lc="${word}"]`;
+      });
+      ret=`${str.replace(/ /g, "+")};q=aword,`+ret+`;q=p+0+0>0+1+[ws(".*",+"definitions",+".*")];exceptmethod=PREV-CONC`;
+      return ret;
     }
   });
 });
