@@ -14,7 +14,7 @@ Screenful.User={
     }
     $(".ScreenfulUser .clickable").on("click", function(e){
       var $mymenu=$(e.delegateTarget).closest(".ScreenfulUser").find(".menu");
-      $(".menu").remove($mymenu[0]).slideUp();
+      $(".menu").not($mymenu).slideUp();
       $mymenu.hide().slideDown();
       e.stopPropagation();
     });
