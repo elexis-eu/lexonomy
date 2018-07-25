@@ -134,10 +134,8 @@ Screenful.Navigator={
             var $menuLink=$("<a class='entryMenuLink'>&middot;&middot;&middot;</a>").appendTo($item);
             $menuLink.on("click", Screenful.Navigator.entryMenuLinkClick);
             var $menu=$("<div class='menu' style='display: none'></div>").appendTo($item);
-            if(Screenful.Navigator.entryDeleteUrl){
-              var $menuItem=$("<a href='javascript:void(null)'><span class='keyCaption'>Del</span>"+Screenful.Loc.delete+"</a>").appendTo($menu);
-              $menuItem.on("click", Screenful.Navigator.entryDelete);
-            }
+            var $menuItem=$("<a href='javascript:void(null)'><span class='keyCaption'>Del</span>"+Screenful.Loc.delete+"</a>").appendTo($menu);
+            $menuItem.on("click", Screenful.Navigator.entryDelete);
           }
 
         });
