@@ -246,7 +246,7 @@ Screenful.Navigator={
     e.stopPropagation();
   },
   entryDelete: function(arg){ //arg = event object or entryID
-    var enryID=arg; if(typeof(arg)=="object") {
+    var entryID=arg; if(typeof(arg)=="object") {
       entryID=$(arg.delegateTarget).closest(".entry").attr("data-id");
       $(".menu").hide();
       arg.stopPropagation();
