@@ -124,14 +124,18 @@ Screenful.Navigator={
       } else {
         $("#countcaption").html(data.total);
         var $listbox=$("#listbox").html("");
-        var el = Screenful.Navigator.flags.flag_element
-        var fl = Screenful.Navigator.flags.flags
-        var flag2color = {}
-        for (var i=0; i<fl.length; i++)
-           flag2color[fl[i]["name"]] = fl[i]["color"]
-        var flag_re = new RegExp("<" + el + "[^>]*>([^<]+)</" + el + ">")
+        var fl=[]
+        if (Screenful.Navigator.flags) {
+          var el = Screenful.Navigator.flags.flag_element
+          fl = Screenful.Navigator.flags.flags
+          var flag2color = {}
+          for (var i=0; i<fl.length; i++)
+             flag2color[fl[i]["name"]] = fl[i]["color"]
+          flag_re = new RegExp("<" + el + "[^>]*>([^<]+)</" + el + ">")
+        }
         data.entries.forEach(function(entry){
-          var flagged = entry.xml.match(flag_re)
+          if (Screenful.Navigator.flags)
+            var flagged = entry.xml.match(flag_re)
           var extra_style = ""
           if (flagged)
             extra_style = " style='background-color: " + flag2color[flagged[1]] + "'"
