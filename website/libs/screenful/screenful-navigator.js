@@ -125,7 +125,7 @@ Screenful.Navigator={
         $("#countcaption").html(data.total);
         var $listbox=$("#listbox").html("");
         var fl=[]
-        if (Screenful.Navigator.flags) {
+        if (Screenful.Navigator.flags && Screenful.Navigator.flags.flag_element.length > 0) {
           var el = Screenful.Navigator.flags.flag_element
           fl = Screenful.Navigator.flags.flags
           var flag2color = {}
@@ -134,7 +134,7 @@ Screenful.Navigator={
           flag_re = new RegExp("<" + el + "[^>]*>([^<]+)</" + el + ">")
         }
         data.entries.forEach(function(entry){
-          if (Screenful.Navigator.flags)
+          if (fl.length > 0)
             var flagged = entry.xml.match(flag_re)
           var extra_style = ""
           if (flagged)
