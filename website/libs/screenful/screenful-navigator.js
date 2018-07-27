@@ -151,7 +151,7 @@ Screenful.Navigator={
             var $menuItem=$("<a href='javascript:void(null)'><span class='keyCaption'>Del</span>"+Screenful.Loc.delete+"</a>").appendTo($menu);
             $menuItem.on("click", Screenful.Navigator.entryDelete);
             for (var i=0;i < fl.length;i++) {
-              $menuItem=$("<a href='javascript:void(null)' data-flag='" + fl[i].name + "'><span class='keyCaption'>" + fl[i].key + "</span>" + fl[i].label + "</a>").appendTo($menu);
+              $menuItem=$("<a href='javascript:void(null)' data-flag='" + fl[i].name + "' data-color='" + fl[i].color + "'><span class='keyCaption'>" + fl[i].key + "</span>" + fl[i].label + "</a>").appendTo($menu);
               $menuItem.on("click", Screenful.Navigator.entryFlag);
             }
           }
@@ -197,7 +197,7 @@ Screenful.Navigator={
           for(var i=0; i<fl.length; i++) {
             if(e.key==fl[i].key){ //Flag key
               e.preventDefault();
-              Screenful.Navigator.entryFlag(e, fl[i].name)
+              Screenful.Navigator.entryFlag(e, fl[i].name, fl[i].color)
             }
           }
         });
@@ -295,10 +295,13 @@ Screenful.Navigator={
       }
     }
   },
-  entryFlag: function(e, flag){
+  entryFlag: function(e, flag, flagcolor){
     var entryID=$(e.delegateTarget).closest(".entry").attr("data-id");
-    if (flag==undefined)
-        flag=$(e.delegateTarget).closest("a").attr("data-flag");
+    if (flag==undefined) {
+        var $a_el = $(e.delegateTarget).closest("a")
+        flag=$a_el.attr("data-flag");
+        flagcolor=$_el.attr("data-color");
+    }
     $(".menu").hide();
     e.stopPropagation();
     $.ajax({url: Screenful.Navigator.entryFlagUrl, dataType: "json", method: "POST", data: {id: entryID, flag: flag}}).done(function(data){
@@ -308,8 +311,9 @@ Screenful.Navigator={
         Screenful.status(Screenful.Loc.ready);
         var $entry=$("div.entry[data-id=\""+entryID+"\"]");
         if($entry.length>0){
+          $entry.css("background-color", flagcolor)
           var $next=$entry.next(".entry"); if($next.length==0) $next=$entry.prev(".entry"); Screenful.Navigator.lastFocusedEntryID=$next.attr("data-id");
-          Screenful.Navigator.refresh();
+          Screenful.Navigator.focusEntryList();
         }
       }
     });
