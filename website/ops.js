@@ -11,13 +11,9 @@ module.exports={
   mailtransporter: null,
   getDB: function(dictID, readonly){
     var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE);
-    var db=new sqlite3.Database(
-      path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"),
-      mode,
-      function(err){
-        if(err) db={err: err}; else db.run('PRAGMA foreign_keys=on');
-      }
-     );
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), mode, function(err){});
+    if(!readonly) db.run('PRAGMA journal_mode=WAL');
+    db.run('PRAGMA foreign_keys=on');
     return db;
   },
   //get request remote IP, if under proxy get real IP
@@ -202,7 +198,7 @@ module.exports={
   },
   readDoctypesUsed: function(db, dictID, callnext){
     db.all("select doctype from entries group by doctype order by count(*) desc", {}, function(err, rows){
-      var doctypes=rows.map(row => row.doctype);
+      var doctypes=(!err && rows) ? rows.map(row => row.doctype) : [];
       callnext(doctypes);
     });
   },
