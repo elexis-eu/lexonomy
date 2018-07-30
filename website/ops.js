@@ -588,6 +588,7 @@ module.exports={
   },
 
   listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, callnext){
+    if!searchtext) searchtext="";
     if(modifier=="start") {
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
@@ -633,6 +634,7 @@ module.exports={
     }
     module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
       db.all(sql1, params1, function(err, rows){
+        if(err || !rows) rows=[];
         var entries=[];
         for(var i=0; i<rows.length; i++){
           rows[i].xml=setHousekeepingAttributes(rows[i].id, rows[i].xml, subbing);
@@ -641,7 +643,7 @@ module.exports={
           entries.push(item);
         }
         db.get(sql2, params2, function(err, row){
-          var total=row.total;
+          var total=(!err && row) ? row.total : 0;
           callnext(total, entries);
         });
       });
