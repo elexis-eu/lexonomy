@@ -124,7 +124,7 @@ module.exports={
         configs.siteconfig=JSON.parse(content);
         db.all("select * from configs", {}, function(err, rows){
           if(!err) for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
-          var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"];
+          var ids=["ident", "publico", "users", "kex", "titling", "flagging", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"];
           ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
           db.dictConfigs=configs;
           callnext(configs);
@@ -143,6 +143,7 @@ module.exports={
     if(id=="searchability") return {searchableElements: []};
     if(id=="xema") return {elements: {}};
     if(id=="titling") return {headwordAnnotations: [], abc: module.exports.siteconfig.defaultAbc};
+    if(id=="flagging") return {flag_element: "", flags: []};
     return {};
   },
   updateDictConfig: function(db, dictID, configID, json, callnext){
@@ -164,7 +165,7 @@ module.exports={
         module.exports.attachDict(db, dictID, function(){
           callnext(json, false);
         });
-      } else if(configID=="titling" || configID=="searchability"){
+      } else if(configID=="titling" || configID=="titling" || configID=="searchability"){
         module.exports.flagForResave(db, dictID, function(resaveNeeded){
           callnext(json, resaveNeeded);
         });
@@ -285,6 +286,40 @@ module.exports={
       });
     });
   },
+  flagEntry: function(db, dictID, entryID, flag, email, historiography, callnext){
+    db.get("select id, xml from entries where id=$id", {$id: entryID}, function(err, row){
+      module.exports.readDictConfigs(db, dictID, function(configs){
+        var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+        var xml=(row?row.xml:"").replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
+        xml=addFlag(entryID, xml, flag, configs.flagging);
+
+        //tell my parents that they need a refresh:
+        db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
+          //update me:
+          db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
+            $id: entryID,
+            $title: module.exports.getEntryTitle(xml, configs.titling),
+            $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+            $xml: xml, $doctype: getDoctype(xml),
+            $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
+            $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
+          }, function(err){
+            //tell history that I have been updated:
+            db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
+              $entry_id: entryID,
+              $action: "update",
+              $when: (new Date()).toISOString(),
+              $email: email,
+              $xml: xml,
+              $historiography: JSON.stringify(historiography),
+            }, function(err){});
+              callnext(entryID, xml);
+          });
+        });
+      });
+    });
+  },
+
   updateEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
     db.get("select id, xml from entries where id=$id", {$id: entryID}, function(err, row){
       module.exports.readDictConfigs(db, dictID, function(configs){
@@ -1342,6 +1377,21 @@ function generateDictID(){
     id+=alphabet[i]
   }
   return "z"+id;
+}
+
+function addFlag(entryID, xml, flag, flagconfig){
+  var el = flagconfig.flag_element;
+  var re = new RegExp("\<" + el + "[^>]*\>[^\<]+\</" + el + "\>")
+  var flag_exists = false
+  xml = xml.replace(re, function(found, $1) { // try replacing existing flag
+    flag_exists = true
+    return "<" + el + ">" + flag + "</" + el + ">";
+  })
+  if (flag_exists)
+    return xml
+  return xml.replace(/^\<([^\>]+>)/, function(found, $1) { // or add new flag
+    return "<" + $1 + "<" + el + ">" + flag + "</" + el + ">";
+  })
 }
 
 function setHousekeepingAttributes(entryID, xml, subbing){

@@ -17,6 +17,7 @@ Screenful.Loc={
   savingFailed: "Failed to save.",
   deleting: "Deleting...",
   deletingFailed: "Failed to delete.",
+  flaggingFailed: "Failed to flag.",
   deleteConfirm: "Careful now! Are you sure?",
   username: "E-mail address",
   password: "Password",
