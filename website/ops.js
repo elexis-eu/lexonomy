@@ -588,7 +588,7 @@ module.exports={
   },
 
   listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, callnext){
-    if!searchtext) searchtext="";
+    if(!searchtext) searchtext="";
     if(modifier=="start") {
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
