@@ -20,6 +20,20 @@ module.exports={
      );
     return db;
   },
+  //get request remote IP, if under proxy get real IP
+  getRemoteAddress: function(request) {
+    var remoteIp = request.connection.remoteAddress.replace('::ffff:','');
+    if (request.headers['x-forwarded-for'] != undefined) {
+      remoteIp = request.headers['x-forwarded-for'];
+    }
+    if (request.headers['x-real-ip'] != undefined) {
+      remoteIp = request.headers['x-real-ip'];
+    }
+    if (request.headers['x-real-ip'] != undefined) {
+      remoteIp = request.headers['x-real-ip'];
+    }
+    return remoteIp;
+  },
 
   dictExists: function(dictID){
     return fs.existsSync(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"));
