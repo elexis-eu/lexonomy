@@ -4,10 +4,10 @@ const path=require("path");
 const fs=require("fs-extra");
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 
-const blankPath=path.join(__dirname, "dictTemplates/blank.sqlite");
-//migrateDBs(path.join(__dirname, "../data/dicts/"));
-//migrateDBs(path.join(__dirname, "../website/dictTemplates/"));
-migrateDB(path.join(__dirname, "../data/dicts/zdpcsy6gx.sqlite"), function(){});
+const blankPath=path.join(__dirname, "../dictTemplates/blank.sqlite");
+migrateDBs(path.join(__dirname, "../../data/dicts/"));
+//migrateDBs(path.join(__dirname, "../../website/dictTemplates/"));
+//migrateDB(path.join(__dirname, "../../data/dicts/zdpcsy6gx.sqlite"), function(){});
 
 function migrateDBs(dirPath){
   var filenames=fs.readdirSync(dirPath).filter(filename => /\.sqlite$/.test(filename) && filename!=path.basename(blankPath));

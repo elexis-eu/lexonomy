@@ -39,7 +39,6 @@ Screenful.Loc={
   signup: "Zřǐdit si účet",
   forgotPwd: "Zapomenuté heslo",
   signupEmail: "Chcete-li si nechat zřídit účet, napište e-mail na adresu",
-  forgotPwdEmail: "Zapomněli-li jste své heslo, napište e-mail na adresu",
   newPassword: "Nové heslo",
   change: "Změnit",
   passwordChanged: "Vaše heslo bylo změněno.",
@@ -60,4 +59,22 @@ Screenful.Loc={
   invalidSourceCode: "Neplatný zdrojový kód",
   unsavedConfirm: "Más neuložené změny. Opravdu o ně chceš přijít?",
   doItLater: "Udělej to jindy",
+  badEmailError: "Nesprávná e-mailová adresa.",
+
+  forgotPwdEmail: "Zapomněli-li jste svoje heslo, zadejte tady svoji e-mailovou adresu a my vám pošleme instrukce, jak si získat nové heslo.",
+  recoverPwd: "Chci nové heslo",
+  tokenSent: "Poslali jsme vám instrukce, jak si získat nové heslo.",
+  recoverPwdMsg: "Nyní si můžete změnit heslo.",
+  changePwdMsg: "Tady si můžete změnit heslo.",
+  invalidToken: "Tento odkaz je neplatný. Možná už vypršel, nebo byl už použit.",
+
+  signupInfoEmail: "To get a new account, enter your e-mail address and we will send you instructions.",
+  signupButton: "Create new account",
+  signupTokenSent: "We have sent you an e-mail with instructions on how to create a new account.",
+  invalidSignupToken: "This signup link is invalid. It may have expired or has been used before.",
+  setPwdMsg: "Please set your password now.",
+  accountCreated: "We have created your account. You can now log in with your e-mail address and password.",
+  signupAccountExists: "You are trying to create an account for e-mail address that already has an account.",
+
+  autosave: "Ukládat automaticky",
 };

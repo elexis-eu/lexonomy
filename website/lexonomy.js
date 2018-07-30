@@ -20,7 +20,9 @@ const querystring=require("querystring");
 const libxslt=require("libxslt"); //https://www.npmjs.com/package/libxslt
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 const nodemailer = require('nodemailer');
+  ops.mailtransporter = nodemailer.createTransport(siteconfig.mailconfig);
 const PORT=process.env.PORT||siteconfig.port||80;
+const jwt = require("jsonwebtoken");
 
 //Do this for each request:
 app.use(function (req, res, next) {
@@ -59,7 +61,12 @@ app.get(siteconfig.rootPath+":dictID/en/", function(req, res){ res.redirect("/"+
 app.get(siteconfig.rootPath, function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     ops.getDictsByUser(user.email, function(dicts){
-      res.render("home.ejs", {siteconfig: siteconfig, user: user, dicts: dicts});
+      var error = null;
+      if (req.cookies.jwt_error) {
+        error = req.cookies.jwt_error;
+        res.clearCookie('jwt_error');
+      }
+      res.render("home.ejs", {siteconfig: siteconfig, user: user, dicts: dicts, error: error});
     });
   });
 });
@@ -88,7 +95,7 @@ app.get(siteconfig.rootPath+"make/", function(req, res){
 });
 app.get(siteconfig.rootPath+"signup/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    res.render("signup.ejs", {user: user, email: siteconfig.admins[0], siteconfig: siteconfig});
+    res.render("signup.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig});
   });
 });
 app.get(siteconfig.rootPath+"forgotpwd/", function(req, res){
@@ -96,9 +103,17 @@ app.get(siteconfig.rootPath+"forgotpwd/", function(req, res){
     res.render("forgotpwd.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig});
   });
 });
+app.get(siteconfig.rootPath+"createaccount/:token/", function(req, res){
+  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    ops.verifyToken(req.params.token, "register", function(valid){
+      var tokenValid = valid;
+      res.render("createaccount.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid});
+    });
+  });
+});
 app.get(siteconfig.rootPath+"recoverpwd/:token/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    ops.verifyToken(req.params.token, function(valid){
+    ops.verifyToken(req.params.token, "recovery", function(valid){
       var tokenValid = valid;
       res.render("recoverpwd.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid});
     });
@@ -144,14 +159,26 @@ app.post(siteconfig.rootPath+"changepwd.json", function(req, res){
     }
   });
 });
+app.post(siteconfig.rootPath+"signup.json", function(req, res){
+  var remoteip = ops.getRemoteAddress(req);
+  ops.sendSignupToken(req.body.email, remoteip, function(success){
+    res.json({success: success});
+  });
+});
 app.post(siteconfig.rootPath+"forgotpwd.json", function(req, res){
-  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
-  ops.sendToken(req.body.email, remoteip, req.body.mailSubject, req.body.mailText, function(success){
+  var remoteip = ops.getRemoteAddress(req);
+  ops.sendToken(req.body.email, remoteip, function(success){
+    res.json({success: success});
+  });
+});
+app.post(siteconfig.rootPath+"createaccount.json", function(req, res){
+  var remoteip = ops.getRemoteAddress(req);
+  ops.createAccount(req.body.token, req.body.password, remoteip, function(success){
     res.json({success: success});
   });
 });
 app.post(siteconfig.rootPath+"recoverpwd.json", function(req, res){
-  var remoteip = req.connection.remoteAddress.replace('::ffff:','');
+  var remoteip = ops.getRemoteAddress(req);
   ops.resetPwd(req.body.token, req.body.password, remoteip, function(success){
     res.json({success: success});
   });
@@ -265,6 +292,34 @@ app.post(siteconfig.rootPath+"dicts/dictread.json", function(req, res){
   });
 });
 
+//SKETCHENGINE LOGIN JSON endpoint:
+app.get(siteconfig.rootPath+"skelogin.json/:token", function(req, res){
+  //var token = req.headers.authorization.replace('Bearer ', '');
+  var token = req.params.token;
+  var secret = siteconfig.sketchengineKey;
+  jwt.verify(token, secret, {audience:'lexonomy.eu'}, function(err, decoded) {
+    if (err == null) {
+      console.log(decoded)
+      ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+        ops.processJWT(user, decoded, function(success, email, sessionkey){
+          if (success) {
+            res.cookie("email", email, {});
+            res.cookie("sessionkey", sessionkey, {});
+            res.redirect(siteconfig.baseUrl)
+          } else {
+            res.cookie("jwt_error", email, {});
+            res.redirect(siteconfig.baseUrl)
+          }
+        });
+      });
+    } else {
+      //JWT not verified, error
+      res.cookie("jwt_error",err.message,{})
+      res.redirect(siteconfig.baseUrl)
+    }
+  });
+});
+
 //ONE-CLICK UI and JSON endpoints:
 app.get(siteconfig.rootPath+"oneclick/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
@@ -332,6 +387,7 @@ app.post(siteconfig.rootPath+"push.api", function(req, res){
         var dictID=json.dictID;
         var entryXmls=json.entryXmls;
         var db=ops.getDB(dictID);
+        db.run("BEGIN TRANSACTION");
         db.serialize(function(){
           var doneCount=0;
           for(var i=0; i<entryXmls.length; i++){
@@ -339,6 +395,7 @@ app.post(siteconfig.rootPath+"push.api", function(req, res){
             ops.createEntry(db, dictID, null, xml, email, {apikey: apikey}, function(){
               doneCount++;
               if(doneCount>=entryXmls.length){
+                db.run("COMMIT");
                 db.close(function(){
                   res.json({success: true});
                 });
@@ -488,7 +545,7 @@ app.get(siteconfig.rootPath+":dictID/:doctype/entryeditor/", function(req, res){
         db.close();
         if(configs.xemplate._xsl) configs.xemplate._xsl="dummy";
         configs.xema._root=configs.xema.root; if(configs.xema.elements[req.params.doctype]) configs.xema.root=req.params.doctype;
-        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
+        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, thes: configs.thes, collx: configs.collx, defo: configs.defo, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
       });
     }
   });
@@ -627,8 +684,10 @@ app.get(siteconfig.rootPath+":dictID/resave/", function(req, res){
 app.post(siteconfig.rootPath+":dictID/resave.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID);
+  db.run("BEGIN TRANSACTION");
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
     if(!user.canConfig && !user.canEdit && !user.canUpload) {
+      db.run("COMMIT");
       db.close();
       res.json({todo: 0});
     } else {
@@ -640,9 +699,10 @@ app.post(siteconfig.rootPath+":dictID/resave.json", function(req, res){
             ops.resave(db, req.params.dictID, function(){
               ops.getDictStats(db, req.params.dictID, function(stats){
                 counter++;
-                if(stats.needResave && counter<10) {
+                if(stats.needResave && counter<=127) {
                   go();
                 } else {
+                  db.run("COMMIT");
                   db.close(function(){ res.json({todo: stats.needResave}); });
                 }
               });
@@ -874,47 +934,38 @@ app.get(siteconfig.rootPath+":dictID/import/", function(req, res){
 app.post(siteconfig.rootPath+":dictID/import.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID);
+  db.run("BEGIN TRANSACTION");
   ops.readDictConfigs(db, req.params.dictID, function(configs){
     ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
       if(!user.canUpload) {
+        db.run("COMMIT");
         db.close();
         res.redirect("edit/");
       } else {
         var filename=req.body.filename;
         var uploadStart=req.body.uploadStart;
-        var offset=new Number(req.body.offset);
-        var counter=req.body.counter || 0;
         var historiography={uploadStart: uploadStart, filename: filename};
-
-        go();
-        var localCounter=0;
-        function go(){
-          ops.import(db, req.params.dictID, path.join(siteconfig.dataDir, "uploads/"+filename), offset, user.email, historiography, function(newOffset, success, finished){
-            offset=newOffset;
-            if(success) { localCounter++; counter++; }
-            if(!finished && localCounter<50){
-              go();
-            } else {
-              db.close(function(){
-                var progressMessage="Entries imported: "+counter;
-                var ret={
-                  progressMessage: progressMessage,
-                  finished: finished,
-                  state: {filename: filename, uploadStart: uploadStart, offset: offset, counter: counter},
-                };
-                res.json(ret);
-              });
-            }
+        ops.import(db, req.params.dictID, path.join(siteconfig.dataDir, "uploads/"+filename), user.email, historiography, function(entryCount){
+          //console.log("going to commit and close");
+          db.run("COMMIT");
+          db.close(function(){
+            //console.log("committed and closed");
+            var ret={
+              progressMessage: "Entries imported: "+entryCount,
+              finished: true,
+              state: {filename: filename, uploadStart: uploadStart},
+            };
+            res.json(ret);
           });
-        }
 
+        });
       }
     });
   });
 });
 
 //SKETCH ENGINE PROXY:
-app.get(siteconfig.rootPath+":dictID/skeget/", function(req, res){
+app.get(siteconfig.rootPath+":dictID/skeget/xampl/", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
@@ -929,10 +980,12 @@ app.get(siteconfig.rootPath+":dictID/skeget/", function(req, res){
       url+="&username="+req.query.username;
       url+="&api_key="+req.query.apikey;
       url+="&format=json";
-      url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
+      //url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
+      url+="&q="+encodeURIComponent(makeQ(req.query.lemma));
       url+="&viewmode=sen";
       url+="&gdex_enabled=1";
       url+="&attrs=word";
+      if(req.query.fromp) url+="&"+req.query.fromp;
       https.get(url, function(getres){
         getres.setEncoding('utf8');
         var data="";
@@ -947,6 +1000,128 @@ app.get(siteconfig.rootPath+":dictID/skeget/", function(req, res){
       //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
       //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
       // ]});
+    }
+    function makeQ(str){
+      var ret="";
+      str.split(' ').map(word => {
+        if(word!="") ret+=`[lemma="${word}"|word="${word}"]`;
+      });
+      return "q"+ret;
+    }
+  });
+});
+app.get(siteconfig.rootPath+":dictID/skeget/thes/", function(req, res){
+  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
+  var db=ops.getDB(req.params.dictID, true);
+  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
+    if(!user.canEdit) {
+      db.close();
+      res.json({success: false});
+    } else {
+      db.close();
+      var url=req.query.url;
+      url+="/thes";
+      url+="?corpname="+req.query.corpus;
+      url+="&username="+req.query.username;
+      url+="&api_key="+req.query.apikey;
+      url+="&format=json";
+      url+="&lemma="+encodeURIComponent(req.query.lemma);
+      if(req.query.fromp) url+="&"+req.query.fromp;
+      https.get(url, function(getres){
+        getres.setEncoding('utf8');
+        var data="";
+        getres.on("data", function(chunk) {data+=chunk});
+        getres.on("end", function(){
+          try { var json=JSON.parse(data); } catch (e) { json={}; }
+          res.json(json);
+        });
+      });
+      // res.json({Lines: [
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      // ]});
+    }
+  });
+});
+app.get(siteconfig.rootPath+":dictID/skeget/collx/", function(req, res){
+  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
+  var db=ops.getDB(req.params.dictID, true);
+  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
+    if(!user.canEdit) {
+      db.close();
+      res.json({success: false});
+    } else {
+      db.close();
+      var url=req.query.url;
+      url+="/wsketch";
+      url+="?corpname="+req.query.corpus;
+      url+="&username="+req.query.username;
+      url+="&api_key="+req.query.apikey;
+      url+="&format=json";
+      url+="&lemma="+encodeURIComponent(req.query.lemma);
+      url+="&structured=0";
+      if(req.query.fromp) url+="&"+req.query.fromp;
+      https.get(url, function(getres){
+        getres.setEncoding('utf8');
+        var data="";
+        getres.on("data", function(chunk) {data+=chunk});
+        getres.on("end", function(){
+          try { var json=JSON.parse(data); } catch (e) { json={}; }
+          res.json(json);
+        });
+      });
+      // res.json({Lines: [
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      // ]});
+    }
+  });
+});
+app.get(siteconfig.rootPath+":dictID/skeget/defo/", function(req, res){
+  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
+  var db=ops.getDB(req.params.dictID, true);
+  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
+    if(!user.canEdit) {
+      db.close();
+      res.json({success: false});
+    } else {
+      db.close();
+      var url=req.query.url;
+      url+="/view";
+      url+="?corpname="+req.query.corpus;
+      url+="&username="+req.query.username;
+      url+="&api_key="+req.query.apikey;
+      url+="&format=json";
+      //url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
+      url+="&iquery="+makeQ(req.query.lemma);
+      url+="&viewmode=sen";
+      //url+="&gdex_enabled=1";
+      //url+="&attrs=word";
+      if(req.query.fromp) url+="&"+req.query.fromp;
+      https.get(url, function(getres){
+        getres.setEncoding('utf8');
+        var data="";
+        getres.on("data", function(chunk) {data+=chunk});
+        getres.on("end", function(){
+          try { var json=JSON.parse(data); } catch (e) { json={}; }
+          res.json(json);
+        });
+      });
+      // res.json({Lines: [
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      // ]});
+    }
+    function makeQ(str){
+      var ret="";
+      str.split(' ').map(word => {
+        if(word!="") ret+=`[lc="${word}"+|+lemma_lc="${word}"]`;
+      });
+      ret=`${str.replace(/ /g, "+")};q=aword,`+ret+`;q=p+0+0>0+1+[ws(".*",+"definitions",+".*")];exceptmethod=PREV-CONC`;
+      return ret;
     }
   });
 });

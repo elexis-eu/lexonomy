@@ -1,4 +1,5 @@
 .xonomy .lexonomySubentryCaption {white-space: nowrap; background-color: #eeeeee; color: #666666; border: 1px outset #cccccc; padding: 3px 10px; border-radius: 5px; cursor: pointer; text-shadow: 1px 1px 0px #ffffff; position: relative; top: -2px;}
+.xonomy.laic .lexonomySubentryCaption {top: 0px; margin-left: 10px;}
 .xonomy .readonly .lexonomySubentryCaption {cursor: pointer !important;}
 .xonomy .lexonomySubentryCaption:hover {color: #004f9b;}
 

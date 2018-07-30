@@ -49,5 +49,16 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 #listbox .entry.current {background-color: rgb(153, 212, 255); text-shadow: 1px 1px 0px #dddddd;}
 #listbox .entry span.searchtext { background-color: #ffecb3; text-shadow: 0px 0px 0px transparent; border: 1px solid #ffffff; margin: 0px -1px; }
 
+#listbox .entry a.entryMenuLink {float: right; color: #999999; font-weight: bold;}
+#listbox .entry a.entryMenuLink:hover {color: #002c6f;}
+
+#listbox .entry div.menu {border: 1px solid rgb(38, 122, 181); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; right: 10px; margin-top: 5px; z-index: 1; white-space: nowrap;}
+#listbox .entry div.menu a {display: block; padding: 10px 20px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
+#listbox .entry div.menu a span.keyCaption {float: right; margin-left: 2em; margin-right: -0.5em; color: #999999; font-size: 80%; padding-top: 1px;}
+#listbox .entry div.menu a:first-child {border-top-left-radius: 4px; border-top-right-radius: 4px; border-top: 0px;}
+#listbox .entry div.menu a:last-child {border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;}
+#listbox .entry div.menu a:hover {background-color: #f7f9ea; }
+
+
 #listbox #divMore { text-align: center; padding: 30px 0px; }
 #listbox #divMore button#butMore {background-image: url(resultset_down.png);}

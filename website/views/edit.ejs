@@ -32,6 +32,7 @@
 			var $xml=$($.parseXML(entry.content));
 			var text=entry.title;
 			if(searchtext!=""){
+				searchtext=searchtext.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
 				$text=$("<span>"+text+"</span>");
 				$text.find("span.headword, span.redirector").each(function(){
 					var $this=$(this);
@@ -51,6 +52,7 @@
 			}
 			$(div).html(text);
 		};
+		Screenful.Navigator.entryDeleteUrl="../../../<%=dictID%>/entrydelete.json";
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-aftersave.css" />
 		<script type="text/javascript" src="../../../libs/screenful/screenful-aftersave.js"></script>

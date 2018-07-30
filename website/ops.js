@@ -10,13 +10,29 @@ module.exports={
   siteconfig: {}, //populated by lexonomy.js on startup
   mailtransporter: null,
   getDB: function(dictID, readonly){
-    var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE)
+    var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE);
     var db=new sqlite3.Database(
       path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"),
       mode,
-      function(){db.run('PRAGMA foreign_keys=on')}
+      function(err){
+        if(err) db={err: err}; else db.run('PRAGMA foreign_keys=on');
+      }
      );
     return db;
+  },
+  //get request remote IP, if under proxy get real IP
+  getRemoteAddress: function(request) {
+    var remoteIp = request.connection.remoteAddress.replace('::ffff:','');
+    if (request.headers['x-forwarded-for'] != undefined) {
+      remoteIp = request.headers['x-forwarded-for'];
+    }
+    if (request.headers['x-real-ip'] != undefined) {
+      remoteIp = request.headers['x-real-ip'];
+    }
+    if (request.headers['x-real-ip'] != undefined) {
+      remoteIp = request.headers['x-real-ip'];
+    }
+    return remoteIp;
   },
 
   dictExists: function(dictID){
@@ -102,20 +118,23 @@ module.exports={
     });
   },
   readDictConfigs: function(db, dictID, callnext){
-    fs.readFile("siteconfig.json", "utf8", function(err, content){
-      var configs={};
-      configs.siteconfig=JSON.parse(content);
-      db.all("select * from configs", {}, function(err, rows){
-        for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
-        var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "xema", "xemplate", "editing", "subbing"];
-        ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
-        callnext(configs);
+    if(db.dictConfigs) callnext(db.dictConfigs); else {
+      fs.readFile("siteconfig.json", "utf8", function(err, content){
+        var configs={};
+        configs.siteconfig=JSON.parse(content);
+        db.all("select * from configs", {}, function(err, rows){
+          if(!err) for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
+          var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"];
+          ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
+          db.dictConfigs=configs;
+          callnext(configs);
+        });
       });
-    });
+    }
   },
   readDictConfig: function(db, dictID, configID, callnext){
     db.get("select * from configs where id=$id", {$id: configID}, function(err, row){
-      if(!row) config=module.exports.defaultDictConfig(configID); else var config=JSON.parse(row.json);
+      if(err || !row) config=module.exports.defaultDictConfig(configID); else var config=JSON.parse(row.json);
       callnext(config);
     });
   },
@@ -228,20 +247,28 @@ module.exports={
     });
   },
   createEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
-    module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
-      xml=setHousekeepingAttributes(entryID, xml, subbing);
+    module.exports.readDictConfigs(db, dictID, function(configs){
+      var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+      xml=setHousekeepingAttributes(entryID, xml, configs.subbing);
       xml=module.exports.removeSubentryParentTags(xml);
-      var params={$xml: xml, $title: "_", $sortkey: "", $doctype: getDoctype(xml)};
-      var sql="insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values($xml, $title, $sortkey, 1, 1, $doctype)";
+      var params={
+        $xml: xml,
+        $title: module.exports.getEntryTitle(xml, configs.titling),
+        $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+        $doctype: getDoctype(xml),
+        $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
+        $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
+      };
+      var sql="insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values($xml, $title, $sortkey, $needs_refac, $needs_resave, $doctype)";
       if(entryID) {
-        sql="insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values($id, $xml, $title, $sortkey, 1, 1, $doctype)";
+        sql="insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values($id, $xml, $title, $sortkey, $needs_refac, $needs_resave, $doctype)";
         params.$id=entryID;
       }
       db.run(sql, params, function(err){
         if(!entryID) entryID=this.lastID;
         db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
           $entry_id: entryID,
-          $txt: "_",
+          $txt: module.exports.getEntryTitle(xml, configs.titling, true),
           $level: 1,
         });
         db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
@@ -260,8 +287,9 @@ module.exports={
   },
   updateEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
     db.get("select id, xml from entries where id=$id", {$id: entryID}, function(err, row){
-      module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
-        xml=setHousekeepingAttributes(entryID, xml, subbing);
+      module.exports.readDictConfigs(db, dictID, function(configs){
+        var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+        xml=setHousekeepingAttributes(entryID, xml, configs.subbing);
         xml=module.exports.removeSubentryParentTags(xml);
         var newXml=xml.replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
         var oldXml=(row?row.xml:"").replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
@@ -273,7 +301,18 @@ module.exports={
           //tell my parents that they need a refresh:
           db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
             //update me:
-            db.run("update entries set doctype=$doctype, xml=$xml, needs_refac=1, needs_resave=1 where id=$id", { $id: entryID, $xml: xml, $doctype: getDoctype(xml)}, function(err){
+            db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
+              $id: entryID,
+              $title: module.exports.getEntryTitle(xml, configs.titling),
+              $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+              $xml: xml, $doctype: getDoctype(xml),
+              $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
+              $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
+            }, function(err){
+              db.run("update searchables set txt=$txt where entry_id=$entry_id and level=1", {
+                $entry_id: entryID,
+                $txt: module.exports.getEntryTitle(xml, configs.titling, true)
+              }, function(err){});
               //tell history that I have been updated:
               db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
                 $entry_id: entryID,
@@ -487,15 +526,23 @@ module.exports={
             }, function(err){ if(err) console.log(err); });
 
             db.run("delete from searchables where entry_id=$entry_id", {$entry_id: entryID}, function(err){ if(err) console.log(err);
-              var searchables=module.exports.getEntrySearchables(doc, configs.searchability, configs.titling);
-              var headword=module.exports.getEntryHeadword(doc, configs.titling);
-              for(var y=0; y<searchables.length; y++){
-                db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
-                  $entry_id: entryID,
-                  $txt: searchables[y],
-                  $level: (searchables[y]==headword ? 1 : 2),
-                });
-              }
+              db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
+                $entry_id: entryID,
+                $txt: module.exports.getEntryTitle(doc, configs.titling, true),
+                $level: 1,
+              }, function(){
+                var searchables=module.exports.getEntrySearchables(doc, configs.searchability, configs.titling);
+                var headword=module.exports.getEntryHeadword(doc, configs.titling);
+                for(var y=0; y<searchables.length; y++){
+                  if(searchables[y]!=headword){
+                    db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
+                      $entry_id: entryID,
+                      $txt: searchables[y],
+                      $level: 2,
+                    });
+                  }
+                }
+              });
              });
           })(entryID, doc);
 
@@ -567,37 +614,28 @@ module.exports={
   },
 
   getEntryTitle: function(xml, titling, plaintext){
-    if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
-    if(plaintext) var ret=module.exports.getEntryHeadword(doc, titling); else var ret="<span class='headword'>"+module.exports.getEntryHeadword(doc, titling)+"</span>";
+    if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
+    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
+    if(plaintext) var ret=module.exports.getEntryHeadword(xml, titling); else var ret="<span class='headword'>"+module.exports.getEntryHeadword(xml, titling)+"</span>";
     if(titling.headwordAnnotations) for(var i=0; i<titling.headwordAnnotations.length; i++){
-      var els=doc.getElementsByTagName(titling.headwordAnnotations[i]);
-      for(var y=0; y<els.length; y++){
-        var txt=els[y].textContent;
-        if(txt!="") {
-          if(ret!="") ret+=" ";
-          ret+=txt;
-        }
-      }
+      if(ret!="") ret+=" ";
+      ret+=extractText(xml, titling.headwordAnnotations[i]).join(" ");
     }
+    //console.log(ret);
     return ret;
   },
   getEntryHeadword: function(xml, titling){
-    if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
+    if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
+    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret="";
-    var els=doc.getElementsByTagName(titling.headword);
-    for(var y=0; y<els.length; y++){
-      var txt=els[y].textContent;
-      if(txt!="") {if(ret!="") ret+=" "; ret+=txt;}
-    }
+    var arr=extractText(xml, titling.headword);
+    if(arr.length>0) ret=arr[0];
     if(ret==""){
-      var els=doc.getElementsByTagName("*");
-      for(var y=0; y<els.length; y++){
-        var hasTextNode=false; for(var i=0; i<els[y].childNodes.length; i++) if(els[y].childNodes[i].nodeType==3) hasTextNode=true;
-        if(hasTextNode) { ret=els[y].textContent; break; }
-      }
+      ret=extractFirstText(xml);
     }
     if(ret=="") ret="?";
     if(ret.length>255) ret=ret.substring(0, 255); //keeping headwords under 255 characters is probably a reeasonable limitation
+    //console.log(ret);
     return ret;
   },
   toSortkey: function(s, abc){
@@ -628,16 +666,15 @@ module.exports={
     return ret;
   },
   getEntrySearchables: function(xml, searchability, titling){
-    if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
+    if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
+    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret=[];
-    ret.push(module.exports.getEntryHeadword(doc, titling));
+    ret.push(module.exports.getEntryHeadword(xml, titling));
     if(searchability.searchableElements) for(var i=0; i<searchability.searchableElements.length; i++){
-      var els=doc.getElementsByTagName(searchability.searchableElements[i]);
-      for(var y=0; y<els.length; y++){
-        var txt=els[y].textContent;
-        if(txt!="" && ret.indexOf(txt)==-1) ret.push(txt);
-      }
+      var arr=extractText(xml, searchability.searchableElements[i]);
+      arr.map(txt => { if(txt!="" && ret.indexOf(txt)==-1) ret.push(txt); });
     }
+    //console.log(ret);
     return ret;
   },
 
@@ -795,79 +832,53 @@ module.exports={
       });
     });
   },
-  import: function(db, dictID, filepath, offset, email, historiography, callnext){
-    var regexOpeningTag=new RegExp("\<[^\!\?\>\<][^\>\<]*\>");
-    var readStream=fs.createReadStream(filepath).setEncoding("utf8");
-    var tempFilePath=filepath+"_temp";
-    fs.writeFileSync(tempFilePath, "");
-    var extract="";
-    var lengthRead=0;
-    var parseError=false;
-    var domparser=new xmldom.DOMParser({ errorHandler: {warning: function(){parseError=true;}, error: function(){parseError=true;}, fatalError: function(){parseError=true;} }});
-    var serializer=new xmldom.XMLSerializer();
-    var tagName="";
-    readStream.read(offset);
-    readStream.on("data", function(chunk){
-      //console.log(`incoming data: ${lengthRead} + ${chunk.length} = ${lengthRead+chunk.length}`);
-      for(var pos=0; pos<chunk.length; pos++){
-        lengthRead++;
-        if(lengthRead>=offset) {
-          extract+=chunk[pos]; if(extract.length>255) extract=extract.substring(extract.length-255);
-          if(offset==0){
-            if(regexOpeningTag.test(extract)){ offset=lengthRead+1; extract=""; }
-          } else {
-            if(tagName==""){
-              var found=extract.match(/^\s*\<\s*([^\<\>\s\/]+)[\/\>\s]/);
-              if(found) tagName=found[1];
-            }
-            fs.appendFileSync(tempFilePath, chunk[pos]);
-            if(extract.endsWith("</"+tagName+">") || extract.endsWith("<"+tagName+"/>")) {
-              var xml=fs.readFileSync(tempFilePath, "utf8").trim().replace(/\>[\r\n]+\s*\</g, "><");
-              parseError=false;
-              var doc=domparser.parseFromString(xml, 'text/xml');
-              if(!parseError && doc.getElementsByTagName("*")[0]) {
-                var success=true;
-                var finished=false;
-                offset=lengthRead+1;
-                readStream.destroy();
 
-                var root=doc.getElementsByTagName("*")[0];
-                var entryID=parseInt(root.getAttributeNS("http://www.lexonomy.eu/", "entryID"));
-                if(!entryID) entryID=parseInt(root.getAttributeNS("http://www.lexonomy.eu/", "subentryID"));
-                root.removeAttributeNS("http://www.lexonomy.eu/", "entryID");
-                root.removeAttributeNS("http://www.lexonomy.eu/", "subentryID");
-                xml=serializer.serializeToString(doc);
-                doc=null;
-                //console.log(xml.substring(0, 10)+"..."+xml.substring(xml.length-10));
-                if(entryID) {
-                  //console.log("about to update entry");
-                  module.exports.updateEntry(db, dictID, entryID, xml, email, historiography, function(entryID, adjustedXml, changed){
-                    //console.log("entry updated");
-                    callnext(offset, success, finished);
-                  });
-                } else {
-                  //console.log("about to create entry");
-                  module.exports.createEntry(db, dictID, null, xml, email, historiography, function(){
-                    //console.log("entry created");
-                    callnext(offset, success, finished);
-                  });
-                }
-                break;
-              }
+  import: function(db, dictID, filepath, email, historiography, callnext){
+    var tagName="";
+    var tagNameLevel=0;
+    var readStream=fs.createReadStream(filepath).setEncoding("utf8");
+    var buffer="";
+    var entryCount=0;
+    var regexOpeningTag=null;
+    readStream.on("data", function(chunk){
+      for(var pos=0; pos<chunk.length; pos++){
+        buffer+=chunk[pos];
+        if(tagName=="" || tagNameLevel<2){
+          var found=buffer.match(/^\s*\<\s*([^\<\>\s\/]+)[\/\>\s]/);
+          if(found) {
+            tagNameLevel++;
+            tagName=found[1];
+            if(tagNameLevel<2) {
+              buffer="";
+            } else {
+              regexOpeningTag=new RegExp("\<"+tagName+"[^\>\<]*\>$");
+            }
+          }
+        } else {
+          var found=buffer.match(regexOpeningTag);
+          if(found){
+            buffer=found[0];
+          }
+          if(buffer.endsWith("</"+tagName+">")){
+            entryCount++;
+            buffer=buffer.replace(/\>[\r\n]+\s*\</g, "><").trim();
+            var found=buffer.match(/^\<[^\>]*\s+lxnm:(sub)?entryID=['"]([0-9]+)["']/);
+            var entryID=null; if(found) {
+              entryID=parseInt(found[2]);
+              //console.log("going to update");
+              module.exports.updateEntry(db, dictID, entryID, buffer, email, historiography, function(newentryID, xml){ /*console.log("UPDATED "+newentryID);*/ });
+            } else {
+              //console.log("going to create");
+              module.exports.createEntry(db, dictID, entryID, buffer, email, historiography, function(newentryID, xml){ /*console.log("CREATED "+newentryID);*/ });
             }
           }
         }
       }
-      //console.log("incoming data done");
     });
     readStream.on("end", function(){
       readStream.destroy();
       fs.remove(filepath, function(){
-        fs.remove(tempFilePath, function(){
-          var success=false;
-          var finished=true;
-          callnext(offset, success, finished);
-        });
+        callnext(entryCount);
       });
     });
   },
@@ -902,7 +913,32 @@ module.exports={
       callnext(true);
     });
   },
-  sendToken: function(email, remoteip, mailSubject, mailText, callnext){
+  sendSignupToken: function(email, remoteip, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select email from users where email=$email", {$email: email}, function(err, row){
+      if (row==undefined) {
+        var expireDate = (new Date()); expireDate.setHours(expireDate.getHours()+48);
+        expireDate = expireDate.toISOString();
+        var token = sha1(sha1(Math.random()));
+        var tokenurl = module.exports.siteconfig.baseUrl + 'createaccount/' + token;
+        var mailSubject="Lexonomy signup";
+        var mailText = `Dear Lexonomy user,\n\n`;
+        mailText+=`Somebody (hopefully you, from the address ${remoteip}) requested to create a new Lexonomy account. Please follow the link below to create your account:\n\n`
+        mailText+=`${tokenurl}\n\n`;
+        mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request an account, you can safely ignore this message. \n\n`;
+        mailText+=`Yours,\nThe Lexonomy team`;
+        db.run("insert into register_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email, $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
+          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.mailconfig.from, to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          db.close();
+          callnext(true);
+        });
+      } else {
+        db.close();
+        callnext(false);
+      }
+    });
+  },
+  sendToken: function(email, remoteip, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", {$email: email}, function(err, row){
       if (row) {
@@ -910,25 +946,49 @@ module.exports={
         expireDate = expireDate.toISOString();
         var token = sha1(sha1(Math.random()));
         var tokenurl = module.exports.siteconfig.baseUrl + 'recoverpwd/' + token;
-        mailText = mailText
-          .replace('<%=remoteip%>',remoteip)
-          .replace('<%=email%>',email)
-          .replace('<%=expiredate%>',expireDate)
-          .replace('<%=tokenurl%>', tokenurl);
+        var mailSubject="Lexonomy password reset";
+        var mailText = `Dear Lexonomy user,\n\n`;
+        mailText+=`Somebody (hopefully you, from the address ${remoteip}) requested a new password for the Lexonomy account ${email}. You can reset your password by clicking the link below:\n\n`
+        mailText+=`${tokenurl}\n\n`;
+        mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request a password reset, you can safely ignore this message. No changes have been made to your account.\n\n`;
+        mailText+=`Yours,\nThe Lexonomy team`;
         db.run("insert into recovery_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email, $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
-          module.exports.mailtransporter.sendMail({from: 'xrambous@fi.muni.cz', to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.mailconfig.from, to: email, subject: mailSubject, text: mailText}, (err, info) => {});
           db.close();
+          callnext(true);
         });
+      } else {
+        db.close();
+        callnext(false);
       }
     });
-    callnext(true);
   },
-  verifyToken: function(token, callnext){
+  verifyToken: function(token, type, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select * from recovery_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
+    db.get("select * from "+type+"_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
       db.close();
-      if (!row) callnext(false);
-      else callnext(true);
+      if(!row) callnext(false); else callnext(true);
+    });
+  },
+  createAccount: function(token, password, remoteip, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select * from register_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
+      if (row) {
+        var email = row.email;
+        db.get("select * from users where email=$email", {$email: email}, function(err, row){
+          if (row==undefined) {
+            var hash = sha1(password);
+            db.run("insert into users (email,passwordHash) values ($email,$hash)", {$hash: hash, $email: email}, function(err, row){
+              db.run("update register_tokens set usedDate=datetime('now'), usedAddress=$remoteip where token=$token", {$remoteip: remoteip, $token: token}, function(err, row){
+                db.close();
+                callnext(true);
+              });
+            });
+          } else {
+            callnext(false);
+          }
+        });
+      }
     });
   },
   resetPwd: function(token, password, remoteip, callnext){
@@ -946,20 +1006,63 @@ module.exports={
       }
     });
   },
+  processJWT: function(user, jwtData, callnext){
+    var db = new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    if (user.loggedin) {
+      //user logged in = save SkE ID in database
+      var key = generateKey();
+      var now = (new Date()).toISOString();
+      db.run("update users set ske_id=$ske_id, ske_username=$ske_username, sessionKey=$key, sessionLast=$now where email=$email", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email:user.email, $key:key, $now:now}, function(err, row){
+        db.close();
+        callnext(true, user.email, key);
+      });
+    } else {
+      //user not logged in =
+      // if SkE ID in database = log in user
+      // if SkE ID not in database = register and log in user
+      db.get("select email from users where ske_id=$ske_id", {$ske_id: jwtData.user.id}, function(err, row){
+        if (!row) {
+          var email = jwtData.user.username + '@sketchengine.co.uk';
+          db.get("select * from users where email=$email", {$email: email}, function(err, row){
+            if (row == undefined) {
+              var key = generateKey();
+              var now = (new Date()).toISOString();
+              db.run("insert into users (email, passwordHash, ske_id, ske_username, sessionKey, sessionLast) values ($email, null, $ske_id, $ske_username, $key, $now)", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email: email, $key:key, $now:now}, function(err, row){
+                db.close();
+                callnext(true, email, key);
+              });
+            } else {
+              db.close();
+              callnext(false, "user already exists "+email, "");
+            }
+          });
+        } else {
+          var email = row.email;
+          var key = generateKey();
+          var now = (new Date()).toISOString();
+          db.run("update users set sessionKey=$key, sessionLast=$now where ske_id=$ske_id", {$key: key, $now: now, $ske_id: jwtData.user.id}, function(err, row){
+            db.close();
+            callnext(true, email, key);
+          });
+        }
+      });
+    }
+  },
   verifyLogin: function(email, sessionkey, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select email from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
+    db.get("select email, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
       if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
         email=row.email;
+        var ske_username = row.ske_username;
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
           module.exports.readSiteConfig(function(siteconfig){
-            callnext({loggedin: true, email: email, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
+            callnext({loggedin: true, email: email, ske_username: ske_username, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
           });
         });
       }
@@ -1002,12 +1105,28 @@ module.exports={
   getDictsByUser: function(email, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     var sql="select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email=$email order by d.title"
+    var dicts=[];
     db.all(sql, {$email: email}, function(err, rows){
-      var dicts=[];
       if(rows) for(var i=0; i<rows.length; i++) dicts.push({id: rows[i].id, title: rows[i].title});
       db.close();
-      callnext(dicts);
+      lookup();
     });
+    function lookup(){
+      for(var i = 0; i < dicts.length; i++) {
+        if(dicts[i].currentUserCanDelete===undefined && module.exports.dictExists(dicts[i].id)){
+          var dictDB=module.exports.getDB(dicts[i].id, true);
+          module.exports.readDictConfig(dictDB, dicts[i].id, "users", function(users){
+            dictDB.close();
+            dicts[i].currentUserCanDelete=(users[email] && users[email].canConfig) ? true : false;
+            lookup();
+          });
+          break;
+        }
+      }
+      if(i>=dicts.length){
+        callnext(dicts);
+      }
+    }
   },
   verifyUserApiKey: function(email, apikey, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
@@ -1180,7 +1299,7 @@ module.exports={
         var history=[];
         for(var i=0; i<rows.length; i++) {
           var row=rows[i];
-          row.xml=setHousekeepingAttributes(row.entry_id, row.xml, subbing);
+          if(row.xml) row.xml=setHousekeepingAttributes(row.entry_id, row.xml, subbing);
           history.push({
             "entry_id": row.entry_id,
             "revision_id": row.id,
@@ -1245,4 +1364,25 @@ function getDoctype(xml){
   return ret;
 }
 
-const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd"];
+function extractText(xml, elName){ //extract the text contents from thusly named elements, return as array of strings
+  var ret=[];
+  var pat=new RegExp("\\<"+elName+"[^\>]*\>(.*?)\\</"+elName+"\\>", "g");
+  xml.replace(pat, function(found, $1){
+    var s=$1.replace(/\<[^\>]*\>/g, "").trim();
+    if(s!="") ret.push(s);
+  });
+  return ret;
+}
+function extractFirstText(xml){ //extract the text content from the first element that has text content and no child nodes
+  var ret="";
+  var pat=new RegExp("\\<([^\\s\\>]+)[^\>]*\>([^\\<\\>]*?)\\</([^\\s\\>]+)\\>", "g");
+  xml.replace(pat, function(found, $1, $2, $3){
+    if(ret=="" && $1==$3) {
+      var s=$2.trim();
+      if(s!="") ret=s;
+    }
+  });
+  return ret;
+}
+
+const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd","createaccount"];

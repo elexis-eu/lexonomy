@@ -18,23 +18,23 @@
 		<script type="text/javascript" src="../../../furniture/screenful-user-config.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-editor.css" />
 		<script type="text/javascript" src="../../../libs/screenful/screenful-editor.js"></script>
-		<script type="text/javascript" src="../../../widgets/xampl.js"></script>
+		<script type="text/javascript" src="../../../widgets/defo.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../widgets/pillarform.css" />
 		<script type="text/javascript" src="../../../widgets/xematron.js"></script>
 		<script type="text/javascript" src="../../../libs/xonomy/xonomy.js"></script>
 		<script type="text/javascript">
 		var xema=<%-JSON.stringify(xema)%>;
 		Screenful.Editor.singleton=true;
-		Screenful.Editor.entryID="xampl";
+		Screenful.Editor.entryID="defo";
 		Screenful.Editor.leaveUrl="../../../<%=dictID%>/config/";
 		Screenful.Editor.readUrl="../../../<%=dictID%>/configread.json";
 		Screenful.Editor.updateUrl="../../../<%=dictID%>/configupdate.json";
 		Screenful.Editor.editor=function(div, entry){
-			Xampl.change=Screenful.Editor.changed;
-			Xampl.render(div, entry.content);
+			Defo.change=Screenful.Editor.changed;
+			Defo.render(div, entry.content);
 		};
 		Screenful.Editor.harvester=function(div){
-			return JSON.stringify(Xampl.harvest(div));
+			return JSON.stringify(Defo.harvest(div));
 		};
 		Screenful.Editor.allowSourceCode=true;
 		Screenful.Editor.formatSourceCode=function(str){
@@ -50,6 +50,6 @@
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
 	</head>
 	<body>
-		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "config", configTitle: "Examples", configUrl: "xampl", rootPath: "../../../"})%>
+		<%-include("header.ejs", {user: user, dictID: dictID, dictTitle: dictTitle, current: "config", configTitle: "Definitions", configUrl: "defo", rootPath: "../../../"})%>
 	</body>
 </html>

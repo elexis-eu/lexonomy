@@ -63,6 +63,7 @@
 							$("form#login").on("submit", function(e){
 					      var email=$("form#login div.field.email input").val();
 					      var password=$("form#login div.field.password input").val();
+								console.log(email, password);
 					      if(email!="" && password!="") {
 									$.ajax({url: "login.json", dataType: "json", method: "POST", data: {email: email, password: password}}).done(function(data){
 							      if(data.success) window.location.reload();
@@ -73,25 +74,49 @@
 					    });
 						});
 						</script>
+						<div class="orline"><span>Other ways to log in</span></div>
+            <%if(error){%><div class="error">Sketch Engine login error: <%=error%></div><%}%>
+            <%if(siteconfig.sketchengineLoginPage){%>
+            <div class="skelogin">
+              <a href="<%=siteconfig.sketchengineLoginPage%>">Sign up or log in with <img alt="Sketch Engine" title="Sketch Engine" src="furniture/logo_ske.png"/> »</a>
+            </div>
+            <%}%>
 					<%}else{%>
 						<div class="usertop">
 							<div class="title"><%=user.email%></div>
 							<div class="subtitle"><a href="logout/">Log out</a> | <a href="changepwd/">Change your password</a></div>
 						</div>
 						<div class="yourdicts">Your dictionaries</div>
-						<%if(dicts.length==0){%>
-							<div class="nodicts">You have no dictionaries yet.</div>
-						<%}else{%>
-							<%for(var i=0; i<dicts.length; i++){%>
-								<div class="dict">
-									<a class="dictTitle" href="<%-dicts[i].id%>/"><%=dicts[i].title%></a>
-									<!--<a class="dictAction" href="<%-dicts[i].id%>/">Delete</a>-->
-								</div>
-							<%}%>
+						<%for(var i=0; i<dicts.length; i++){%>
+							<div class="dict" id="dict_<%-dicts[i].id%>">
+								<a class="dictTitle" href="<%-dicts[i].id%>/"><%=dicts[i].title%></a>
+								<%if(dicts[i].currentUserCanDelete){%><a class="dictAction" href="javascript:void(null)" onclick="destroyDict('<%-dicts[i].id%>')">Delete</a><%}%>
+							</div>
 						<%}%>
+						<script type="text/javascript">
+						function destroyDict(dictID){
+							if(confirm("Careful now! You will not be able to undo this.")){
+								$.ajax({url: "./"+dictID+"/destroy.json", dataType: "json", method: "POST", data: {}}).done(function(data){
+									if(data.success) {
+										$("#dict_"+dictID).slideUp("fast", function(){ $("#dict_"+dictID).remove() });
+									};
+								});
+							}
+						}
+						</script>
 						<div class="createdict"><a href="make/">Create a dictionary</a></div>
 						<div class="yourdicts">One-Click Dictionary settings</div>
 						<div class="adminlink"><a href="oneclick/">API key</a></div>
+            <%if(siteconfig.sketchengineLoginPage){%>
+  						<div class="yourdicts">Sketch Engine login</div>
+	  					<div class="adminlink">
+              <%if(user.ske_username){%>
+                Your Lexonomy account is linked to your Sketch Engine account <b><%=user.ske_username%></b>. <a href="<%=siteconfig.sketchengineLoginPage%>">Link to a different Sketch Engine account&nbsp;»</a>
+              <%} else {%>
+                <a href="<%=siteconfig.sketchengineLoginPage%>">Link your Lexonomy account to your Sketch Engine account&nbsp;»</a>
+              <%}%>
+              </div>
+						<%}%>
 						<%if(user.isAdmin){%>
 							<div class="yourdicts">Administration</div>
 							<div class="adminlink"><a href="users/">Users</a> <a href="dicts/">Dictionaries</a></div>
