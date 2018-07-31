@@ -876,8 +876,9 @@ module.exports={
     readStream.on("data", function(chunk){
       for(var pos=0; pos<chunk.length; pos++){
         buffer+=chunk[pos];
+        if(buffer.match(/^\s*\<\?[^\?\>]*\?\>/)) buffer="";
         if(tagName=="" || tagNameLevel<2){
-          var found=buffer.match(/^\s*\<\s*([^\<\>\s\/]+)[\/\>\s]/);
+          var found=buffer.match(/^\s*\<\s*([^\<\>\s\/]+)[^\>]*\>/);
           if(found) {
             tagNameLevel++;
             tagName=found[1];
