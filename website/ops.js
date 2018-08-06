@@ -1056,7 +1056,7 @@ module.exports={
       // if SkE ID not in database = register and log in user
       db.get("select email from users where ske_id=$ske_id", {$ske_id: jwtData.user.id}, function(err, row){
         if (!row) {
-          var email = jwtData.user.username + '@sketchengine.co.uk';
+          var email = jwtData.user.email;
           db.get("select * from users where email=$email", {$email: email}, function(err, row){
             if (row == undefined) {
               var key = generateKey();
