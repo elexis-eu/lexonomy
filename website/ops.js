@@ -11,13 +11,9 @@ module.exports={
   mailtransporter: null,
   getDB: function(dictID, readonly){
     var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE);
-    var db=new sqlite3.Database(
-      path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"),
-      mode,
-      function(err){
-        if(err) db={err: err}; else db.run('PRAGMA foreign_keys=on');
-      }
-     );
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), mode, function(err){});
+    if(!readonly) db.run('PRAGMA journal_mode=WAL');
+    db.run('PRAGMA foreign_keys=on');
     return db;
   },
   //get request remote IP, if under proxy get real IP
@@ -124,7 +120,7 @@ module.exports={
         configs.siteconfig=JSON.parse(content);
         db.all("select * from configs", {}, function(err, rows){
           if(!err) for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
-          var ids=["ident", "publico", "users", "kex", "titling", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"];
+          var ids=["ident", "publico", "users", "kex", "titling", "flagging", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"];
           ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
           db.dictConfigs=configs;
           callnext(configs);
@@ -143,6 +139,7 @@ module.exports={
     if(id=="searchability") return {searchableElements: []};
     if(id=="xema") return {elements: {}};
     if(id=="titling") return {headwordAnnotations: [], abc: module.exports.siteconfig.defaultAbc};
+    if(id=="flagging") return {flag_element: "", flags: []};
     return {};
   },
   updateDictConfig: function(db, dictID, configID, json, callnext){
@@ -164,7 +161,7 @@ module.exports={
         module.exports.attachDict(db, dictID, function(){
           callnext(json, false);
         });
-      } else if(configID=="titling" || configID=="searchability"){
+      } else if(configID=="titling" || configID=="titling" || configID=="searchability"){
         module.exports.flagForResave(db, dictID, function(resaveNeeded){
           callnext(json, resaveNeeded);
         });
@@ -201,7 +198,7 @@ module.exports={
   },
   readDoctypesUsed: function(db, dictID, callnext){
     db.all("select doctype from entries group by doctype order by count(*) desc", {}, function(err, rows){
-      var doctypes=rows.map(row => row.doctype);
+      var doctypes=(!err && rows) ? rows.map(row => row.doctype) : [];
       callnext(doctypes);
     });
   },
@@ -285,6 +282,40 @@ module.exports={
       });
     });
   },
+  flagEntry: function(db, dictID, entryID, flag, email, historiography, callnext){
+    db.get("select id, xml from entries where id=$id", {$id: entryID}, function(err, row){
+      module.exports.readDictConfigs(db, dictID, function(configs){
+        var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+        var xml=(row?row.xml:"").replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
+        xml=addFlag(entryID, xml, flag, configs.flagging);
+
+        //tell my parents that they need a refresh:
+        db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", {$child_id: entryID}, function(err){
+          //update me:
+          db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
+            $id: entryID,
+            $title: module.exports.getEntryTitle(xml, configs.titling),
+            $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+            $xml: xml, $doctype: getDoctype(xml),
+            $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
+            $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
+          }, function(err){
+            //tell history that I have been updated:
+            db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
+              $entry_id: entryID,
+              $action: "update",
+              $when: (new Date()).toISOString(),
+              $email: email,
+              $xml: xml,
+              $historiography: JSON.stringify(historiography),
+            }, function(err){});
+              callnext(entryID, xml);
+          });
+        });
+      });
+    });
+  },
+
   updateEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
     db.get("select id, xml from entries where id=$id", {$id: entryID}, function(err, row){
       module.exports.readDictConfigs(db, dictID, function(configs){
@@ -553,6 +584,7 @@ module.exports={
   },
 
   listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, callnext){
+    if(!searchtext) searchtext="";
     if(modifier=="start") {
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
@@ -598,6 +630,7 @@ module.exports={
     }
     module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
       db.all(sql1, params1, function(err, rows){
+        if(err || !rows) rows=[];
         var entries=[];
         for(var i=0; i<rows.length; i++){
           rows[i].xml=setHousekeepingAttributes(rows[i].id, rows[i].xml, subbing);
@@ -606,7 +639,7 @@ module.exports={
           entries.push(item);
         }
         db.get(sql2, params2, function(err, row){
-          var total=row.total;
+          var total=(!err && row) ? row.total : 0;
           callnext(total, entries);
         });
       });
@@ -843,8 +876,9 @@ module.exports={
     readStream.on("data", function(chunk){
       for(var pos=0; pos<chunk.length; pos++){
         buffer+=chunk[pos];
+        if(buffer.match(/^\s*\<\?[^\?\>]*\?\>/)) buffer="";
         if(tagName=="" || tagNameLevel<2){
-          var found=buffer.match(/^\s*\<\s*([^\<\>\s\/]+)[\/\>\s]/);
+          var found=buffer.match(/^\s*\<\s*([^\<\>\s\/]+)[^\>]*\>/);
           if(found) {
             tagNameLevel++;
             tagName=found[1];
@@ -1342,6 +1376,21 @@ function generateDictID(){
     id+=alphabet[i]
   }
   return "z"+id;
+}
+
+function addFlag(entryID, xml, flag, flagconfig){
+  var el = flagconfig.flag_element;
+  var re = new RegExp("\<" + el + "[^>]*\>[^\<]+\</" + el + "\>")
+  var flag_exists = false
+  xml = xml.replace(re, function(found, $1) { // try replacing existing flag
+    flag_exists = true
+    return "<" + el + ">" + flag + "</" + el + ">";
+  })
+  if (flag_exists)
+    return xml
+  return xml.replace(/^\<([^\>]+>)/, function(found, $1) { // or add new flag
+    return "<" + $1 + "<" + el + ">" + flag + "</" + el + ">";
+  })
 }
 
 function setHousekeepingAttributes(entryID, xml, subbing){

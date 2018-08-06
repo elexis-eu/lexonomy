@@ -20,6 +20,7 @@
 		<script type="text/javascript" src="../../../libs/screenful/screenful-navigator.js?2018-02-04"></script>
 		<script type="text/javascript" src="../../../libs/js.cookie.js"></script>
 		<script type="text/javascript">
+		Screenful.Navigator.flags=<%-JSON.stringify(flags)%>;
 		Screenful.Navigator.listUrl="../../../<%=dictID%>/<%=doctype%>/entrylist.json";
 		Screenful.Navigator.stepSize=1000;
 		Screenful.Navigator.editorUrl="../../../<%=dictID%>/<%=doctype%>/entryeditor/";
@@ -53,6 +54,7 @@
 			$(div).html(text);
 		};
 		Screenful.Navigator.entryDeleteUrl="../../../<%=dictID%>/entrydelete.json";
+		Screenful.Navigator.entryFlagUrl="../../../<%=dictID%>/entryflag.json";
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-aftersave.css" />
 		<script type="text/javascript" src="../../../libs/screenful/screenful-aftersave.js"></script>

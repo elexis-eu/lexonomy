@@ -527,7 +527,7 @@ app.get(siteconfig.rootPath+":dictID/edit/:doctype/", function(req, res){
           var doctypes=[configs.xema.root];
           for(var doctype in configs.subbing) if(doctypes.indexOf(doctype)==-1) doctypes.push(doctype);
           doctypesUsed.map(doctype => {if(doctypes.indexOf(doctype)==-1) doctypes.push(doctype)});
-          res.render("edit.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, siteconfig: siteconfig, doctypes: doctypes, doctype: req.params.doctype, xonomyMode: configs.editing.xonomyMode});
+          res.render("edit.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, flags: configs.flagging, siteconfig: siteconfig, doctypes: doctypes, doctype: req.params.doctype, xonomyMode: configs.editing.xonomyMode});
         });
       });
     }
@@ -545,7 +545,7 @@ app.get(siteconfig.rootPath+":dictID/:doctype/entryeditor/", function(req, res){
         db.close();
         if(configs.xemplate._xsl) configs.xemplate._xsl="dummy";
         configs.xema._root=configs.xema.root; if(configs.xema.elements[req.params.doctype]) configs.xema.root=req.params.doctype;
-        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, thes: configs.thes, collx: configs.collx, defo: configs.defo, titling: configs.titling, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
+        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, thes: configs.thes, collx: configs.collx, defo: configs.defo, titling: configs.titling, flagging: configs.flagging, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing});
       });
     }
   });
@@ -616,6 +616,23 @@ app.post(siteconfig.rootPath+":dictID/entryread.json", function(req, res){
             }
           }
           res.json({success: (adjustedEntryID>0), id: adjustedEntryID, content: xml, contentHtml: html});
+        });
+      });
+    }
+  });
+});
+app.post(siteconfig.rootPath+":dictID/entryflag.json", function(req, res){
+  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
+  var db=ops.getDB(req.params.dictID);
+  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
+    if(!user.canEdit) {
+      db.close();
+      res.json({success: false});
+    } else {
+      ops.readDictConfigs(db, req.params.dictID, function(configs){
+        ops.flagEntry(db, req.params.dictID, req.body.id, req.body.flag, user.email, {}, function(){
+          db.close();
+          res.json({success: true, id: req.body.id});
         });
       });
     }
@@ -747,7 +764,7 @@ app.get(siteconfig.rootPath+":dictID/config/:page/", function(req, res){
         res.redirect(siteconfig.baseUrl+req.params.dictID+"/edit/");
       } else {
         db.close();
-        res.render("config-"+req.params.page+".ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, xema: configs.xema, titling: configs.titling, siteconfig: configs.siteconfig});
+        res.render("config-"+req.params.page+".ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, xema: configs.xema, titling: configs.titling, flagging: configs.flagging, siteconfig: configs.siteconfig});
       }
     });
   });
@@ -1190,5 +1207,15 @@ app.post(siteconfig.rootPath+":dictID/history.json", function(req, res){
 });
 
 app.use(function(req, res){ res.status(404).render("404.ejs", {siteconfig: siteconfig}); });
+process.on('uncaughtException', (err) => {
+  if(!ops.siteconfig) ops.siteconfig=JSON.parse(fs.readFileSync(path.join(__dirname, "siteconfig.json"), "utf8"));
+  //Log the exception:
+  if(ops.siteconfig.verbose){
+    var str=`Caught exception: ${err}\n`;
+    if(ops.siteconfig.verbose.multiline && ops.siteconfig.verbose.filename) str+="\n";
+    if(ops.siteconfig.verbose.filename) fs.appendFile(ops.siteconfig.verbose.filename, str, function(err){});
+    else console.log(str);
+  }
+});
 app.listen(PORT);
 console.log("Process ID "+process.pid+" is now listening on port number "+PORT+".");
