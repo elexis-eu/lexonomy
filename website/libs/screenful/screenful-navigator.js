@@ -351,10 +351,8 @@ Screenful.Navigator={
       var $entry=$("div.entry[data-id=\""+entryID+"\"]");
       if($entry.length>0){
         $entry.find(".entryFlagLink").css("background-color", flag.color)
-        Screenful.Navigator.focusEntryList();
         //if the entry is currently open in the editor, abandon it and reload it there:
         if(window.frames["editframe"].Screenful && window.frames["editframe"].Screenful.Editor && window.frames["editframe"].Screenful.Editor.entryID==entryID) {
-          //window.frames["editframe"].Screenful.Editor.abandon();
           window.frames["editframe"].Screenful.Editor.needsSaving=false;
           window.frames["editframe"].Screenful.Editor.open(e, entryID);
         }
