@@ -645,6 +645,22 @@ module.exports={
       });
     });
   },
+  listEntriesById: function(db, dictID, entryID, callnext){
+    var sql="select e.id, e.title, e.xml from entries as e where e.id=$entryID";
+    var params={$entryID: entryID};
+    module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
+      db.all(sql, params, function(err, rows){
+        if(err || !rows) rows=[];
+        var entries=[];
+        for(var i=0; i<rows.length; i++){
+          rows[i].xml=setHousekeepingAttributes(rows[i].id, rows[i].xml, subbing);
+          var item={id: rows[i].id, title: rows[i].title, xml: rows[i].xml};
+          entries.push(item);
+        }
+        callnext(entries);
+      });
+    });
+  },
 
   getEntryTitle: function(xml, titling, plaintext){
     if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);

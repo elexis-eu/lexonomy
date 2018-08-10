@@ -20,7 +20,6 @@ Screenful.Aftersave={
 
       if(!data.todo) {
         $("#aftersave").fadeOut();
-        if(Screenful.Navigator) Screenful.Navigator.refresh();
       } else {
         $("#aftersave").show();
         window.setTimeout(Screenful.Aftersave.batch, 0); //1000 ms = 1 second

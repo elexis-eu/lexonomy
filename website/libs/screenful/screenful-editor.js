@@ -299,12 +299,11 @@ Screenful.Editor={
           Screenful.Editor.needsSaving=false;
           if(data.redirUrl) window.location=data.redirUrl;
           if(Screenful.Editor.postCreateRedirUrl) window.location=Screenful.Editor.postCreateRedirUrl;
+          if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
           if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Aftersave){
             window.parent.Screenful.Aftersave.batch();
           } else if(Screenful.Aftersave){
             Screenful.Aftersave.batch();
-          } else {
-            if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
           }
         }
     	});
@@ -335,12 +334,11 @@ Screenful.Editor={
           Screenful.Editor.updateToolbar();
           if(data.redirUrl) window.location=data.redirUrl;
           if(Screenful.Editor.postUpdateRedirUrl) window.location=Screenful.Editor.postUpdateRedirUrl;
+          if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh(id, "update");
           if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Aftersave){
             window.parent.Screenful.Aftersave.batch();
           } else if(Screenful.Aftersave){
             Screenful.Aftersave.batch();
-          } else {
-            if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
           }
         }
     	});
@@ -363,12 +361,11 @@ Screenful.Editor={
           Screenful.status(Screenful.Loc.ready);
           Screenful.Editor.updateToolbar();
           if(Screenful.Editor.postDeleteRedirUrl) window.location=Screenful.Editor.postDeleteRedirUrl;
+          if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh(id, "delete");
           if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Aftersave){
             window.parent.Screenful.Aftersave.batch();
           } else if(Screenful.Aftersave){
             Screenful.Aftersave.batch();
-          } else {
-            if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.refresh();
           }
         }
     	});

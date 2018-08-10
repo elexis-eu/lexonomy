@@ -560,10 +560,17 @@ app.post(siteconfig.rootPath+":dictID/:doctype/entrylist.json", function(req, re
       db.close();
       res.json({success: false});
     } else {
-      ops.listEntries(db, req.params.dictID, req.params.doctype, req.body.searchtext, req.body.modifier, req.body.howmany, function(total, entries){
-        db.close();
-        res.json({success: true, total: total, entries: entries});
-      });
+      if(req.body.id) {
+        ops.listEntriesById(db, req.params.dictID, req.body.id, function(entries){
+          db.close();
+          res.json({success: true, entries: entries});
+        });
+      } else {
+        ops.listEntries(db, req.params.dictID, req.params.doctype, req.body.searchtext, req.body.modifier, req.body.howmany, function(total, entries){
+          db.close();
+          res.json({success: true, total: total, entries: entries});
+        });
+      }
     }
   });
 });

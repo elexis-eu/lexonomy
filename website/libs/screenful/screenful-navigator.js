@@ -273,13 +273,33 @@ Screenful.Navigator={
     $("#listbox").scrollTop(0);
     Screenful.Navigator.list();
   },
-  refresh: function(){
-    Screenful.Navigator.list(null, Screenful.Navigator.lastStepSize, true);
-  },
   setModifier: function(i){
     var obj=Screenful.Navigator.modifiers[i];
     $("#navbox .lineModifiers .clickable .current").html(obj.caption).data("value", obj.value);
     if($.trim($("#searchbox").val())!="") Screenful.Navigator.list();
+  },
+
+  refresh: function(entryID, action){
+    if(entryID && action=="delete"){
+      var $entry=$("div.entry[data-id=\""+entryID+"\"]");
+      $entry.remove();
+    } else if(entryID && action=="update" && Screenful.Navigator.listByIdUrl){
+      $.ajax({url: Screenful.Navigator.listByIdUrl, dataType: "json", method: "POST", data: {id: entryID}}).done(function(data){
+        if(data.success && data.entries.length>0 && data.entries[0].id==entryID) {
+          var entry=data.entries[0];
+          var $entry=$("div.entry[data-id=\""+entryID+"\"]");
+          Screenful.Navigator.renderer($entry.find("div.inside").toArray()[0], entry, "", "");
+          if(Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl && Screenful.Navigator.extractEntryFlag){
+            var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
+            $entry.find(".entryFlagLink").css("background-color", flag.color);
+          }
+        } else {
+          Screenful.status(Screenful.Loc.listingFailed, "warn"); //"failed to get list of entries"
+        }
+      });
+    } else {
+      Screenful.Navigator.list(null, Screenful.Navigator.lastStepSize, true);
+    }
   },
 
   entryMenuLinkClick: function(e){
