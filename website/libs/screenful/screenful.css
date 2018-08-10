@@ -2,7 +2,7 @@ body {font-family: sans-serif; background-color: #ffffff; margin: 0; padding: 0;
 #header { position: absolute; top: 0px; left: 0px; right: 0px; z-index: 2; }
 #envelope { position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px;}
 #envelope.scrollable {overflow-y: auto;}
-#statusbar { position: absolute; bottom: 0px; left: 0px; right: 0px; padding: 5px 15px; background-color: #dddddd; color: #666666; font-size: 0.9em; height: 1.3em; overflow: hidden; box-shadow: 0px -2px 2px #999999; z-index: 2;}
+#statusbar { position: absolute; bottom: 0px; left: 0px; right: 0px; padding: 5px 15px; background-color: #dddddd; color: #666666; font-size: 0.9em; height: 1.3em; overflow: hidden; box-shadow: 0px -2px 2px #999999; z-index: 5;}
 #footer { position: absolute; bottom: 0px; left: 0px; right: 0px; }
 #curtain { position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: #333333; opacity: 0.5; z-index: 5;}
 

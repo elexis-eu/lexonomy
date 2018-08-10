@@ -527,7 +527,7 @@ app.get(siteconfig.rootPath+":dictID/edit/:doctype/", function(req, res){
           var doctypes=[configs.xema.root];
           for(var doctype in configs.subbing) if(doctypes.indexOf(doctype)==-1) doctypes.push(doctype);
           doctypesUsed.map(doctype => {if(doctypes.indexOf(doctype)==-1) doctypes.push(doctype)});
-          res.render("edit.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, flags: configs.flagging, siteconfig: siteconfig, doctypes: doctypes, doctype: req.params.doctype, xonomyMode: configs.editing.xonomyMode});
+          res.render("edit.ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, flagging: configs.flagging, siteconfig: siteconfig, doctypes: doctypes, doctype: req.params.doctype, xonomyMode: configs.editing.xonomyMode});
         });
       });
     }

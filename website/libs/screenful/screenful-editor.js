@@ -449,5 +449,10 @@ Screenful.Editor={
       Screenful.Editor.needsSaving=false;
     }
   },
+  abandon: function(){
+    Screenful.Editor.needsSaving=false;
+    $("#idbox").val("");
+    Screenful.Editor.open();
+  },
 };
 $(window).ready(Screenful.Editor.start);

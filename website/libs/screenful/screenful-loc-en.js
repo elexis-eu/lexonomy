@@ -17,7 +17,6 @@ Screenful.Loc={
   savingFailed: "Failed to save.",
   deleting: "Deleting...",
   deletingFailed: "Failed to delete.",
-  flaggingFailed: "Failed to flag.",
   deleteConfirm: "Careful now! Are you sure?",
   username: "E-mail address",
   password: "Password",
@@ -78,4 +77,7 @@ Screenful.Loc={
   signupAccountExists: "You are trying to create an account for e-mail address that already has an account.",
 
   autosave: "Autosave",
+
+  flagging: "Flagging...",
+  flaggingFailed: "Failed to flag the entry.",
 };

@@ -77,4 +77,7 @@ Screenful.Loc={
   signupAccountExists: "You are trying to create an account for e-mail address that already has an account.",
 
   autosave: "Ukládat automaticky",
+
+  flagging: "Flagging...",
+  flaggingFailed: "Failed to flag the entry.",
 };
