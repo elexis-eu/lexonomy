@@ -34,7 +34,7 @@
 					<%if(hasXemaOverride) {%><div class="signpost"><a href="../../<%=dictID%>/config/xema-override/">Entry structure</a></div><%} else {%><div class="signpost"><a href="../../<%=dictID%>/config/xema/">Entry structure</a></div><%}%>
 					<div class="signpost"><a href="../../<%=dictID%>/config/subbing/">Subentries</a></div>
 					<div class="signpost"><a href="../../<%=dictID%>/config/titling/">Headwords</a></div>
-				  <div class="signpost"><a href="../../<%=dictID%>/config/flagging/">Flags</a></div>
+				  <%if(dictID=="hindiwordlist"){%><div class="signpost"><a href="../../<%=dictID%>/config/flagging/">Flags</a></div><%}%>
 					<div class="signpost"><a href="../../<%=dictID%>/config/searchability/">Search</a></div>
 				</div>
 				<div class="signposts">
