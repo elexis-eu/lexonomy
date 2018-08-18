@@ -154,18 +154,22 @@ Screenful.Navigator={
           //entry title:
           Screenful.Navigator.renderer($item.find("div.inside").toArray()[0], entry, searchtext, modifier);
 
+
           //entry flag:
           if(Screenful.Navigator.flags && Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl && Screenful.Navigator.extractEntryFlag){
-            var $flagLink=$("<a class='entryFlagLink'></a>").prependTo($item);
-            var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
-            $flagLink.css("background-color", flag.color);
-            $flagLink.on("click", Screenful.Navigator.entryFlagLinkClick);
-            var $menu=$("<div class='menu flagmenu' style='display: none'></div>").appendTo($item);
-            Screenful.Navigator.flags.map(flag => {
-              var $menuItem=$("<a href='javascript:void(null)'><span class='spot' style='background-color: "+flag.color+"'></span><span class='keyCaption'>"+flag.key+"</span>"+flag.label+"</a>").appendTo($menu);
-              $menuItem.on("click", Screenful.Navigator.entryFlag);
-              $menuItem.data("flag", flag);
-            });
+            var $flagLink=$("<a class='entryFlagLink undecided'></a>").prependTo($item);
+            window.setTimeout(function(){
+              var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
+              $flagLink.removeClass("undecided");
+              $flagLink.css("background-color", flag.color);
+              $flagLink.on("click", Screenful.Navigator.entryFlagLinkClick);
+              var $menu=$("<div class='menu flagmenu' style='display: none'></div>").appendTo($item);
+              Screenful.Navigator.flags.map(flag => {
+                var $menuItem=$("<a href='javascript:void(null)'><span class='spot' style='background-color: "+flag.color+"'></span><span class='keyCaption'>"+flag.key+"</span>"+flag.label+"</a>").appendTo($menu);
+                $menuItem.on("click", Screenful.Navigator.entryFlag);
+                $menuItem.data("flag", flag);
+              });
+            }, 10);
           }
 
           //entry menu:
