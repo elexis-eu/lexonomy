@@ -155,7 +155,7 @@ Screenful.Navigator={
           Screenful.Navigator.renderer($item.find("div.inside").toArray()[0], entry, searchtext, modifier);
 
           //entry flag:
-          if(Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl && Screenful.Navigator.extractEntryFlag){
+          if(Screenful.Navigator.flags && Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl && Screenful.Navigator.extractEntryFlag){
             var $flagLink=$("<a class='entryFlagLink'></a>").prependTo($item);
             var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
             $flagLink.css("background-color", flag.color);
@@ -216,7 +216,7 @@ Screenful.Navigator={
             e.preventDefault();
             Screenful.Navigator.entryDelete(e);
           }
-          if(Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl){
+          if(Screenful.Navigator.flags && Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl){
             for(var i=0; i<Screenful.Navigator.flags.length; i++) {
               if(e.key==Screenful.Navigator.flags[i].key){
                 e.preventDefault();
