@@ -45,7 +45,7 @@ Screenful.Editor={
 
     $(document).on("click", function(e){
       if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.User){
-        window.parent.$(".menu").slideUp();
+        window.parent.$(".menu:visible").slideUp();
       }
     });
 

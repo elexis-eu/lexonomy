@@ -14,12 +14,12 @@ Screenful.User={
     }
     $(".ScreenfulUser .clickable").on("click", function(e){
       var $mymenu=$(e.delegateTarget).closest(".ScreenfulUser").find(".menu");
-      $(".menu").not($mymenu).slideUp();
+      $(".menu:visible").not($mymenu).slideUp();
       $mymenu.hide().slideDown();
       e.stopPropagation();
     });
     $(document).on("click", function(e){
-      $(".menu").slideUp();
+      $(".menu:visible").slideUp();
     });
   },
 };

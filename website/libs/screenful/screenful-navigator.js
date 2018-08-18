@@ -52,13 +52,13 @@ Screenful.Navigator={
       }
       $("#navbox .lineModifiers .clickable").on("click", function(e){
         var $mymenu=$(e.delegateTarget).closest(".lineModifiers").find(".menu");
-        $(".menu").not($mymenu).slideUp();
+        $(".menu:visible").not($mymenu).slideUp();
         $mymenu.hide().slideDown();
         e.stopPropagation();
       });
     }
     $(document).on("click", function(e){
-      $(".menu").slideUp();
+      $(".menu:visible").slideUp();
     });
     if(Screenful.Navigator.critEditor && Screenful.Navigator.critHarvester) {
       $("#navbox .lineModifiers").addClass("hasCrits");
@@ -308,15 +308,15 @@ Screenful.Navigator={
     var $entry=$menuLink.closest(".entry");
     var entryID=$entry.attr("data-id");
     var $menu=$entry.find(".entrymenu");
-    $("#listbox .menu").not($menu).hide();
-    $(".menu").not($menu).slideUp();
+    $("#listbox .menu:visible").not($menu).hide();
+    $(".menu:visible").not($menu).slideUp();
     $menu.hide().slideDown();
     e.stopPropagation();
   },
   entryDelete: function(arg){ //arg = event object or entryID
     var entryID=arg; if(typeof(arg)=="object") {
       entryID=$(arg.delegateTarget).closest(".entry").attr("data-id");
-      $(".menu").hide();
+      $(".menu:visible").hide();
       arg.stopPropagation();
     }
     if(window.frames["editframe"].Screenful && window.frames["editframe"].Screenful.Editor && window.frames["editframe"].Screenful.Editor.entryID==entryID) {
@@ -346,8 +346,8 @@ Screenful.Navigator={
     var $entry=$menuLink.closest(".entry");
     var entryID=$entry.attr("data-id");
     var $menu=$entry.find(".flagmenu");
-    $("#listbox .menu").not($menu).hide();
-    $(".menu").not($menu).slideUp();
+    $("#listbox .menu:visible").not($menu).hide();
+    $(".menu:visible").not($menu).slideUp();
     $menu.hide().slideDown();
     e.stopPropagation();
   },
@@ -360,7 +360,7 @@ Screenful.Navigator={
     if(flagName===undefined) flagName=$(e.delegateTarget).data("flag").name;
     var flag=Screenful.Navigator.flagLookup(flagName);
     var entryID=$(e.delegateTarget).closest(".entry").attr("data-id");
-    $(".menu").hide();
+    $(".menu:visible").hide();
     e.stopPropagation();
     Screenful.status(Screenful.Loc.flagging, "wait"); //"flagging entry..."
     $.ajax({url: Screenful.Navigator.entryFlagUrl, dataType: "json", method: "POST", data: {id: entryID, flag: flag.name}}).done(function(data){
