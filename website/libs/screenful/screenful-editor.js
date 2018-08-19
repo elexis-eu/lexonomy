@@ -52,7 +52,7 @@ Screenful.Editor={
   },
   populateToolbar: function(){
     var $toolbar=$("#toolbar");
-    if(Screenful.Editor.historyUrl) $("<button id='butHistory' class='iconOnly' title='"+Screenful.Loc.history+"'>&nbsp;</button>").appendTo($toolbar).on("click", Screenful.Editor.history);
+    if(Screenful.History) $("<button id='butHistory' class='iconOnly' title='"+Screenful.Loc.history+"'>&nbsp;</button>").appendTo($toolbar).on("click", Screenful.Editor.history);
     if(Screenful.Editor.allowSourceCode) $("<button id='butSourceCode' class='iconOnly' title='"+Screenful.Loc.sourceCode+"'>&nbsp;</button>").appendTo($toolbar).on("click", Screenful.Editor.sourceCode);
     $("<span id='errorMessage' style='display: none;'></span>").appendTo($toolbar);
     if(!Screenful.Editor.singleton) {
@@ -391,7 +391,7 @@ Screenful.Editor={
         $("#history").show();
         Screenful.Editor.updateToolbar();
         $("#container .xonomy .layby").remove();
-        window.frames["historyframe"].Screenful.History.go(id);
+        Screenful.History.go(id);
       }
     }
   },

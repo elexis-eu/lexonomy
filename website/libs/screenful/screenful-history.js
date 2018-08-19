@@ -1,7 +1,7 @@
 Screenful.History={
   go: function(entryID){
-    window.parent.Screenful.Editor.entryID=entryID;
-    $("body").html("<div class='leftie'></div>");
+    Screenful.Editor.entryID=entryID;
+    $("#history").html("<div class='leftie'></div>");
     $.ajax({url: Screenful.History.historyUrl, dataType: "json", method: "POST", data: {id: entryID}}).done(function(data){
       if(!data.length) {
         //no history for this entry
@@ -9,11 +9,11 @@ Screenful.History={
         for(var i=0; i<data.length; i++){
           var hist=data[i];
           if(!Screenful.History.isDeletion(hist)) {
-            var $div=$("<div class='revision'></div>").appendTo($("body"));
+            var $div=$("<div class='revision'></div>").appendTo($("#history"));
             Screenful.History.drawRevision($div, hist, data.length-i, (i==0));
             if(i==0) Screenful.History.zoomRevision(Screenful.History.getRevisionID(hist), true);
           }
-          var $div=$("<div class='interRevision'></div>").appendTo($("body"));
+          var $div=$("<div class='interRevision'></div>").appendTo($("#history"));
           Screenful.History.drawInterRevision($div, hist);
         }
       }
@@ -24,7 +24,7 @@ Screenful.History={
     $div.on("click", function(e){
       Screenful.History.zoomRevision(Screenful.History.getRevisionID(hist), true);
     });
-    if(window.parent.Screenful.Editor.viewer){
+    if(Screenful.Editor.viewer){
       $div.append(" <span class='pretty'></span>")
       $div.find(".pretty").on("click", function(e){
         Screenful.History.zoomRevision(Screenful.History.getRevisionID(hist), false);
@@ -54,14 +54,14 @@ Screenful.History={
         if(!asSourceCode) $this.addClass("pretty");
         var fakeentry=Screenful.History.fakeEntry($this.data("hist"));
         if(fakeentry){
-          if(!asSourceCode && window.parent.Screenful.Editor.viewer){
-            window.parent.$("#container").removeClass("empty").html("<div id='viewer'></div>");
-            window.parent.Screenful.Editor.viewer(window.parent.document.getElementById("viewer"), fakeentry);
+          if(!asSourceCode && Screenful.Editor.viewer){
+            $("#container").removeClass("empty").html("<div id='viewer'></div>");
+            Screenful.Editor.viewer(document.getElementById("viewer"), fakeentry);
           } else {
-            window.parent.$("#container").removeClass("empty").html("<div id='editor'></div>");
-            window.parent.Screenful.Editor.editor(window.parent.document.getElementById("editor"), fakeentry, true);
+            $("#container").removeClass("empty").html("<div id='editor'></div>");
+            Screenful.Editor.editor(document.getElementById("editor"), fakeentry, true);
           }
-          window.parent.$("#container").hide().fadeIn();
+          $("#container").hide().fadeIn();
         }
       }
     });
@@ -72,12 +72,12 @@ Screenful.History={
       if(Screenful.History.getRevisionID($this.data("hist"))==revision_id) {
         var fakeentry=Screenful.History.fakeEntry($this.data("hist"));
         if(fakeentry){
-          window.parent.Screenful.Editor.hideHistory();
-          window.parent.$("#container").removeClass("empty").html("<div id='editor'></div>");
-          window.parent.Screenful.Editor.editor(window.parent.document.getElementById("editor"), fakeentry);
-          window.parent.$("#container").hide().fadeIn();
-          window.parent.Screenful.Editor.updateToolbar();
-          window.parent.Screenful.Editor.changed();
+          Screenful.Editor.hideHistory();
+          $("#container").removeClass("empty").html("<div id='editor'></div>");
+          Screenful.Editor.editor(document.getElementById("editor"), fakeentry);
+          $("#container").hide().fadeIn();
+          Screenful.Editor.updateToolbar();
+          Screenful.Editor.changed();
         }
       }
     });

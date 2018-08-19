@@ -35,7 +35,6 @@
 		Screenful.Editor.readUrl="../../../<%=dictID%>/entryread.json";
 		Screenful.Editor.updateUrl="../../../<%=dictID%>/entryupdate.json";
 		Screenful.Editor.deleteUrl="../../../<%=dictID%>/entrydelete.json";
-		Screenful.Editor.historyUrl="../../../<%=dictID%>/history/";
 		var dictID="<%=dictID%>";
 		var xema=<%-JSON.stringify(xema)%>;
 		var xemplate=<%-JSON.stringify(xemplate)%>;
@@ -92,7 +91,15 @@
 			docSpec.onchange=Screenful.Editor.changed;
 			if(uneditable) {
 				for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
-				if(docSpec.unknownElement) docSpec.unknownElement.isReadOnly=true;
+				if(docSpec.unknownElement && typeof(docSpec.unknownElement)=="object") docSpec.unknownElement.isReadOnly=true;
+				if(docSpec.unknownElement && typeof(docSpec.unknownElement)=="function") {
+					var func=docSpec.unknownElement;
+					docSpec.unknownElement=function(elName){
+						var ret=func(elName);
+						ret.isReadOnly=true;
+						return ret;
+					}
+				}
 			}
 			if(!ownEditor){
 				Xonomy.render((entry ? entry.content : newXml), div, docSpec);
@@ -119,6 +126,40 @@
 			return Screenful.cleanupXml(str);
 		};
 		</script>
+
+		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-history.css" />
+		<script type="text/javascript" src="../../../libs/screenful/screenful-history.js"></script>
+		<script type="text/javascript">
+		Screenful.History.historyUrl="../../../<%=dictID%>/history.json";
+		Screenful.History.isDeletion=function(revision){
+			return revision.action=="delete" || revision.action=="purge";
+		};
+		Screenful.History.getRevisionID=function(revision){
+			return revision.revision_id;
+		};
+		Screenful.History.printAction=function(revision){
+			var content="";
+			//actions: delete | create | update | purge
+			//historiography: {apikey: apikey} | {uploadStart: uploadStart, filename: filename}
+			content+="<div style='white-space: nowrap'>";
+				if(revision.action=="create") content+="<b>Created</b>";
+				else if(revision.action=="update") content+="<b>Changed</b>";
+				else if(revision.action=="delete") content+="<b>Deleted</b>";
+				else if(revision.action=="purge") content+="<b>Bulk-deleted</b>";
+				if(revision.historiography.uploadStart) content+=" while uploading";
+				if(revision.historiography.apikey) content+=" through API";
+				if(revision.historiography.refactoredFrom) content+=" as a subentry of <a href='javascript:void(null)' onclick='parent.Screenful.Editor.open(null, "+revision.historiography.refactoredFrom+")'>"+revision.historiography.refactoredFrom+"</a>";
+			content+="</div>";
+			if(revision.email) content+="<div style='white-space: nowrap'><b>By:</b> "+revision.email+"</div>";
+			content+="<div style='white-space: nowrap'><b>When:</b> "+revision.when+"</div>";
+			return content;
+			//return revision.action+", "+revision.email+", "+revision.when+", "+JSON.stringify(revision.historiography, null, "<br/>");
+		};
+		Screenful.History.fakeEntry=function(revision){
+			return {id: revision.entry_id, content: revision.content, contentHtml: revision.contentHtml};
+		};
+		</script>
+
 	</head>
 	<body>
 	</body>

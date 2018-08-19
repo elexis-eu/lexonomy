@@ -1172,15 +1172,7 @@ app.get(siteconfig.rootPath+":dictID/subget/", function(req, res){
   });
 });
 
-//HISTORY UI: Screenful.History:
-app.get(siteconfig.rootPath+":dictID/history/", function(req, res){
-  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
-  var db=ops.getDB(req.params.dictID, true);
-  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
-    db.close();
-    res.render("history.ejs", {user: user, dictID: req.params.dictID, siteconfig: siteconfig});
-  });
-});
+//HISTORY: JSON endpoint
 app.post(siteconfig.rootPath+":dictID/history.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID, true);
