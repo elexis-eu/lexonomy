@@ -1,8 +1,8 @@
 div#history {background-color: #dddddd; font-size: 0.85rem; box-shadow: inside 0px 0px 5px #666666; padding: 20px 0px; overflow: auto; overflow-x: hidden;}
 div#history > div.leftie {position: absolute; top: 0px; left: 0px; bottom: 0px; width: 1px; box-shadow: 0px 0px 5px #666666;}
 
-div#history div.revision {background-color: #f0f0f0; margin: 0px 15px; padding: 0px 5px 0px 15px; border-radius: 4px; cursor: pointer; color: #004f9b; position: relative;}
-div#history div.revision:hover {color: #0063c2;}
+div#history div.revision {background-color: #f0f0f0; margin: 0px 15px; padding: 0px 5px 0px 15px; border-radius: 4px; cursor: pointer; color: var(--link); position: relative;}
+div#history div.revision:hover {color: var(--link-hover);}
 div#history div.revision span.label {display: inline-block; padding: 10px 0px; vertical-align: middle;}
 div#history div.revision.current {background-color: #ffffff; margin-left: 0px; padding-left: 30px; box-shadow: 0px 0px 5px #666666; border-radius: 0px 4px 4px 0px; z-index: 10;}
 
@@ -15,10 +15,10 @@ div#history div.revision span.pretty {background-image: url(page_white_text.png)
 div#history div.revision span.pretty:hover {background-color: #b4daff;}
 div#history div.revision.current.pretty span.pretty {background-color: #d0e6fb;}
 
-div#history div.interRevision {padding: 15px 0px 15px 20px; margin: 3px 0px 3px 30px; border-left: 1px solid #4457bd; text-shadow: 1px 1px 0px #ffffff; color: #666666; position: relative; z-index: 11;}
+div#history div.interRevision {padding: 15px 0px 15px 20px; margin: 3px 0px 3px 30px; border-left: 1px solid var(--border, #666666); text-shadow: 1px 1px 0px #ffffff; color: #666666; position: relative; z-index: 11;}
 div#history div.interRevision > div.arrowTop {width: 16px; height: 16px; position: absolute; top: -9px; left: -8px; background-image: url(control_stop_blue.png);}
 div#history div.interRevision > div.arrowMiddle {width: 16px; position: absolute; top: 0px; bottom: 0px; left: -8px; background-image: url(resultset_up.png); background-position: center center; background-repeat: no-repeat;}
 div#history div.interRevision:first-child > div.arrowTop {width: 16px; height: 16px; position: absolute; top: -4px; left: -8px; background-image: url(control_stop_blue.png);}
 div#history div.interRevision > div.arrowBottom {width: 16px; height: 16px; position: absolute; bottom: -9px; left: -8px; background-image: url(control_stop_blue.png);}
-div#history div.interRevision a {color: #004f9b; text-decoration: none;}
-div#history div.interRevision a:hover {color: #0063c2}
+div#history div.interRevision a {color: var(--link); text-decoration: none;}
+div#history div.interRevision a:hover {color: var(--link-hover)}
