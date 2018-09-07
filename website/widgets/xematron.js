@@ -337,12 +337,13 @@ Xematron.initialAttributes=function(xema, elname){
 	}
 	return ret;
 };
-Xematron.initialElement=function(xema, elname){
+Xematron.initialElement=function(xema, elname, depth){
+	if(!depth) depth=0;
 	var el=xema.elements[elname];
 	var ret="<"+elname+Xematron.initialAttributes(xema, elname)+">";
-	if(el.filling=="chd" && el.children){
+	if(el.filling=="chd" && el.children && depth<10){
 		el.children.forEach(function(child){
-			for(var i=0; i<child.min; i++) ret+=Xematron.initialElement(xema, child.name);
+			for(var i=0; i<child.min; i++) ret+=Xematron.initialElement(xema, child.name, depth+1);
 		});
 	}
 	ret+="</"+elname+">";

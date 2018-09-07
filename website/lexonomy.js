@@ -752,7 +752,7 @@ app.get(siteconfig.rootPath+":dictID/config/", function(req, res){
           db.close();
           res.render("config.ejs", {
             user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, needResave: stats.needResave, siteconfig: siteconfig,
-            hasXemaOverride: (configs.xema._xonomyDocSpec!=null),
+            hasXemaOverride: (configs.xema._xonomyDocSpec!=null || configs.xema._dtd!=null),
             hasXemplateOverride: (configs.xemplate._xsl!=null || configs.xemplate._css!=null),
             hasEditingOverride: (configs.editing._js!=null),
           });

@@ -14,6 +14,7 @@
 		<link type="text/css" rel="stylesheet" href="../../../libs/xonomy/xonomy.css" />
 		<script type="text/javascript" src="../../../libs/xonomy/xonomy.js?2018-02-02"></script>
 		<script type="text/javascript" src="../../../widgets/xematron.js"></script>
+		<script type="text/javascript" src="../../../libs/xonomy-tools/dtdconvert/dtd2xonomy.js"></script>
 		<script type="text/javascript" src="../../../widgets/xemplatron.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../widgets/xemplatron.css" />
 		<script type="text/javascript" src="../../../widgets/ske.js"></script>
@@ -65,16 +66,20 @@
 		Screenful.Editor.editor=function(div, entry, uneditable){
 			<%if(!user.canEdit){%> uneditable=true;<%}%>
 			Xonomy.lang="en";
+
+			var newXml="";
 			<%if(xema._xonomyDocSpec){%>
 				var docSpec=<%-xema._xonomyDocSpec%>;
+				<%if(xema._newXml){%>newXml=`<%-xema._newXml%>`;<%}%>
+			<%}else if(xema._dtd){%>
+					var xmlStructure=parseDTD(`<%-xema._dtd%>`);
+					var docSpec=struct2Xonomy(xmlStructure);
+					newXml=initialDocument(xmlStructure);
 			<%} else {%>
 				var docSpec=Xematron.xema2docspec(xema);
 			<%}%>
-			<%if(xema._newXml){%>
-				var newXml=`<%-xema._newXml%>`;
-			<%} else {%>
-				var newXml=Xematron.xema2xml(xema);
-			<%}%>
+			if(!newXml) newXml=Xematron.xema2xml(xema);
+
 			docSpec.allowModeSwitching=true;
 			docSpec.onModeSwitch=function(mode){
 				Cookies.set("xonomyMode_<%=dictID%>", mode);
