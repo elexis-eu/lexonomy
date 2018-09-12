@@ -1,7 +1,6 @@
 Screenful.Loc={
   ready: "Réidh.",
-  filter: "Scag",
-  removeFilter: "Bain scagaire",
+  find: "Aimsigh",
   reload: "Athlódáil",
   cancel: "Cealaigh",
   more: "Tuilleadh",

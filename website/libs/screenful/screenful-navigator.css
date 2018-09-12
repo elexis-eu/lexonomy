@@ -13,7 +13,7 @@
 #envelope.leftContainerExpanded > #leftcontainer > .closer:hover {background-color: #eeeeee;}
 #envelope.leftContainerExpanded > #leftcontainer > #leftbox {display: block;}
 
-#navbox { position: absolute; top: 0px; left: 0px; width: 30%; height: 100px; box-shadow: -2px 2px 2px #999999; z-index: 5; }
+#navbox { position: absolute; top: 0px; left: 0px; width: 30%; height: 100px; box-shadow: -2px 2px 2px #999999; z-index: 5;}
 #listbox { position: absolute; top: 100px; left: 0px; width: 30%; bottom: 0px; overflow-y: scroll; overflow-x: hidden; padding-top: 10px; }
 #navbox.hasSearchModifiers {height: 125px;}
 #listbox.hasSearchModifiers {top: 125px;}
@@ -22,6 +22,7 @@
 #critbox { position: absolute; top: 70px; left: 15px; bottom: 30px; max-height: 600px; width: 60%; background-color: #ffffff; box-shadow: 0px 0px 5px #666666; border-radius: 4px; z-index: 10;}
 
 input#searchbox {font: inherit; border: 1px inset #cccccc; cursor: inline; border-radius: 4px; background-color: #ffffff; color: #333333; padding: 6px 35px 6px 10px; margin: 10px 5px 10px 5px; min-height: 1.3em; display: inline-block; width: 40%; vertical-align: middle;}
+input#searchbox.hasSearchModifiers {padding-left: 80px; width: 30%;}
 
 button#butCritOpen {background-image: url(find.png);}
 button#butCritOpen.on { background-color: rgb(198, 231, 255); }
@@ -31,37 +32,48 @@ button#butCritCancel {background-image: url(arrow_left.png);}
 button#butCritGo {background-image: url(find.png);}
 button.iconOnly#butSearch {background-image: url(magnifier.png);}
 
-#navbox .line1 { padding-left: 10px; overflow-x: hidden; white-space: nowrap; border-bottom: 1px solid #eeeeee;}
+#navbox .line1 { padding-left: 10px; white-space: nowrap; border-bottom: 1px solid #eeeeee;}
 #navbox.hasSearchModifiers .line1 {border-bottom: 0px;}
 #navbox .lineModifiers { display: none; padding-left: 15px; border-bottom: 1px solid #eeeeee; overflow-x: hidden; white-space: nowrap; padding-bottom: 5px; margin-top: -5px; font-size: 0.9em;}
-#navbox .lineModifiers.hasCrits {padding-left: 62px;}
+#navbox .lineModifiersLeft.hasCrits {padding-left: 62px;}
 #navbox.hasSearchModifiers .lineModifiers {display: block;}
 #navbox .line2 { padding-left: 10px; margin: 0px 0px 0px 0px; overflow-x: hidden; white-space: nowrap; }
 #navbox .line2 button {padding-top: 0px; padding-bottom: 0px;}
 #navbox #countcaption {color: #666666; padding: 14px 20px 0px 10px; float: right;}
 
-#navbox .lineModifiers span.clickable { color: #999999; cursor: pointer;}
-#navbox .lineModifiers span.clickable:hover {color: var(--link); }
-#navbox .lineModifiers span.clickable span.arrow {color: #999999; font-size: 85%; position: relative; top: -2px; margin-left: 5px; }
-#navbox .lineModifiers span.clickable:hover span.arrow {color: #09587e; }
+#navbox .modifiers span.clickable { color: #999999; cursor: pointer;}
+#navbox .modifiers span.clickable:hover {color: var(--link); }
+#navbox .modifiers span.clickable span.arrow {color: #999999; font-size: 85%; position: relative; top: -2px; margin-left: 5px; }
+#navbox .modifiers span.clickable:hover span.arrow {color: #09587e; }
 
-#navbox .lineModifiers div.menu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; left: 10px; margin-top: 5px; z-index: 1; white-space: nowrap;}
-#navbox .lineModifiers.hasCrits div.menu {left: 55px;}
-#navbox .lineModifiers div.menu a {display: block; padding: 10px 20px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
-#navbox .lineModifiers div.menu a:first-child {border-top-left-radius: 4px; border-top-right-radius: 4px; border-top: 0px;}
-#navbox .lineModifiers div.menu a:last-child {border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;}
-#navbox .lineModifiers div.menu a:hover {background-color: #f7f9ea; }
+#navbox .modifiers span.clickable span.current span.caption {display: none;}
+#navbox .modifiers span.clickable span.current span.abbr {display: inline-block; width: 3em; overflow: hidden; text-align: center; box-sizing: border-box; padding: 4px 4px; margin: 0px 0px -10px 0px; position: relative; top: -4px; line-height: 1em; background-color: #cccccc; border-radius: 2px; text-shadow: 1px 1px 0px #ffffff; color: #333333;}
+
+#navbox .modifiers div.menu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; margin-top: 5px; z-index: 1; white-space: nowrap;}
+#navbox .modifiers div.menu a {display: block; padding: 10px 20px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
+#navbox .modifiers div.menu a span.abbr {display: inline-block; width: 3em; overflow: hidden; text-align: center; box-sizing: border-box; padding: 4px 4px; margin: 0px 10px -10px -10px; position: relative; top: -3px; line-height: 1em; background-color: #cccccc; border-radius: 2px; text-shadow: 1px 1px 0px #ffffff;}
+#navbox .modifiers div.menu a:first-child {border-top-left-radius: 4px; border-top-right-radius: 4px; border-top: 0px;}
+#navbox .modifiers div.menu a:last-child {border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;}
+#navbox .modifiers div.menu a:hover {background-color: #f7f9ea; }
+
+#navbox .lineModifiersLeft div.menu {left: 10px;}
+#navbox .lineModifiersLeft.hasCrits div.menu {left: 55px;}
+#navbox .lineModifiersRight { float: right; padding-right: 20px;}
+#navbox .lineModifiersRight div.menu {right: 10px;}
+
+#navbox .boxModifiers {display: inline-block; font-size: 0.9em; width: 70px; margin: 0px -83px 0px 10px; position: relative; top: 0px;}
+#navbox .boxModifiers div.menu {left: -10px; top: 30px;}
 
 #critbox #editor { position: absolute; top: 15px; left: 15px; right: 10px; bottom: 4em; overflow-y: scroll; overflow-x: hidden; padding-right: 20px;}
 #critbox .buttons { position: absolute; left: 15px; right: 10px; bottom: 0px; text-align: right; }
 #critbox .buttons *:last-child {margin-right: 0px;}
 
-#listbox .entry { padding: 5px 5px; margin: 0px 10px; border-bottom: 1px solid #eeeeee; cursor: pointer; }
+#listbox .entry { padding: 5px 5px; margin: 0px 10px; border-bottom: 1px solid #eeeeee; cursor: pointer; position: relative;}
 #listbox .entry > div.inside { display: inline; }
 #listbox .entry:first-child { border-top: 1px solid #eeeeee; }
 #listbox .entry:last-child {margin-bottom: 10px;}
 #listbox .entry:hover {background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff;}
-#listbox .entry:focus {background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff; outline: 1px dotted #666666;}
+#listbox .entry:focus {background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff; outline: 0px;}
 #listbox .entry.current {background-color: var(--highlight); text-shadow: 1px 1px 0px #dddddd;}
 #listbox .entry span.searchtext { background-color: #ffecb3; text-shadow: 0px 0px 0px transparent; border: 1px solid #ffffff; margin: 0px -1px; }
 
@@ -72,14 +84,14 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 #listbox .entry a.entryFlagLink.undecided {border-color: transparent; background-image: url(loader-round-tiny.gif); background-position: center center; background-repeat: no-repeat;}
 #listbox .entry a.entryFlagLink:hover {border-color: #002c6f;}
 
-#listbox .entry div.entrymenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; right: 10px; margin-top: 5px; z-index: 1; white-space: nowrap;}
+#listbox .entry div.entrymenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; right: 0px; top: 35px; z-index: 1; white-space: nowrap;}
 #listbox .entry div.entrymenu a {display: block; padding: 8px 20px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
 #listbox .entry div.entrymenu a span.keyCaption {float: right; margin-left: 2em; margin-right: -0.5em; color: #999999; font-size: 80%; padding-top: 1px;}
 #listbox .entry div.entrymenu a:first-child {border-top-left-radius: 4px; border-top-right-radius: 4px; border-top: 0px;}
 #listbox .entry div.entrymenu a:last-child {border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;}
 #listbox .entry div.entrymenu a:hover {background-color: #f7f9ea; }
 
-#listbox .entry div.flagmenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; left: 10px; margin-top: 5px; z-index: 1; white-space: nowrap; max-height: 300px; overflow-y: auto;}
+#listbox .entry div.flagmenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; left: 10px; top: 35px; z-index: 1; white-space: nowrap; max-height: 300px; overflow-y: auto;}
 #listbox .entry div.flagmenu a {display: block; padding: 8px 20px 8px 10px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
 #listbox .entry div.flagmenu a span.spot {float: left; background-color: #ffffff; border: 1px solid #999999; border-radius: 20px; box-sizing: border-box; width: 1em; height: 1em; margin-right: 0.5em; position: relative; top: 2px;}
 #listbox .entry div.flagmenu a span.keyCaption {float: right; margin-left: 2em; margin-right: -0.5em; color: #999999; font-size: 80%; padding-top: 1px;}

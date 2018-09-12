@@ -1,7 +1,6 @@
 Screenful.Loc={
   ready: "Ready.",
-  filter: "Filter",
-  removeFilter: "Clear filter",
+  find: "Find",
   reload: "Reload",
   cancel: "Cancel",
   more: "More",

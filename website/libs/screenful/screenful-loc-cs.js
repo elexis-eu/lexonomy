@@ -1,7 +1,6 @@
 Screenful.Loc={
   ready: "Hotovo.",
-  filter: "Filtrovat",
-  removeFilter: "Odstranit filtr",
+  find: "Najít",
   reload: "Obnovit",
   cancel: "Storno",
   more: "Víc",
