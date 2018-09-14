@@ -1,16 +1,15 @@
 Screenful.Facetor={
+  panes: [],
   show: function(){
-    console.log("Facetor is showing itself.");
-    $("#leftbox").html("<label><input type='checkbox' name='somefacet'/>somefacet</label>");
-    $("#leftbox input").on("change", Screenful.Facetor.change);
+    //console.log("Facetor is showing itself.");
+    $("#leftbox").html("<div/>");
+    Screenful.Facetor.panes[0].render($("#leftbox div")[0]);
   },
   hide: function(){
-    console.log("Facetor is hiding itself.");
+    //console.log("Facetor is hiding itself.");
   },
-  harvest: function(){
-    var ret=null;
-    if( $("#leftbox input[name='somefacet']").prop("checked") ) ret="somefacet";
-    return ret;
+  report: function(){
+    return Screenful.Facetor.panes[0].harvest($("#leftbox div")[0]);
   },
   change: function(){
     Screenful.Navigator.list();

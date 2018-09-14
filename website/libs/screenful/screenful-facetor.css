@@ -1,0 +1,10 @@
+#leftbox > div {padding: 20px 15px;}
+
+#leftbox div.title:first-child {margin-top: 0px;}
+#leftbox div.title {font-weight: bold; border-bottom: 2px solid var(--contrast); padding: 0px 4px 0px 4px; margin: 20px 0px 5px 0px; }
+#leftbox div.title span.tab { background-color: var(--contrast); color: #ffffff; font-weight: normal; padding: 4px 10px 2px 10px; margin: 0px -4px; font-size: 0.9em; border-radius: 4px 4px 0px 0px; display: inline-block;}
+
+#leftbox div.subtitle {border-bottom: 1px dotted #999999; padding: 4px 4px; margin: 10px 0px 5px 0px; }
+
+#leftbox select {font: inherit; font-size: 0.9em; box-sizing: border-box; padding: 4px 4px; border: 1px inset #bbbbbb; background-color: #ffffff; border-radius: 4px;}
+#leftbox select.fullwidth {width: 100%; display: block; margin: 5px 0px;}

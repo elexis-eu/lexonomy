@@ -79,4 +79,7 @@ Screenful.Loc={
 
   flagging: "Flagging...",
   flaggingFailed: "Failed to flag the entry.",
+
+  exactMatches: "Přesné výsledky",
+  partialMatches: "Přibližné výsledky",
 };

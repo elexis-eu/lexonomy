@@ -79,4 +79,7 @@ Screenful.Loc={
 
   flagging: "Flagging...",
   flaggingFailed: "Failed to flag the entry.",
+
+  exactMatches: "Exact matches",
+  partialMatches: "Partial matches",
 };

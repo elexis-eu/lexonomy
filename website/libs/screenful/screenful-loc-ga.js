@@ -80,4 +80,6 @@ Screenful.Loc={
   flagging: "Flagging...",
   flaggingFailed: "Failed to flag the entry.",
 
+  exactMatches: "Torthaí beachta",
+  partialMatches: "Torthaí gaolmhara",
 };

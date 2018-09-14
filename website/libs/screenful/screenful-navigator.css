@@ -61,12 +61,22 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 #navbox .lineModifiersRight { float: right; padding-right: 20px;}
 #navbox .lineModifiersRight div.menu {right: 10px;}
 
-#navbox .boxModifiers {display: inline-block; font-size: 0.9em; width: 70px; margin: 0px -83px 0px 10px; position: relative; top: 0px;}
-#navbox .boxModifiers div.menu {left: -10px; top: 30px;}
+#navbox .boxModifiers {font-size: 0.9em; border-radius: 4px 0px 0px 4px; background-color: #eeeeee; color:   #666666; text-shadow: 1px 1px 0px #ffffff; padding: 7px 5px 6px 5px; margin: 0px 9px; min-height: 1.3em; display: inline-block; width: 60px; vertical-align: middle; z-index: 1; position: relative; margin-right: -76px;}
+#navbox .boxModifiers span.clickable {position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; padding-top: 5px;}
+#navbox .boxModifiers span.clickable span.arrow {position: absolute; top: 0px; right: 12px; bottom: 0px; padding-top: 4px; font-size: 0.7em;}
+#navbox .boxModifiers span.current span.abbr {background-color: transparent !important;}
+#navbox .boxModifiers div.menu {left: -5px; top: 35px;}
 
 #critbox #editor { position: absolute; top: 15px; left: 15px; right: 10px; bottom: 4em; overflow-y: scroll; overflow-x: hidden; padding-right: 20px;}
 #critbox .buttons { position: absolute; left: 15px; right: 10px; bottom: 0px; text-align: right; }
 #critbox .buttons *:last-child {margin-right: 0px;}
+
+#listbox div.suggs {padding: 5px 15px; font-size: 0.9em; line-height: 2em;}
+#listbox span.sugg {color: var(--link); cursor: pointer; margin-right: 0.75em; white-space: nowrap;}
+#listbox span.sugg:hover {color: var(--link-hover);}
+
+#listbox div.intertitle {padding: 20px 5px 5px 5px; margin: 0px 10px; border-bottom: 1px solid #eeeeee; color: #999999;}
+#listbox div.intertitle:first-child {padding-top: 5px;}
 
 #listbox .entry { padding: 5px 5px; margin: 0px 10px; border-bottom: 1px solid #eeeeee; cursor: pointer; position: relative;}
 #listbox .entry > div.inside { display: inline; }
@@ -77,10 +87,10 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 #listbox .entry.current {background-color: var(--highlight); text-shadow: 1px 1px 0px #dddddd;}
 #listbox .entry span.searchtext { background-color: #ffecb3; text-shadow: 0px 0px 0px transparent; border: 1px solid #ffffff; margin: 0px -1px; }
 
-#listbox .entry a.entryMenuLink {float: right; color: #999999; font-weight: bold;}
+#listbox .entry a.entryMenuLink {float: right; color: #999999; font-weight: bold; position: relative; z-index: 1;}
 #listbox .entry a.entryMenuLink:hover {color: #002c6f;}
 
-#listbox .entry a.entryFlagLink {float: left; background-color: #ffffff; border: 1px solid #999999; border-radius: 20px; box-sizing: border-box; width: 1em; height: 1em; margin-right: 0.5em; position: relative; top: 2px;}
+#listbox .entry a.entryFlagLink {float: left; background-color: #ffffff; border: 1px solid #999999; border-radius: 20px; box-sizing: border-box; width: 1em; height: 1em; margin-right: 0.5em; position: relative; top: 2px; z-index: 1;}
 #listbox .entry a.entryFlagLink.undecided {border-color: transparent; background-image: url(loader-round-tiny.gif); background-position: center center; background-repeat: no-repeat;}
 #listbox .entry a.entryFlagLink:hover {border-color: #002c6f;}
 
