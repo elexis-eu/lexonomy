@@ -75,8 +75,8 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 #listbox span.sugg {color: var(--link); cursor: pointer; margin-right: 0.75em; white-space: nowrap;}
 #listbox span.sugg:hover {color: var(--link-hover);}
 
-#listbox div.intertitle {padding: 20px 5px 5px 5px; margin: 0px 10px; border-bottom: 1px solid #eeeeee; color: #999999;}
-#listbox div.intertitle:first-child {padding-top: 5px;}
+#listbox div.intertitle {padding: 5px 10px; margin: 20px 10px 10px 10px; background-color: var(--contrast); color: #ffffff; border-radius: 2px;}
+#listbox div.intertitle:first-child {margin-top: 0px;}
 
 #listbox .entry { padding: 5px 5px; margin: 0px 10px; border-bottom: 1px solid #eeeeee; cursor: pointer; position: relative;}
 #listbox .entry > div.inside { display: inline; }

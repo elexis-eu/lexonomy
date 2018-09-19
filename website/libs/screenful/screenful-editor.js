@@ -254,6 +254,7 @@ Screenful.Editor={
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
       Screenful.Editor.needsSaving=false;
       Screenful.Editor.hideHistory();
+      if($("#container").hasClass("withSourceCode")) $("#container").removeClass("withSourceCode").html("<div id='editor'></div>");
       if(!id) id=$.trim( $("#idbox").val() );
       if(!id) {
         $("#container").html("").addClass("empty");
