@@ -706,7 +706,7 @@ module.exports={
     return ret;
   },
   toSortkey: function(s, abc){
-    const keylength=5;
+    const keylength=15;
     var ret=s.replace(/\<[\<\>]+>/g, "").toLowerCase();
     //replace any numerals:
     var pat=new RegExp("[0-9]{1,"+keylength+"}", "g");
