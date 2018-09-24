@@ -37,12 +37,17 @@
 #envelope div.pillarform div.instro img {max-width: 50%; box-sizing: content-box; border: 1px solid #666666; border-radius: 2px; box-shadow: 0px 0px 5px #333333; margin: 10px 0px;}
 #envelope div.pillarform div.instro.seeabove {margin-top: -10px;}
 #envelope div.pillarform div.instro span.seeabove {background-image: url(../furniture/seeabove.png); display: inline-block; background-repeat: no-repeat; width: 32px; height: 32px; margin-right: 0.5em;}
+#envelope div.pillarform div.half {width: 49%; display: inline-block; margin: 0; vertical-align: top}
 
-#envelope div.pillarform div.scrollbox {height: 150px; overflow-y: scroll; resize: vertical; margin: 0px 0px 0px 0px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 10px 8px; }
+#envelope div.pillarform div.scrollbox {height: 150px; overflow-y: scroll; resize: vertical; font: inherit; border-width: 0px; border-radius: 4px; box-shadow: inset 0px 0px 2px #666666; padding: 10px 8px; }
 #envelope div.pillarform div.scrollbox.long {height: none; padding-bottom: 40px;}
 #envelope div.pillarform div.scrollbox label {color: #000000;}
 #envelope div.pillarform div.scrollbox label.readonly {color: #999999; cursor: default;}
 #envelope div.pillarform div.scrollbox label.readonly:hover {background-color: transparent;}
+
+#envelope div.pillarform textarea.advancedAnnotations {height: 150px; font: inherit; border-width: 0px; border-radius: 4px; box-shadow: inset 0px 0px 2px #666666; padding: 10px 8px; width: 100%}
+#envelope div.pillarform input[type='radio'] {margin-bottom: 1.5ex;}
+#envelope div.pillarform :disabled, #envelope div.pillarform .disabled {background-color: #eeeeee; cursor: not-allowed}
 
 #envelope div.pillarform div.user {padding: 5px 5px 15px 5px; border-bottom: 1px solid #eeeeee; margin-bottom: 10px;}
 #envelope div.pillarform div.user div.email {font-size: 1.2em;}

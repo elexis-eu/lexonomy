@@ -673,7 +673,12 @@ module.exports={
   },
   getEntryTitle: function(xml, titling, plaintext){
     if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
-    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
+    if (titling.headwordAnnotationsType=="advanced") {
+      var ret = titling.headwordAnnotationsAdvanced.replace(/%\([^)]+\)/g, function (el) {
+          return extractText(xml, el.substring(2, el.length - 1));
+      })
+      return ret;
+    }
     var ret=module.exports.getEntryHeadword(xml, titling.headword);
     if(plaintext)
       ret="<span class='headword'>"+ret+"</span>";
@@ -681,7 +686,6 @@ module.exports={
       if(ret!="") ret+=" ";
       ret+=extractText(xml, titling.headwordAnnotations[i]).join(" ");
     }
-    //console.log(ret);
     return ret;
   },
   getEntryHeadword: function(xml, headword_elem){
