@@ -18,7 +18,7 @@ function initColorPicker(elem, c) {
     },
     onChange: function (hsb, hex, rgb) {
       $(elem).css('backgroundColor', '#' + hex);
-      $(elem).val(hex);
+      $(elem).val('#' + hex);
     }
  })
 }
