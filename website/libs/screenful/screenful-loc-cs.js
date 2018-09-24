@@ -2,6 +2,7 @@ Screenful.Loc={
   ready: "Hotovo.",
   find: "Najít",
   reload: "Obnovit",
+  reverse: "Obrátit",
   cancel: "Storno",
   more: "Víc",
   new: "Nové",

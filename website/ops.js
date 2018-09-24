@@ -251,7 +251,7 @@ module.exports={
       var params={
         $xml: xml,
         $title: module.exports.getEntryTitle(xml, configs.titling),
-        $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+        $sortkey: module.exports.toSortkey(module.exports.getSortTitle(xml, configs.titling), abc),
         $doctype: getDoctype(xml),
         $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
         $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
@@ -295,7 +295,7 @@ module.exports={
           db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
             $id: entryID,
             $title: module.exports.getEntryTitle(xml, configs.titling),
-            $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+            $sortkey: module.exports.toSortkey(module.exports.getSortTitle(xml, configs.titling), abc),
             $xml: xml, $doctype: getDoctype(xml),
             $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
             $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
@@ -335,7 +335,7 @@ module.exports={
             db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
               $id: entryID,
               $title: module.exports.getEntryTitle(xml, configs.titling),
-              $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+              $sortkey: module.exports.toSortkey(module.exports.getSortTitle(xml, configs.titling), abc),
               $xml: xml, $doctype: getDoctype(xml),
               $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
               $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
@@ -553,7 +553,7 @@ module.exports={
             db.run("update entries set needs_resave=0, title=$title, sortkey=$sortkey where id=$id", {
               $id: entryID,
               $title: module.exports.getEntryTitle(doc, configs.titling),
-              $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(doc, configs.titling, true), abc),
+              $sortkey: module.exports.toSortkey(module.exports.getSortTitle(doc, configs.titling), abc),
             }, function(err){ if(err) console.log(err); });
 
             db.run("delete from searchables where entry_id=$entry_id", {$entry_id: entryID}, function(err){ if(err) console.log(err);
@@ -563,7 +563,7 @@ module.exports={
                 $level: 1,
               }, function(){
                 var searchables=module.exports.getEntrySearchables(doc, configs.searchability, configs.titling);
-                var headword=module.exports.getEntryHeadword(doc, configs.titling);
+                var headword=module.exports.getEntryHeadword(doc, configs.titling.headword);
                 for(var y=0; y<searchables.length; y++){
                   if(searchables[y]!=headword){
                     db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
@@ -583,15 +583,19 @@ module.exports={
     });
   },
 
-  listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, callnext){
+  listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, sortdesc, callnext){
     if(!searchtext) searchtext="";
+    if (sortdesc == 'true')
+      sortdesc = " DESC "
+    else
+      sortdesc = ""
     if(modifier=="start") {
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
         inner join entries as e on e.id=s.entry_id
         where doctype=$doctype and s.txt like $like
         group by e.id
-        order by e.sortkey, s.level
+        order by e.sortkey` + sortdesc + `, s.level
         limit $howmany`;
       var params1={$howmany: howmany, $like: searchtext+"%", $doctype: doctype};
       var sql2=`select count(distinct s.entry_id) as total
@@ -605,7 +609,7 @@ module.exports={
         inner join entries as e on e.id=s.entry_id
         where doctype=$doctype and (s.txt like $like1 or s.txt like $like2)
         group by e.id
-        order by e.sortkey, s.level
+        order by e.sortkey` + sortdesc + `, s.level
         limit $howmany`;
       var params1={$howmany: howmany, $like1: searchtext+"%", $like2: "% "+searchtext+"%", $doctype: doctype};
       var sql2=`select count(distinct s.entry_id) as total
@@ -619,7 +623,7 @@ module.exports={
         inner join entries as e on e.id=s.entry_id
         where doctype=$doctype and s.txt like $like
         group by e.id
-        order by e.sortkey, s.level
+        order by e.sortkey` + sortdesc + `, s.level
         limit $howmany`;
       var params1={$howmany: howmany, $like: "%"+searchtext+"%", $doctype: doctype};
       var sql2=`select count(distinct s.entry_id) as total
@@ -662,10 +666,17 @@ module.exports={
     });
   },
 
+  getSortTitle: function(xml, titling) {
+    if(titling.headwordSorting)
+      return module.exports.getEntryHeadword(xml, titling.headwordSorting)
+    return module.exports.getEntryHeadword(xml, titling.headword)
+  },
   getEntryTitle: function(xml, titling, plaintext){
     if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
     //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
-    if(plaintext) var ret=module.exports.getEntryHeadword(xml, titling); else var ret="<span class='headword'>"+module.exports.getEntryHeadword(xml, titling)+"</span>";
+    var ret=module.exports.getEntryHeadword(xml, titling.headword);
+    if(plaintext)
+      ret="<span class='headword'>"+ret+"</span>";
     if(titling.headwordAnnotations) for(var i=0; i<titling.headwordAnnotations.length; i++){
       if(ret!="") ret+=" ";
       ret+=extractText(xml, titling.headwordAnnotations[i]).join(" ");
@@ -673,11 +684,11 @@ module.exports={
     //console.log(ret);
     return ret;
   },
-  getEntryHeadword: function(xml, titling){
+  getEntryHeadword: function(xml, headword_elem){
     if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
     //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret="";
-    var arr=extractText(xml, titling.headword);
+    var arr=extractText(xml, headword_elem);
     if(arr.length>0) ret=arr[0];
     if(ret==""){
       ret=extractFirstText(xml);
@@ -718,7 +729,7 @@ module.exports={
     if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
     //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret=[];
-    ret.push(module.exports.getEntryHeadword(xml, titling));
+    ret.push(module.exports.getEntryHeadword(xml, titling.headword));
     if(searchability.searchableElements) for(var i=0; i<searchability.searchableElements.length; i++){
       var arr=extractText(xml, searchability.searchableElements[i]);
       arr.map(txt => { if(txt!="" && ret.indexOf(txt)==-1) ret.push(txt); });

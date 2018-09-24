@@ -34,10 +34,11 @@ Screenful.Navigator={
       if(event.which==13) Screenful.Navigator.critGo(event);
     });
     $("#butSearch").on("click", Screenful.Navigator.critGo);
-    $("#navbox").append("<div class='line2'><span id='countcaption'>0</span><button class='iconYes noborder' id='butReload'>"+Screenful.Loc.reload+"</button></div>");
+    $("#navbox").append("<div class='line2'><span id='countcaption'>0</span><button class='iconYes noborder' id='butReload'>"+Screenful.Loc.reload+"</button><button class='iconYes noborder' id='butReverse'>"+Screenful.Loc.reverse+"</button></div>");
     if(!(Screenful.Navigator.critEditor && Screenful.Navigator.critHarvester)) $("#butCritOpen").remove();
     $("#butCritOpen").on("click", Screenful.Navigator.critOpen);
     $("#butReload").on("click", Screenful.Navigator.reload);
+    $("#butReverse").on("click", Screenful.Navigator.reverse);
     $("#critbox").html("<div id='editor'></div><div class='buttons'><button class='iconYes' id='butCritCancel'>"+Screenful.Loc.cancel+"</button><button class='iconYes' id='butCritGo'>"+Screenful.Loc.find+"</button></div>");
     $("#butCritCancel").on("click", Screenful.Navigator.critCancel);
     $("#butCritGo").on("click", Screenful.Navigator.critGo);
@@ -192,7 +193,7 @@ Screenful.Navigator={
       $("#butCritRemove").hide();
     }
     if(searchtext!="") $("#butCritRemove").show();
-    $.ajax({url: url, dataType: "json", method: "POST", data: {facets: facets, criteria: criteria, searchtext: searchtext, modifier: modifier, howmany: howmany}}).done(function(data){
+    $.ajax({url: url, dataType: "json", method: "POST", data: {facets: facets, criteria: criteria, searchtext: searchtext, modifier: modifier, howmany: howmany, sortdesc: Screenful.Navigator.sortDesc}}).done(function(data){
       if(!data.success) {
         Screenful.status(Screenful.Loc.listingFailed, "warn"); //"failed to get list of entries"
       } else {
@@ -345,6 +346,16 @@ Screenful.Navigator={
   reload: function(event){
     $("#listbox").scrollTop(0);
     Screenful.Navigator.list();
+  },
+  reverse: function(event){
+    $("#listbox").scrollTop(0);
+    Screenful.Navigator.sortDesc = !Screenful.Navigator.sortDesc;
+    Screenful.Navigator.list();
+  },
+  setModifier: function(i){
+    var obj=Screenful.Navigator.modifiers[i];
+    $("#navbox .lineModifiers .clickable .current").html(obj.caption).data("value", obj.value);
+    if($.trim($("#searchbox").val())!="") Screenful.Navigator.list();
   },
 
   refresh: function(entryID, action){

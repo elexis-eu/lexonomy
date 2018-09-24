@@ -28,6 +28,7 @@ button#butCritOpen {background-image: url(find.png);}
 button#butCritOpen.on { background-color: rgb(198, 231, 255); }
 button#butCritRemove {background-image: url(cross.png);}
 button#butReload {background-image: url(arrow_refresh.png); padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
+button#butReverse {background-image: url(reverse.png); background-size: auto 2ex; padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
 button#butCritCancel {background-image: url(arrow_left.png);}
 button#butCritGo {background-image: url(find.png);}
 button.iconOnly#butSearch {background-image: url(magnifier.png);}

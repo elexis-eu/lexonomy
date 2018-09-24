@@ -15,6 +15,16 @@ Titling.render=function(div, json){
   $block.find("select").on("change", function(e){Titling.headwordChanged(); Titling.change();});
   $block.append("<div class='instro'>Select the element which contains the entry's headword. If you make no selection here Lexonomy will try to guess what the headword of each entry is.</div>");
 
+  var $block=$("<div class='block headwordSorting'></div>").appendTo($div);
+  $block.append("<div class='title'>Headword sorting</div>");
+  $block.append("<select></select>");
+  $block.find("select").append("<option value=''>(not set)</option>");
+  for(var i=0; i<elements.length; i++){
+    $block.find("select").append("<option "+(json.headwordSorting==elements[i] ? "selected='selected'" : "")+" value='"+elements[i]+"'>"+elements[i]+"</option>");
+  }
+  $block.find("select").on("change", function(e){Titling.headwordChanged(); Titling.change();});
+  $block.append("<div class='instro'>Select the element which will be used for sorting of headwords in the entry list. If you make no selection here Lexonomy will use the element you chose for headword.</div>");
+
   var $block=$("<div class='block headwordAnnotations'></div>").appendTo($div);
 	$block.append("<div class='title'>Headword annotations</div>");
   $block.append("<div class='scrollbox'><div>");
@@ -38,6 +48,7 @@ Titling.render=function(div, json){
 Titling.harvest=function(div){
   var ret={};
   ret.headword=$(".pillarform .block.headword select").val();
+  ret.headwordSorting=$(".pillarform .block.headwordSorting select").val();
   ret.headwordAnnotations=[];
   $(".pillarform .block.headwordAnnotations .scrollbox label input").each(function(){
     var $input=$(this);
