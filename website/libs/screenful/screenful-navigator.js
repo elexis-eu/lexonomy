@@ -210,14 +210,14 @@ Screenful.Navigator={
             });
           });
         }
-        if(data.primeEntries){
-          if(data.primeEntries.length>0) {
-            $listbox.append("<div class='intertitle'>"+Screenful.Loc.exactMatches+"</div>");
-            data.primeEntries.forEach(function(entry){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier); });
-          }
-          if(data.entries.length>0) $listbox.append("<div class='intertitle'>"+Screenful.Loc.partialMatches+"</div>");
+        if(data.primeEntries && data.primeEntries.length>0 && data.entries.length>0){
+          $listbox.append("<div class='intertitle'>"+Screenful.Loc.exactMatches+"</div>");
         }
-        data.entries.forEach(function(entry){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier); });
+        if(data.primeEntries) data.primeEntries.forEach(function(entry){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier); });
+        if(data.primeEntries && data.primeEntries.length>0 && data.entries.length>0){
+          $listbox.append("<div class='intertitle'>"+Screenful.Loc.partialMatches+"</div>");
+        }
+        if(data.entries) data.entries.forEach(function(entry){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier); });
         if(!noSFX) $listbox.hide().fadeIn();
         if(data.entries.length+(data.primeEntries?data.primeEntries.length:0)<data.total){
           $listbox.append("<div id='divMore'><button class='iconYes' id='butMore'>"+Screenful.Loc.more+"</button></div>");
