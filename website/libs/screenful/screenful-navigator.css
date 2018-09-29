@@ -52,7 +52,8 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 #navbox .modifiers span.clickable span.current span.caption {display: none;}
 #navbox .modifiers span.clickable span.current span.abbr {display: inline-block; width: 3em; overflow: hidden; text-align: center; box-sizing: border-box; padding: 4px 4px; margin: 0px 0px -10px 0px; position: relative; top: -4px; line-height: 1em; background-color: #cccccc; border-radius: 2px; text-shadow: 1px 1px 0px #ffffff; color: #333333;}
 
-#navbox .modifiers div.menu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; margin-top: 5px; z-index: 1; white-space: nowrap;}
+div.menu {z-index: 2;}
+#navbox .modifiers div.menu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; margin-top: 5px; white-space: nowrap;}
 #navbox .modifiers div.menu a {display: block; padding: 10px 20px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
 #navbox .modifiers div.menu a span.abbr {display: inline-block; width: 3em; overflow: hidden; text-align: center; box-sizing: border-box; padding: 4px 4px; margin: 0px 10px -10px -10px; position: relative; top: -3px; line-height: 1em; background-color: #cccccc; border-radius: 2px; text-shadow: 1px 1px 0px #ffffff;}
 #navbox .modifiers div.menu a:first-child {border-top-left-radius: 4px; border-top-right-radius: 4px; border-top: 0px;}
@@ -99,14 +100,14 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 
 #listbox .entry span.entryLineNumber {float: left; margin-right: 0.5em; top: 2px; z-index: 1; display: none}
 
-#listbox .entry div.entrymenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; right: 0px; top: 35px; z-index: 1; white-space: nowrap;}
+#listbox .entry div.entrymenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; right: 0px; top: 35px; white-space: nowrap;}
 #listbox .entry div.entrymenu a {display: block; padding: 8px 20px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
 #listbox .entry div.entrymenu a span.keyCaption {float: right; margin-left: 2em; margin-right: -0.5em; color: #999999; font-size: 80%; padding-top: 1px;}
 #listbox .entry div.entrymenu a:first-child {border-top-left-radius: 4px; border-top-right-radius: 4px; border-top: 0px;}
 #listbox .entry div.entrymenu a:last-child {border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;}
 #listbox .entry div.entrymenu a:hover {background-color: #f7f9ea; }
 
-#listbox .entry div.flagmenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; left: 10px; top: 35px; z-index: 2; white-space: nowrap; max-height: 300px; overflow-y: auto;}
+#listbox .entry div.flagmenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; left: 10px; top: 35px; white-space: nowrap; max-height: 300px; overflow-y: auto;}
 #listbox .entry div.flagmenu a {display: block; padding: 8px 20px 8px 10px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
 #listbox .entry div.flagmenu a span.spot {float: left; background-color: #ffffff; border: 1px solid #999999; border-radius: 20px; box-sizing: border-box; width: 1em; height: 1em; margin-right: 0.5em; position: relative; top: 2px;}
 #listbox .entry div.flagmenu a span.keyCaption {float: right; margin-left: 2em; margin-right: -0.5em; color: #999999; font-size: 80%; padding-top: 1px;}
@@ -119,7 +120,7 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 #listbox #divMore button#butMore {background-image: url(resultset_down.png);}
 
 #listMenuWrapper {display: inline-block; position: absolute; right: 0; margin-top: 5px; margin-right: 5px;}
-#listMenu { display: none; border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; z-index: 2; white-space: nowrap; max-height: 300px; overflow-y: auto;}
+#listMenu { display: none; border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; white-space: nowrap; max-height: 300px; overflow-y: auto;}
 #listMenu a {text-align: left; display: block; padding: 8px 20px 8px 10px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
 #listMenu a button {margin: 0}
 #listMenu a:hover {background-color: #f7f9ea; }
