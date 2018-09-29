@@ -15,8 +15,8 @@
 
 #navbox { position: absolute; top: 0px; left: 0px; width: 30%; height: 100px; box-shadow: -2px 2px 2px #999999; z-index: 5;}
 #listbox { position: absolute; top: 100px; left: 0px; width: 30%; bottom: 0px; overflow-y: scroll; overflow-x: hidden; padding-top: 10px; }
-#navbox.hasSearchModifiers {height: 125px;}
-#listbox.hasSearchModifiers {top: 125px;}
+#navbox.hasSearchModifiers {height: 80px;}
+#listbox.hasSearchModifiers {top: 80px;}
 #editbox { position: absolute; top: 1px; left: 30%; right: 0px; bottom: 0px; border-left: 1px solid var(--border, #aaaaaa); }
 #editbox iframe { width: 100%; height: 100%; border: 0px; }
 #critbox { position: absolute; top: 70px; left: 15px; bottom: 30px; max-height: 600px; width: 60%; background-color: #ffffff; box-shadow: 0px 0px 5px #666666; border-radius: 4px; z-index: 10;}
@@ -30,18 +30,19 @@ button#butCritRemove {background-image: url(cross.png);}
 button#butReload {background-image: url(arrow_refresh.png); padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
 button#butReverse {background-image: url(reverse.png); background-size: auto 2ex; padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
 button#butShowNumbers {background-image: url(numbers.png); background-size: auto 2ex; padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
+button#butListMenu {background-image: url(listmenu.png); background-size: auto 2ex;}
 button#butCritCancel {background-image: url(arrow_left.png);}
 button#butCritGo {background-image: url(find.png);}
 button.iconOnly#butSearch {background-image: url(magnifier.png);}
 
 #navbox .line1 { padding-left: 10px; white-space: nowrap; border-bottom: 1px solid #eeeeee;}
 #navbox.hasSearchModifiers .line1 {border-bottom: 0px;}
-#navbox .lineModifiers { display: none; padding-left: 15px; border-bottom: 1px solid #eeeeee; overflow-x: hidden; white-space: nowrap; padding-bottom: 5px; margin-top: -5px; font-size: 0.9em;}
+#navbox .lineModifiers { display: none; padding-left: 15px; overflow-x: hidden; white-space: nowrap; padding-bottom: 5px; margin-top: -5px; font-size: 0.9em;}
 #navbox .lineModifiersLeft.hasCrits {padding-left: 62px;}
 #navbox.hasSearchModifiers .lineModifiers {display: block;}
 #navbox .line2 { padding-left: 10px; margin: 0px 0px 0px 0px; overflow-x: hidden; white-space: nowrap; }
 #navbox .line2 button {padding-top: 0px; padding-bottom: 0px;}
-#navbox #countcaption {color: #666666; padding: 14px 20px 0px 10px; float: right;}
+#navbox #countcaption {color: #666666; padding: 14px 20px 0px 10px;}
 
 #navbox .modifiers span.clickable { color: #999999; cursor: pointer;}
 #navbox .modifiers span.clickable:hover {color: var(--link); }
@@ -116,3 +117,9 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 
 #listbox #divMore { text-align: center; padding: 30px 0px; }
 #listbox #divMore button#butMore {background-image: url(resultset_down.png);}
+
+#listMenuWrapper {display: inline-block; position: absolute; right: 0; margin-top: 5px; margin-right: 5px;}
+#listMenu { display: none; border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; z-index: 2; white-space: nowrap; max-height: 300px; overflow-y: auto;}
+#listMenu a {text-align: left; display: block; padding: 8px 20px 8px 10px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
+#listMenu a button {margin: 0}
+#listMenu a:hover {background-color: #f7f9ea; }

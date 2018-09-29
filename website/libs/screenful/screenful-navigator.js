@@ -26,6 +26,10 @@ Screenful.Navigator={
     $("#midcontainer").html("<div id='navbox'></div><div id='listbox'></div><div id='editbox'></div><div id='critbox' tabindex='0' style='display: none'></div>");
     $("#editbox").html("<iframe name='editframe' frameborder='0' scrolling='no' src='"+Screenful.Navigator.editorUrl+"'/>");
     $("#navbox").html("<div class='line1'><button class='iconOnly' id='butCritOpen'>&nbsp;</button><div class='modifiers boxModifiers' style='display: none'><span class='clickable'><span class='current'></span> <span class='arrow'>▼</span></span><div class='menu' style='display: none'></div></div><input id='searchbox' title='Ctrl + Shift + T'/><button id='butSearch' class='iconOnly mergeLeft noborder'>&nbsp;</buttton><button class='iconOnly noborder' id='butCritRemove' style='display: none;'></button></div>");
+    $line1 = $(".line1")
+    $line1.append("<span id='countcaption'>0</span>");
+    $listMenuWrapper = $("<div id='listMenuWrapper'></div>").appendTo($line1);
+    $butListMenu = $("<button class='iconYes noborder' id='butListMenu'></button>").appendTo($listMenuWrapper);
     $("#navbox").append("<div class='modifiers lineModifiers lineModifiersRight' style='display: none'><span class='clickable'><span class='current'></span> <span class='arrow'>▼</span></span><div class='menu' style='display: none'></div></div>");
     $("#navbox").append("<div class='modifiers lineModifiers lineModifiersLeft' style='display: none'><span class='clickable'><span class='current'></span> <span class='arrow'>▼</span></span><div class='menu' style='display: none'></div></div>");
     $("#searchbox").on("keydown", function(e){if(!e.altKey && !((e.ctrlKey || e.metaKey) && e.shiftKey)) e.stopPropagation()});
@@ -34,10 +38,11 @@ Screenful.Navigator={
       if(event.which==13) Screenful.Navigator.critGo(event);
     });
     $("#butSearch").on("click", Screenful.Navigator.critGo);
-    $("#navbox").append("<div class='line2'><span id='countcaption'>0</span>\
-				         <button class='iconYes noborder' id='butReload'>"+Screenful.Loc.reload+"</button>\
-				         <button class='iconYes noborder' id='butReverse'>"+Screenful.Loc.reverse+"</button>\
-				         <button class='iconYes noborder' id='butShowNumbers'>"+Screenful.Loc.shownumbers+"</button></div>");
+    $listMenuWrapper.append("<div class='menu' id='listMenu'>\
+                         <a href='javascript:void(0);'><button class='iconYes noborder' id='butReload'>"+Screenful.Loc.reload+"</button></a>\
+				         <a href='javascript:void(0);'><button class='iconYes noborder' id='butReverse'>"+Screenful.Loc.reverse+"</button></a>\
+				         <a href='javascript:void(0);'><button class='iconYes noborder' id='butShowNumbers'>"+Screenful.Loc.shownumbers+"</button></a></div>");
+    $butListMenu.on("click", Screenful.Navigator.listMenuLinkClick);
     if(!(Screenful.Navigator.critEditor && Screenful.Navigator.critHarvester)) $("#butCritOpen").remove();
     $("#butCritOpen").on("click", Screenful.Navigator.critOpen);
     $("#butReload").on("click", Screenful.Navigator.reload);
@@ -436,6 +441,13 @@ Screenful.Navigator={
     }
   },
 
+  listMenuLinkClick: function(e){
+    e.stopPropagation();
+    var $menu=$("#listMenu");
+    $(".menu:visible").not($menu).slideUp();
+    $menu.hide().slideDown();
+    e.stopPropagation();
+  },
   entryFlagLinkClick: function(e){
     e.stopPropagation();
     var $menuLink=$(e.delegateTarget);
