@@ -298,7 +298,8 @@ Screenful.Navigator={
       window.setTimeout(function(){
         var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
         $flagLink.removeClass("undecided");
-        $flagLink.css("background-color", flag.color);
+        if (flag)
+          $flagLink.css("background-color", flag.color);
         $flagLink.on("click", Screenful.Navigator.entryFlagLinkClick);
         var $menu=$("<div class='menu flagmenu' style='display: none'></div>").appendTo($item);
         Screenful.Navigator.flags.map(flag => {
