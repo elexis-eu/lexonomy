@@ -23,9 +23,32 @@ Screenful.Navigator={
       });
     }
 
-    $("#midcontainer").html("<div id='navbox'></div><div id='listbox'></div><div id='editbox'></div><div id='critbox' tabindex='0' style='display: none'></div>");
-    $("#editbox").html("<iframe name='editframe' frameborder='0' scrolling='no' src='"+Screenful.Navigator.editorUrl+"'/>");
+    $("#midcontainer").html("<div id='navlistcontainer'>\
+                               <div id='innernavlistcontainer'>\
+                                 <div id='navbox'></div>\
+                                 <div id='listbox'></div>\
+                               </div>\
+                               <div id='resizenavlistcontainer'></div>\
+                             </div>\
+                             <div id='editbox'></div>\
+                             <div id='critbox' tabindex='0' style='display: none'></div>");
+    $("#editbox").html("<div id='editoverlay'></div><iframe name='editframe' frameborder='0' scrolling='no' src='"+Screenful.Navigator.editorUrl+"'/>");
     $("#navbox").html("<div class='line1'><button class='iconOnly' id='butCritOpen'>&nbsp;</button><div class='modifiers boxModifiers' style='display: none'><span class='clickable'><span class='current'></span> <span class='arrow'>▼</span></span><div class='menu' style='display: none'></div></div><input id='searchbox' title='Ctrl + Shift + T'/><button id='butSearch' class='iconOnly mergeLeft noborder'>&nbsp;</buttton><button class='iconOnly noborder' id='butCritRemove' style='display: none;'></button></div>");
+    var $navlistcontainer = $("#navlistcontainer");
+    var $editbox = $("#editbox");
+    var $editoverlay = $("#editoverlay"); // must be here to make resize working, otherwise iframe catches mouseup
+    $("#resizenavlistcontainer").mousedown(function() {
+      $editoverlay.show();
+      var minListWidth = 2 * ($("#countcaption").width() + $("#butListMenu").outerWidth());
+      $editframe = $("iframe[name='editframe']").contents();
+      var minEditFrameWidth = 1.3 * ($("#butNew", $editframe).outerWidth() + $("#idbox", $editframe).outerWidth());
+      var maxListWidth = $(window).width() - minEditFrameWidth;
+      $(window).mousemove(function(e) {
+        var newwidth = Math.min(maxListWidth, Math.max(e.pageX, minListWidth));
+        $navlistcontainer.css("width", newwidth),
+        $editbox.css("left", newwidth)});
+    })
+    $(window).mouseup(function() {$(window).off("mousemove"); $editoverlay.hide()});
     $line1 = $(".line1")
     $line1.append("<span id='countcaption'>0</span>");
     $listMenuWrapper = $("<div id='listMenuWrapper'></div>").appendTo($line1);
