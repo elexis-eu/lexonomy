@@ -10,7 +10,7 @@
 
 #toolbar span.divider {font: inherit; border-left: 2px dotted #cccccc; padding: 2px 0px; margin: 8px 5px; min-height: 2em; display: inline-block; vertical-align: middle; }
 #toolbar span#idlabel {font: inherit; border-radius: 4px 0px 0px 4px; background-color: #eeeeee; color: #666666; text-shadow: 1px 1px 0px #ffffff; padding: 6px 10px 5px 10px; margin: 0px 5px; min-height: 1.3em; display: inline-block; width: 20px; vertical-align: middle; z-index: 1; position: relative; text-align: center;}
-#toolbar input#idbox {font: inherit; border: 1px inset #cccccc; cursor: inline; border-radius: 4px; background-color: #ffffff; color: #333333; padding: 6px 35px 6px 50px; margin: 8px 5px; min-height: 1.3em; display: inline-block; width: 5em; vertical-align: middle; margin-left: -46px;}
+#toolbar input#idbox {font: inherit; border: 1px inset #cccccc; border-radius: 4px; background-color: #ffffff; color: #333333; padding: 6px 35px 6px 50px; margin: 8px 5px; min-height: 1.3em; display: inline-block; width: 5em; vertical-align: middle; margin-left: -46px;}
 #toolbar button.iconYes#butNew {background-image: url(lightning.png);}
 #toolbar button.iconOnly#butOpen {background-image: url(resultset_next.png);}
 #toolbar button.iconYes#butSave {background-image: url(disk.png);}
