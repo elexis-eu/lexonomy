@@ -82,4 +82,10 @@ Screenful.Loc={
 
   exactMatches: "Exact matches",
   partialMatches: "Partial matches",
+
+  termsTitle: "Terms of Use",
+  termsOfUse: "Lexonomy is a service provided by <a href='https://www.lexicalcomputing.com' target='_blank'>Lexical Computing CZ s.r.o.</a>. This service is provided free of charge for <b>non-commercial purposes only</b>. Lexonomy is still in the development phase and no warranties are given as for service availability or fitness for particular purpose.<br/><br/>Commercial users as well as users interested in a guaranteed service level need to <a href='mailto:inquiries@sketchengine.eu'>contact us</a> in order to obtain a subscription.",
+  termsConsent: "My usage is non-commercial and I agree to the terms of use",
+  confirm: "Confirm",
+  termsError: "Please, confirm Terms of Use before using Lexonomy.",
 };
