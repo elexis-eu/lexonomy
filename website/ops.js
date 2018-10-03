@@ -978,6 +978,13 @@ module.exports={
       callnext(true);
     });
   },
+  setConsent: function(email, consent, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.run("update users set consent=$consent where email=$email", {$consent: consent, $email: email}, function(err, row){
+      db.close();
+      callnext(true);
+    });
+  },
   sendSignupToken: function(email, remoteip, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", {$email: email}, function(err, row){
@@ -1116,18 +1123,20 @@ module.exports={
   verifyLogin: function(email, sessionkey, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select email, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
+    db.get("select email, ske_username, consent from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
       if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
         email=row.email;
         var ske_username = row.ske_username;
+        var consent = false;
+        if (row.consent == 1) consent = true;
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
           module.exports.readSiteConfig(function(siteconfig){
-            callnext({loggedin: true, email: email, ske_username: ske_username, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
+            callnext({loggedin: true, email: email, ske_username: ske_username, consent: consent, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
           });
         });
       }
@@ -1465,4 +1474,4 @@ function extractFirstText(xml){ //extract the text content from the first elemen
   return ret;
 }
 
-const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd","createaccount"];
+const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent"];

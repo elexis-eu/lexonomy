@@ -60,6 +60,9 @@ app.get(siteconfig.rootPath+":dictID/en/", function(req, res){ res.redirect("/"+
 //SITEWIDE UI:
 app.get(siteconfig.rootPath, function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    if (user.loggedin && !user.consent) {
+      res.redirect(siteconfig.baseUrl + 'consent/');
+    }
     ops.getDictsByUser(user.email, function(dicts){
       var error = null;
       if (req.cookies.jwt_error) {
@@ -68,6 +71,12 @@ app.get(siteconfig.rootPath, function(req, res){
       }
       res.render("home.ejs", {siteconfig: siteconfig, user: user, dicts: dicts, error: error});
     });
+  });
+});
+app.get(siteconfig.rootPath+"consent/", function(req, res){
+  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    if (!user.loggedin) res.redirect(siteconfig.baseUrl);
+    res.render("consent.ejs", {user: user, siteconfig: siteconfig});
   });
 });
 app.get(siteconfig.rootPath+"login/", function(req, res){
@@ -138,6 +147,15 @@ app.post(siteconfig.rootPath+"login.json", function(req, res){
       res.json({success: true, sessionkey: sessionkey});
     } else {
       res.json({success: false});
+    }
+  });
+});
+app.post(siteconfig.rootPath+"consent.json", function(req, res){
+  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    if (user.loggedin) {
+      ops.setConsent(user.email, req.body.consent, function(success) {
+        res.json({success: success});
+      });
     }
   });
 });
