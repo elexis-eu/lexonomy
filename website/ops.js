@@ -683,7 +683,7 @@ module.exports={
       return ret;
     }
     var ret=module.exports.getEntryHeadword(xml, titling.headword);
-    if(plaintext)
+    if(!plaintext)
       ret="<span class='headword'>"+ret+"</span>";
     if(titling.headwordAnnotations) for(var i=0; i<titling.headwordAnnotations.length; i++){
       if(ret!="") ret+=" ";
