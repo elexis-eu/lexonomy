@@ -121,7 +121,7 @@ div.menu {z-index: 2;}
 
 
 #listbox #divMore { text-align: center; padding: 30px 0px; }
-#listbox #divMore button#butMore {background-image: url(resultset_down.png);}
+#listbox #divMore button#butMore {background-image: url(resultset_down.png); margin-bottom: 15%;}
 
 #listMenuWrapper {display: inline-block; position: absolute; right: 0; margin-top: 5px; margin-right: 20px;}
 #listMenu { display: none; border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; white-space: nowrap; max-height: 300px; overflow-y: auto;}
