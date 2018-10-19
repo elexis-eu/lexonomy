@@ -1,10 +1,10 @@
 const fs=require("fs-extra");
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 
-const filepath="/home/mbm/Downloads/vojta/dk_ipa.xml";
+const filepath="/home/mbm/deleteme/KSSJ_LBS+AVT_1.1-dump.xml";
 var readStream=fs.createReadStream(filepath).setEncoding("utf8");
 
-const dbpath="/home/mbm/lexonomy/data/dicts/zg6iqmitk.sqlite";
+const dbpath="/home/mbm/lexonomy/data/dicts/zwkaq8ym4.sqlite";
 var db=new sqlite3.Database(dbpath, sqlite3.OPEN_READWRITE);
 
 var entryCount=0;
@@ -14,15 +14,20 @@ db.exec("delete from entries; delete from history; delete from searchables; dele
   console.log(`database emptied`);
   db.run("BEGIN TRANSACTION");
   var buffer="";
+  var tail=""; //the buffer's tail = the last 1000 chars of the buffer
   readStream.on("data", function(chunk){
     for(var pos=0; pos<chunk.length; pos++){
       buffer+=chunk[pos];
-      if(buffer.endsWith("<entry>")){
-        buffer="<entry>";
-      }
-      if(buffer.endsWith("</entry>")){
-        entryCount++;
-        insertEntry(entryCount, buffer);
+      tail+=chunk[pos]; if(tail.length>100) tail=tail.substring(tail.length-100, tail.length); //the last 1000 chars of the buffer
+      if(chunk[pos]==">"){
+        if(tail.endsWith("<clanek>")){ //for performance reasons, we check the buffer's tail instead of the buffer itself
+          buffer="<clanek>";
+          tail="<clanek>";
+        }
+        if(tail.endsWith("</clanek>")){ //for performance reasons, we check the buffer's tail instead of the buffer itself
+          entryCount++;
+          insertEntry(entryCount, buffer);
+        }
       }
     }
   });
@@ -36,14 +41,17 @@ db.exec("delete from entries; delete from history; delete from searchables; dele
 //---
 
 function insertEntry(entryID, buffer){
+  console.log(`entryID ${entryID} beginning to insert`);
   var xml=buffer.replace(/\>[\r\n]+\s*\</g, "><"); buffer="";
-  var headword=""; xml.replace(/\<headword\>(.*)\<\/headword\>/, function(s, $1){headword=$1});
-  var status=""; xml.replace(/\<status\>(.*)\<\/status\>/, function(s, $1){status=$1});
-  var pos=""; xml.replace(/\<partOfSpeech\>(.*)\<\/partOfSpeech\>/, function(s, $1){status+=" "+$1});
-  var title=headword+" "+status;
-  var titleHtml="<span class='headword'>"+headword+"</span> "+status;
+  var headword=""; xml.replace(/\<zapis[^\>]*\>(.*)\<\/zapis\>/, function(s, $1){headword=$1});
+  // var status=""; xml.replace(/\<status\>(.*)\<\/status\>/, function(s, $1){status=$1});
+  // var pos=""; xml.replace(/\<partOfSpeech\>(.*)\<\/partOfSpeech\>/, function(s, $1){status+=" "+$1});
+  var title=headword
+  var titleHtml="<span class='headword'>"+headword+"</span>";
+  // var title=headword+" "+status;
+  // var titleHtml="<span class='headword'>"+headword+"</span> "+status;
   var sortkey=toSortkey(title, abc);
-  db.run("insert into entries(id, doctype, xml, title, sortkey) values($id, $doctype, $xml, $title, $sortkey)", {$id: entryID, $doctype: "entry", $xml: xml, $title: titleHtml, $sortkey: sortkey}, function(err){
+  db.run("insert into entries(id, doctype, xml, title, sortkey) values($id, $doctype, $xml, $title, $sortkey)", {$id: entryID, $doctype: "clanek", $xml: xml, $title: titleHtml, $sortkey: sortkey}, function(err){
     if(err) console.log(err);
     console.log(`entryID ${entryID} inserted into table entries`);
   });
@@ -55,7 +63,7 @@ function insertEntry(entryID, buffer){
     $entry_id: entryID,
     $action: "create",
     $when: (new Date()).toISOString(),
-    $email: "valselob@gmail.com",
+    $email: "",
     $xml: xml,
     $historiography: JSON.stringify({}),
   }, function(err){
