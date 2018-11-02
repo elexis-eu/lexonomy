@@ -321,6 +321,13 @@ app.get(siteconfig.rootPath+"skelogin.json/:token", function(req, res){
       ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
         ops.processJWT(user, decoded, function(success, email, sessionkey){
           if (success) {
+            //successful SkE login, send Lexonomy API key back to SkE
+            ops.prepareApiKeyForSke(user.email, function(apiKey){
+              if (apiKey != false) {
+                ops.sendApiKeyToSke(user.email, apiKey, user.ske_username, user.ske_apiKey, function(){});
+              }
+            });
+            //login user
             res.cookie("email", email, {});
             res.cookie("sessionkey", sessionkey, {});
             res.redirect(siteconfig.baseUrl)
@@ -362,6 +369,7 @@ app.post(siteconfig.rootPath+"oneclickupdate.json", function(req, res){
       var adjustedEntryID=req.body.id;
       var json=JSON.parse(req.body.content);
       ops.updateUserApiKey(user.email, json.apikey, function(){
+        ops.sendApiKeyToSke(user.email, json.apikey, user.ske_username, user.ske_apiKey, function(){});
         res.json({success: true, id: adjustedEntryID, content: json});
       });
     }

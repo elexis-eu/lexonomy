@@ -5,6 +5,8 @@ const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sq
 const sha1 = require('sha1'); //https://www.npmjs.com/package/sha1
 const markdown = require("markdown").markdown; //https://www.npmjs.com/package/markdown
 const nodemailer = require('nodemailer');
+const https=require("https");
+const querystring=require("querystring");
 
 module.exports={
   siteconfig: {}, //populated by lexonomy.js on startup
@@ -1084,7 +1086,7 @@ module.exports={
       //user logged in = save SkE ID in database
       var key = generateKey();
       var now = (new Date()).toISOString();
-      db.run("update users set ske_id=$ske_id, ske_username=$ske_username, sessionKey=$key, sessionLast=$now where email=$email", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email:user.email, $key:key, $now:now}, function(err, row){
+      db.run("update users set ske_id=$ske_id, ske_username=$ske_username, ske_apiKey=$ske_apiKey, sessionKey=$key, sessionLast=$now where email=$email", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email:user.email, $key:key, $now:now, $ske_apiKey: jwtData.user.api_key}, function(err, row){
         db.close();
         callnext(true, user.email, key);
       });
@@ -1099,7 +1101,7 @@ module.exports={
             if (row == undefined) {
               var key = generateKey();
               var now = (new Date()).toISOString();
-              db.run("insert into users (email, passwordHash, ske_id, ske_username, sessionKey, sessionLast) values ($email, null, $ske_id, $ske_username, $key, $now)", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email: email, $key:key, $now:now}, function(err, row){
+              db.run("insert into users (email, passwordHash, ske_id, ske_username, ske_apiKey, sessionKey, sessionLast) values ($email, null, $ske_id, $ske_username, $ske_apiKey, $key, $now)", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $ske_apiKey: jwtData.user.api_key, $email: email, $key:key, $now:now}, function(err, row){
                 db.close();
                 callnext(true, email, key);
               });
@@ -1112,7 +1114,7 @@ module.exports={
           var email = row.email;
           var key = generateKey();
           var now = (new Date()).toISOString();
-          db.run("update users set sessionKey=$key, sessionLast=$now where ske_id=$ske_id", {$key: key, $now: now, $ske_id: jwtData.user.id}, function(err, row){
+          db.run("update users set ske_apiKey=$ske_apiKey, sessionKey=$key, sessionLast=$now where ske_id=$ske_id", {$key: key, $now: now, $ske_id: jwtData.user.id, $ske_apiKey: jwtData.user.api_key}, function(err, row){
             db.close();
             callnext(true, email, key);
           });
@@ -1123,20 +1125,21 @@ module.exports={
   verifyLogin: function(email, sessionkey, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select email, ske_username, consent from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
+    db.get("select email, ske_username, ske_apiKey, consent from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
       if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
         email=row.email;
         var ske_username = row.ske_username;
+        var ske_apiKey = row.ske_apiKey;
         var consent = false;
         if (row.consent == 1) consent = true;
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
           module.exports.readSiteConfig(function(siteconfig){
-            callnext({loggedin: true, email: email, ske_username: ske_username, consent: consent, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
+            callnext({loggedin: true, email: email, ske_username: ske_username, ske_apiKey: ske_apiKey, consent: consent, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
           });
         });
       }
@@ -1215,7 +1218,59 @@ module.exports={
       }
     });
   },
-
+  prepareApiKeyForSke: function(email, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select apiKey, ske_username, ske_apiKey from users where email=$email", {$email: email}, function(err, row){
+      if(!row || module.exports.siteconfig.readonly){
+        db.close();
+        callnext(false);
+      } else {
+        var lexonomyApiKey;
+        if (row.apiKey == '' || row.apiKey == null) {
+          //generate new key
+          var key = '';
+          var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+          while(key.length < 32) {
+            var i = Math.floor(Math.random() * alphabet.length);
+            key += alphabet[i]
+          }
+          db.run("update users set apiKey=$apiKey where email=$email", {$email: email, $apiKey: key});
+          lexonomyApiKey = key;
+        } else {
+          lexonomyApiKey = row.apiKey;
+        }
+        callnext(lexonomyApiKey);
+      }
+    });
+  },
+  sendApiKeyToSke: function(email, apiKey, ske_username, ske_apiKey, callnext) {
+    console.log('send API key to SkE');
+    if (ske_username != "" && ske_apiKey != "") {
+      var data = JSON.stringify({options:{
+        settings_lexonomyApiKey: apiKey,
+        settings_lexonomyEmail: email,
+      }});
+      var queryData = querystring.stringify({'username':ske_username, 'api_key': ske_apiKey, 'json': data});
+      var options = {
+        'host': 'api.sketchengine.co.uk',
+        'path': '/bonito/run.cgi/set_user_options?' + queryData,
+        'method': 'GET',
+      };
+      var req = https.request(options, function(response){
+        var str = '';
+        response.on('data', function(chunk){
+          str += chunk;
+        });
+        response.on('end', function(){
+          console.log(str)
+        });
+      });
+      req.on('error', function(e) {
+        console.log('problem with request: ' + e.message);
+      });
+      req.end();
+    }
+  },
   getDoc: function(docID, callnext){
     var doc={id: docID, title: "", html: ""};
     fs.readFile("docs/"+docID+".md", "utf8", function(err, content){
