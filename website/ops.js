@@ -158,6 +158,7 @@ module.exports={
     });
     var afterwards=function(){
       if(configID=="ident" || configID=="users"){
+        db.dictConfigs=null;
         module.exports.attachDict(db, dictID, function(){
           callnext(json, false);
         });
