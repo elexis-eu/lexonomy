@@ -1148,12 +1148,14 @@ module.exports={
   verifyLoginAndDictAccess: function(email, sessionkey, dictDB, dictID, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select email from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
+    db.get("select email, ske_apiKey, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
       if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
         email=row.email;
+        ske_apiKey = row.ske_apiKey;
+        ske_username = row.ske_username;
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
@@ -1165,7 +1167,7 @@ module.exports={
               var canConfig=(configs.siteconfig.admins.indexOf(email)>-1 ? true : configs.users[email].canConfig);
               var canDownload=(configs.siteconfig.admins.indexOf(email)>-1 ? true : configs.users[email].canDownload);
               var canUpload=(configs.siteconfig.admins.indexOf(email)>-1 ? true : configs.users[email].canUpload);
-              callnext({loggedin: true, email: email, dictAccess: true, isAdmin: (configs.siteconfig.admins.indexOf(email)>-1), canEdit: canEdit, canConfig: canConfig, canDownload: canDownload, canUpload: canUpload});
+              callnext({loggedin: true, email: email, dictAccess: true, isAdmin: (configs.siteconfig.admins.indexOf(email)>-1), canEdit: canEdit, canConfig: canConfig, canDownload: canDownload, canUpload: canUpload, ske_username: ske_username, ske_apiKey: ske_apiKey});
             }
           });
         });
