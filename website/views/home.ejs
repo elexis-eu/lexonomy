@@ -113,10 +113,17 @@
 	  					<div class="adminlink">
               <%if(user.ske_username){%>
                 Your Lexonomy account is linked to your Sketch Engine account <b><%=user.ske_username%></b>.<br/>
-                Your Sketch Engine API key is <b><%=user.ske_apiKey%></b>.
+                <%if(user.ske_apiKey){%>
+                  Your Sketch Engine API key is <b><%=user.ske_apiKey%></b>.
+                <%}%>
                 <br/><a href="<%=siteconfig.sketchengineLoginPage%>">Link to a different Sketch Engine account&nbsp;»</a>
               <%} else {%>
                 <a href="<%=siteconfig.sketchengineLoginPage%>">Link your Lexonomy account to your Sketch Engine account&nbsp;»</a>
+              <%}%>
+              </div>
+	  					<div class="adminlink">
+              <%if(user.ske_apiKey==''){%>
+                Your Sketch Engine API key is not set. Please, <a href="<%=siteconfig.sketchengineLoginPage%>">login via Sketch Engine</a> to set API key.
               <%}%>
               </div>
 						<%}%>
