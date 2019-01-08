@@ -3,6 +3,7 @@ Screenful.Loc={
   find: "Find",
   reload: "Reload",
   reverse: "Reverse",
+  shownumbers: "Number lines",
   cancel: "Cancel",
   more: "More",
   new: "New",

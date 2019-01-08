@@ -29,6 +29,7 @@ button#butCritOpen.on { background-color: rgb(198, 231, 255); }
 button#butCritRemove {background-image: url(cross.png);}
 button#butReload {background-image: url(arrow_refresh.png); padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
 button#butReverse {background-image: url(reverse.png); background-size: auto 2ex; padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
+button#butShowNumbers {background-image: url(numbers.png); background-size: auto 2ex; padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
 button#butCritCancel {background-image: url(arrow_left.png);}
 button#butCritGo {background-image: url(find.png);}
 button.iconOnly#butSearch {background-image: url(magnifier.png);}
@@ -95,7 +96,9 @@ button.iconOnly#butSearch {background-image: url(magnifier.png);}
 #listbox .entry a.entryFlagLink.undecided {border-color: transparent; background-image: url(loader-round-tiny.gif); background-position: center center; background-repeat: no-repeat;}
 #listbox .entry a.entryFlagLink:hover {border-color: #002c6f;}
 
-#listbox .entry div.entrymenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; right: 0px; top: 35px; z-index: 2; white-space: nowrap;}
+#listbox .entry span.entryLineNumber {float: left; margin-right: 0.5em; top: 2px; z-index: 1; display: none}
+
+#listbox .entry div.entrymenu {border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; position: absolute; right: 0px; top: 35px; z-index: 1; white-space: nowrap;}
 #listbox .entry div.entrymenu a {display: block; padding: 8px 20px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
 #listbox .entry div.entrymenu a span.keyCaption {float: right; margin-left: 2em; margin-right: -0.5em; color: #999999; font-size: 80%; padding-top: 1px;}
 #listbox .entry div.entrymenu a:first-child {border-top-left-radius: 4px; border-top-right-radius: 4px; border-top: 0px;}

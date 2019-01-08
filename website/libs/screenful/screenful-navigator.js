@@ -34,11 +34,15 @@ Screenful.Navigator={
       if(event.which==13) Screenful.Navigator.critGo(event);
     });
     $("#butSearch").on("click", Screenful.Navigator.critGo);
-    $("#navbox").append("<div class='line2'><span id='countcaption'>0</span><button class='iconYes noborder' id='butReload'>"+Screenful.Loc.reload+"</button><button class='iconYes noborder' id='butReverse'>"+Screenful.Loc.reverse+"</button></div>");
+    $("#navbox").append("<div class='line2'><span id='countcaption'>0</span>\
+				         <button class='iconYes noborder' id='butReload'>"+Screenful.Loc.reload+"</button>\
+				         <button class='iconYes noborder' id='butReverse'>"+Screenful.Loc.reverse+"</button>\
+				         <button class='iconYes noborder' id='butShowNumbers'>"+Screenful.Loc.shownumbers+"</button></div>");
     if(!(Screenful.Navigator.critEditor && Screenful.Navigator.critHarvester)) $("#butCritOpen").remove();
     $("#butCritOpen").on("click", Screenful.Navigator.critOpen);
     $("#butReload").on("click", Screenful.Navigator.reload);
     $("#butReverse").on("click", Screenful.Navigator.reverse);
+    $("#butShowNumbers").on("click", Screenful.Navigator.numberLines);
     $("#critbox").html("<div id='editor'></div><div class='buttons'><button class='iconYes' id='butCritCancel'>"+Screenful.Loc.cancel+"</button><button class='iconYes' id='butCritGo'>"+Screenful.Loc.find+"</button></div>");
     $("#butCritCancel").on("click", Screenful.Navigator.critCancel);
     $("#butCritGo").on("click", Screenful.Navigator.critGo);
@@ -213,11 +217,11 @@ Screenful.Navigator={
         if(data.primeEntries && data.primeEntries.length>0 && data.entries.length>0){
           $listbox.append("<div class='intertitle'>"+Screenful.Loc.exactMatches+"</div>");
         }
-        if(data.primeEntries) data.primeEntries.forEach(function(entry){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier); });
+        if(data.primeEntries) data.primeEntries.forEach(function(entry, index){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier, index + 1); });
         if(data.primeEntries && data.primeEntries.length>0 && data.entries.length>0){
           $listbox.append("<div class='intertitle'>"+Screenful.Loc.partialMatches+"</div>");
         }
-        if(data.entries) data.entries.forEach(function(entry){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier); });
+        if(data.entries) data.entries.forEach(function(entry, index){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier, index + 1); });
         if(!noSFX) $listbox.hide().fadeIn();
         if(data.entries.length+(data.primeEntries?data.primeEntries.length:0)<data.total){
           $listbox.append("<div id='divMore'><button class='iconYes' id='butMore'>"+Screenful.Loc.more+"</button></div>");
@@ -268,9 +272,14 @@ Screenful.Navigator={
           Screenful.Navigator.lastFocusedEntryID=$(e.delegateTarget).attr("data-id");
         });
       }
+
+      if (Screenful.Navigator.showNumbers)
+        $(".entryLineNumber").show();
+      else
+        $(".entryLineNumber").hide();
     });
   },
-  printEntry: function(entry, $listbox, searchtext, modifier){
+  printEntry: function(entry, $listbox, searchtext, modifier, index){
     var $item=$("<div class='entry' tabindex='0' data-id='"+entry.id+"'><div class='inside'>"+entry.id+"</div></div>").appendTo($listbox);
     $item.on("click", entry, Screenful.Navigator.openEntry);
 
@@ -280,6 +289,7 @@ Screenful.Navigator={
     //entry flag:
     if(Screenful.Navigator.flags && Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl && Screenful.Navigator.extractEntryFlag){
       var $flagLink=$("<a class='entryFlagLink undecided'></a>").prependTo($item);
+	  $("<span class='entryLineNumber'>" + index + " </span>").prependTo($item);
       window.setTimeout(function(){
         var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
         $flagLink.removeClass("undecided");
@@ -351,6 +361,13 @@ Screenful.Navigator={
     $("#listbox").scrollTop(0);
     Screenful.Navigator.sortDesc = !Screenful.Navigator.sortDesc;
     Screenful.Navigator.list();
+  },
+  numberLines: function(event){
+    Screenful.Navigator.showNumbers = !Screenful.Navigator.showNumbers;
+    if (Screenful.Navigator.showNumbers)
+      $(".entryLineNumber").show();
+    else
+      $(".entryLineNumber").hide();
   },
   setModifier: function(i){
     var obj=Screenful.Navigator.modifiers[i];
