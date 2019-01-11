@@ -29,5 +29,15 @@ fs.readFile(path.join(__dirname, "../siteconfig.json"), "utf8", function(err, co
       return console.error(err.message);
     }
   });
+  db.run("ALTER TABLE users ADD COLUMN consent INTEGER", {}, function(err) {
+    if (err) {
+      return console.error(err.message);
+    }
+  });
+  db.run("ALTER TABLE users ADD COLUMN ske_apiKey TEXT", {}, function(err) {
+    if (err) {
+      return console.error(err.message);
+    }
+  });
   db.close();
 });

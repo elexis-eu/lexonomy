@@ -11,7 +11,7 @@ var Screenful={
     var headerHeight=$("#header").outerHeight() | 0;
     var footerHeight=$("#footer").outerHeight() | 0;
     var statusbarHeight=$("#statusbar").outerHeight() | 0;
-    $("#statusbar").css("bottom", (footerHeight+1)+"px");
+    $("#statusbar").css("bottom", (footerHeight)+"px");
     $("#envelope").css("top", headerHeight+"px");
     $("#envelope").css("bottom", (footerHeight+statusbarHeight+2)+"px");
   },

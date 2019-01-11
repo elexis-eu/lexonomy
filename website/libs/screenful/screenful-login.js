@@ -6,6 +6,10 @@ Screenful.Login={
     $("#middlebox").append("<div class='field password'><div class='label'>"+Screenful.Loc.password+"</div><input type='password' class='textbox'/></div>");
     $("#middlebox").append("<div class='field submit'><input class='button' type='submit' value='"+Screenful.Loc.login+"'/></div>");
     $("#middlebox").append("<div class='error' style='display: none'>"+Screenful.Loc.loginError+"</div>");
+    if (Screenful.Login.sketchengineLoginPage != '') {
+      $("#middlebox").append("<div class='orline'><span>Other ways to log in</span></div>");
+      $("#middlebox").append("<div class='skelogin'><a href='"+Screenful.Login.sketchengineLoginPage+"'>Sign up or log in with <img alt='Sketch Engine' title='Sketch Engine' src='../furniture/logo_ske.png'/> »</a></div>");
+    }
 
     $("#middlebox div.field.email input").focus();
     $("#middlebox").on("submit", function(e){

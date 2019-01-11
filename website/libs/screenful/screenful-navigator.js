@@ -23,9 +23,36 @@ Screenful.Navigator={
       });
     }
 
-    $("#midcontainer").html("<div id='navbox'></div><div id='listbox'></div><div id='editbox'></div><div id='critbox' tabindex='0' style='display: none'></div>");
-    $("#editbox").html("<iframe name='editframe' frameborder='0' scrolling='no' src='"+Screenful.Navigator.editorUrl+"'/>");
+    $("#midcontainer").html("<div id='navlistcontainer'>\
+                               <div id='innernavlistcontainer'>\
+                                 <div id='navbox'></div>\
+                                 <div id='listbox'></div>\
+                               </div>\
+                               <div id='resizenavlistcontainer'></div>\
+                             </div>\
+                             <div id='editbox'></div>\
+                             <div id='critbox' tabindex='0' style='display: none'></div>");
+    $("#editbox").html("<div id='editoverlay'></div><iframe name='editframe' frameborder='0' scrolling='no' src='"+Screenful.Navigator.editorUrl+"'/>");
     $("#navbox").html("<div class='line1'><button class='iconOnly' id='butCritOpen'>&nbsp;</button><div class='modifiers boxModifiers' style='display: none'><span class='clickable'><span class='current'></span> <span class='arrow'>▼</span></span><div class='menu' style='display: none'></div></div><input id='searchbox' title='Ctrl + Shift + T'/><button id='butSearch' class='iconOnly mergeLeft noborder'>&nbsp;</buttton><button class='iconOnly noborder' id='butCritRemove' style='display: none;'></button></div>");
+    var $navlistcontainer = $("#navlistcontainer");
+    var $editbox = $("#editbox");
+    var $editoverlay = $("#editoverlay"); // must be here to make resize working, otherwise iframe catches mouseup
+    $("#resizenavlistcontainer").mousedown(function() {
+      $editoverlay.show();
+      var minListWidth = 2 * ($("#countcaption").width() + $("#butListMenu").outerWidth());
+      $editframe = $("iframe[name='editframe']").contents();
+      var minEditFrameWidth = 1.3 * ($("#butNew", $editframe).outerWidth() + $("#idbox", $editframe).outerWidth());
+      var maxListWidth = $(window).width() - minEditFrameWidth;
+      $(window).mousemove(function(e) {
+        var newwidth = Math.min(maxListWidth, Math.max(e.pageX, minListWidth));
+        $navlistcontainer.css("width", newwidth),
+        $editbox.css("left", newwidth)});
+    })
+    $(window).mouseup(function() {$(window).off("mousemove"); $editoverlay.hide()});
+    $line1 = $(".line1")
+    $line1.append("<span id='countcaption'>0</span>");
+    $listMenuWrapper = $("<div id='listMenuWrapper'></div>").appendTo($line1);
+    $butListMenu = $("<button class='iconYes noborder' id='butListMenu'></button>").appendTo($listMenuWrapper);
     $("#navbox").append("<div class='modifiers lineModifiers lineModifiersRight' style='display: none'><span class='clickable'><span class='current'></span> <span class='arrow'>▼</span></span><div class='menu' style='display: none'></div></div>");
     $("#navbox").append("<div class='modifiers lineModifiers lineModifiersLeft' style='display: none'><span class='clickable'><span class='current'></span> <span class='arrow'>▼</span></span><div class='menu' style='display: none'></div></div>");
     $("#searchbox").on("keydown", function(e){if(!e.altKey && !((e.ctrlKey || e.metaKey) && e.shiftKey)) e.stopPropagation()});
@@ -34,10 +61,16 @@ Screenful.Navigator={
       if(event.which==13) Screenful.Navigator.critGo(event);
     });
     $("#butSearch").on("click", Screenful.Navigator.critGo);
-    $("#navbox").append("<div class='line2'><span id='countcaption'>0</span><button class='iconYes noborder' id='butReload'>"+Screenful.Loc.reload+"</button></div>");
+    $listMenuWrapper.append("<div class='menu' id='listMenu'>\
+                         <a href='javascript:void(0);'><button class='iconYes noborder' id='butReload'>"+Screenful.Loc.reload+"</button></a>\
+				         <a href='javascript:void(0);'><button class='iconYes noborder' id='butReverse'>"+Screenful.Loc.reverse+"</button></a>\
+				         <a href='javascript:void(0);'><button class='iconYes noborder' id='butShowNumbers'>"+Screenful.Loc.shownumbers+"</button></a></div>");
+    $butListMenu.on("click", Screenful.Navigator.listMenuLinkClick);
     if(!(Screenful.Navigator.critEditor && Screenful.Navigator.critHarvester)) $("#butCritOpen").remove();
     $("#butCritOpen").on("click", Screenful.Navigator.critOpen);
     $("#butReload").on("click", Screenful.Navigator.reload);
+    $("#butReverse").on("click", Screenful.Navigator.reverse);
+    $("#butShowNumbers").on("click", Screenful.Navigator.numberLines);
     $("#critbox").html("<div id='editor'></div><div class='buttons'><button class='iconYes' id='butCritCancel'>"+Screenful.Loc.cancel+"</button><button class='iconYes' id='butCritGo'>"+Screenful.Loc.find+"</button></div>");
     $("#butCritCancel").on("click", Screenful.Navigator.critCancel);
     $("#butCritGo").on("click", Screenful.Navigator.critGo);
@@ -192,7 +225,7 @@ Screenful.Navigator={
       $("#butCritRemove").hide();
     }
     if(searchtext!="") $("#butCritRemove").show();
-    $.ajax({url: url, dataType: "json", method: "POST", data: {facets: facets, criteria: criteria, searchtext: searchtext, modifier: modifier, howmany: howmany}}).done(function(data){
+    $.ajax({url: url, dataType: "json", method: "POST", data: {facets: facets, criteria: criteria, searchtext: searchtext, modifier: modifier, howmany: howmany, sortdesc: Screenful.Navigator.sortDesc}}).done(function(data){
       if(!data.success) {
         Screenful.status(Screenful.Loc.listingFailed, "warn"); //"failed to get list of entries"
       } else {
@@ -212,11 +245,11 @@ Screenful.Navigator={
         if(data.primeEntries && data.primeEntries.length>0 && data.entries.length>0){
           $listbox.append("<div class='intertitle'>"+Screenful.Loc.exactMatches+"</div>");
         }
-        if(data.primeEntries) data.primeEntries.forEach(function(entry){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier); });
+        if(data.primeEntries) data.primeEntries.forEach(function(entry, index){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier, index + 1); });
         if(data.primeEntries && data.primeEntries.length>0 && data.entries.length>0){
           $listbox.append("<div class='intertitle'>"+Screenful.Loc.partialMatches+"</div>");
         }
-        if(data.entries) data.entries.forEach(function(entry){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier); });
+        if(data.entries) data.entries.forEach(function(entry, index){ Screenful.Navigator.printEntry(entry, $listbox, searchtext, modifier, index + 1); });
         if(!noSFX) $listbox.hide().fadeIn();
         if(data.entries.length+(data.primeEntries?data.primeEntries.length:0)<data.total){
           $listbox.append("<div id='divMore'><button class='iconYes' id='butMore'>"+Screenful.Loc.more+"</button></div>");
@@ -267,9 +300,14 @@ Screenful.Navigator={
           Screenful.Navigator.lastFocusedEntryID=$(e.delegateTarget).attr("data-id");
         });
       }
+
+      if (Screenful.Navigator.showNumbers)
+        $(".entryLineNumber").show();
+      else
+        $(".entryLineNumber").hide();
     });
   },
-  printEntry: function(entry, $listbox, searchtext, modifier){
+  printEntry: function(entry, $listbox, searchtext, modifier, index){
     var $item=$("<div class='entry' tabindex='0' data-id='"+entry.id+"'><div class='inside'>"+entry.id+"</div></div>").appendTo($listbox);
     $item.on("click", entry, Screenful.Navigator.openEntry);
 
@@ -279,10 +317,12 @@ Screenful.Navigator={
     //entry flag:
     if(Screenful.Navigator.flags && Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl && Screenful.Navigator.extractEntryFlag){
       var $flagLink=$("<a class='entryFlagLink undecided'></a>").prependTo($item);
+	  $("<span class='entryLineNumber'>" + index + " </span>").prependTo($item);
       window.setTimeout(function(){
         var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
         $flagLink.removeClass("undecided");
-        $flagLink.css("background-color", flag.color);
+        if (flag)
+          $flagLink.css("background-color", flag.color);
         $flagLink.on("click", Screenful.Navigator.entryFlagLinkClick);
         var $menu=$("<div class='menu flagmenu' style='display: none'></div>").appendTo($item);
         Screenful.Navigator.flags.map(flag => {
@@ -346,6 +386,23 @@ Screenful.Navigator={
     $("#listbox").scrollTop(0);
     Screenful.Navigator.list();
   },
+  reverse: function(event){
+    $("#listbox").scrollTop(0);
+    Screenful.Navigator.sortDesc = !Screenful.Navigator.sortDesc;
+    Screenful.Navigator.list();
+  },
+  numberLines: function(event){
+    Screenful.Navigator.showNumbers = !Screenful.Navigator.showNumbers;
+    if (Screenful.Navigator.showNumbers)
+      $(".entryLineNumber").show();
+    else
+      $(".entryLineNumber").hide();
+  },
+  setModifier: function(i){
+    var obj=Screenful.Navigator.modifiers[i];
+    $("#navbox .lineModifiers .clickable .current").html(obj.caption).data("value", obj.value);
+    if($.trim($("#searchbox").val())!="") Screenful.Navigator.list();
+  },
 
   refresh: function(entryID, action){
     if(entryID && action=="delete"){
@@ -408,6 +465,13 @@ Screenful.Navigator={
     }
   },
 
+  listMenuLinkClick: function(e){
+    e.stopPropagation();
+    var $menu=$("#listMenu");
+    $(".menu:visible").not($menu).slideUp();
+    $menu.hide().slideDown();
+    e.stopPropagation();
+  },
   entryFlagLinkClick: function(e){
     e.stopPropagation();
     var $menuLink=$(e.delegateTarget);

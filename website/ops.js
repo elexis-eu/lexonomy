@@ -5,6 +5,8 @@ const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sq
 const sha1 = require('sha1'); //https://www.npmjs.com/package/sha1
 const markdown = require("markdown").markdown; //https://www.npmjs.com/package/markdown
 const nodemailer = require('nodemailer');
+const https=require("https");
+const querystring=require("querystring");
 
 module.exports={
   siteconfig: {}, //populated by lexonomy.js on startup
@@ -158,6 +160,7 @@ module.exports={
     });
     var afterwards=function(){
       if(configID=="ident" || configID=="users"){
+        db.dictConfigs=null;
         module.exports.attachDict(db, dictID, function(){
           callnext(json, false);
         });
@@ -251,7 +254,7 @@ module.exports={
       var params={
         $xml: xml,
         $title: module.exports.getEntryTitle(xml, configs.titling),
-        $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+        $sortkey: module.exports.toSortkey(module.exports.getSortTitle(xml, configs.titling), abc),
         $doctype: getDoctype(xml),
         $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
         $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
@@ -295,7 +298,7 @@ module.exports={
           db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
             $id: entryID,
             $title: module.exports.getEntryTitle(xml, configs.titling),
-            $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+            $sortkey: module.exports.toSortkey(module.exports.getSortTitle(xml, configs.titling), abc),
             $xml: xml, $doctype: getDoctype(xml),
             $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
             $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
@@ -335,7 +338,7 @@ module.exports={
             db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
               $id: entryID,
               $title: module.exports.getEntryTitle(xml, configs.titling),
-              $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(xml, configs.titling, true), abc),
+              $sortkey: module.exports.toSortkey(module.exports.getSortTitle(xml, configs.titling), abc),
               $xml: xml, $doctype: getDoctype(xml),
               $needs_refac: Object.keys(configs.subbing).length>0 ? 1 : 0,
               $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length>0 ? 1 : 0
@@ -553,7 +556,7 @@ module.exports={
             db.run("update entries set needs_resave=0, title=$title, sortkey=$sortkey where id=$id", {
               $id: entryID,
               $title: module.exports.getEntryTitle(doc, configs.titling),
-              $sortkey: module.exports.toSortkey(module.exports.getEntryTitle(doc, configs.titling, true), abc),
+              $sortkey: module.exports.toSortkey(module.exports.getSortTitle(doc, configs.titling), abc),
             }, function(err){ if(err) console.log(err); });
 
             db.run("delete from searchables where entry_id=$entry_id", {$entry_id: entryID}, function(err){ if(err) console.log(err);
@@ -563,7 +566,7 @@ module.exports={
                 $level: 1,
               }, function(){
                 var searchables=module.exports.getEntrySearchables(doc, configs.searchability, configs.titling);
-                var headword=module.exports.getEntryHeadword(doc, configs.titling);
+                var headword=module.exports.getEntryHeadword(doc, configs.titling.headword);
                 for(var y=0; y<searchables.length; y++){
                   if(searchables[y]!=headword){
                     db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
@@ -583,15 +586,19 @@ module.exports={
     });
   },
 
-  listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, callnext){
+  listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, sortdesc, callnext){
     if(!searchtext) searchtext="";
+    if (sortdesc == 'true')
+      sortdesc = " DESC "
+    else
+      sortdesc = ""
     if(modifier=="start") {
       var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
         from searchables as s
         inner join entries as e on e.id=s.entry_id
         where doctype=$doctype and s.txt like $like
         group by e.id
-        order by e.sortkey, s.level
+        order by e.sortkey` + sortdesc + `, s.level
         limit $howmany`;
       var params1={$howmany: howmany, $like: searchtext+"%", $doctype: doctype};
       var sql2=`select count(distinct s.entry_id) as total
@@ -605,7 +612,7 @@ module.exports={
         inner join entries as e on e.id=s.entry_id
         where doctype=$doctype and (s.txt like $like1 or s.txt like $like2)
         group by e.id
-        order by e.sortkey, s.level
+        order by e.sortkey` + sortdesc + `, s.level
         limit $howmany`;
       var params1={$howmany: howmany, $like1: searchtext+"%", $like2: "% "+searchtext+"%", $doctype: doctype};
       var sql2=`select count(distinct s.entry_id) as total
@@ -619,7 +626,7 @@ module.exports={
         inner join entries as e on e.id=s.entry_id
         where doctype=$doctype and s.txt like $like
         group by e.id
-        order by e.sortkey, s.level
+        order by e.sortkey` + sortdesc + `, s.level
         limit $howmany`;
       var params1={$howmany: howmany, $like: "%"+searchtext+"%", $doctype: doctype};
       var sql2=`select count(distinct s.entry_id) as total
@@ -662,22 +669,33 @@ module.exports={
     });
   },
 
+  getSortTitle: function(xml, titling) {
+    if(titling.headwordSorting)
+      return module.exports.getEntryHeadword(xml, titling.headwordSorting)
+    return module.exports.getEntryHeadword(xml, titling.headword)
+  },
   getEntryTitle: function(xml, titling, plaintext){
     if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
-    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
-    if(plaintext) var ret=module.exports.getEntryHeadword(xml, titling); else var ret="<span class='headword'>"+module.exports.getEntryHeadword(xml, titling)+"</span>";
+    if (titling.headwordAnnotationsType=="advanced") {
+      var ret = titling.headwordAnnotationsAdvanced.replace(/%\([^)]+\)/g, function (el) {
+          return extractText(xml, el.substring(2, el.length - 1));
+      })
+      return ret;
+    }
+    var ret=module.exports.getEntryHeadword(xml, titling.headword);
+    if(!plaintext)
+      ret="<span class='headword'>"+ret+"</span>";
     if(titling.headwordAnnotations) for(var i=0; i<titling.headwordAnnotations.length; i++){
       if(ret!="") ret+=" ";
       ret+=extractText(xml, titling.headwordAnnotations[i]).join(" ");
     }
-    //console.log(ret);
     return ret;
   },
-  getEntryHeadword: function(xml, titling){
+  getEntryHeadword: function(xml, headword_elem){
     if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
     //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret="";
-    var arr=extractText(xml, titling.headword);
+    var arr=extractText(xml, headword_elem);
     if(arr.length>0) ret=arr[0];
     if(ret==""){
       ret=extractFirstText(xml);
@@ -688,7 +706,7 @@ module.exports={
     return ret;
   },
   toSortkey: function(s, abc){
-    const keylength=5;
+    const keylength=15;
     var ret=s.replace(/\<[\<\>]+>/g, "").toLowerCase();
     //replace any numerals:
     var pat=new RegExp("[0-9]{1,"+keylength+"}", "g");
@@ -718,7 +736,7 @@ module.exports={
     if(typeof(xml)!="string") xml=(new xmldom.XMLSerializer()).serializeToString(xml);
     //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret=[];
-    ret.push(module.exports.getEntryHeadword(xml, titling));
+    ret.push(module.exports.getEntryHeadword(xml, titling.headword));
     if(searchability.searchableElements) for(var i=0; i<searchability.searchableElements.length; i++){
       var arr=extractText(xml, searchability.searchableElements[i]);
       arr.map(txt => { if(txt!="" && ret.indexOf(txt)==-1) ret.push(txt); });
@@ -963,6 +981,13 @@ module.exports={
       callnext(true);
     });
   },
+  setConsent: function(email, consent, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.run("update users set consent=$consent where email=$email", {$consent: consent, $email: email}, function(err, row){
+      db.close();
+      callnext(true);
+    });
+  },
   sendSignupToken: function(email, remoteip, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", {$email: email}, function(err, row){
@@ -1062,7 +1087,7 @@ module.exports={
       //user logged in = save SkE ID in database
       var key = generateKey();
       var now = (new Date()).toISOString();
-      db.run("update users set ske_id=$ske_id, ske_username=$ske_username, sessionKey=$key, sessionLast=$now where email=$email", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email:user.email, $key:key, $now:now}, function(err, row){
+      db.run("update users set ske_id=$ske_id, ske_username=$ske_username, ske_apiKey=$ske_apiKey, sessionKey=$key, sessionLast=$now where email=$email", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email:user.email, $key:key, $now:now, $ske_apiKey: jwtData.user.api_key}, function(err, row){
         db.close();
         callnext(true, user.email, key);
       });
@@ -1077,7 +1102,7 @@ module.exports={
             if (row == undefined) {
               var key = generateKey();
               var now = (new Date()).toISOString();
-              db.run("insert into users (email, passwordHash, ske_id, ske_username, sessionKey, sessionLast) values ($email, null, $ske_id, $ske_username, $key, $now)", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email: email, $key:key, $now:now}, function(err, row){
+              db.run("insert into users (email, passwordHash, ske_id, ske_username, ske_apiKey, sessionKey, sessionLast) values ($email, null, $ske_id, $ske_username, $ske_apiKey, $key, $now)", {$ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $ske_apiKey: jwtData.user.api_key, $email: email, $key:key, $now:now}, function(err, row){
                 db.close();
                 callnext(true, email, key);
               });
@@ -1090,7 +1115,7 @@ module.exports={
           var email = row.email;
           var key = generateKey();
           var now = (new Date()).toISOString();
-          db.run("update users set sessionKey=$key, sessionLast=$now where ske_id=$ske_id", {$key: key, $now: now, $ske_id: jwtData.user.id}, function(err, row){
+          db.run("update users set ske_apiKey=$ske_apiKey, sessionKey=$key, sessionLast=$now where ske_id=$ske_id", {$key: key, $now: now, $ske_id: jwtData.user.id, $ske_apiKey: jwtData.user.api_key}, function(err, row){
             db.close();
             callnext(true, email, key);
           });
@@ -1101,18 +1126,21 @@ module.exports={
   verifyLogin: function(email, sessionkey, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select email, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
+    db.get("select email, ske_username, ske_apiKey, consent from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
       if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
         email=row.email;
         var ske_username = row.ske_username;
+        var ske_apiKey = row.ske_apiKey;
+        var consent = false;
+        if (row.consent == 1) consent = true;
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
           module.exports.readSiteConfig(function(siteconfig){
-            callnext({loggedin: true, email: email, ske_username: ske_username, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
+            callnext({loggedin: true, email: email, ske_username: ske_username, ske_apiKey: ske_apiKey, consent: consent, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
           });
         });
       }
@@ -1121,12 +1149,14 @@ module.exports={
   verifyLoginAndDictAccess: function(email, sessionkey, dictDB, dictID, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select email from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
+    db.get("select email, ske_apiKey, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
       if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
         email=row.email;
+        ske_apiKey = row.ske_apiKey;
+        ske_username = row.ske_username;
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
@@ -1138,7 +1168,7 @@ module.exports={
               var canConfig=(configs.siteconfig.admins.indexOf(email)>-1 ? true : configs.users[email].canConfig);
               var canDownload=(configs.siteconfig.admins.indexOf(email)>-1 ? true : configs.users[email].canDownload);
               var canUpload=(configs.siteconfig.admins.indexOf(email)>-1 ? true : configs.users[email].canUpload);
-              callnext({loggedin: true, email: email, dictAccess: true, isAdmin: (configs.siteconfig.admins.indexOf(email)>-1), canEdit: canEdit, canConfig: canConfig, canDownload: canDownload, canUpload: canUpload});
+              callnext({loggedin: true, email: email, dictAccess: true, isAdmin: (configs.siteconfig.admins.indexOf(email)>-1), canEdit: canEdit, canConfig: canConfig, canDownload: canDownload, canUpload: canUpload, ske_username: ske_username, ske_apiKey: ske_apiKey});
             }
           });
         });
@@ -1191,7 +1221,59 @@ module.exports={
       }
     });
   },
-
+  prepareApiKeyForSke: function(email, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.get("select apiKey, ske_username, ske_apiKey from users where email=$email", {$email: email}, function(err, row){
+      if(!row || module.exports.siteconfig.readonly){
+        db.close();
+        callnext(false);
+      } else {
+        var lexonomyApiKey;
+        if (row.apiKey == '' || row.apiKey == null) {
+          //generate new key
+          var key = '';
+          var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+          while(key.length < 32) {
+            var i = Math.floor(Math.random() * alphabet.length);
+            key += alphabet[i]
+          }
+          db.run("update users set apiKey=$apiKey where email=$email", {$email: email, $apiKey: key});
+          lexonomyApiKey = key;
+        } else {
+          lexonomyApiKey = row.apiKey;
+        }
+        callnext(lexonomyApiKey);
+      }
+    });
+  },
+  sendApiKeyToSke: function(email, apiKey, ske_username, ske_apiKey, callnext) {
+    console.log('send API key to SkE');
+    if (ske_username != "" && ske_apiKey != "") {
+      var data = JSON.stringify({options:{
+        settings_lexonomyApiKey: apiKey,
+        settings_lexonomyEmail: email,
+      }});
+      var queryData = querystring.stringify({'username':ske_username, 'api_key': ske_apiKey, 'json': data});
+      var options = {
+        'host': 'api.sketchengine.co.uk',
+        'path': '/bonito/run.cgi/set_user_options?' + queryData,
+        'method': 'GET',
+      };
+      var req = https.request(options, function(response){
+        var str = '';
+        response.on('data', function(chunk){
+          str += chunk;
+        });
+        response.on('end', function(){
+          console.log(str)
+        });
+      });
+      req.on('error', function(e) {
+        console.log('problem with request: ' + e.message);
+      });
+      req.end();
+    }
+  },
   getDoc: function(docID, callnext){
     var doc={id: docID, title: "", html: ""};
     fs.readFile("docs/"+docID+".md", "utf8", function(err, content){
@@ -1450,4 +1532,4 @@ function extractFirstText(xml){ //extract the text content from the first elemen
   return ret;
 }
 
-const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd","createaccount"];
+const prohibitedDictIDs=["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent"];

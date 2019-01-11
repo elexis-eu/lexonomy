@@ -48,9 +48,10 @@
 		var defo=<%-JSON.stringify(defo)%>;
 		var titling=<%-JSON.stringify(titling)%>;
 		var flagging=<%-JSON.stringify(flagging)%>;
+    var ske_username = <%-JSON.stringify(user.ske_username)%>;
+    var ske_apiKey = <%-JSON.stringify(user.ske_apiKey)%>;
 		if(!xemplate[xema.root]) xemplate[xema.root]={shown: false};
 		if(xemplate[xema.root].shown=="false") xemplate[xema.root].shown=false;
-
 		Screenful.Editor.viewer=null;
 		if(xemplate._xsl || xemplate._css || xemplate[xema.root].shown) {
 			Screenful.Editor.viewer=function(div, entry){

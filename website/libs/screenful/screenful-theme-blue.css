@@ -2,6 +2,7 @@
   --link: #004f9b;
   --link-hover: #2c7fba;
   --border: rgb(38, 122, 181);
+  --border-light: rgb(38, 122, 181, 0.3);
   --highlight: rgb(153, 212, 255);
   --contrast: #4c9ed9;
 }
