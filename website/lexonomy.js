@@ -142,7 +142,7 @@ app.post(siteconfig.rootPath+"login.json", function(req, res){
       //const oneday=86400000; //86,400,000 miliseconds = 24 hours
       // res.cookie("email", email, {expires: new Date(Date.now() + oneday)});
       // res.cookie("sessionkey", sessionkey, {expires: new Date(Date.now() + oneday)});
-      res.cookie("email", email, {});
+      res.cookie("email", email.toLowerCase(), {});
       res.cookie("sessionkey", sessionkey, {});
       res.json({success: true, sessionkey: sessionkey});
     } else {
@@ -328,7 +328,7 @@ app.get(siteconfig.rootPath+"skelogin.json/:token", function(req, res){
               }
             });
             //login user
-            res.cookie("email", email, {});
+            res.cookie("email", email.toLowerCase(), {});
             res.cookie("sessionkey", sessionkey, {});
             res.redirect(siteconfig.baseUrl)
           } else {
@@ -1236,6 +1236,7 @@ process.on('uncaughtException', (err) => {
   if(!ops.siteconfig) ops.siteconfig=JSON.parse(fs.readFileSync(path.join(__dirname, "siteconfig.json"), "utf8"));
   //Log the exception:
   if(ops.siteconfig.verbose){
+  console.log(err)
     var str=`Caught exception: ${err}\n`;
     if(ops.siteconfig.verbose.multiline && ops.siteconfig.verbose.filename) str+="\n";
     if(ops.siteconfig.verbose.filename) fs.appendFile(ops.siteconfig.verbose.filename, str, function(err){});
