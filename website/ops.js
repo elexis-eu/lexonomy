@@ -49,11 +49,12 @@ module.exports={
     } else {
       fs.copy("dictTemplates/"+template+".sqlite", path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), function(err){
         var users={}; users[email]={"canEdit": true, "canConfig": true, "canDownload": true, "canUpload": true};
-        db.run("update configs set json=$json where id='users'", {$json: JSON.stringify(users, null, "\t")}, function(err){ if(err) console.log(err);
+        var dictDB = module.exports.getDB(dictID); 
+        dictDB.run("update configs set json=$json where id='users'", {$json: JSON.stringify(users, null, "\t")}, function(err){ if(err) console.log(err);
           var ident={"title": title, "blurb": blurb};
-          db.run("update configs set json=$json where id='ident'", {$json: JSON.stringify(ident, null, "\t")}, function(err){ if(err) console.log(err);
-            module.exports.attachDict(db, dictID, function(){
-              db.close();
+          dictDB.run("update configs set json=$json where id='ident'", {$json: JSON.stringify(ident, null, "\t")}, function(err){ if(err) console.log(err);
+            module.exports.attachDict(dictDB, dictID, function(){
+              dictDB.close();
               callnext(true);
             });
           });
