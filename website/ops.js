@@ -1150,7 +1150,8 @@ module.exports={
   verifyLoginAndDictAccess: function(email, sessionkey, dictDB, dictID, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
-    db.get("select email, ske_apiKey, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email.toLowerCase(), $key: sessionkey, $yesterday: yesterday}, function(err, row){
+    if (email != undefined) email = email.toLowerCase();
+    db.get("select email, ske_apiKey, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
       if(!row || module.exports.siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
