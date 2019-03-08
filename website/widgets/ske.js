@@ -19,6 +19,13 @@ Ske.getHeadword=function(){
   if(!hwd) hwd="";
   return hwd;
 };
+Ske.getCQL=function(cql){
+  var $xml=$($.parseXML(Xonomy.harvest()));
+  var ret = cql.replace(/%\([^)]+\)/g, function (el) {
+    return $xml.find(el.substring(2, el.length - 1)).html();
+  })
+  return ret;
+};
 Ske.extendDocspec=function(docspec, xema){
   if(kex.corpus) {
     if(!subbing[xema.root]) {
@@ -146,7 +153,11 @@ Ske.menuRoot=function(htmlID){
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-      html+="<a target='_blank' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&keyword="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+      if (kex.concquery.length > 0)
+        html+="<a target='_blank' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&queryselector=cql&cql="+encodeURIComponent(Ske.getCQL(kex.concquery))+"&showresults=1'>";
+      else
+        html+="<a target='_blank' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&keyword="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show concordance...";
       html+="</a>";
