@@ -147,7 +147,7 @@ Ske.menuRoot=function(htmlID){
   }
   if(Ske.getHeadword() && (kex.url.indexOf("sketchengine.co.uk")>-1 || kex.url.indexOf("sketchengine.eu")>-1)) {
     html+="<div class='menuItem')'>";
-      html+="<a target='ske' href='https://app.sketchengine.eu/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"'>";
+      html+="<a target='ske' href='https://app.sketchengine.eu/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show word sketch";
       html+="</a>";
