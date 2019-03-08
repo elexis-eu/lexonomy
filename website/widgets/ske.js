@@ -19,6 +19,26 @@ Ske.getHeadword=function(){
   if(!hwd) hwd="";
   return hwd;
 };
+Ske.getCQL=function(cql){
+  var $xml=$($.parseXML(Xonomy.harvest()));
+  var ret = cql.replace(/%\([^)]+\)/g, function (el) {
+    return $xml.find(el.substring(2, el.length - 1)).html();
+  })
+  return ret;
+};
+Ske.getConcordance=function(){
+  var operations = [];
+  if (kex.concquery.length > 0) {
+    var cql = Ske.getCQL(kex.concquery);
+    operations.push({"name":"cql","arg":cql,"active":true,"query":{"queryselector":"cqlrow","cql":cql}});
+  } else {
+    var simplequery = Ske.getHeadword();
+    operations.push({"name":"iquery","arg":simplequery,"active":true,"query":{"queryselector":"iqueryrow","iquery":simplequery}});
+  }
+  if (kex.concsampling > 0)
+    operations.push({"name":"sample","arg":kex.concsampling,"query":{"q":"r"+kex.concsampling},"active":true});
+  return JSON.stringify(operations);
+};
 Ske.extendDocspec=function(docspec, xema){
   if(kex.corpus) {
     if(!subbing[xema.root]) {
@@ -140,21 +160,21 @@ Ske.menuRoot=function(htmlID){
   }
   if(Ske.getHeadword() && (kex.url.indexOf("sketchengine.co.uk")>-1 || kex.url.indexOf("sketchengine.eu")>-1)) {
     html+="<div class='menuItem')'>";
-      html+="<a target='_blank' href='https://app.sketchengine.eu/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"'>";
+      html+="<a target='ske' href='https://app.sketchengine.eu/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-        html+="Show word sketch...";
+        html+="Show word sketch";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-      html+="<a target='_blank' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&keyword="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+        html+="<a target='ske' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&showresults=1&operations="+encodeURIComponent(Ske.getConcordance())+"'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-        html+="Show concordance...";
+        html+="Show concordance";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-      html+="<a target='_blank' href='https://app.sketchengine.eu/#thesaurus?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+      html+="<a target='ske' href='https://app.sketchengine.eu/#thesaurus?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-        html+="Show thesaurus...";
+        html+="Show thesaurus";
       html+="</a>";
     html+="</div>";
   }
