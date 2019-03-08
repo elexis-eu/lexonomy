@@ -1,0 +1,21 @@
+.middlebox {max-width: 600px; padding: 40px 30px; min-height: 100px; margin: 75px auto 50px auto; border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; }
+
+.middlebox div.field {margin-top: 30px;}
+.middlebox div.field:first-child {margin-top: 0px;}
+.middlebox div.label {font-weight: bold; margin: 0px 0px 5px 0px; color: #333333;}
+.middlebox div.field input.textbox {box-sizing: border-box; width: 100%; margin: 0px 0px 0px 0px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 9px 8px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
+.middlebox div.field input.button {box-sizing: border-box; margin: 0px 0px 0px 0px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: 0px 0px 2px #666666; padding: 9px 30px; min-height: 1.3em; display: inline-block; vertical-align: middle; color: var(--link); cursor: pointer;}
+.middlebox div.field input.button:hover {color: var(--link-hover);}
+.middlebox div.field button {box-sizing: border-box; margin: 0px 0px 0px 0px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: 0px 0px 2px #666666; padding: 9px 30px; min-height: 1.3em; display: inline-block; vertical-align: middle; color: #267ab5; cursor: pointer;}
+.middlebox div.field button:hover {color: #4698d1;}
+
+.middlebox div.field.submit {text-align: center;}
+.middlebox div.field.submit input.button {font-weight: bold;}
+.middlebox div.field.submit button {font-weight: bold;}
+
+.middlebox div.error {background-color: #ffcdcc; color: #99004d; font-weight: bold; text-align: center; padding: 40px; margin: 30px -30px -40px -30px; text-shadow: 1px 1px 0px #eeeeee;}
+
+.middlebox div.two div.message {text-align: center; margin: 20px 0px 30px 0px;}
+
+button.iconReload { background-image: url(../../furniture/arrow_refresh.png); padding: 7px 10px 6px 35px !important; background-position: 10px center; background-repeat: no-repeat;}
+button.iconCross { background-image: url(../../furniture/cross.png); padding: 7px 10px 6px 35px !important; background-position: 10px center; background-repeat: no-repeat;}

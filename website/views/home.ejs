@@ -85,7 +85,7 @@
 					<%}else{%>
 						<div class="usertop">
 							<div class="title"><%=user.email%></div>
-							<div class="subtitle"><a href="logout/">Log out</a> | <a href="changepwd/">Change your password</a></div>
+							<div class="subtitle"><a href="logout/">Log out</a> | <a href="userprofile/">Your profile</a></div>
 						</div>
 						<div class="yourdicts">Your dictionaries</div>
 						<%for(var i=0; i<dicts.length; i++){%>
@@ -106,27 +106,6 @@
 						}
 						</script>
 						<div class="createdict"><a href="make/">Create a dictionary</a></div>
-						<div class="yourdicts">One-Click Dictionary settings</div>
-						<div class="adminlink"><a href="oneclick/">API key</a></div>
-            <%if(siteconfig.sketchengineLoginPage){%>
-  						<div class="yourdicts">Sketch Engine login</div>
-	  					<div class="adminlink">
-              <%if(user.ske_username){%>
-                Your Lexonomy account is linked to your Sketch Engine account <b><%=user.ske_username%></b>.<br/>
-                <%if(user.ske_apiKey){%>
-                  Your Sketch Engine API key is <b><%=user.ske_apiKey%></b>.
-                <%}%>
-                <br/><a href="<%=siteconfig.sketchengineLoginPage%>">Link to a different Sketch Engine account&nbsp;»</a>
-              <%} else {%>
-                <a href="<%=siteconfig.sketchengineLoginPage%>">Link your Lexonomy account to your Sketch Engine account&nbsp;»</a>
-              <%}%>
-              </div>
-	  					<div class="adminlink">
-              <%if(user.ske_apiKey==''){%>
-                Your Sketch Engine API key is not set. Please, <a href="<%=siteconfig.sketchengineLoginPage%>">login via Sketch Engine</a> to set API key.
-              <%}%>
-              </div>
-						<%}%>
 						<%if(user.isAdmin){%>
 							<div class="yourdicts">Administration</div>
 							<div class="adminlink"><a href="users/">Users</a> <a href="dicts/">Dictionaries</a></div>

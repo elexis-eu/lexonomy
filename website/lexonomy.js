@@ -134,6 +134,12 @@ app.get(siteconfig.rootPath+"changepwd/", function(req, res){
     res.render("changepwd.ejs", {user: user, redirectUrl: req.headers.referer || siteconfig.baseUrl, siteconfig: siteconfig});
   });
 });
+app.get(siteconfig.rootPath+"userprofile/", function(req, res){
+  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    if(/\/userprofile\/$/.test(req.headers.referer)) req.headers.referer=null;
+    res.render("userprofile.ejs", {user: user, redirectUrl: req.headers.referer || siteconfig.baseUrl, siteconfig: siteconfig});
+  });
+});
 
 //SITEWIDE UI, JSON endpoints:
 app.post(siteconfig.rootPath+"login.json", function(req, res){
@@ -173,6 +179,25 @@ app.post(siteconfig.rootPath+"changepwd.json", function(req, res){
     if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
       ops.changePwd(user.email, req.body.password, function(success){
         res.json({success: success});
+      });
+    }
+  });
+});
+app.post(siteconfig.rootPath+"changeskeapi.json", function(req, res){
+  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
+      ops.changeSkeApiKey(user.email, req.body.ske_apiKey, function(success){
+        res.json({success: success});
+      });
+    }
+  });
+});
+app.post(siteconfig.rootPath+"changeoneclickapi.json", function(req, res){
+  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
+      ops.updateUserApiKey(user.email, req.body.apiKey, function(){
+        ops.sendApiKeyToSke(user.email, req.body.apiKey, user.ske_username, user.ske_apiKey, function(){});
+        res.json({success: true, id: adjustedEntryID, content: json});
       });
     }
   });

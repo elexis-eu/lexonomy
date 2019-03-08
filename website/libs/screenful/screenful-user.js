@@ -4,7 +4,7 @@ Screenful.User={
       $(".ScreenfulUser").html("<div class='clickable'>"+Screenful.User.username+" <span class='arrow'>▼</span></div><div class='menu' style='display: none'></div>");
       if(Screenful.User.homeUrl) $(".ScreenfulUser .menu").append("<a href='"+Screenful.User.homeUrl+"'>"+Screenful.Loc.home+"</a>");
       if(Screenful.User.logoutUrl) $(".ScreenfulUser .menu").append("<a href='"+Screenful.User.logoutUrl+"'>"+Screenful.Loc.logout+"</a>");
-      if(Screenful.User.changePwdUrl) $(".ScreenfulUser .menu").append("<a href='"+Screenful.User.changePwdUrl+"'>"+Screenful.Loc.changePwd+"</a>");
+      if(Screenful.User.profileUrl) $(".ScreenfulUser .menu").append("<a href='"+Screenful.User.profileUrl+"'>"+Screenful.Loc.userProfile+"</a>");
     } else {
       $(".ScreenfulUser").html("<div class='clickable'>"+Screenful.Loc.anonymous+" <span class='arrow'>▼</span></div><div class='menu' style='display: none'></div>");
       if(Screenful.User.homeUrl) $(".ScreenfulUser .menu").append("<a href='"+Screenful.User.homeUrl+"'>"+Screenful.Loc.home+"</a>");
