@@ -147,25 +147,25 @@ Ske.menuRoot=function(htmlID){
   }
   if(Ske.getHeadword() && (kex.url.indexOf("sketchengine.co.uk")>-1 || kex.url.indexOf("sketchengine.eu")>-1)) {
     html+="<div class='menuItem')'>";
-      html+="<a target='_blank' href='https://app.sketchengine.eu/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"'>";
+      html+="<a target='ske' href='https://app.sketchengine.eu/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-        html+="Show word sketch...";
+        html+="Show word sketch";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
       if (kex.concquery.length > 0)
-        html+="<a target='_blank' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&queryselector=cql&cql="+encodeURIComponent(Ske.getCQL(kex.concquery))+"&showresults=1'>";
+        html+="<a target='ske' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&queryselector=cql&cql="+encodeURIComponent(Ske.getCQL(kex.concquery))+"&showresults=1'>";
       else
-        html+="<a target='_blank' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&keyword="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+        html+="<a target='ske' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&keyword="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
 
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-        html+="Show concordance...";
+        html+="Show concordance";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-      html+="<a target='_blank' href='https://app.sketchengine.eu/#thesaurus?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+      html+="<a target='ske' href='https://app.sketchengine.eu/#thesaurus?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-        html+="Show thesaurus...";
+        html+="Show thesaurus";
       html+="</a>";
     html+="</div>";
   }
