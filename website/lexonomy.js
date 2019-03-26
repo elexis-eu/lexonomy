@@ -1050,16 +1050,17 @@ app.get(siteconfig.rootPath+":dictID/skeget/xampl/", function(req, res){
     } else {
       db.close();
       var url=req.query.url;
-      url+="/view";
+      url+="/first";
       url+="?corpname="+req.query.corpus;
       url+="&username="+req.query.username;
       url+="&api_key="+req.query.apikey;
       url+="&format=json";
-      //url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
-      url+="&q="+encodeURIComponent(makeQ(req.query.lemma));
+      if (req.query.querytype == "skesimple")
+        url+="&iquery="+encodeURIComponent(req.query.query);
+      else
+        url+="&queryselector=cqlrow&cql="+encodeURIComponent(req.query.query);
       url+="&viewmode=sen";
       url+="&gdex_enabled=1";
-      url+="&attrs=word";
       if(req.query.fromp) url+="&"+req.query.fromp;
       https.get(url, function(getres){
         getres.setEncoding('utf8');
@@ -1071,17 +1072,10 @@ app.get(siteconfig.rootPath+":dictID/skeget/xampl/", function(req, res){
         });
       });
       // res.json({Lines: [
-      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
-      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
-      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.lemma}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.iquery}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.iquery}], Right: [{str: " lorem ipsum."}]},
+      //   {Left: [{str: "Lorem ipsum "}], Kwic: [{str: req.query.iquery}], Right: [{str: " lorem ipsum."}]},
       // ]});
-    }
-    function makeQ(str){
-      var ret="";
-      str.split(' ').map(word => {
-        if(word!="") ret+=`[lemma="${word}"|word="${word}"]`;
-      });
-      return "q"+ret;
     }
   });
 });

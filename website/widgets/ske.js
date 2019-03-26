@@ -186,6 +186,11 @@ Ske.menuRoot=function(htmlID){
 Ske.menuExamples=function(htmlID, param){
   if(param=="layby") Ske.htmlID=null; else  Ske.htmlID=htmlID;
   document.body.appendChild(Xonomy.makeBubble(Ske.boxExamples())); //create bubble
+  $("input[name=skesearchtype]").on("click", function() {
+    var val = $(this).val() == "skesimple"
+    $("#skesimple").nextAll("input").first().prop("disabled", !val)
+    $("#skecql").nextAll("input").first().prop("disabled", val)
+  })
   if(Xonomy.lastClickWhat=="openingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.opening > .name")); //anchor bubble to opening tag
   else if(Xonomy.lastClickWhat=="closingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.closing > .name")); //anchor bubble to closing tag
   else Xonomy.showBubble($("#"+htmlID));
@@ -199,7 +204,21 @@ Ske.boxExamples=function(){
   var html="";
   html="<div class='skebox'>"
     html+="<form class='topbar' onsubmit='Ske.searchExamples(); return false'>";
-  		html+="<input name='val' class='textbox focusme' value='"+Ske.getHeadword()+"'/> ";
+      if (kex.concquery.length > 0) {
+        html+="<input id='skesimple' type='radio' name='skesearchtype' value='skesimple'/>";
+        html+="<label for='skesimple'>Simple search: </label>";
+        html+="<input disabled name='val' class='textbox simple' value='"+Ske.getHeadword()+"'/> ";
+        html+="<input id='skecql' type='radio' name='skesearchtype' checked value='skecql'/>";
+        html+="<label for='skecql'>CQL: </label>";
+        html+="<input name='val' class='textbox cql focusme' value='"+Ske.getCQL(kex.concquery)+"'/> ";
+      } else {
+        html+="<input id='skesimple' type='radio' name='skesearchtype' checked value='skesimple'/>";
+        html+="<label for='skesimple'>Simple search: </label>";
+        html+="<input name='val' class='textbox simple focusme' value='"+Ske.getHeadword()+"'/> ";
+        html+="<input id='skecql' type='radio' name='skesearchtype' value='skecql'/>";
+        html+="<label for='skecql'>CQL: </label>";
+        html+="<input name='val' class='textbox cql' disabled/> ";
+      }
       html+="<input type='submit' class='button ske' value='&nbsp;'/>";
     html+="</form>";
     html+="<div class='waiter'></div>";
@@ -221,9 +240,10 @@ Ske.searchExamples=function(fromp){
   $(".skebox .choices").hide();
   $(".skebox .bottombar").hide();
   $(".skebox .waiter").show();
-  var lemma=$.trim($(".skebox .textbox").val());
-  if(lemma!="") {
-    $.get(rootPath+dictID+"/skeget/xampl/", {url: kex.url, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
+  var query=$.trim($(".skebox input.textbox:enabled").val());
+  var querytype=$("input[name=skesearchtype]:checked").val();
+  if(query!="") {
+    $.get(rootPath+dictID+"/skeget/xampl/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, querytype: querytype, query: query, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");
