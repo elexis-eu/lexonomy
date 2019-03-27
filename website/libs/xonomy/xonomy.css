@@ -179,11 +179,11 @@
 #xonomyBubble.nerd span.punc { color: #669acc; }
 
 /*When the pop-up box functions as menu or picker*/
-#xonomyBubble.nerd #xonomyBubbleContent div.menu { margin: -5px; max-height: 250px; overflow-y: auto; white-space: nowrap; }
+#xonomyBubble.nerd #xonomyBubbleContent div.menu { margin: -5px; max-height: 250px; overflow-y: auto; white-space: nowrap; line-height: 1;}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem { padding: 8px 20px 7px 10px; border-top: 1px solid #dddddd; cursor: pointer; margin-top: -1px; background-color: #ffffff;}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem div.menuLabel {margin: -8px -20px -7px -10px; padding: 8px 20px 7px 30px; background-color: #ffffff; background-image: url(plus.gif); background-position: 10px center; background-repeat: no-repeat; font-weight: bold;}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem div.menuLabel:hover {background-color: #ffffcc;}
-#xonomyBubble.nerd #xonomyBubbleContent div.menuItem span.icon {display: inline-block; margin: -8px 0px -7px 0px; width: 18px;}
+#xonomyBubble.nerd #xonomyBubbleContent div.menuItem span.icon {display: inline-block; vertical-align: middle; width: 18px; }
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem span.icon img {max-height: 15px; max-width: 20px; display: inline-block;}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem span.keyCaption {float: right; margin-left: 2em; margin-right: -0.5em; color: #999999;}
 #xonomyBubble.nerd #xonomyBubbleContent div.submenu { margin: 0px -20px -7px -10px; display: none; }
@@ -231,7 +231,7 @@
 .xonomy.laic .element > .children > .textnode > .value { display: inline-block; font-family: monospace; background-color: #ffffff; padding: 4px 0px; border-bottom: 1px solid #999999; cursor: pointer; min-width: 2em; }
 .xonomy.laic .element.oneliner > .children > .textnode > .value { text-align: center; }
 .xonomy.laic .element > .tag.closing { display: none; }
-.xonomy.laic .element > .tag { display: block; padding: 5px 10px; background-color: #eeeeee; box-shadow: 0px 0px 2px #999999; z-index: 9;}
+.xonomy.laic .element > .tag { display: inline-block; padding: 5px 10px; background-color: #eeeeee; box-shadow: 0px 0px 2px #999999; z-index: 9;}
 .xonomy.laic .element > .tag > .name {font-weight: bold; color: #315696; cursor: pointer;}
 .xonomy.laic .element > .tag.opening > .attributes > .attribute { margin-left: 0.75em; border-left: 1px solid #cccccc; padding-left: 0.75em; display: inline-block; }
 .xonomy.laic .element > .tag.opening > .attributes > .attribute > .name { font-weight: bold; color: #6385bf; cursor: pointer; }
@@ -272,7 +272,7 @@
 .xonomy.laic .inlinecaption:empty {display: none;}
 .xonomy.laic .inlinecaption {-webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text !important;}
 .xonomy.laic .attribute > .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; margin-left: 5px; margin-right: 4px; }
-.xonomy.laic .element > .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; display: block; position: absolute; top: 10px; right: 3px; z-index: 9; }
+.xonomy.laic .element > .inlinecaption { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #999999; font-weight: normal; z-index: 9; }
 .xonomy.laic .element.oneliner > .inlinecaption { display: inline; margin-left: 1em; margin-right: 4px; position: relative; top: auto; right: auto;}
 
 /*Elements with no children*/
@@ -384,16 +384,16 @@
 
 /*Pop-up box*/
 #xonomyBubble.laic { display: none; position: absolute; z-index: 20; min-width: 100px; }
-#xonomyBubble.laic > div.inside { box-shadow: 0px 0px 5px #99cbff; border: 1px solid #333333; background-color: #dddddd; border-radius: 2px; margin-top: 8px; }
+#xonomyBubble.laic > div.inside { box-shadow: 0px 0px 5px #99cbff; border: 1px solid #333333; background-color: #dddddd; border-radius: 2px; }
 #xonomyBubble.laic > div.inside > #xonomyBubbleContent { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #666666; margin: 0px; padding: 10px; background-color: #ffffff; border-radius: 2px; }
 #xonomyBubble.laic span.punc { display: none; }
 
 /*When the pop-up box functions as menu or picker*/
-#xonomyBubble.laic #xonomyBubbleContent div.menu { margin: -10px; max-height: 250px; overflow-y: auto; white-space: nowrap; }
+#xonomyBubble.laic #xonomyBubbleContent div.menu { margin: -10px; max-height: 250px; overflow-y: auto; white-space: nowrap; line-height: 1;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem { padding: 10px 20px 10px 10px; border-top: 1px solid #dddddd; cursor: pointer; margin-top: -1px; background-color: #ffffff;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem div.menuLabel {margin: -8px -20px -7px -10px; padding: 8px 20px 7px 30px; background-color: #ffffff; background-image: url(plus.gif); background-position: 10px center; background-repeat: no-repeat; font-weight: bold;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem div.menuLabel:hover {background-color: #f6f6f6;}
-#xonomyBubble.laic #xonomyBubbleContent div.menuItem span.icon {display: inline-block; margin: -8px 0px -7px 0px; width: 18px;}
+#xonomyBubble.laic #xonomyBubbleContent div.menuItem span.icon {display: inline-block; vertical-align: middle; width: 18px;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem span.icon img {max-height: 15px; max-width: 20px; display: inline-block;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem span.keyCaption {float: right; margin-left: 2em; margin-right: -0.5em; color: #999999;}
 #xonomyBubble.laic #xonomyBubbleContent div.submenu { margin: 0px -20px -7px -10px; display: none; }
