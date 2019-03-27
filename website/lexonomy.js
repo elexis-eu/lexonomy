@@ -183,6 +183,15 @@ app.post(siteconfig.rootPath+"changepwd.json", function(req, res){
     }
   });
 });
+app.post(siteconfig.rootPath+"changeskeusername.json", function(req, res){
+  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
+    if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
+      ops.changeSkeUserName(user.email, req.body.ske_userName, function(success){
+        res.json({success: success});
+      });
+    }
+  });
+});
 app.post(siteconfig.rootPath+"changeskeapi.json", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {

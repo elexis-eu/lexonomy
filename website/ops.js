@@ -981,6 +981,13 @@ module.exports={
       callnext(true);
     });
   },
+  changeSkeUserName: function(email, ske_userName, callnext){
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    db.run("update users set ske_username=$ske_userName where email=$email", {$ske_userName: ske_userName, $email: email.toLowerCase()}, function(err, row){
+      db.close();
+      callnext(true);
+    });
+  },
   changeSkeApiKey: function(email, ske_apiKey, callnext){
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.run("update users set ske_apiKey=$ske_apiKey where email=$email", {$ske_apiKey: ske_apiKey, $email: email.toLowerCase()}, function(err, row){

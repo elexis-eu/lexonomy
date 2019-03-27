@@ -1,7 +1,7 @@
 Screenful.UserProfile={
   start: function(){
     Screenful.createEnvelope(true);
-    $("#envelope").html("<div id='skeloginbox' class='middlebox'><div class='one'></div></div><form id='skeapibox' class='middlebox'><div class='one'></div><div class='two' style='display: none'></div></form><div id='oneclickbox' class='middlebox'><div class='one'></div></div><form id='changepwdbox' class='middlebox'><div class='one'></div><div class='two' style='display: none'></div></form>");
+    $("#envelope").html("<form id='skeloginbox' class='middlebox'><div class='one'></div><div class='two' style='display: none'></div></form><form id='skeapibox' class='middlebox'><div class='one'></div><div class='two' style='display: none'></div></form><div id='oneclickbox' class='middlebox'><div class='one'></div></div><form id='changepwdbox' class='middlebox'><div class='one'></div><div class='two' style='display: none'></div></form>");
     $("#changepwdbox .one").append("<div class='message'>"+Screenful.Loc.changePwdMsg+"</div>");
     $("#changepwdbox .one").append("<div class='field password'><div class='label'>"+Screenful.Loc.newPassword+"</div><input class='textbox' type='password'/></div>");
     $("#changepwdbox .one").append("<div class='field submit'><input class='button' type='submit' value='"+Screenful.Loc.change+"'/></div>");
@@ -9,30 +9,29 @@ Screenful.UserProfile={
     $("#changepwdbox .two").append("<div class='message'>"+Screenful.Loc.passwordChanged+"</div>");
     $("#changepwdbox .two").append("<div class='field submit'><button class='return'>"+Screenful.Loc.ok+"</button></div>");
 
+    $("#skeloginbox .one").append("<div class='label'>Sketch Engine login</div>");
     if (Screenful.User.sketchengineLoginPage != "") {
-      $("#skeloginbox .one").append("<div class='label'>Sketch Engine login</div>");
-      if (Screenful.User.ske_username != "") {
-        $("#skeloginbox .one").append("<div class='message'>Your Lexonomy account is linked to your Sketch Engine account <b>"+Screenful.User.ske_username+"</b>.</div>");
-        if (Screenful.User.ske_apiKey != "") {
-          $("#skeloginbox .one").append("<div class='message'>Your Sketch Engine API key is <b>"+Screenful.User.ske_apiKey+"</b>.</div>");
-        }
-        $("#skeloginbox .one").append("<div class='message'><a href='"+Screenful.User.sketchengineLoginPage+"'>Link to a different Sketch Engine account&nbsp;»</a></div>");
-      } else {
+      if (Screenful.User.ske_username == "") {
         $("#skeloginbox .one").append("<div class='message'><a href='"+Screenful.User.sketchengineLoginPage+"'>Link your Lexonomy account to your Sketch Engine account&nbsp;»</a></div>");
+      } else {
+        $("#skeloginbox .one").append("<div class='message'>Your Lexonomy account is linked to your Sketch Engine account <b>"+Screenful.User.ske_username+"</b>.</div>");
+        $("#skeloginbox .one").append("<div class='message'><a href='"+Screenful.User.sketchengineLoginPage+"'>Link to a different Sketch Engine account&nbsp;»</a></div>");
       }
-      if (Screenful.User.ske_apiKey == "") {
-        $("#skeloginbox .one").append("<div class='message'>Your Sketch Engine API key is not set. Please, <a href='"+Screenful.User.sketchengineLoginPage+"'>login via Sketch Engine</a> to set API key automatically.</div>");
-      }
+    } else {
+        $("#skeloginbox .one").append("<div class='field skeusername'><div class='label'>"+Screenful.Loc.skeUserName+"</div><input class='textbox' value='"+Screenful.User.ske_username+"'/></div>");
+        $("#skeloginbox .one").append("<div class='field submit'><input class='button' type='submit' value='"+Screenful.Loc.change+"'/></div>");
+        $("#skeloginbox .two").append("<div class='message'>"+Screenful.Loc.skeUserNameChanged+"</div>");
+        $("#skeloginbox .two").append("<div class='field submit'><button class='return'>"+Screenful.Loc.ok+"</button></div>");
     }
 
     $("#skeapibox .one").append("<div class='label'>Sketch Engine API key</div>");
-    if (Screenful.User.sketchengineLoginPage != "") {
+    if (Screenful.User.sketchengineLoginPage != "" && Screenful.User.ske_apiKey == "") {
       $("#skeapibox .one").append("<div class='message'>Unless you need special setup, Please, <a href='"+Screenful.User.sketchengineLoginPage+"'>login via Sketch Engine</a> to set API key automatically.</div>");
     }
-    $("#skeapibox .one").append("<div class='field skeapikey'><div class='label'>"+Screenful.Loc.newApiKey+"</div><input class='textbox' value='"+Screenful.User.ske_apiKey+"'/></div>");
+    $("#skeapibox .one").append("<div class='field skeapikey'><div class='label'>"+Screenful.Loc.skeApiKey+"</div><input class='textbox' value='"+Screenful.User.ske_apiKey+"'/></div>");
     $("#skeapibox .one").append("<div class='field submit'><input class='button' type='submit' value='"+Screenful.Loc.change+"'/></div>");
     $("#skeapibox .one").append("<div class='error' style='display: none'></div>");
-    $("#skeapibox .two").append("<div class='message'>"+Screenful.Loc.apiKeyChanged+"</div>");
+    $("#skeapibox .two").append("<div class='message'>"+Screenful.Loc.skeApiKeyChanged+"</div>");
     $("#skeapibox .two").append("<div class='field submit'><button class='return'>"+Screenful.Loc.ok+"</button></div>");
 
     $("#oneclickbox .one").append("<div class='label'>One-Click Dictionary API key</div>");
@@ -46,6 +45,12 @@ Screenful.UserProfile={
       if(password.length<6) { $("#changepwdbox .error").html(Screenful.Loc.passwordShort).show(); return false; }
       if($.trim(password)!=password) { $("#changepwdbox .error").html(Screenful.Loc.passwordWhitespace).show(); return false; }
       Screenful.UserProfile.goPassword(password);
+      return false;
+    });
+
+    $("#skeloginbox").on("submit", function(e){
+      var newusername=$("#skeloginbox div.field.skeusername input").val();
+      Screenful.UserProfile.goSkeUserName(newusername);
       return false;
     });
 
@@ -80,8 +85,17 @@ Screenful.UserProfile={
     });
   },
 
+  goSkeUserName: function(skeusername){
+    $.ajax({url: Screenful.UserProfile.skeUserNameActionUrl, dataType: "json", method: "POST", data: {ske_userName: skeusername}}).done(function(data){
+      if(data.success) {
+        $("#skeloginbox .one").hide();
+        $("#skeloginbox .two").show()
+      }
+    });
+  },
+
   goSkeApiKey: function(skeapikey){
-    $.ajax({url: Screenful.UserProfile.skeActionUrl, dataType: "json", method: "POST", data: {ske_apiKey: skeapikey}}).done(function(data){
+    $.ajax({url: Screenful.UserProfile.skeApiActionUrl, dataType: "json", method: "POST", data: {ske_apiKey: skeapikey}}).done(function(data){
       if(data.success) {
         $("#skeapibox .one").hide();
         $("#skeapibox .two").show()
