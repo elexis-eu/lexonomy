@@ -92,6 +92,7 @@
 							<div class="dict" id="dict_<%-dicts[i].id%>">
 								<a class="dictTitle" href="<%-dicts[i].id%>/"><%=dicts[i].title%></a>
 								<%if(dicts[i].currentUserCanDelete){%><a class="dictAction" href="javascript:void(null)" onclick="destroyDict('<%-dicts[i].id%>')">Delete</a><%}%>
+								<a class="dictAction" href="javascript:void(null)" onclick="cloneDict('<%-dicts[i].id%>')">Clone</a>
 							</div>
 						<%}%>
 						<script type="text/javascript">
@@ -103,6 +104,16 @@
 									};
 								});
 							}
+						}
+						function cloneDict(dictID){
+							$.ajax({url: "./"+dictID+"/clone.json", dataType: "json", method: "POST", data: {}}).done(function(data){
+								if (data.success) {
+									var clone = '<div class="dict" id="dict_' + data.dictID + '"><a class="dictTitle" href="' + data.dictID + '/">' + data.title +'</a>';
+									clone += '<a class="dictAction" href="javascript:void(null)" onclick="destroyDict(\'' + data.dictID + '\')">Delete</a> ';
+									clone += '<a class="dictAction" href="javascript:void(null)" onclick="cloneDict(\'' + data.dictID + '\')">Clone</a></div>';
+									$(clone).insertAfter($("#dict_"+dictID));
+								}
+							});
 						}
 						</script>
 						<div class="createdict"><a href="make/">Create a dictionary</a></div>

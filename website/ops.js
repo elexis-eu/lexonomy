@@ -108,7 +108,26 @@ module.exports={
       });
     });
   },
-
+  cloneDict: function(dictID, email, callnext){
+    module.exports.suggestDictID(function(cloneDictID) {
+      fs.copy(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), path.join(module.exports.siteconfig.dataDir, "dicts/"+cloneDictID+".sqlite"), function(err){
+        var cloneDictDB = module.exports.getDB(cloneDictID);
+        cloneDictDB.get("select json from configs where id='ident'", {}, function(err, row){
+          var ident={"title": "?", "blurb": "?"};
+          if(!err) {
+            ident = JSON.parse(row.json);
+            ident["title"] = "Clone of " + ident["title"];
+          }
+          cloneDictDB.run("update configs set json=$json where id='ident'", {$json: JSON.stringify(ident, null, "\t")}, function(err){ if(err) console.log(err);
+            module.exports.attachDict(cloneDictDB, cloneDictID, function(){
+              cloneDictDB.close();
+              callnext(true, cloneDictID, ident["title"]);
+            });
+          });
+        });
+      });
+    });
+  },
   readSiteConfig: function(callnext){
     fs.readFile("siteconfig.json", "utf8", function(err, content){
       var siteconfig=JSON.parse(content);

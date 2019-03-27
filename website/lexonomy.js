@@ -900,6 +900,22 @@ app.post(siteconfig.rootPath+":dictID/destroy.json", function(req, res){
     }
   });
 });
+app.post(siteconfig.rootPath+":dictID/clone.json", function(req, res){
+  if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
+  var db=ops.getDB(req.params.dictID);
+  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
+    if(!user.canConfig) {
+      db.close();
+      res.json({success: false});
+    } else {
+      db.close(function(){
+        ops.cloneDict(req.params.dictID, req.cookies.email, function(success, cloneDictID, title){
+          res.json({success: success, dictID: cloneDictID, title: title});
+        });
+      });
+    }
+  });
+});
 app.post(siteconfig.rootPath+":dictID/move.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID);
