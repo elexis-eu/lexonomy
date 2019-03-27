@@ -54,7 +54,7 @@ Ske.extendDocspec=function(docspec, xema){
     }
   }
 
-  if(kex.url && kex.corpus && ske_username && ske_apiKey && ske_username != "" && ske_apiKey != "") {
+  if(kex.apiurl && kex.corpus && ske_username && ske_apiKey && ske_username != "" && ske_apiKey != "") {
     for(var parName in xema.elements){
       if(xema.elements[parName].children){
 
@@ -158,21 +158,21 @@ Ske.menuRoot=function(htmlID){
       html+="Find definitions items <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+defo.container+"</span><span class='punc'>&gt;</span></span>";
     html+="</div>";
   }
-  if(Ske.getHeadword() && (kex.url.indexOf("sketchengine.co.uk")>-1 || kex.url.indexOf("sketchengine.eu")>-1)) {
+  if(Ske.getHeadword()) {
     html+="<div class='menuItem')'>";
-      html+="<a target='ske' href='https://app.sketchengine.eu/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+      html+="<a target='ske' href='" + kex.url + "/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show word sketch";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-        html+="<a target='ske' href='https://app.sketchengine.eu/#concordance?corpname="+kex.corpus+"&showresults=1&operations="+encodeURIComponent(Ske.getConcordance())+"'>";
+        html+="<a target='ske' href='" + kex.url + "/#concordance?corpname="+kex.corpus+"&showresults=1&operations="+encodeURIComponent(Ske.getConcordance())+"'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show concordance";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-      html+="<a target='ske' href='https://app.sketchengine.eu/#thesaurus?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+      html+="<a target='ske' href='" + kex.url + "/#thesaurus?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show thesaurus";
       html+="</a>";

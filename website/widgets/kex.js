@@ -2,6 +2,11 @@ var Kex={};
 
 Kex.change=function(){};
 
+Kex.settings={
+  defaultURL: "https://app.sketchengine.eu/",
+  defaultAPIURL: "https://api.sketchengine.co.uk/bonito/run.cgi"
+}
+
 Kex.ifchange=function(event){
   var $inp=$(event.delegateTarget);
   if($inp.val()!=$inp.data("origval")) Kex.change();
@@ -13,7 +18,12 @@ Kex.render=function(div, json){
   $div.append("<div class='title'>Sketch Engine URL</div>");
   $div.append("<input class='textbox' id='kex_url'/>");
   $div.find("#kex_url").val(json.url).data("origval", json.url).on("change keyup", Kex.ifchange);
-  $div.append("<div class='instro'>The path to the <code>run.cgi</code> script in Sketch Engine. For most users this should be <code>https://api.sketchengine.co.uk/bonito/run.cgi</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
+  $div.append("<div class='instro'>The URL of the Sketch Engine installation where external links should point. Defaults to <code>https://app.sketchengine.eu</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
+
+  $div.append("<div class='title'>Sketch Engine API URL</div>");
+  $div.append("<input class='textbox' id='kex_apiurl'/>");
+  $div.find("#kex_apiurl").val(json.apiurl).data("origval", json.apiurl).on("change keyup", Kex.ifchange);
+  $div.append("<div class='instro'>The path to the <code>run.cgi</code> API script in Sketch Engine. Defaults to <code>https://api.sketchengine.co.uk/bonito/run.cgi</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
 
   $div.append("<div class='title'>Corpus name</div>");
   $div.append("<input class='textbox' id='kex_corpus'/>");
@@ -32,7 +42,8 @@ Kex.render=function(div, json){
 Kex.harvest=function(div){
   var $div=$(div);
   var ret={};
-  ret.url=$.trim( $div.find("#kex_url").val() );
+  ret.url=$.trim( $div.find("#kex_url").val() ) || Kex.settings.defaultURL;
+  ret.apiurl=$.trim( $div.find("#kex_apiurl").val() ) || Kex.settings.defaultAPIURL;
   ret.corpus=$.trim( $div.find("#kex_corpus").val() );
   ret.concquery=$.trim( $div.find("#kex_concquery").val() );
   ret.concsampling=$.trim( Math.max(0, $div.find("#kex_concsampling").val()));
