@@ -19,6 +19,9 @@ Ske.getHeadword=function(){
   if(!hwd) hwd="";
   return hwd;
 };
+Ske.getSearchword=function(elementID){
+  return Xonomy.harvestElement(document.getElementById(elementID)).getText();
+};
 Ske.getCQL=function(cql){
   var $xml=$($.parseXML(Xonomy.harvest()));
   var ret = cql.replace(/%\([^)]+\)/g, function (el) {
@@ -26,9 +29,12 @@ Ske.getCQL=function(cql){
   })
   return ret;
 };
-Ske.getConcordance=function(){
+Ske.getConcordance=function(htmlID){
   var operations = [];
-  if (kex.concquery.length > 0) {
+  if (htmlID) { // menus for additional elements
+    var simplequery = Ske.getSearchword(htmlID);
+    operations.push({"name":"iquery","arg":simplequery,"active":true,"query":{"queryselector":"iqueryrow","iquery":simplequery}});
+  } else if (kex.concquery.length > 0) {
     var cql = Ske.getCQL(kex.concquery);
     operations.push({"name":"cql","arg":cql,"active":true,"query":{"queryselector":"cqlrow","cql":cql}});
   } else {
@@ -56,6 +62,15 @@ Ske.extendDocspec=function(docspec, xema){
 
   if(kex.apiurl && kex.corpus && ske_username && ske_apiKey && ske_username != "" && ske_apiKey != "") {
     for(var parName in xema.elements){
+      if(kex.searchElements.indexOf(parName) != -1) {
+        docspec.elements[parName].caption = function(jsMe){
+          var cap="";
+          cap="<span class='lexonomySkeCaption' onclick='Xonomy.notclick=true; Ske.menuRoot(\""+jsMe.htmlID+"\", true)'>▼</span>";
+          if(typeof(incaption)=="function") cap=incaption(jsMe)+cap;
+          if(typeof(incaption)=="string") cap=incaption+cap;
+          return cap;
+        };
+      }
       if(xema.elements[parName].children){
 
         canHaveExamples=false;
@@ -132,47 +147,56 @@ Ske.extendDocspec=function(docspec, xema){
   }
 };
 
-Ske.menuRoot=function(htmlID){
+Ske.menuRoot=function(htmlID, additional=false){
   var html="<div class='menu'>";
-  if(xampl.container) {
-    html+="<div class='menuItem' onclick='Ske.menuExamples(\""+htmlID+"\", \"layby\")'>";
-      html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-      html+="Find examples <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+xampl.container+"</span><span class='punc'>&gt;</span></span>";
-    html+="</div>";
+  if (!additional) {
+    if(xampl.container) {
+      html+="<div class='menuItem' onclick='Ske.menuExamples(\""+htmlID+"\", \"layby\")'>";
+        html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
+        html+="Find examples <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+xampl.container+"</span><span class='punc'>&gt;</span></span>";
+      html+="</div>";
+    }
+    if(collx.container) {
+      html+="<div class='menuItem' onclick='Ske.menuCollx(\""+htmlID+"\", \"layby\")'>";
+        html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
+        html+="Find collocations <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+collx.container+"</span><span class='punc'>&gt;</span></span>";
+      html+="</div>";
+    }
+    if(thes.container) {
+      html+="<div class='menuItem' onclick='Ske.menuThes(\""+htmlID+"\", \"layby\")'>";
+        html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
+        html+="Find thesaurus items <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+thes.container+"</span><span class='punc'>&gt;</span></span>";
+      html+="</div>";
+    }
+    if(defo.container) {
+      html+="<div class='menuItem' onclick='Ske.menuDefo(\""+htmlID+"\", \"layby\")'>";
+        html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
+        html+="Find definitions items <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+defo.container+"</span><span class='punc'>&gt;</span></span>";
+      html+="</div>";
+    }
   }
-  if(collx.container) {
-    html+="<div class='menuItem' onclick='Ske.menuCollx(\""+htmlID+"\", \"layby\")'>";
-      html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-      html+="Find collocations <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+collx.container+"</span><span class='punc'>&gt;</span></span>";
-    html+="</div>";
+  if (additional) {
+    var headword = encodeURIComponent(Ske.getSearchword(htmlID))
+    var conc = encodeURIComponent(Ske.getConcordance(htmlID))
+  } else {
+    var headword = encodeURIComponent(Ske.getHeadword())
+    var conc = encodeURIComponent(Ske.getConcordance())
   }
-  if(thes.container) {
-    html+="<div class='menuItem' onclick='Ske.menuThes(\""+htmlID+"\", \"layby\")'>";
-      html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-      html+="Find thesaurus items <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+thes.container+"</span><span class='punc'>&gt;</span></span>";
-    html+="</div>";
-  }
-  if(defo.container) {
-    html+="<div class='menuItem' onclick='Ske.menuDefo(\""+htmlID+"\", \"layby\")'>";
-      html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
-      html+="Find definitions items <span class='techno'><span class='punc'>&lt;</span><span class='elName'>"+defo.container+"</span><span class='punc'>&gt;</span></span>";
-    html+="</div>";
-  }
-  if(Ske.getHeadword()) {
+  if(headword) {
     html+="<div class='menuItem')'>";
-      html+="<a target='ske' href='" + kex.url + "/#wordsketch?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+      html+="<a target='ske' href='" + kex.url + "/#wordsketch?corpname="+kex.corpus+"&lemma="+headword+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show word sketch";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-        html+="<a target='ske' href='" + kex.url + "/#concordance?corpname="+kex.corpus+"&showresults=1&operations="+encodeURIComponent(Ske.getConcordance())+"'>";
+        html+="<a target='ske' href='" + kex.url + "/#concordance?corpname="+kex.corpus+"&showresults=1&operations="+conc+"'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show concordance";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-      html+="<a target='ske' href='" + kex.url + "/#thesaurus?corpname="+kex.corpus+"&lemma="+encodeURIComponent(Ske.getHeadword())+"&showresults=1'>";
+      html+="<a target='ske' href='" + kex.url + "/#thesaurus?corpname="+kex.corpus+"&lemma="+headword+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show thesaurus";
       html+="</a>";

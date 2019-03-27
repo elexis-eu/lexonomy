@@ -21,7 +21,9 @@
 		<script type="text/javascript" src="../../../libs/screenful/screenful-editor.js"></script>
 		<script type="text/javascript" src="../../../widgets/kex.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../widgets/pillarform.css" />
+		<script type="text/javascript" src="../../../widgets/xematron.js"></script>
 		<script type="text/javascript">
+		var xema=<%-JSON.stringify(xema)%>;
 		Screenful.Editor.singleton=true;
 		Screenful.Editor.entryID="kex";
 		Screenful.Editor.leaveUrl="../../../<%=dictID%>/config/";

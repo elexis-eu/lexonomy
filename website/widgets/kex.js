@@ -37,6 +37,21 @@ Kex.render=function(div, json){
   $div.append("<input type='number' min='0' placeholder='0' class='textbox' style='width: auto' id='kex_concsampling'/>");
   $div.find("#kex_concsampling").val(json.concsampling).data("origval", json.concsampling).on("change keyup", Kex.ifchange);
   $div.append("<div class='instro'>Whether to apply automatic sampling of the concordance. Any non-zero value means to automatically create a random sample of that size.</div>");
+
+  if (!json.searchElements)
+    json.searchElements = [];
+  $div.append("<div class='title'>Additional search elements</div>");
+  $div.append("<div class='scrollbox'>");
+  var $scrollbox = $div.find(".scrollbox");
+  var elements=Xematron.listElements(xema);
+  for(var i=0; i<elements.length; i++){
+    var available = ["txt","lst"].indexOf(xema.elements[elements[i]].filling) != -1;
+    $scrollbox.append("<div><label class='radio' data-name='"+elements[i]+"'>\
+          <input type='checkbox' data-name='"+elements[i]+"' "+(json.searchElements.indexOf(elements[i])>-1?"checked":"")+ " " + (available?"":"disabled") + "/> \
+          "+elements[i]+"</label></div>");
+  }
+  $scrollbox.find("label").on("click", Kex.change);
+  $scrollbox.parent().append("<div class='instro'>You can select any textual elements here whose content you would like to search for in Sketch Engine. A menu will be displayed next to all these elements like for the root entry element.</div>");
 };
 
 Kex.harvest=function(div){
@@ -47,5 +62,10 @@ Kex.harvest=function(div){
   ret.corpus=$.trim( $div.find("#kex_corpus").val() );
   ret.concquery=$.trim( $div.find("#kex_concquery").val() );
   ret.concsampling=$.trim( Math.max(0, $div.find("#kex_concsampling").val()));
+  ret.searchElements=[];
+  $(".pillarform .scrollbox label input").each(function(){
+    var $input=$(this);
+    if($input.prop("checked")) ret.searchElements.push($input.attr("data-name"));
+  });
   return ret;
 };
