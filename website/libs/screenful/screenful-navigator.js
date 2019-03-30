@@ -314,10 +314,12 @@ Screenful.Navigator={
     //entry title:
     Screenful.Navigator.renderer($item.find("div.inside").toArray()[0], entry, searchtext, modifier);
 
+    //entry line number
+    $("<span class='entryLineNumber'>" + index + " </span>").prependTo($item);
+
     //entry flag:
     if(Screenful.Navigator.flags && Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl && Screenful.Navigator.extractEntryFlag){
       var $flagLink=$("<a class='entryFlagLink undecided'></a>").prependTo($item);
-	  $("<span class='entryLineNumber'>" + index + " </span>").prependTo($item);
       window.setTimeout(function(){
         var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
         $flagLink.removeClass("undecided");
