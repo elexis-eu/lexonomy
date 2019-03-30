@@ -363,10 +363,12 @@ Screenful.Navigator={
   },
   goLast: function() {
     $.ajax({url: Screenful.Navigator.listUrl, dataType: "json", method: "POST", data: {id: "last"}}).done(function(data){
-      Screenful.Navigator.setEntryAsCurrent(data.entryID);
-      Screenful.Navigator.focusEntryList();
-      $("#listbox").scrollTop($("div.entry[data-id=\""+data.entryID+"\"]").offset().top - $("#listbox").offset().top);
-      Screenful.Navigator.openEntry({data: {id: data.entryID}});
+      if (data.entryID) {
+        Screenful.Navigator.setEntryAsCurrent(data.entryID);
+        Screenful.Navigator.focusEntryList();
+        $("#listbox").scrollTop($("div.entry[data-id=\""+data.entryID+"\"]").offset().top - $("#listbox").offset().top);
+        Screenful.Navigator.openEntry({data: {id: data.entryID}});
+      }
     })
   },
   previousCrit: null,

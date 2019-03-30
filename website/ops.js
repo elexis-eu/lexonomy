@@ -1490,7 +1490,10 @@ module.exports={
 
   getLastEditedEntry: function (db, dictID, email, callnext){
     db.all("select entry_id from history where email=$email order by [when] desc limit 1", {$email: email}, function(err, rows){
-      callnext(rows[0].entry_id);
+      if (rows.length > 0)
+        callnext(rows[0].entry_id);
+      else
+        callnext();
     })
   }
 }; //end of module.exports
