@@ -605,68 +605,73 @@ module.exports={
     });
   },
 
-  listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, sortdesc, callnext){
-    if(!searchtext) searchtext="";
-    if (sortdesc == 'true')
-      sortdesc = " DESC "
-    else
-      sortdesc = ""
-    if(modifier=="start") {
-      var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
-        from searchables as s
-        inner join entries as e on e.id=s.entry_id
-        where doctype=$doctype and s.txt like $like
-        group by e.id
-        order by e.sortkey` + sortdesc + `, s.level
-        limit $howmany`;
-      var params1={$howmany: howmany, $like: searchtext+"%", $doctype: doctype};
-      var sql2=`select count(distinct s.entry_id) as total
-        from searchables as s
-        inner join entries as e on e.id=s.entry_id
-        where doctype=$doctype and s.txt like $like`;
-      var params2={$like: searchtext+"%", $doctype: doctype};
-    } else if(modifier=="wordstart"){
-      var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
-        from searchables as s
-        inner join entries as e on e.id=s.entry_id
-        where doctype=$doctype and (s.txt like $like1 or s.txt like $like2)
-        group by e.id
-        order by e.sortkey` + sortdesc + `, s.level
-        limit $howmany`;
-      var params1={$howmany: howmany, $like1: searchtext+"%", $like2: "% "+searchtext+"%", $doctype: doctype};
-      var sql2=`select count(distinct s.entry_id) as total
-        from searchables as s
-        inner join entries as e on e.id=s.entry_id
-        where doctype=$doctype and (s.txt like $like1 or s.txt like $like2)`;
-      var params2={$like1: searchtext+"%", $like2: "% "+searchtext+"%", $doctype: doctype};
-    } else if(modifier=="substring"){
-      var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
-        from searchables as s
-        inner join entries as e on e.id=s.entry_id
-        where doctype=$doctype and s.txt like $like
-        group by e.id
-        order by e.sortkey` + sortdesc + `, s.level
-        limit $howmany`;
-      var params1={$howmany: howmany, $like: "%"+searchtext+"%", $doctype: doctype};
-      var sql2=`select count(distinct s.entry_id) as total
-        from searchables as s
-        inner join entries as e on e.id=s.entry_id
-        where doctype=$doctype and s.txt like $like`;
-      var params2={$like: "%"+searchtext+"%", $doctype: doctype};
-    }
-    module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
-      db.all(sql1, params1, function(err, rows){
-        if(err || !rows) rows=[];
-        var entries=[];
-        for(var i=0; i<rows.length; i++){
-          rows[i].xml=setHousekeepingAttributes(rows[i].id, rows[i].xml, subbing);
-          var item={id: rows[i].id, title: rows[i].title, xml: rows[i].xml};
-          if(rows[i].level>1) item.title+=" ← <span class='redirector'>"+rows[i].txt+"</span>";
-          entries.push(item);
-        }
-        db.get(sql2, params2, function(err, row){
-          var total=(!err && row) ? row.total : 0;
-          callnext(total, entries);
+  listEntries: function(db, dictID, doctype, searchtext, modifier, howmany, reversed, callnext){
+    module.exports.readDictConfig(db, dictID, "titling", function(titling){
+      if(!searchtext) searchtext="";
+      var sortdesc = titling.headwordSortDesc || false;
+      if (reversed == 'true')
+          sortdesc = !sortdesc;
+      if (sortdesc)
+        sortdesc = " DESC "
+      else
+        sortdesc = ""
+      if(modifier=="start") {
+        var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
+          from searchables as s
+          inner join entries as e on e.id=s.entry_id
+          where doctype=$doctype and s.txt like $like
+          group by e.id
+          order by e.sortkey` + sortdesc + `, s.level
+          limit $howmany`;
+        var params1={$howmany: howmany, $like: searchtext+"%", $doctype: doctype};
+        var sql2=`select count(distinct s.entry_id) as total
+          from searchables as s
+          inner join entries as e on e.id=s.entry_id
+          where doctype=$doctype and s.txt like $like`;
+        var params2={$like: searchtext+"%", $doctype: doctype};
+      } else if(modifier=="wordstart"){
+        var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
+          from searchables as s
+          inner join entries as e on e.id=s.entry_id
+          where doctype=$doctype and (s.txt like $like1 or s.txt like $like2)
+          group by e.id
+          order by e.sortkey` + sortdesc + `, s.level
+          limit $howmany`;
+        var params1={$howmany: howmany, $like1: searchtext+"%", $like2: "% "+searchtext+"%", $doctype: doctype};
+        var sql2=`select count(distinct s.entry_id) as total
+          from searchables as s
+          inner join entries as e on e.id=s.entry_id
+          where doctype=$doctype and (s.txt like $like1 or s.txt like $like2)`;
+        var params2={$like1: searchtext+"%", $like2: "% "+searchtext+"%", $doctype: doctype};
+      } else if(modifier=="substring"){
+        var sql1=`select s.txt, min(s.level) as level, e.id, e.title, e.xml
+          from searchables as s
+          inner join entries as e on e.id=s.entry_id
+          where doctype=$doctype and s.txt like $like
+          group by e.id
+          order by e.sortkey` + sortdesc + `, s.level
+          limit $howmany`;
+        var params1={$howmany: howmany, $like: "%"+searchtext+"%", $doctype: doctype};
+        var sql2=`select count(distinct s.entry_id) as total
+          from searchables as s
+          inner join entries as e on e.id=s.entry_id
+          where doctype=$doctype and s.txt like $like`;
+        var params2={$like: "%"+searchtext+"%", $doctype: doctype};
+      }
+      module.exports.readDictConfig(db, dictID, "subbing", function(subbing){
+        db.all(sql1, params1, function(err, rows){
+          if(err || !rows) rows=[];
+          var entries=[];
+          for(var i=0; i<rows.length; i++){
+            rows[i].xml=setHousekeepingAttributes(rows[i].id, rows[i].xml, subbing);
+            var item={id: rows[i].id, title: rows[i].title, xml: rows[i].xml};
+            if(rows[i].level>1) item.title+=" ← <span class='redirector'>"+rows[i].txt+"</span>";
+            entries.push(item);
+          }
+          db.get(sql2, params2, function(err, row){
+            var total=(!err && row) ? row.total : 0;
+            callnext(total, entries);
+          });
         });
       });
     });

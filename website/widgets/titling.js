@@ -23,6 +23,9 @@ Titling.render=function(div, json){
     $block.find("select").append("<option "+(json.headwordSorting==elements[i] ? "selected='selected'" : "")+" value='"+elements[i]+"'>"+elements[i]+"</option>");
   }
   $block.find("select").on("change", function(e){Titling.headwordChanged(); Titling.change();});
+  $block.append("<input type='checkbox' id='sortDesc' " + (json.headwordSortDesc ? "checked" : "") + " style='margin-top: 1em'>")
+  $block.append("<label for='sortDesc'>Sort in descending order</label>")
+  $("#sortDesc").on("change", Titling.change);
   $block.append("<div class='instro'>Select the element which will be used for sorting of headwords in the entry list. If you make no selection here Lexonomy will use the element you chose for headword.</div>");
 
   var $block=$("<div class='block headwordAnnotations'></div>").appendTo($div);
@@ -75,6 +78,7 @@ Titling.harvest=function(div){
   var ret={};
   ret.headword=$(".pillarform .block.headword select").val();
   ret.headwordSorting=$(".pillarform .block.headwordSorting select").val();
+  ret.headwordSortDesc=$("#sortDesc").prop("checked");
   ret.headwordAnnotations=[];
   ret.headwordAnnotationsType=$('[name="hwannotype"]:checked').val();
   ret.headwordAnnotationsAdvanced=$(".advancedAnnotations").val();
