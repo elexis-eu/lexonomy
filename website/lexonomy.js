@@ -621,10 +621,17 @@ app.post(siteconfig.rootPath+":dictID/:doctype/entrylist.json", function(req, re
       res.json({success: false});
     } else {
       if(req.body.id) {
-        ops.listEntriesById(db, req.params.dictID, req.body.id, function(entries){
-          db.close();
-          res.json({success: true, entries: entries});
-        });
+        if (req.body.id == "last") {
+          ops.getLastEditedEntry(db, req.params.dictID, user.email, function(entryID){
+            db.close();
+            res.json({success: true, entryID: entryID});
+          });
+        } else {
+          ops.listEntriesById(db, req.params.dictID, req.body.id, function(entries){
+            db.close();
+            res.json({success: true, entries: entries});
+          });
+        }
       } else {
         ops.listEntries(db, req.params.dictID, req.params.doctype, req.body.searchtext, req.body.modifier, req.body.howmany, req.body.sortdesc, function(total, entries){
           db.close();

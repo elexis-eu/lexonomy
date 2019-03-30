@@ -64,13 +64,15 @@ Screenful.Navigator={
     $listMenuWrapper.append("<div class='menu' id='listMenu'>\
                          <a href='javascript:void(0);'><button class='iconYes noborder' id='butReload'>"+Screenful.Loc.reload+"</button></a>\
 				         <a href='javascript:void(0);'><button class='iconYes noborder' id='butReverse'>"+Screenful.Loc.reverse+"</button></a>\
-				         <a href='javascript:void(0);'><button class='iconYes noborder' id='butShowNumbers'>"+Screenful.Loc.shownumbers+"</button></a></div>");
+				         <a href='javascript:void(0);'><button class='iconYes noborder' id='butShowNumbers'>"+Screenful.Loc.shownumbers+"</button></a>\
+				         <a href='javascript:void(0);'><button class='iconYes noborder' id='butGoLast'>"+Screenful.Loc.golast+"</button></a></div>");
     $butListMenu.on("click", Screenful.Navigator.listMenuLinkClick);
     if(!(Screenful.Navigator.critEditor && Screenful.Navigator.critHarvester)) $("#butCritOpen").remove();
     $("#butCritOpen").on("click", Screenful.Navigator.critOpen);
     $("#butReload").on("click", Screenful.Navigator.reload);
     $("#butReverse").on("click", Screenful.Navigator.reverse);
     $("#butShowNumbers").on("click", Screenful.Navigator.numberLines);
+    $("#butGoLast").on("click", Screenful.Navigator.goLast);
     $("#critbox").html("<div id='editor'></div><div class='buttons'><button class='iconYes' id='butCritCancel'>"+Screenful.Loc.cancel+"</button><button class='iconYes' id='butCritGo'>"+Screenful.Loc.find+"</button></div>");
     $("#butCritCancel").on("click", Screenful.Navigator.critCancel);
     $("#butCritGo").on("click", Screenful.Navigator.critGo);
@@ -359,7 +361,14 @@ Screenful.Navigator={
     $("#listbox .entry").removeClass("current")
     $("div.entry[data-id=\""+id+"\"]").addClass("current");
   },
-
+  goLast: function() {
+    $.ajax({url: Screenful.Navigator.listUrl, dataType: "json", method: "POST", data: {id: "last"}}).done(function(data){
+      Screenful.Navigator.setEntryAsCurrent(data.entryID);
+      Screenful.Navigator.focusEntryList();
+      $("#listbox").scrollTop($("div.entry[data-id=\""+data.entryID+"\"]").offset().top - $("#listbox").offset().top);
+      Screenful.Navigator.openEntry({data: {id: data.entryID}});
+    })
+  },
   previousCrit: null,
   critOpen: function(event){
     Screenful.Navigator.previousCrit=Screenful.Navigator.critHarvester(document.getElementById("editor")); //save previous criteria for later, in case the user cancels

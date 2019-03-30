@@ -34,6 +34,7 @@ button#butCritRemove {background-image: url(cross.png);}
 button#butReload {background-image: url(arrow_refresh.png); padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
 button#butReverse {background-image: url(reverse.png); background-size: auto 2ex; padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
 button#butShowNumbers {background-image: url(numbers.png); background-size: auto 2ex; padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
+button#butGoLast {background-image: url(arrow_left.png); background-size: auto 2ex; padding-top: 5px !important; padding-bottom: 5px !important; position: relative; top: -2px; margin-left: -2px; }
 button#butListMenu {background-image: url(listmenu.png); background-size: auto 2ex;}
 button#butCritCancel {background-image: url(arrow_left.png);}
 button#butCritGo {background-image: url(find.png);}

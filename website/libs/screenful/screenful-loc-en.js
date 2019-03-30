@@ -4,6 +4,7 @@ Screenful.Loc={
   reload: "Reload",
   reverse: "Reverse",
   shownumbers: "Number lines",
+  golast: "Show last edited entry",
   cancel: "Cancel",
   more: "More",
   new: "New",
