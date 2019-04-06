@@ -629,6 +629,9 @@ Xonomy.renderAttribute=function(attribute, optionalParentName) {
 		}
 	}
 
+	var isURL=false;
+	if (displayValue.startsWith("https://") || displayValue.startsWith("http://"))
+		isURL=true;
 	var html="";
 	html+='<span data-name="'+attribute.name+'" data-value="'+Xonomy.xmlEscape(attribute.value)+'" id="'+htmlID+'" class="'+classNames+'">';
 		html+='<span class="punc"> </span>';
@@ -639,9 +642,14 @@ Xonomy.renderAttribute=function(attribute, optionalParentName) {
 		var onclick=''; if(!readonly) onclick=' onclick="Xonomy.click(\''+htmlID+'\', \'attributeValue\')"';
 		html+='<span class="valueContainer attributeValue focusable"'+onclick+'>';
 			html+='<span class="punc">"</span>';
-			html+='<span class="value">'+displayValue+'</span>';
+			if (isURL)
+				html+='<span class="value" title="'+displayValue+'">URL</span>';
+			else
+				html+='<span class="value">'+displayValue+'</span>';
 			html+='<span class="punc">"</span>';
 		html+='</span>';
+		if (isURL)
+			caption = '<a href="'+displayValue+'" target=' + attribute.name + '>🔗</a> ' + caption;
 		if(caption) html+="<span class='inlinecaption'>"+caption+"</span>";
 	html+='</span>';
 	attribute.htmlID = htmlID;
