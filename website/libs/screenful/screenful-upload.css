@@ -22,6 +22,7 @@
 
 #middlebox div.field.submit {margin-top: 30px;}
 #middlebox div.field.submit input.button {font-weight: bold;}
+#middlebox div.field.submit input.button:disabled {color: grey; cursor: not-allowed}
 
 #middlebox div.error {background-color: #ffcdcc; color: #99004d; font-weight: bold; text-align: center; padding: 40px; margin: 30px -30px -40px -100px; text-shadow: 1px 1px 0px #eeeeee;}
 
