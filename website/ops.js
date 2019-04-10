@@ -386,7 +386,7 @@ module.exports={
   },
 
   removeSubentryParentTags: function(xml){
-    xml=xml.replace(/\<lxnm:subentryParent[^\>]*\>/g, "");
+    xml=xml.replace(/<lxnm:subentryParent[^>]*>/g, "");
     return xml;
   },
   addSubentryParentTags: function(db, entryID, xml, callnext){
@@ -731,7 +731,7 @@ module.exports={
   },
   toSortkey: function(s, abc){
     const keylength=15;
-    var ret=s.replace(/\<[\<\>]+>/g, "").toLowerCase();
+    var ret=s.replace(/<[<>]+>/g, "").toLowerCase();
     //replace any numerals:
     var pat=new RegExp("[0-9]{1,"+keylength+"}", "g");
     ret=ret.replace(pat, function(x){while(x.length<keylength+1) x="0"+x; return x;});
@@ -1527,7 +1527,7 @@ function generateDictID(){
 
 function addFlag(entryID, xml, flag, flagconfig){
   var el = flagconfig.flag_element;
-  var re = new RegExp("\<" + el + "[^>]*\>[^\<]+\</" + el + "\>")
+  var re = new RegExp("<" + el + "[^>]*>[^<]+</" + el + ">")
   var flag_exists = false
   xml = xml.replace(re, function(found, $1) { // try replacing existing flag
     flag_exists = true
@@ -1535,43 +1535,43 @@ function addFlag(entryID, xml, flag, flagconfig){
   })
   if (flag_exists)
     return xml
-  return xml.replace(/^\<([^\>]+>)/, function(found, $1) { // or add new flag
+  return xml.replace(/^<([^>]+>)/, function(found, $1) { // or add new flag
     return "<" + $1 + "<" + el + ">" + flag + "</" + el + ">";
   })
 }
 
 function setHousekeepingAttributes(entryID, xml, subbing){
   //delete any housekeeping attributes and elements that already exist in the XML:
-  xml=xml.replace(/^(\<[^\>\/]*)\s+xmlns:lxnm=['"]http:\/\/www\.lexonomy\.eu\/["']/, function(found, $1){return $1});
-  xml=xml.replace(/^(\<[^\>\/]*)\s+lxnm:entryID=['"][^\"\']*["']/, function(found, $1){return $1});
-  xml=xml.replace(/^(\<[^\>\/]*)\s+lxnm:subentryID=['"][^\"\']*["']/, function(found, $1){return $1});
+  xml=xml.replace(/^(<[^>\/]*)\s+xmlns:lxnm=['"]http:\/\/www\.lexonomy\.eu\/["']/, function(found, $1){return $1});
+  xml=xml.replace(/^(<[^>\/]*)\s+lxnm:entryID=['"][^\"\']*["']/, function(found, $1){return $1});
+  xml=xml.replace(/^(<[^>\/]*)\s+lxnm:subentryID=['"][^\"\']*["']/, function(found, $1){return $1});
   //get name of the top-level element:
-  var root=""; xml.replace(/^\<([^\s\>\/]+)/, function(found, $1){root=$1});
+  var root=""; xml.replace(/^<([^\s>\/]+)/, function(found, $1){root=$1});
   //set housekeeping attributes:
-  if(subbing[root]) xml=xml.replace(/^\<[^\s\>\/]+/, function(found){return found+" lxnm:subentryID='"+entryID+"'"});
-  if(!subbing[root]) xml=xml.replace(/^\<[^\s\>\/]+/, function(found){return found+" lxnm:entryID='"+entryID+"'"});
-  xml=xml.replace(/^\<[^\s\>\/]+/, function(found){return found+" xmlns:lxnm='http://www.lexonomy.eu/'"});
+  if(subbing[root]) xml=xml.replace(/^<[^\s>\/]+/, function(found){return found+" lxnm:subentryID='"+entryID+"'"});
+  if(!subbing[root]) xml=xml.replace(/^<[^\s>\/]+/, function(found){return found+" lxnm:entryID='"+entryID+"'"});
+  xml=xml.replace(/^<[^\s>\/]+/, function(found){return found+" xmlns:lxnm='http://www.lexonomy.eu/'"});
   return xml;
 }
 
 function getDoctype(xml){
   var ret="";
-  xml=xml.replace(/^\<([^\>\/\s]+)/, function(found, $1){ ret=$1 });
+  xml=xml.replace(/^<([^>\/\s]+)/, function(found, $1){ ret=$1 });
   return ret;
 }
 
 function extractText(xml, elName){ //extract the text contents from thusly named elements, return as array of strings
   var ret=[];
-  var pat=new RegExp("\\<"+elName+"[^\>]*\>([^\<]*)\\</"+elName+"\\>", "g");
+  var pat=new RegExp("<"+elName+"[^>]*>([^<]*)</"+elName+">", "g");
   xml.replace(pat, function(found, $1){
-    var s=$1.replace(/\<[^\>]*\>/g, "").trim();
+    var s=$1.replace(/<[^>]*>/g, "").trim();
     if(s!="") ret.push(s);
   });
   return ret;
 }
 function extractFirstText(xml){ //extract the text content from the first element that has text content and no child nodes
   var ret="";
-  var pat=new RegExp("\\<([^\\s\\>]+)[^\>]*\>([^\\<\\>]*?)\\</([^\\s\\>]+)\\>", "g");
+  var pat=new RegExp("<([^\\s>]+)[^>]*>([^<>]*?)</([^\\s>]+)>", "g");
   xml.replace(pat, function(found, $1, $2, $3){
     if(ret=="" && $1==$3) {
       var s=$2.trim();
