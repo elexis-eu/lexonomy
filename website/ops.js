@@ -1562,7 +1562,7 @@ function getDoctype(xml){
 
 function extractText(xml, elName){ //extract the text contents from thusly named elements, return as array of strings
   var ret=[];
-  var pat=new RegExp("\\<"+elName+"[^\>]*\>(.*?)\\</"+elName+"\\>", "g");
+  var pat=new RegExp("\\<"+elName+"[^\>]*\>([^\<]*)\\</"+elName+"\\>", "g");
   xml.replace(pat, function(found, $1){
     var s=$1.replace(/\<[^\>]*\>/g, "").trim();
     if(s!="") ret.push(s);
