@@ -1038,36 +1038,33 @@ app.get(siteconfig.rootPath+":dictID/import/", function(req, res){
     });
   });
 });
-app.post(siteconfig.rootPath+":dictID/import.json", function(req, res){
+app.get(siteconfig.rootPath+":dictID/import.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID);
-  db.run("BEGIN TRANSACTION");
-  ops.readDictConfigs(db, req.params.dictID, function(configs){
-    ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
-      if(!user.canUpload) {
-        db.run("COMMIT");
-        db.close();
-        res.redirect("edit/");
-      } else {
-        var filename=req.body.filename;
-        var uploadStart=req.body.uploadStart;
-        var historiography={uploadStart: uploadStart, filename: filename};
-        ops.import(db, req.params.dictID, path.join(siteconfig.dataDir, "uploads/"+filename), user.email, historiography, function(entryCount){
-          //console.log("going to commit and close");
-          db.run("COMMIT");
-          db.close(function(){
-            //console.log("committed and closed");
-            var ret={
-              progressMessage: "Entries imported: "+entryCount,
-              finished: true,
-              state: {filename: filename, uploadStart: uploadStart},
-            };
+  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
+    db.close();
+    if(!user.canUpload) {
+      res.redirect("edit/");
+    } else {
+      var parsedUrl=url.parse(req.url, true);
+      var filename=parsedUrl.query.filename;
+      var truncate=parsedUrl.query.truncate || 0;
+      if (parsedUrl.query.showErrors) {
+        ops.showImportErrors(path.join(siteconfig.dataDir, "uploads/"+filename), truncate, function(ret){
+          if (truncate)
             res.json(ret);
-          });
-
+          else {
+            res.setHeader("content-type", "text/plain; charset=utf-8");
+            res.setHeader('content-disposition', 'attachment; filename="error.log"');
+            res.end(ret.errorData);
+          }
+        });
+      } else {
+        ops.import(req.params.dictID, path.join(siteconfig.dataDir, "uploads/"+filename), user.email, function(ret){
+          res.json(ret);
         });
       }
-    });
+    }
   });
 });
 

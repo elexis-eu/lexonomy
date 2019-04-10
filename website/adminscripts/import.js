@@ -1,276 +1,118 @@
-const fs=require("fs-extra");
-const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
+#!/usr/bin/node
 
-const filepath="/home/mbm/deleteme/KSSJ_LBS+AVT_1.1-dump.xml";
-var readStream=fs.createReadStream(filepath).setEncoding("utf8");
+if (process.argv.length < 4) {
+    console.log("Usage: import.js [-p] PATH_TO_DICTIONARY.sqlite FILE_TO_IMPORT.xml [AUTHOR_EMAIL]")
+    console.log("       -p   purge dictionary before importing")
+    process.exit(1);
+}
+console.log("PID " + process.pid)
+console.log("Import started. Please wait...")
+process.argv.shift() // node
+process.argv.shift() // import.js
+var purge = false
+if (process.argv[0] == "-p") {
+  purge = true
+  process.argv.shift() // -p
+}
 
-const dbpath="/home/mbm/lexonomy/data/dicts/zwkaq8ym4.sqlite";
-var db=new sqlite3.Database(dbpath, sqlite3.OPEN_READWRITE);
+const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
+const sax = require('sax')
+const path = require('path');
+const ops = require("../ops");
+const util = require("util");
 
-var entryCount=0;
+var dbname = process.argv[0]
+var filename = process.argv[1]
+var email=process.argv[2] || "IMPORT@LEXONOMY"
 
-//db.serialize();
-db.exec("delete from entries; delete from history; delete from searchables; delete from sub; delete from sqlite_sequence", function(err){
-  console.log(`database emptied`);
-  db.run("BEGIN TRANSACTION");
-  var buffer="";
-  var tail=""; //the buffer's tail = the last 1000 chars of the buffer
-  readStream.on("data", function(chunk){
-    for(var pos=0; pos<chunk.length; pos++){
-      buffer+=chunk[pos];
-      tail+=chunk[pos]; if(tail.length>100) tail=tail.substring(tail.length-100, tail.length); //the last 1000 chars of the buffer
-      if(chunk[pos]==">"){
-        if(tail.endsWith("<clanek>")){ //for performance reasons, we check the buffer's tail instead of the buffer itself
-          buffer="<clanek>";
-          tail="<clanek>";
-        }
-        if(tail.endsWith("</clanek>")){ //for performance reasons, we check the buffer's tail instead of the buffer itself
-          entryCount++;
-          insertEntry(entryCount, buffer);
-        }
+var db=new sqlite3.Database(dbname, sqlite3.OPEN_READWRITE);
+var dictID = path.basename(dbname, ".sqlite")
+var historiography={importStart: new Date().toISOString(), filename: path.basename(filename)}
+var input = fs.readFileSync(filename).toString();
+
+if (purge) {
+  ops.purge(db, dictID, email, historiography, function() {
+    console.log("Dictionary purged.")
+    checkEntry();
+  })
+} else
+  checkEntry();
+
+// first pass -- check what is entry and how many entries we have
+
+function checkEntry() {
+  var saxParser = sax.parser(true, {trim: true, strictEntities: false, xmlns: true, position: true, normalize: true, lowercase: false})
+  saxParser.onerror = function (e) {
+    console.error(e.toString().split("\n").slice(0,4))
+    saxParser.error = null
+    saxParser.resume()
+  }
+  var rootTag, entryTag;
+  saxParser.onopentagstart = function (node) {
+    if (!rootTag)
+      rootTag = node.name
+    else if (!entryTag)
+      entryTag = node.name
+    else // we know both, just remove this handler
+      saxParser.onopentag = undefined
+  }
+  var entryTagCount = 0;
+  saxParser.onclosetag = function (node) {
+    if (node == entryTag)
+      entryTagCount++
+  }
+  saxParser.onend = function (e) {
+    console.log("Detected %d entries in '%s' element", entryTagCount, entryTag)
+    importDictionary(entryTag, entryTagCount);
+  }
+  saxParser.write(input).close()
+}
+
+// second pass, we know what the entry is and can import that
+
+function importDictionary(entryTag, entryTotal) {
+  var saxParser = sax.parser(true, {trim: false, strictEntities: false, xmlns: true, position: true, normalize: false, lowercase: false})
+  var tagNameLength = entryTag.length + 2
+  var currBeg;
+  db.run("BEGIN TRANSACTION")
+  saxParser.onerror = function (e) {
+    saxParser.error = null
+    saxParser.resume()
+  }
+  saxParser.onopentagstart = function (node) {
+    if (node.name == entryTag)
+      currBeg = saxParser.position - tagNameLength;
+  }
+  saxParser.onclosetag = function (node) {
+    if (node == entryTag) {
+      entry = input.substring(currBeg, saxParser.position).replace(/\>[\r\n]+\s*\</g, "><").trim()
+      importEntry(entry, entryTotal)
+    }
+  }
+  saxParser.write(input).close()
+}
+
+var entryInserted = 0
+function importEntry(entryXML, entryTotal) {
+  var found=entryXML.match(/^<[^>]*\s+lxnm:(sub)?entryID=['"]([0-9]+)["']/);
+  var entryID=null;
+  if(found) {
+    entryID=parseInt(found[2]);
+    ops.updateEntry(db, dictID, entryID, entryXML, email.toLowerCase(), historiography, function(newentryID, xml){
+      process.stdout.write(util.format("\r%s%% (%d/%d entries imported)",(++entryInserted / entryTotal * 100).toFixed(), entryInserted, entryTotal))
+      if (entryTotal == entryInserted) {
+        db.run("COMMIT");
+        db.close();
       }
-    }
-  });
-  readStream.on("end", function(){
-    db.run("COMMIT");
-    db.close();
-    readStream.destroy();
-  });
-});
-
-//---
-
-function insertEntry(entryID, buffer){
-  console.log(`entryID ${entryID} beginning to insert`);
-  var xml=buffer.replace(/\>[\r\n]+\s*\</g, "><"); buffer="";
-  var headword=""; xml.replace(/\<zapis[^\>]*\>(.*)\<\/zapis\>/, function(s, $1){headword=$1});
-  // var status=""; xml.replace(/\<status\>(.*)\<\/status\>/, function(s, $1){status=$1});
-  // var pos=""; xml.replace(/\<partOfSpeech\>(.*)\<\/partOfSpeech\>/, function(s, $1){status+=" "+$1});
-  var title=headword
-  var titleHtml="<span class='headword'>"+headword+"</span>";
-  // var title=headword+" "+status;
-  // var titleHtml="<span class='headword'>"+headword+"</span> "+status;
-  var sortkey=toSortkey(title, abc);
-  db.run("insert into entries(id, doctype, xml, title, sortkey) values($id, $doctype, $xml, $title, $sortkey)", {$id: entryID, $doctype: "clanek", $xml: xml, $title: titleHtml, $sortkey: sortkey}, function(err){
-    if(err) console.log(err);
-    console.log(`entryID ${entryID} inserted into table entries`);
-  });
-  db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {$entry_id: entryID, $txt: headword, $level: 1}, function(err){
-    if(err) console.log(err);
-    console.log(`entryID ${entryID} inserted into table searchables`);
-  });
-  db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
-    $entry_id: entryID,
-    $action: "create",
-    $when: (new Date()).toISOString(),
-    $email: "",
-    $xml: xml,
-    $historiography: JSON.stringify({}),
-  }, function(err){
-    if(err) console.log(err);
-    console.log(`entryID ${entryID} inserted into table history`);
-  });
-}
-
-//----
-
-function toSortkey(s, abc){
-  const keylength=15;
-  var ret=s.replace(/\<[\<\>]+>/g, "").toLowerCase();
-  //replace any numerals:
-  var pat=new RegExp("[0-9]{1,"+keylength+"}", "g");
-  ret=ret.replace(pat, function(x){while(x.length<keylength+1) x="0"+x; return x;});
-  //prepare characters:
-  var chars=[];
-  var count=0;
-  for(var pos=0; pos<abc.length; pos++){
-    var key=(count++).toString(); while(key.length<keylength) key="0"+key; key="_"+key;
-    for(var i=0; i<abc[pos].length; i++){
-      if(i>0) count++;
-      chars.push({char: abc[pos][i], key: key});
-    }
+    });
+  } else {
+    ops.createEntry(db, dictID, entryID, entryXML, email.toLowerCase(), historiography, function(newentryID, xml){
+      process.stdout.write(util.format("\r%s%% (%d/%d entries imported)",(++entryInserted / entryTotal * 100).toFixed(), entryInserted, entryTotal))
+      if (entryTotal == entryInserted) {
+        db.run("COMMIT");
+        db.close();
+      }
+    });
   }
-  chars.sort(function(a,b){ if(a.char.length>b.char.length) return -1; if(a.char.length<b.char.length) return 1; return 0; });
-  //replace characters:
-  for(var i=0; i<chars.length; i++){
-    if(!/^[0-9]$/.test(chars[i].char)) { //skip chars that are actually numbers
-      while(ret.indexOf(chars[i].char)>-1) ret=ret.replace(chars[i].char, chars[i].key);
-    }
-  }
-  //remove any remaining characters that aren't a number or an underscore:
-  ret=ret.replace(/[^0-9_]/g, "");
-  return ret;
 }
-
-const abc=[
-    [
-      "a",
-      "á",
-      "à",
-      "â",
-      "ä",
-      "ă",
-      "ā",
-      "ã",
-      "å",
-      "ą",
-      "æ"
-    ],
-    [
-      "b"
-    ],
-    [
-      "c",
-      "ć",
-      "ċ",
-      "ĉ",
-      "č",
-      "ç"
-    ],
-    [
-      "d",
-      "ď",
-      "đ"
-    ],
-    [
-      "e",
-      "é",
-      "è",
-      "ė",
-      "ê",
-      "ë",
-      "ě",
-      "ē",
-      "ę"
-    ],
-    [
-      "f"
-    ],
-    [
-      "g",
-      "ġ",
-      "ĝ",
-      "ğ",
-      "ģ"
-    ],
-    [
-      "h",
-      "ĥ",
-      "ħ"
-    ],
-    [
-      "i",
-      "ı",
-      "í",
-      "ì",
-      "i",
-      "î",
-      "ï",
-      "ī",
-      "į"
-    ],
-    [
-      "j",
-      "ĵ"
-    ],
-    [
-      "k",
-      "ĸ",
-      "ķ"
-    ],
-    [
-      "l",
-      "ĺ",
-      "ŀ",
-      "ľ",
-      "ļ",
-      "ł"
-    ],
-    [
-      "m"
-    ],
-    [
-      "n",
-      "ń",
-      "ň",
-      "ñ",
-      "ņ"
-    ],
-    [
-      "o",
-      "ó",
-      "ò",
-      "ô",
-      "ö",
-      "ō",
-      "õ",
-      "ő",
-      "ø",
-      "œ"
-    ],
-    [
-      "p"
-    ],
-    [
-      "q"
-    ],
-    [
-      "r",
-      "ŕ",
-      "ř",
-      "ŗ"
-    ],
-    [
-      "s",
-      "ś",
-      "ŝ",
-      "š",
-      "ş",
-      "ș",
-      "ß"
-    ],
-    [
-      "t",
-      "ť",
-      "ţ",
-      "ț"
-    ],
-    [
-      "u",
-      "ú",
-      "ù",
-      "û",
-      "ü",
-      "ŭ",
-      "ū",
-      "ů",
-      "ų",
-      "ű"
-    ],
-    [
-      "v"
-    ],
-    [
-      "w",
-      "ẃ",
-      "ẁ",
-      "ŵ",
-      "ẅ"
-    ],
-    [
-      "x"
-    ],
-    [
-      "y",
-      "ý",
-      "ỳ",
-      "ŷ",
-      "ÿ"
-    ],
-    [
-      "z",
-      "ź",
-      "ż",
-      "ž"
-    ]
-  ]

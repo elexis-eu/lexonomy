@@ -7,13 +7,18 @@ const markdown = require("markdown").markdown; //https://www.npmjs.com/package/m
 const nodemailer = require('nodemailer');
 const https=require("https");
 const querystring=require("querystring");
+const { fork } = require('child_process');
+const find_process = require('find-process');
 
 module.exports={
   siteconfig: {}, //populated by lexonomy.js on startup
   mailtransporter: null,
   getDB: function(dictID, readonly){
     var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE);
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), mode, function(err){});
+    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), mode, function(err){
+      if (err)
+        throw new Error(err);
+    });
     if(!readonly) db.run('PRAGMA journal_mode=WAL');
     db.run('PRAGMA foreign_keys=on');
     return db;
@@ -267,7 +272,7 @@ module.exports={
   },
   createEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
     module.exports.readDictConfigs(db, dictID, function(configs){
-      var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+      var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.siteconfig.defaultAbc;
       xml=setHousekeepingAttributes(entryID, xml, configs.subbing);
       xml=module.exports.removeSubentryParentTags(xml);
       var params={
@@ -284,6 +289,8 @@ module.exports={
         params.$id=entryID;
       }
       db.run(sql, params, function(err){
+        if (err)
+          throw new Error(err);
         if(!entryID) entryID=this.lastID;
         db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
           $entry_id: entryID,
@@ -924,55 +931,55 @@ module.exports={
     });
   },
 
-  import: function(db, dictID, filepath, email, historiography, callnext){
-    var tagName="";
-    var tagNameLevel=0;
-    var readStream=fs.createReadStream(filepath).setEncoding("utf8");
-    var buffer="";
-    var entryCount=0;
-    var regexOpeningTag=null;
-    readStream.on("data", function(chunk){
-      for(var pos=0; pos<chunk.length; pos++){
-        buffer+=chunk[pos];
-        if(buffer.match(/^\s*\<\?[^\?\>]*\?\>/)) buffer="";
-        if(tagName=="" || tagNameLevel<2){
-          var found=buffer.match(/^\s*\<\s*([^\<\>\s\/]+)[^\>]*\>/);
-          if(found) {
-            tagNameLevel++;
-            tagName=found[1];
-            if(tagNameLevel<2) {
-              buffer="";
-            } else {
-              regexOpeningTag=new RegExp("\<"+tagName+"[^\>\<]*\>$");
-            }
-          }
-        } else {
-          var found=buffer.match(regexOpeningTag);
-          if(found){
-            buffer=found[0];
-          }
-          if(buffer.endsWith("</"+tagName+">")){
-            entryCount++;
-            buffer=buffer.replace(/\>[\r\n]+\s*\</g, "><").trim();
-            var found=buffer.match(/^\<[^\>]*\s+lxnm:(sub)?entryID=['"]([0-9]+)["']/);
-            var entryID=null; if(found) {
-              entryID=parseInt(found[2]);
-              //console.log("going to update");
-              module.exports.updateEntry(db, dictID, entryID, buffer, email.toLowerCase(), historiography, function(newentryID, xml){ /*console.log("UPDATED "+newentryID);*/ });
-            } else {
-              //console.log("going to create");
-              module.exports.createEntry(db, dictID, entryID, buffer, email.toLowerCase(), historiography, function(newentryID, xml){ /*console.log("CREATED "+newentryID);*/ });
-            }
-          }
-        }
+  checkImportStatus: function(pidfile, errfile, callnext) {
+    fs.readFile(pidfile, function(err, pid_data) {
+      if (err)
+        callnext({progressMessage: "Import failed", finished: true, errors: false})
+      else {
+        pid_data = pid_data.toString().trim().split(/[\n\r]/)
+        var progress = pid_data[pid_data.length - 1]
+        var errors = false
+        fs.stat(errfile, function(err, stats) {
+          if (!err && stats.size)
+            errors = true
+          find_process('pid', pid_data[0].substr(4))
+          .then(function (list) {
+            callnext({progressMessage: progress, finished: list.length == 0, errors: errors})
+          }, function (err) {
+            console.log(err.stack || err);
+          })
+        })
       }
-    });
-    readStream.on("end", function(){
-      readStream.destroy();
-      fs.remove(filepath, function(){
-        callnext(entryCount);
-      });
-    });
+    })
+  },
+
+  showImportErrors: function(filepath, truncate, callnext) {
+    fs.readFile(filepath + ".err", "utf8", function(err, content){
+      if (err)
+        content = "Failed to read error file"
+      if (truncate)
+        content = content.substring(0, truncate)
+      callnext({errorData: content, truncated: truncate});
+    })
+  },
+
+  import: function(dictID, filepath, email, callnext){
+    var pidfile = filepath + ".pid";
+    var errfile = filepath + ".err";
+    if (fs.existsSync(pidfile)) { // = import is in progress, just check status
+      progress = module.exports.checkImportStatus(pidfile, errfile, callnext)
+    } else { // = start import
+      try {
+        pidfile_fd = fs.openSync(pidfile, 'wx')
+        errfile_fd = fs.openSync(errfile, 'w')
+      } catch (e) {
+        // somebody created the pidfile meanwhile, the import is probably underway
+        progress = module.exports.checkImportStatus(pidfile, errfile, callnext)
+      }
+      var dbpath = path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite");
+      fork("adminscripts/import.js", [dbpath, filepath, email], {detached: true, stdio: ['ignore', pidfile_fd, errfile_fd, 'ipc']})
+      callnext({progressMessage: "Import started. Please wait...", finished: false, errors: false})
+    }
   },
 
   login: function(email, password, callnext){
