@@ -925,7 +925,7 @@ module.exports={
       $email: email.toLowerCase(),
       $historiography: JSON.stringify(historiography),
     }, function(err){
-      db.run("delete from entries", {}, function(err){
+      db.run("delete from entries; vacuum", {}, function(err){
         callnext();
       });
     });
