@@ -3,8 +3,8 @@ Screenful.Consent={
     Screenful.createEnvelope(true);
     $("#envelope").html("<form id='middlebox'><div class='one'></div><div class='two' style='display: none'></div></form>");
     $("#middlebox").append("<div class='title'>"+Screenful.Loc.termsTitle+"</div>");
-    $("#middlebox").append("<div class=''>"+Screenful.Loc.termsOfUse+"</div>");
-    $("#middlebox").append("<div class='field consent'><label><input type='checkbox' id='consent'/>"+Screenful.Loc.termsConsent+"</label></div>");
+    $("#middlebox").append("<div class=''>"+(Screenful.Consentterms.replace(/&lt;/g,'<').replace(/&gt;/g,'>'))+"</div>");
+    $("#middlebox").append("<div class='field consent'><label><input type='checkbox' id='consent'/>"+Screenful.Consentconfirm+"</label></div>");
     $("#middlebox").append("<div class='field submit'><input class='button' type='submit' value='"+Screenful.Loc.confirm+"'/></div>");
     $("#middlebox").append("<div class='error' style='display: none'></div>");
 

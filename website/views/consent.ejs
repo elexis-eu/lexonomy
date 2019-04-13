@@ -15,6 +15,8 @@
 		<script type="text/javascript">
 		Screenful.User.loggedin=<%=(user.loggedin ? "true" : "false")%>;
 		Screenful.User.username="<%=user.email%>";
+		Screenful.Consentterms = "<%=siteconfig.consent.terms%>";
+		Screenful.Consentconfirm = "<%=siteconfig.consent.confirm%>";
 		</script>
 		<script type="text/javascript">var rootPath="../";</script>
 		<script type="text/javascript" src="../furniture/screenful-user-config.js"></script>

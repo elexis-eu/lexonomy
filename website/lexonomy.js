@@ -60,7 +60,7 @@ app.get(siteconfig.rootPath+":dictID/en/", function(req, res){ res.redirect("/"+
 //SITEWIDE UI:
 app.get(siteconfig.rootPath, function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if (user.loggedin && !user.consent) {
+    if (user.loggedin && siteconfig.consent != null && siteconfig.consent.terms != null && !user.consent) {
       res.redirect(siteconfig.baseUrl + 'consent/');
     }
     ops.getDictsByUser(user.email, function(dicts){

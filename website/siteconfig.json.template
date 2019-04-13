@@ -11,6 +11,7 @@
   "mailconfig": {"host": "smtp.server.example", "port": 465,"secure": true, "from": "noreply@example.com"},
   "sketchengineKey": null,
   "sketchengineLoginPage": null,
+  "consent": {"terms": null, "confirm": null},
   "licences": {
     "cc-by-4.0": {
       "title": "Creative Commons Attribution 4.0 International",
