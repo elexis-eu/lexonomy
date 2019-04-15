@@ -911,7 +911,8 @@ module.exports={
       res.setHeader("content-disposition", "attachment; filename="+dictID+".xml");
       res.write("<"+dictID+">\n");
       db.each("select id, xml from entries", {}, function(err, row){
-        xml=setHousekeepingAttributes(row.id, row.xml, subbing);
+        xml=row.xml.replace(/></g,">\n<");
+        xml=setHousekeepingAttributes(row.id, xml, subbing);
         res.write(xml+"\n");
       }, function(err, rowCount){
         res.write("</"+dictID+">\n");
