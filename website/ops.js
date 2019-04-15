@@ -1535,11 +1535,14 @@ function generateDictID(){
 
 function addFlag(entryID, xml, flag, flagconfig){
   var el = flagconfig.flag_element;
-  var re = new RegExp("<" + el + "[^>]*>[^<]+</" + el + ">")
+  var re = new RegExp("<" + el + "[^>]*>[^<]*</" + el + ">")
   var flag_exists = false
   xml = xml.replace(re, function(found, $1) { // try replacing existing flag
     flag_exists = true
-    return "<" + el + ">" + flag + "</" + el + ">";
+    if (flag)
+      return "<" + el + ">" + flag + "</" + el + ">";
+    else
+      return ""
   })
   if (flag_exists)
     return xml
