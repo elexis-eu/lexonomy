@@ -60,15 +60,6 @@
 
 		Screenful.Navigator.flags=<%-JSON.stringify(flagging.flags)%>;
 		Screenful.Navigator.entryFlagUrl="../../../<%=dictID%>/entryflag.json";
-		Screenful.Navigator.extractEntryFlag=function(entry){
-			var flagName="";
-			try{
-				var doc=$.parseXML(entry.xml);
-				flagName=$(doc).find("<%-flagging.flag_element-%>").html();
-			} catch(ex){}
-			if(!flagName) flagName="";
-			return flagName;
-		};
 
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-aftersave.css" />

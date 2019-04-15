@@ -289,7 +289,7 @@ Screenful.Navigator={
             e.preventDefault();
             Screenful.Navigator.entryDelete(e);
           }
-          if(Screenful.Navigator.flags && Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl){
+          if(Screenful.Navigator.flags.length > 0){
             for(var i=0; i<Screenful.Navigator.flags.length; i++) {
               if(e.key==Screenful.Navigator.flags[i].key){
                 e.preventDefault();
@@ -320,10 +320,10 @@ Screenful.Navigator={
     $("<span class='entryLineNumber'>" + index + " </span>").prependTo($item);
 
     //entry flag:
-    if(Screenful.Navigator.flags && Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl && Screenful.Navigator.extractEntryFlag){
+    if(Screenful.Navigator.flags.length > 0){
       var $flagLink=$("<a class='entryFlagLink undecided'></a>").prependTo($item);
       window.setTimeout(function(){
-        var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
+        var flag=Screenful.Navigator.flagLookup(entry.flag);
         $flagLink.removeClass("undecided");
         if (flag)
           $flagLink.css("background-color", flag.color);
@@ -427,8 +427,8 @@ Screenful.Navigator={
           var entry=data.entries[0];
           var $entry=$("div.entry[data-id=\""+entryID+"\"]");
           Screenful.Navigator.renderer($entry.find("div.inside").toArray()[0], entry, "", "");
-          if(Screenful.Navigator.flags.length>0 && Screenful.Navigator.entryFlagUrl && Screenful.Navigator.extractEntryFlag){
-            var flag=Screenful.Navigator.flagLookup( Screenful.Navigator.extractEntryFlag(entry) );
+          if(Screenful.Navigator.flags.length>0){
+            var flag=Screenful.Navigator.flagLookup(entry.flag);
             $entry.find(".entryFlagLink").css("background-color", flag.color);
           }
         } else {

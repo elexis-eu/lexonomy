@@ -633,7 +633,7 @@ app.post(siteconfig.rootPath+":dictID/:doctype/entrylist.json", function(req, re
           });
         }
       } else {
-        ops.listEntries(db, req.params.dictID, req.params.doctype, req.body.searchtext, req.body.modifier, req.body.howmany, req.body.sortdesc, function(total, entries){
+        ops.listEntries(db, req.params.dictID, req.params.doctype, req.body.searchtext, req.body.modifier, req.body.howmany, req.body.sortdesc, false, function(total, entries){
           db.close();
           res.json({success: true, total: total, entries: entries});
         });
@@ -1233,7 +1233,7 @@ app.get(siteconfig.rootPath+":dictID/subget/", function(req, res){
       db.close();
       res.json({success: false});
     } else {
-      ops.listEntries(db, req.params.dictID, req.query.doctype, req.query.lemma, "wordstart", 100, function(total, entries){
+      ops.listEntries(db, req.params.dictID, req.query.doctype, req.query.lemma, "wordstart", 100, false, true, function(total, entries){
         db.close();
         res.json({success: true, total: total, entries: entries});
       });
