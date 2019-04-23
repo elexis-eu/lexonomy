@@ -59,44 +59,47 @@ XemaDesigner.listNodes=function(){
 	var $list=$(".designer .list");
 	var scrollTop=$list.scrollTop();
 	$list.html("");
-	XemaDesigner.listElement(XemaDesigner.xema.root, $list);
+	XemaDesigner.listElement(XemaDesigner.xema.root, $list, 0);
 	var parentless=XemaDesigner.getParentlessElements();
 	if(parentless.length>0){
 		$("<div class='title'><span>Unattached elements</span></div>").appendTo($list);
-		parentless.forEach(function(elName){ XemaDesigner.listElement(elName, $list); });
+		parentless.forEach(function(elName){ XemaDesigner.listElement(elName, $list, 0); });
 	}
 	$list.scrollTop(scrollTop);
 }
-XemaDesigner.listElement=function(elName, $list){
-	var hasEponymousAscendant=($list.closest(".container."+elName.replace(/\./g, "\\.")).length>0);
-	var collapsed="";
-		if((XemaDesigner.hasAttributes(elName) || XemaDesigner.hasChildren(elName)) && !hasEponymousAscendant) collapsed+=" hasChildren";
-		var parName=$list.closest(".container").find(".element").first().data("elName");
-		if(XemaDesigner.xema.elements[elName]._collapsedUnder && XemaDesigner.xema.elements[elName]._collapsedUnder[parName]) collapsed+=" collapsed";
-	var $c=$("<div class='container "+elName+" "+collapsed+"'></div>").appendTo($list);
-	$("<div class='horizontal'><span class='plusminus'></span></div>").appendTo($c).on("click", function(event){ XemaDesigner.plusminus( $(event.delegateTarget.parentNode) ) });
-	var html="<span class='tech'><span class='brak'>&lt;</span><span class='elm'>"+elName+"</span><span class='brak'>&gt;</span></span>";
-	$("<div class='clickable element "+(XemaDesigner.xema.root==elName?"root":"")+"'>"+html+"</div>").appendTo($c).data("elName", elName).on("click", function(event){XemaDesigner.selectElement( $(event.delegateTarget).data("elName") )});
-	if((XemaDesigner.hasAttributes(elName) || XemaDesigner.hasChildren(elName)) && !hasEponymousAscendant) {
-		var $sublist=$("<div class='children'></div>").appendTo($c);
-		if(XemaDesigner.hasAttributes(elName)) {
-			for(var atName in XemaDesigner.xema.elements[elName].attributes){
-				var $c=$("<div class='container'></div>").appendTo($sublist);
-				$("<div class='horizontal'></div>").appendTo($c);
-				var html="<span class='tech'><span class='ats'>@</span><span class='att'>"+atName+"</span></span>";
-				$("<div class='clickable attribute'>"+html+"</div>").appendTo($c).data("elName", elName).data("atName", atName).on("click", function(event){XemaDesigner.selectAttribute( $(event.delegateTarget).data("elName"), $(event.delegateTarget).data("atName") )});;
+XemaDesigner.listElement=function(elName, $list, level){
+	if(XemaDesigner.xema.elements[elName]){
+		var hasEponymousAscendant=($list.closest(".container."+elName.replace(/\./g, "\\.")).length>0);
+		var collapsed="";
+			if((XemaDesigner.hasAttributes(elName) || XemaDesigner.hasChildren(elName)) && !hasEponymousAscendant) collapsed+=" hasChildren";
+			var parName=$list.closest(".container").find(".element").first().data("elName");
+			if(XemaDesigner.xema.elements[elName]._collapsedUnder && XemaDesigner.xema.elements[elName]._collapsedUnder[parName]) collapsed+=" collapsed";
+			if(level>1) collapsed+=" collapsed";
+		var $c=$("<div class='container "+elName+" "+collapsed+"'></div>").appendTo($list);
+		$("<div class='horizontal'><span class='plusminus'></span></div>").appendTo($c).on("click", function(event){ XemaDesigner.plusminus( $(event.delegateTarget.parentNode) ) });
+		var html="<span class='tech'><span class='brak'>&lt;</span><span class='elm'>"+elName+"</span><span class='brak'>&gt;</span></span>";
+		$("<div class='clickable element "+(XemaDesigner.xema.root==elName?"root":"")+"'>"+html+"</div>").appendTo($c).data("elName", elName).on("click", function(event){XemaDesigner.selectElement( $(event.delegateTarget).data("elName") )});
+		if((XemaDesigner.hasAttributes(elName) || XemaDesigner.hasChildren(elName)) && !hasEponymousAscendant) {
+			var $sublist=$("<div class='children'></div>").appendTo($c);
+			if(XemaDesigner.hasAttributes(elName)) {
+				for(var atName in XemaDesigner.xema.elements[elName].attributes){
+					var $c=$("<div class='container'></div>").appendTo($sublist);
+					$("<div class='horizontal'></div>").appendTo($c);
+					var html="<span class='tech'><span class='ats'>@</span><span class='att'>"+atName+"</span></span>";
+					$("<div class='clickable attribute'>"+html+"</div>").appendTo($c).data("elName", elName).data("atName", atName).on("click", function(event){XemaDesigner.selectAttribute( $(event.delegateTarget).data("elName"), $(event.delegateTarget).data("atName") )});;
+				}
 			}
-		}
-		if(XemaDesigner.hasChildren(elName)) {
-			if(true){
-				XemaDesigner.xema.elements[elName].children.forEach(function(item){
-					var childName=item.name;
-					XemaDesigner.listElement(childName, $sublist);
-				});
+			if(XemaDesigner.hasChildren(elName)) {
+				if(true){
+					XemaDesigner.xema.elements[elName].children.forEach(function(item){
+						var childName=item.name;
+						XemaDesigner.listElement(childName, $sublist, level+1);
+					});
+				}
 			}
+			$("<div class='blinder'></div>").appendTo($sublist);
+			//XemaDesigner.resizeBlinders();
 		}
-		$("<div class='blinder'></div>").appendTo($sublist);
-		XemaDesigner.resizeBlinders();
 	}
 };
 XemaDesigner.plusminus=function($divContainer){
@@ -116,7 +119,9 @@ XemaDesigner.resizeBlinders=function(){
 	$(".designer .blinder").each(function(){
 		var $blinder=$(this);
 		var $prev=$blinder.prev();
-		$blinder.css({top: $prev.position().top+16});
+		if($prev.length>0){
+			$blinder.css({top: $prev.position().top+16});
+		}
 	});
 };
 
