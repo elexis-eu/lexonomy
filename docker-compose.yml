@@ -1,0 +1,32 @@
+version: '3.4'
+
+x-services:
+  &base
+  image: node:11
+  volumes:
+    - .:/opt/service
+    - ./website/siteconfig.json.template:/opt/service/website/siteconfig.json
+    - nodemodules:/opt/service/website/node_modules
+  working_dir: /opt/service/website
+
+services:
+  install:
+    << : *base
+    command: npm install --unsafe-perm=true
+  build:
+    << : *base
+    command: npm run build
+  create-bundles:
+    << : *base
+    command: npm run create-bundles
+  dev:
+    << : *base
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "8080:8080"
+
+volumes:
+  nodemodules:
+    external: true
