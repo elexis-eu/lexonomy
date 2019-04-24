@@ -355,7 +355,7 @@ Ske.searchThes=function(fromp){
   $(".skebox .waiter").show();
   var lemma=$.trim($(".skebox .textbox").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/skeget/thes/", {url: kex.url, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
+    $.get(rootPath+dictID+"/skeget/thes/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");
@@ -436,7 +436,7 @@ Ske.searchCollx=function(fromp){
   $(".skebox .waiter").show();
   var lemma=$.trim($(".skebox .textbox").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/skeget/collx/", {url: kex.url, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
+    $.get(rootPath+dictID+"/skeget/collx/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");
@@ -517,7 +517,7 @@ Ske.searchDefo=function(fromp){
   $(".skebox .waiter").show();
   var lemma=$.trim($(".skebox .textbox").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/skeget/defo/", {url: kex.url, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
+    $.get(rootPath+dictID+"/skeget/defo/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");
