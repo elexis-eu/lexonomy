@@ -4,10 +4,34 @@ const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sq
 const sha1 = require('sha1'); //https://www.npmjs.com/package/sha1
 
 fs.readFile(path.join(__dirname, "../siteconfig.json"), "utf8", function(err, content){
+  if (err) {
+     console.log(err);
+  }
   var siteconfig=JSON.parse(content);
+  var dbFile = path.join(siteconfig.dataDir, siteconfig.dbFile);
+
+  // Prepare to initialise the DB
+  var db = new sqlite3.Database(dbFile, function(err){
+    if (err) {
+        console.log(err)
+        return
+    }
+    console.log('Connected to ' + dbFile + ' database.')
+  });
+  // Read the DB Schema into a String
+  var dbSchema = fs.readFileSync(path.join(siteconfig.dataDir, siteconfig.dbSchemaFile), 'utf8');
+  // Initialise the DB (in case it already exists this will print warninigs)
+  db.exec(dbSchema, function(err){
+      if (err) {
+          console.log(err);
+          console.log("Likely the DB has already been created.");
+      } else {
+          console.log("Initialised " + siteconfig.dbFile + " with: \n" + dbSchema);
+      }
+  });
+
   var password=Math.random().toString(36).slice(-10);
   var passwordHash=sha1(password);
-  var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
   for(var i=0; i<siteconfig.admins.length; i++){
     var email=siteconfig.admins[i];
     insertUser(db, email, password, passwordHash);
