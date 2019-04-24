@@ -67,14 +67,17 @@ XemaDesigner.listNodes=function(){
 	}
 	$list.scrollTop(scrollTop);
 }
+var elNamesDone=[];
 XemaDesigner.listElement=function(elName, $list, level){
-	if(XemaDesigner.xema.elements[elName]){
+	var isSuspect=(XemaDesigner.xema._dtd ? true : false); //all xemas that originate from a DTD are inherently suspect
+	if(XemaDesigner.xema.elements[elName] && (!isSuspect || elNamesDone.indexOf(elName)==-1)){
+		elNamesDone.push(elName);
 		var hasEponymousAscendant=($list.closest(".container."+elName.replace(/\./g, "\\.")).length>0);
 		var collapsed="";
 			if((XemaDesigner.hasAttributes(elName) || XemaDesigner.hasChildren(elName)) && !hasEponymousAscendant) collapsed+=" hasChildren";
 			var parName=$list.closest(".container").find(".element").first().data("elName");
 			if(XemaDesigner.xema.elements[elName]._collapsedUnder && XemaDesigner.xema.elements[elName]._collapsedUnder[parName]) collapsed+=" collapsed";
-			if(level>1) collapsed+=" collapsed";
+			if(level>5) collapsed+=" collapsed";
 		var $c=$("<div class='container "+elName+" "+collapsed+"'></div>").appendTo($list);
 		$("<div class='horizontal'><span class='plusminus'></span></div>").appendTo($c).on("click", function(event){ XemaDesigner.plusminus( $(event.delegateTarget.parentNode) ) });
 		var html="<span class='tech'><span class='brak'>&lt;</span><span class='elm'>"+elName+"</span><span class='brak'>&gt;</span></span>";
