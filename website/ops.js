@@ -202,13 +202,15 @@ module.exports={
     };
   },
   readRandomOne: function(db, dictID, callnext){
-    var sql_random="select id, title, xml from entries where id in (select id from entries order by random() limit 1)"
-    db.get(sql_random, {}, function(err, row){
-      if(row){
-        callnext({id: row.id, title: row.title, xml: row.xml});
-      } else {
-        callnext({id: 0, title: "", xml: ""});
-      }
+    module.exports.readDictConfig(db, dictID, "xema", function(xema){
+      var sql_random="select id, title, xml from entries where id in (select id from entries where doctype=$doctype order by random() limit 1)"
+      db.get(sql_random, {$doctype: xema.root}, function(err, row){
+        if(row){
+          callnext({id: row.id, title: row.title, xml: row.xml});
+        } else {
+          callnext({id: 0, title: "", xml: ""});
+        }
+      });
     });
   },
   flagForResave: function(db, dictID, callnext){
