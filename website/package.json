@@ -1,4 +1,9 @@
 {
+  "name": "lexonomy",
+  "scripts": {
+    "dev": "node lexonomy.js",
+    "postinstall": "node adminscripts/init.js"
+  },
   "dependencies": {
     "cookie-parser": "^1.4.4",
     "ejs": "^2.6.1",
