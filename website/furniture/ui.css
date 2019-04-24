@@ -26,7 +26,8 @@
 #header div.doctypes.laic a.doctype.current span.tech span.elm {font-weight: bold; color: #315696;}
 #header span.arrow {font-size: 0.75em;}
 
-#pagebody { overflow-x: hidden; overflow-y: auto;}
+#pagebody {position: absolute; top: 59px; left: 0px; right: 0px; bottom: 0px; overflow-x: hidden; overflow-y: auto;}
+#pagebody.notop { top: 0px; }
 
 div.notification {max-width: 1200px; margin: 50px auto -50px auto; font-size: 1rem; background-image: url(error.png); background-position: 15px center; background-repeat: no-repeat; color: #c74d4d; text-shadow: 1px 1px 0px #ffffff; background-color: #eeeeee; padding: 20px 10px 20px 45px; border-radius: 4px; }
 div.notification a {text-decoration: none; color: #004f9b; font-weight: bold;}
