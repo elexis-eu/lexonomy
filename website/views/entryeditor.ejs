@@ -167,7 +167,17 @@
 		};
 		</script>
 
+		<!--open an entry on page load if the URL is eg. "www.lexonomy.eu/mydictionary/edit/entry/#123456"-->
+		<script type="text/javascript">
+		function autoOpen(){
+			if(window.parent && window.parent.location.hash){
+				var entryID=window.parent.location.hash.replace(/^\#/, "");
+				Screenful.Editor.open(null, entryID);
+			}
+		}
+		</script>
+
 	</head>
-	<body>
+	<body onload="autoOpen()">
 	</body>
 </html>
