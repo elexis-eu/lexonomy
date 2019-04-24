@@ -4,6 +4,8 @@
   "rootPath": "/",
   "port": 8080,
   "dataDir": "../data/",
+  "dbSchemaFile": "lexonomy.sqlite.schema",
+  "dbFile": "lexonomy.sqlite",
   "verbose": true,
   "admins": ["root@localhost"],
   "trackingCode": "",

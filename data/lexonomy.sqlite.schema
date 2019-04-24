@@ -1,0 +1,10 @@
+CREATE TABLE dicts (id TEXT PRIMARY KEY, title TEXT);
+CREATE INDEX title ON dicts (title);
+CREATE TABLE users (email TEXT PRIMARY KEY, passwordHash TEXT, sessionKey TEXT, sessionLast DATETIME, apiKey TEXT, ske_id INTEGER, ske_username TEXT, consent INTEGER, ske_apiKey TEXT);
+CREATE INDEX email_password ON users (email, passwordHash);
+CREATE INDEX email_session ON users (email, sessionKey, sessionLast);
+CREATE TABLE user_dict (id INTEGER PRIMARY KEY AUTOINCREMENT, dict_id TEXT, user_email TEXT);
+CREATE INDEX dict_id ON user_dict (dict_id);
+CREATE INDEX user_email ON user_dict (user_email);
+CREATE TABLE recovery_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text);
+CREATE TABLE register_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text);
