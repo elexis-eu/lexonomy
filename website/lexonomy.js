@@ -1279,13 +1279,12 @@ app.post(siteconfig.rootPath+":dictID/history.json", function(req, res){
 
 app.use(function(req, res){ res.status(404).render("404.ejs", {siteconfig: siteconfig}); });
 process.on('uncaughtException', (err) => {
-  if(!ops.siteconfig) ops.siteconfig=JSON.parse(fs.readFileSync(path.join(__dirname, "siteconfig.json"), "utf8"));
   //Log the exception:
-  if(ops.siteconfig.verbose){
-  console.log(err)
+  if(siteconfig.verbose){
+    console.log(err);
     var str=`Caught exception: ${err}\n`;
-    if(ops.siteconfig.verbose.multiline && ops.siteconfig.verbose.filename) str+="\n";
-    if(ops.siteconfig.verbose.filename) fs.appendFile(ops.siteconfig.verbose.filename, str, function(err){});
+    if(siteconfig.verbose.multiline && siteconfig.verbose.filename) str+="\n";
+    if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str, function(err){});
     else console.log(str);
   }
 });

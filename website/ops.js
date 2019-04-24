@@ -133,24 +133,17 @@ module.exports={
       });
     });
   },
-  readSiteConfig: function(callnext){
-    fs.readFile("siteconfig.json", "utf8", function(err, content){
-      var siteconfig=JSON.parse(content);
-      callnext(siteconfig);
-    });
-  },
   readDictConfigs: function(db, dictID, callnext){
-    if(db.dictConfigs) callnext(db.dictConfigs); else {
-      fs.readFile("siteconfig.json", "utf8", function(err, content){
-        var configs={};
-        configs.siteconfig=JSON.parse(content);
-        db.all("select * from configs", {}, function(err, rows){
-          if(!err) for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
-          var ids=["ident", "publico", "users", "kex", "titling", "flagging", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"];
-          ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
-          db.dictConfigs=configs;
-          callnext(configs);
-        });
+    if(db.dictConfigs)
+      callnext(db.dictConfigs);
+    else {
+      var configs = {siteconfig: siteconfig};
+      db.all("select * from configs", {}, function(err, rows){
+        if(!err) for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
+        var ids=["ident", "publico", "users", "kex", "titling", "flagging", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"];
+        ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
+        db.dictConfigs=configs;
+        callnext(configs);
       });
     }
   },
@@ -1192,9 +1185,7 @@ module.exports={
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
-          module.exports.readSiteConfig(function(siteconfig){
-            callnext({loggedin: true, email: email, ske_username: ske_username, ske_apiKey: ske_apiKey, apiKey: apiKey, consent: consent, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
-          });
+          callnext({loggedin: true, email: email, ske_username: ske_username, ske_apiKey: ske_apiKey, apiKey: apiKey, consent: consent, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
         });
       }
     });
