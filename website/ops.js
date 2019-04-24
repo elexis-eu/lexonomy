@@ -54,7 +54,7 @@ module.exports={
     } else {
       fs.copy("dictTemplates/"+template+".sqlite", path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), function(err){
         var users={}; users[email]={"canEdit": true, "canConfig": true, "canDownload": true, "canUpload": true};
-        var dictDB = module.exports.getDB(dictID); 
+        var dictDB = module.exports.getDB(dictID);
         dictDB.run("update configs set json=$json where id='users'", {$json: JSON.stringify(users, null, "\t")}, function(err){ if(err) console.log(err);
           var ident={"title": title, "blurb": blurb};
           dictDB.run("update configs set json=$json where id='ident'", {$json: JSON.stringify(ident, null, "\t")}, function(err){ if(err) console.log(err);
@@ -443,7 +443,7 @@ module.exports={
         } else { //if we have found an entry that needs refactoring; this becomes our current entry:
           const domparser=new xmldom.DOMParser();
           const serializer=new xmldom.XMLSerializer();
-          var entryID=row.id; var xml=row.xml; var email=row.email;
+          var entryID=row.id; var xml=row.xml; var email=row.email || "";
           var doc=domparser.parseFromString(xml, 'text/xml');
           doc.documentElement.setAttributeNS("http://www.lexonomy.eu/", "lxnm:entryID", entryID);
 
@@ -999,7 +999,7 @@ module.exports={
           db.close();
           callnext(false, "", "");
         } else {
-          email=row.email;
+          email=row.email || "";
           var key=generateKey();
           var now=(new Date()).toISOString();
           db.run("update users set sessionKey=$key, sessionLast=$now where email=$email", {$key: key, $now: now, $email: email}, function(err, row){
@@ -1100,7 +1100,7 @@ module.exports={
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select * from register_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
       if (row) {
-        var email = row.email;
+        var email = row.email || "";
         db.get("select * from users where email=$email", {$email: email}, function(err, row){
           if (row==undefined) {
             var hash = sha1(password);
@@ -1121,7 +1121,7 @@ module.exports={
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select * from recovery_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
       if (row) {
-        var email = row.email;
+        var email = row.email || "";
         var hash = sha1(password);
         db.run("update users set passwordHash=$hash where email=$email", {$hash: hash, $email: email}, function(err, row){
           db.run("update recovery_tokens set usedDate=datetime('now'), usedAddress=$remoteip where token=$token", {$remoteip: remoteip, $token: token}, function(err, row){
@@ -1163,7 +1163,7 @@ module.exports={
             }
           });
         } else {
-          var email = row.email;
+          var email = row.email || "";
           var key = generateKey();
           var now = (new Date()).toISOString();
           db.run("update users set ske_apiKey=$ske_apiKey, sessionKey=$key, sessionLast=$now where ske_id=$ske_id", {$key: key, $now: now, $ske_id: jwtData.user.id, $ske_apiKey: jwtData.user.api_key}, function(err, row){
@@ -1183,7 +1183,7 @@ module.exports={
         db.close();
         callnext({loggedin: false, email: ''});
       } else {
-        email=row.email;
+        email=row.email || "";
         var ske_username = row.ske_username;
         var ske_apiKey = row.ske_apiKey;
         var apiKey = row.apiKey;
@@ -1208,7 +1208,7 @@ module.exports={
         db.close();
         callnext({loggedin: false, email: null});
       } else {
-        email=row.email;
+        email=row.email || "";
         ske_apiKey = row.ske_apiKey;
         ske_username = row.ske_username;
         var now=(new Date()).toISOString();
@@ -1269,7 +1269,7 @@ module.exports={
         db.close();
         callnext({valid: false});
       } else {
-        email=row.email;
+        email=row.email || "";
         db.close();
         callnext({valid: true, email: email});
       }
@@ -1368,7 +1368,7 @@ module.exports={
     var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.get("select * from users where email=$email", {$email: email.toLowerCase()}, function(err, row){
       if(!row) callnext("", ""); else {
-        email=row.email;
+        email=row.email || "";
         var lastSeen=""; if(row.sessionLast) lastSeen=row.sessionLast;
         db.all("select d.id, d.title from user_dict as ud inner join dicts as d on d.id=ud.dict_id  where ud.user_email=$email order by d.title", {$email: email}, function(err, rows){
           xml="<user"; if(lastSeen) xml+=" lastSeen='"+lastSeen+"'"; xml+=">";
@@ -1492,7 +1492,7 @@ module.exports={
             "content": row.xml,
             "action": row.action,
             "when": row.when,
-            "email": row.email,
+            "email": row.email || "",
             "historiography": JSON.parse(row.historiography)
           });
         }
