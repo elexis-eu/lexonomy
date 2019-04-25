@@ -116,7 +116,7 @@
 			}
 
 			if(!usingOwnEditor){
-				if(customizeEditor.adjustDocSpec)
+				if(customizeEditor && customizeEditor.adjustDocSpec)
 					customizeEditor.adjustDocSpec(docSpec);
 				Xonomy.render((entry ? entry.content : newXml), div, docSpec);
 				if(!Xonomy.keyNav) Xonomy.startKeyNav(document, document.getElementById("container"));
