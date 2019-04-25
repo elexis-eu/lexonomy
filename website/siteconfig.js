@@ -5,11 +5,11 @@ var siteconfig = {}
 
 function siteconfig_file() {
   if(process.env.LEXONOMY_SITECONFIG !== undefined) {
-    var path = process.env.LEXONOMY_SITECONFIG;
-    if(fs.existsSync(path)) {
-      return path;
+    var mypath = process.env.LEXONOMY_SITECONFIG;
+    if(fs.existsSync(mypath)) {
+      return mypath;
     } else {
-      throw Error(`Cannot locate $LEXONOMY_SITECONFIG file: ${ path }`);
+      throw Error(`Cannot locate $LEXONOMY_SITECONFIG file: ${ mypath }`);
     }
   }
   return path.join(__dirname, "siteconfig.json");
