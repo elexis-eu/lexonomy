@@ -28,9 +28,15 @@
 			<%-editing._css%>
 		</style>
 		<%if(editing._js){%>
-			<script type="text/javascript">var ownEditor=<%-editing._js%>;</script>
+			<script type="text/javascript">
+				var customizeEditor=<%-editing._js%>;
+				var usingOwnEditor=customizeEditor.editor && customizeEditor.harvester;
+			</script>
 		<%} else {%>
-			<script type="text/javascript">var ownEditor=null;</script>
+			<script type="text/javascript">
+				var customizeEditor=null;
+				var usingOwnEditor=false;
+			</script>
 		<%}%>
 		<script type="text/javascript">
 		Screenful.Editor.createUrl="../../../<%=dictID%>/entrycreate.json";
@@ -108,18 +114,21 @@
 					}
 				}
 			}
-			if(!ownEditor){
+
+			if(!usingOwnEditor){
+				if(customizeEditor.adjustDocSpec)
+					customizeEditor.adjustDocSpec(docSpec);
 				Xonomy.render((entry ? entry.content : newXml), div, docSpec);
 				if(!Xonomy.keyNav) Xonomy.startKeyNav(document, document.getElementById("container"));
 			} else {
-				ownEditor.editor(div, entry ? entry : {content: newXml, id: 0}, uneditable);
+				customizeEditor.editor(div, entry ? entry : {content: newXml, id: 0}, uneditable);
 			}
 		};
 		Screenful.Editor.harvester=function(div){
-			if(!ownEditor){
+			if(!usingOwnEditor){
 				return Xonomy.harvest();
 			} else {
-				return ownEditor.harvester(div);
+				return customizeEditor.harvester(div);
 			}
 		};
 		Screenful.Editor.allowSourceCode=true;
