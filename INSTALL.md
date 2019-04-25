@@ -8,8 +8,6 @@ Download all the source code from this repository, put it in a directory on your
 
 - In the `website` directory, rename `siteconfig.json.template` to `siteconfig.json`.
 
-- In the `data` directory, rename `lexonomy.sqlite.template` to `lexonomy.sqlite`.
-
 Then, in your terminal, go to the `website` directory:
 
 ```
