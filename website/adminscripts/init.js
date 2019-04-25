@@ -5,7 +5,7 @@ const sha1 = require('sha1'); //https://www.npmjs.com/package/sha1
 
 fs.readFile(path.join(__dirname, "../siteconfig.json"), "utf8", function(err, content){
   var siteconfig=JSON.parse(content);
-  var password="lexonomy";
+  var password=Math.random().toString(36).slice(-10);
   var passwordHash=sha1(password);
   var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
   for(var i=0; i<siteconfig.admins.length; i++){
