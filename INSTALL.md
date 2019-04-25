@@ -14,7 +14,7 @@ Then, in your terminal, go to the `website` directory:
 cd website
 ```
 
-And install all modules that Lexonomy depends on with this:
+And install all modules that Lexonomy depends on with this (basic database and default user setup is also done during this step):
 
 ```
 npm install
