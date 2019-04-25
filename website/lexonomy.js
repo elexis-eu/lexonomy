@@ -2,10 +2,9 @@ const express=require("express");
 const app=express();
 const path=require("path");
 const fs=require("fs");
-var siteconfig=JSON.parse(fs.readFileSync(path.join(__dirname, "siteconfig.json"), "utf8"));
+var siteconfig=require('./siteconfig').load();
 const https=require("https");
 const ops=require("./ops");
- ops.siteconfig=siteconfig;
 const xemplatron=require("./widgets/xemplatron.js");
 const xmldom=require("xmldom"); //https://www.npmjs.com/package/xmldom
 const bodyParser = require('body-parser');
@@ -28,8 +27,7 @@ const jwt = require("jsonwebtoken");
 app.use(function (req, res, next) {
   if(!/^\/(widgets|furniture|libs)\//.test(req.url) && !/^\/docs\/.*\.[a-zA-Z0-9]+$/.test(req.url)) { //skip if the request is for a static file
     //Reload my siteconfig:
-    siteconfig=JSON.parse(fs.readFileSync(path.join(__dirname, "siteconfig.json"), "utf8"));
-    ops.siteconfig=siteconfig;
+    siteconfig.reload();
     //Log the request:
     if(siteconfig.verbose){
       var bodyCopy={}; for(var key in req.body) { bodyCopy[key]=req.body[key]; if(key=="password") bodyCopy[key]="******"; }
@@ -1281,13 +1279,12 @@ app.post(siteconfig.rootPath+":dictID/history.json", function(req, res){
 
 app.use(function(req, res){ res.status(404).render("404.ejs", {siteconfig: siteconfig}); });
 process.on('uncaughtException', (err) => {
-  if(!ops.siteconfig) ops.siteconfig=JSON.parse(fs.readFileSync(path.join(__dirname, "siteconfig.json"), "utf8"));
   //Log the exception:
-  if(ops.siteconfig.verbose){
-  console.log(err)
+  if(siteconfig.verbose){
+    console.log(err);
     var str=`Caught exception: ${err}\n`;
-    if(ops.siteconfig.verbose.multiline && ops.siteconfig.verbose.filename) str+="\n";
-    if(ops.siteconfig.verbose.filename) fs.appendFile(ops.siteconfig.verbose.filename, str, function(err){});
+    if(siteconfig.verbose.multiline && siteconfig.verbose.filename) str+="\n";
+    if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str, function(err){});
     else console.log(str);
   }
 });

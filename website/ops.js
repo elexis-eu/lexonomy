@@ -9,13 +9,13 @@ const https=require("https");
 const querystring=require("querystring");
 const { fork } = require('child_process');
 const find_process = require('find-process');
+const siteconfig = require('./siteconfig');
 
 module.exports={
-  siteconfig: {}, //populated by lexonomy.js on startup
   mailtransporter: null,
   getDB: function(dictID, readonly){
     var mode=(readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE);
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), mode, function(err){
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "dicts/"+dictID+".sqlite"), mode, function(err){
       if (err)
         throw new Error(err);
     });
@@ -39,7 +39,7 @@ module.exports={
   },
 
   dictExists: function(dictID){
-    return fs.existsSync(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"));
+    return fs.existsSync(path.join(siteconfig.dataDir, "dicts/"+dictID+".sqlite"));
   },
   suggestDictID: function(callnext){
     var id;
@@ -52,7 +52,7 @@ module.exports={
     if(prohibitedDictIDs.indexOf(dictID)>-1 || module.exports.dictExists(dictID)){
       callnext(false);
     } else {
-      fs.copy("dictTemplates/"+template+".sqlite", path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), function(err){
+      fs.copy("dictTemplates/"+template+".sqlite", path.join(siteconfig.dataDir, "dicts/"+dictID+".sqlite"), function(err){
         var users={}; users[email]={"canEdit": true, "canConfig": true, "canDownload": true, "canUpload": true};
         var dictDB = module.exports.getDB(dictID);
         dictDB.run("update configs set json=$json where id='users'", {$json: JSON.stringify(users, null, "\t")}, function(err){ if(err) console.log(err);
@@ -71,8 +71,8 @@ module.exports={
     if(prohibitedDictIDs.indexOf(newDictID)>-1 || module.exports.dictExists(newDictID)){
       callnext(false);
     } else {
-      fs.move(path.join(module.exports.siteconfig.dataDir, "dicts/"+oldDictID+".sqlite"), path.join(module.exports.siteconfig.dataDir, "dicts/"+newDictID+".sqlite"), function(err){
-        var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+      fs.move(path.join(siteconfig.dataDir, "dicts/"+oldDictID+".sqlite"), path.join(siteconfig.dataDir, "dicts/"+newDictID+".sqlite"), function(err){
+        var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
         db.run("delete from dicts where id=$dictID", {$dictID: oldDictID}, function(err){ if(err) console.log(err);
           db.close();
           var dictDB=module.exports.getDB(newDictID);
@@ -86,7 +86,7 @@ module.exports={
   },
   attachDict: function(dictDB, dictID, callnext){
     module.exports.readDictConfigs(dictDB, dictID, function(configs){
-      var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+      var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
       db.run("delete from dicts where id=$dictID", {$dictID: dictID}, function(err){ if(err) console.log(err);
         var title=configs.ident.title;
         db.run("insert into dicts(id, title) values ($dictID, $title)", {$dictID: dictID, $title: title}, function(err){ if(err) console.log(err);
@@ -102,11 +102,11 @@ module.exports={
     });
   },
   destroyDict: function(dictID, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
     db.run("delete from dicts where id=$dictID", {$dictID: dictID}, function(err){ if(err) console.log(err);
       db.run("delete from user_dict where dict_id=$dictID", {$dictID: dictID}, function(err){ if(err) console.log(err);
         db.close(function(){
-          fs.remove(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), function(){
+          fs.remove(path.join(siteconfig.dataDir, "dicts/"+dictID+".sqlite"), function(){
             callnext();
           });
         });
@@ -115,7 +115,7 @@ module.exports={
   },
   cloneDict: function(dictID, email, callnext){
     module.exports.suggestDictID(function(cloneDictID) {
-      fs.copy(path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite"), path.join(module.exports.siteconfig.dataDir, "dicts/"+cloneDictID+".sqlite"), function(err){
+      fs.copy(path.join(siteconfig.dataDir, "dicts/"+dictID+".sqlite"), path.join(siteconfig.dataDir, "dicts/"+cloneDictID+".sqlite"), function(err){
         var cloneDictDB = module.exports.getDB(cloneDictID);
         cloneDictDB.get("select json from configs where id='ident'", {}, function(err, row){
           var ident={"title": "?", "blurb": "?"};
@@ -133,24 +133,17 @@ module.exports={
       });
     });
   },
-  readSiteConfig: function(callnext){
-    fs.readFile("siteconfig.json", "utf8", function(err, content){
-      var siteconfig=JSON.parse(content);
-      callnext(siteconfig);
-    });
-  },
   readDictConfigs: function(db, dictID, callnext){
-    if(db.dictConfigs) callnext(db.dictConfigs); else {
-      fs.readFile("siteconfig.json", "utf8", function(err, content){
-        var configs={};
-        configs.siteconfig=JSON.parse(content);
-        db.all("select * from configs", {}, function(err, rows){
-          if(!err) for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
-          var ids=["ident", "publico", "users", "kex", "titling", "flagging", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"];
-          ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
-          db.dictConfigs=configs;
-          callnext(configs);
-        });
+    if(db.dictConfigs)
+      callnext(db.dictConfigs);
+    else {
+      var configs = {siteconfig: siteconfig};
+      db.all("select * from configs", {}, function(err, rows){
+        if(!err) for(var i=0; i<rows.length; i++) configs[rows[i].id]=JSON.parse(rows[i].json);
+        var ids=["ident", "publico", "users", "kex", "titling", "flagging", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"];
+        ids.map(function(id){ if(!configs[id]) configs[id]=module.exports.defaultDictConfig(id); });
+        db.dictConfigs=configs;
+        callnext(configs);
       });
     }
   },
@@ -164,7 +157,7 @@ module.exports={
     if(id=="editing") return {xonomyMode: "nerd"};
     if(id=="searchability") return {searchableElements: []};
     if(id=="xema") return {elements: {}};
-    if(id=="titling") return {headwordAnnotations: [], abc: module.exports.siteconfig.defaultAbc};
+    if(id=="titling") return {headwordAnnotations: [], abc: siteconfig.defaultAbc};
     if(id=="flagging") return {flag_element: "", flags: []};
     return {};
   },
@@ -316,7 +309,7 @@ module.exports={
   flagEntry: function(db, dictID, entryID, flag, email, historiography, callnext){
     db.get("select id, xml from entries where id=$id", {$id: entryID}, function(err, row){
       module.exports.readDictConfigs(db, dictID, function(configs){
-        var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+        var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.siteconfig.defaultAbc;
         var xml=(row?row.xml:"").replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
         xml=addFlag(entryID, xml, flag, configs.flagging);
 
@@ -350,7 +343,7 @@ module.exports={
   updateEntry: function(db, dictID, entryID, xml, email, historiography, callnext){
     db.get("select id, xml from entries where id=$id", {$id: entryID}, function(err, row){
       module.exports.readDictConfigs(db, dictID, function(configs){
-        var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+        var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.siteconfig.defaultAbc;
         xml=setHousekeepingAttributes(entryID, xml, configs.subbing);
         xml=module.exports.removeSubentryParentTags(xml);
         var newXml=xml.replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
@@ -573,7 +566,7 @@ module.exports={
   },
   resave: function(db, dictID, callnext){ //updates an entry's display title, search keys and so on
     module.exports.readDictConfigs(db, dictID, function(configs){
-      var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+      var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.siteconfig.defaultAbc;
       const domparser=new xmldom.DOMParser();
       db.all("select id, xml from entries where needs_resave=1 limit 12", {}, function(err, rows){
         for(var i=0; i<rows.length; i++){
@@ -821,7 +814,7 @@ module.exports={
         where doctype=$doctype and e1.sortkey>$sortkey
         order by e1.sortkey asc
         limit 15`;
-      var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.module.exports.siteconfig.defaultAbc;
+      var abc=configs.titling.abc; if(!abc || abc.length==0) abc=configs.siteconfig.defaultAbc;
       var sortkey=module.exports.toSortkey(text, abc);
       var nabes=[];
       db.all(sql_before, {$sortkey: sortkey, $doctype: configs.xema.root}, function(err, rows){
@@ -984,17 +977,17 @@ module.exports={
         // somebody created the pidfile meanwhile, the import is probably underway
         progress = module.exports.checkImportStatus(pidfile, errfile, callnext)
       }
-      var dbpath = path.join(module.exports.siteconfig.dataDir, "dicts/"+dictID+".sqlite");
+      var dbpath = path.join(siteconfig.dataDir, "dicts/"+dictID+".sqlite");
       fork("adminscripts/import.js", [dbpath, filepath, email], {detached: true, stdio: ['ignore', pidfile_fd, errfile_fd, 'ipc']})
       callnext({progressMessage: "Import started. Please wait...", finished: false, errors: false})
     }
   },
 
   login: function(email, password, callnext){
-    if(module.exports.siteconfig.readonly){
+    if(siteconfig.readonly){
       callnext(false, "", "");
     } else {
-      var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+      var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
       var hash=sha1(password);
       db.get("select email from users where email=$email and passwordHash=$hash", {$email: email.toLowerCase(), $hash: hash}, function(err, row){
         if(!row){
@@ -1013,7 +1006,7 @@ module.exports={
     }
   },
   changePwd: function(email, password, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     var hash=sha1(password);
     db.run("update users set passwordHash=$hash where email=$email", {$hash: hash, $email: email.toLowerCase()}, function(err, row){
       db.close();
@@ -1021,34 +1014,34 @@ module.exports={
     });
   },
   changeSkeUserName: function(email, ske_userName, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.run("update users set ske_username=$ske_userName where email=$email", {$ske_userName: ske_userName, $email: email.toLowerCase()}, function(err, row){
       db.close();
       callnext(true);
     });
   },
   changeSkeApiKey: function(email, ske_apiKey, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.run("update users set ske_apiKey=$ske_apiKey where email=$email", {$ske_apiKey: ske_apiKey, $email: email.toLowerCase()}, function(err, row){
       db.close();
       callnext(true);
     });
   },
   setConsent: function(email, consent, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.run("update users set consent=$consent where email=$email", {$consent: consent, $email: email.toLowerCase()}, function(err, row){
       db.close();
       callnext(true);
     });
   },
   sendSignupToken: function(email, remoteip, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", {$email: email.toLowerCase()}, function(err, row){
       if (row==undefined) {
         var expireDate = (new Date()); expireDate.setHours(expireDate.getHours()+48);
         expireDate = expireDate.toISOString();
         var token = sha1(sha1(Math.random()));
-        var tokenurl = module.exports.siteconfig.baseUrl + 'createaccount/' + token;
+        var tokenurl = siteconfig.baseUrl + 'createaccount/' + token;
         var mailSubject="Lexonomy signup";
         var mailText = `Dear Lexonomy user,\n\n`;
         mailText+=`Somebody (hopefully you, from the address ${remoteip}) requested to create a new Lexonomy account. Please follow the link below to create your account:\n\n`
@@ -1056,7 +1049,7 @@ module.exports={
         mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request an account, you can safely ignore this message. \n\n`;
         mailText+=`Yours,\nThe Lexonomy team`;
         db.run("insert into register_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email.toLowerCase(), $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
-          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.mailconfig.from, to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          module.exports.mailtransporter.sendMail({from: siteconfig.mailconfig.from, to: email, subject: mailSubject, text: mailText}, (err, info) => {});
           db.close();
           callnext(true);
         });
@@ -1067,13 +1060,13 @@ module.exports={
     });
   },
   sendToken: function(email, remoteip, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", {$email: email.toLowerCase()}, function(err, row){
       if (row) {
         var expireDate = (new Date()); expireDate.setHours(expireDate.getHours()+48);
         expireDate = expireDate.toISOString();
         var token = sha1(sha1(Math.random()));
-        var tokenurl = module.exports.siteconfig.baseUrl + 'recoverpwd/' + token;
+        var tokenurl = siteconfig.baseUrl + 'recoverpwd/' + token;
         var mailSubject="Lexonomy password reset";
         var mailText = `Dear Lexonomy user,\n\n`;
         mailText+=`Somebody (hopefully you, from the address ${remoteip}) requested a new password for the Lexonomy account ${email}. You can reset your password by clicking the link below:\n\n`
@@ -1081,7 +1074,7 @@ module.exports={
         mailText+=`For security reasons this link is only valid for two days (until ${expireDate}). If you did not request a password reset, you can safely ignore this message. No changes have been made to your account.\n\n`;
         mailText+=`Yours,\nThe Lexonomy team`;
         db.run("insert into recovery_tokens (email, requestAddress, token, expiration) values ($email, $remoteip, $token, $expire)", {$email: email.toLowerCase(), $expire: expireDate, $remoteip: remoteip, $token: token}, function(err, row){
-          module.exports.mailtransporter.sendMail({from: module.exports.siteconfig.mailconfig.from, to: email, subject: mailSubject, text: mailText}, (err, info) => {});
+          module.exports.mailtransporter.sendMail({from: siteconfig.mailconfig.from, to: email, subject: mailSubject, text: mailText}, (err, info) => {});
           db.close();
           callnext(true);
         });
@@ -1092,14 +1085,14 @@ module.exports={
     });
   },
   verifyToken: function(token, type, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select * from "+type+"_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
       db.close();
       if(!row) callnext(false); else callnext(true);
     });
   },
   createAccount: function(token, password, remoteip, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select * from register_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
       if (row) {
         var email = row.email || "";
@@ -1120,7 +1113,7 @@ module.exports={
     });
   },
   resetPwd: function(token, password, remoteip, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select * from recovery_tokens where token=$token and expiration>=datetime('now') and usedDate is null", {$token: token}, function(err, row){
       if (row) {
         var email = row.email || "";
@@ -1135,7 +1128,7 @@ module.exports={
     });
   },
   processJWT: function(user, jwtData, callnext){
-    var db = new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     if (user.loggedin) {
       //user logged in = save SkE ID in database
       var key = generateKey();
@@ -1178,10 +1171,10 @@ module.exports={
   },
   verifyLogin: function(email, sessionkey, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     if (email != null) email = email.toLowerCase();
     db.get("select email, ske_username, ske_apiKey, apiKey, consent from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
-      if(!row || module.exports.siteconfig.readonly){
+      if(!row || siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: ''});
       } else {
@@ -1194,19 +1187,17 @@ module.exports={
         var now=(new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
-          module.exports.readSiteConfig(function(siteconfig){
-            callnext({loggedin: true, email: email, ske_username: ske_username, ske_apiKey: ske_apiKey, apiKey: apiKey, consent: consent, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
-          });
+          callnext({loggedin: true, email: email, ske_username: ske_username, ske_apiKey: ske_apiKey, apiKey: apiKey, consent: consent, isAdmin: (siteconfig.admins.indexOf(email)>-1)});
         });
       }
     });
   },
   verifyLoginAndDictAccess: function(email, sessionkey, dictDB, dictID, callnext){
     var yesterday=(new Date()); yesterday.setHours(yesterday.getHours()-24); yesterday=yesterday.toISOString();
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     if (email != undefined) email = email.toLowerCase();
     db.get("select email, ske_apiKey, ske_username from users where email=$email and sessionKey=$key and sessionLast>=$yesterday", {$email: email, $key: sessionkey, $yesterday: yesterday}, function(err, row){
-      if(!row || module.exports.siteconfig.readonly){
+      if(!row || siteconfig.readonly){
         db.close();
         callnext({loggedin: false, email: null});
       } else {
@@ -1217,7 +1208,7 @@ module.exports={
         db.run("update users set sessionLast=$now where email=$email", {$now: now, $email: email}, function(err, row){
           db.close();
           module.exports.readDictConfigs(dictDB, dictID, function(configs){
-            if(!configs.users[email] && module.exports.siteconfig.admins.indexOf(email)==-1){
+            if(!configs.users[email] && siteconfig.admins.indexOf(email)==-1){
               callnext({loggedin: true, email: email, dictAccess: false, isAdmin: false});
             } else {
               var canEdit=(configs.siteconfig.admins.indexOf(email)>-1 ? true : configs.users[email].canEdit);
@@ -1232,14 +1223,14 @@ module.exports={
     });
   },
   logout: function(email, sessionkey, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.run("update users set sessionKey=null where email=$email and sessionKey=$key", {$email: email.toLowerCase(), $key: sessionkey}, function(err, row){
       db.close();
       callnext();
     });
   },
   getDictsByUser: function(email, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     var sql="select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email=$email order by d.title"
     var dicts=[];
     db.all(sql, {$email: email}, function(err, rows){
@@ -1265,9 +1256,9 @@ module.exports={
     }
   },
   verifyUserApiKey: function(email, apikey, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email and apiKey=$key", {$email: email.toLowerCase(), $key: apikey}, function(err, row){
-      if(!row || module.exports.siteconfig.readonly){
+      if(!row || siteconfig.readonly){
         db.close();
         callnext({valid: false});
       } else {
@@ -1278,9 +1269,9 @@ module.exports={
     });
   },
   prepareApiKeyForSke: function(email, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select apiKey, ske_username, ske_apiKey from users where email=$email", {$email: email.toLowerCase()}, function(err, row){
-      if(!row || module.exports.siteconfig.readonly){
+      if(!row || siteconfig.readonly){
         db.close();
         callnext(false);
       } else {
@@ -1352,7 +1343,7 @@ module.exports={
     var sql1=`select * from users where email like $like order by email limit $howmany`;
     var sql2=`select count(*) as total from users where email like $like`;
     var like="%"+searchtext+"%";
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.all(sql1, {$howmany: howmany, $like: like}, function(err, rows){
       var entries=[];
       for(var i=0; i<rows.length; i++){
@@ -1367,7 +1358,7 @@ module.exports={
     });
   },
   readUser: function(email, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.get("select * from users where email=$email", {$email: email.toLowerCase()}, function(err, row){
       if(!row) callnext("", ""); else {
         email=row.email || "";
@@ -1385,7 +1376,7 @@ module.exports={
     });
   },
   deleteUser: function(email, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
     db.run("delete from users where email=$email", {
       $email: email.toLowerCase(),
     }, function(err){
@@ -1397,7 +1388,7 @@ module.exports={
     var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml');
     var email=doc.documentElement.getAttribute("email");
     var passwordHash=sha1(doc.documentElement.getAttribute("password"));
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
     db.run("insert into users(email, passwordHash) values($email, $passwordHash)", {
       $email: email.toLowerCase(),
       $passwordHash: passwordHash,
@@ -1412,7 +1403,7 @@ module.exports={
       module.exports.readUser(email, function(email, xml){ callnext(email, xml); });
     } else {
       var passwordHash=sha1(doc.documentElement.getAttribute("password"));
-      var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+      var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
       db.run("update users set passwordHash=$passwordHash where email=$email", {
         $email: email.toLowerCase(),
         $passwordHash: passwordHash,
@@ -1425,7 +1416,7 @@ module.exports={
     }
   },
   readUserApiKey: function(email, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.get("select apiKey from users where email=$email", {$email: email.toLowerCase()}, function(err, row){
       if(!row) callnext(""); else {
         db.close();
@@ -1434,7 +1425,7 @@ module.exports={
     });
   },
   updateUserApiKey: function(email, apikey, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function(){db.run('PRAGMA foreign_keys=on')});
     db.run("update users set apiKey=$apiKey where email=$email", {
       $email: email.toLowerCase(),
       $apiKey: apikey,
@@ -1448,7 +1439,7 @@ module.exports={
     var sql1=`select * from dicts where id like $like or title like $like order by id limit $howmany`;
     var sql2=`select count(*) as total from dicts where id like $like or title like $like`;
     var like="%"+searchtext+"%";
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.all(sql1, {$howmany: howmany, $like: like}, function(err, rows){
       var entries=[];
       for(var i=0; i<rows.length; i++){
@@ -1463,7 +1454,7 @@ module.exports={
     });
   },
   readDict: function(dictID, callnext){
-    var db=new sqlite3.Database(path.join(module.exports.siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
+    var db=new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.get("select * from dicts where id=$dictID", {$dictID: dictID}, function(err, row){
       if(!row) callnext("", ""); else {
         var id=row.id;
