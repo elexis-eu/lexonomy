@@ -32,7 +32,7 @@
 			Editing.change=Screenful.Editor.changed;
 			if(!entry.content.xonomyMode) entry.content.xonomyMode="nerd";
 			Editing.render(div, entry.content);
-			if(entry.content._js) { //the user is switching back from own entry editor
+			if(entry.content._js) { //the user is disabling any entry editor customizations
 				delete entry.content._js;
 				delete entry.content._css;
 				window.setTimeout(Screenful.Editor.changed, 100);
@@ -52,7 +52,7 @@
 			return JSON.parse(str);
 		};
 		Screenful.Editor.toolbarLinks=[
-			{image: "../../../furniture/cog.png", caption: "Use your own entry editor...", href: "../../../<%=dictID%>/config/editing-override/"}
+			{image: "../../../furniture/cog.png", caption: "Customize entry editor...", href: "../../../<%=dictID%>/config/editing-override/"}
 		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
