@@ -40,6 +40,24 @@ var EditingOverride={};
     //div = the div from which you should harvest the contents of the editor
     var headword=$(div).find("input.headword").val();
     return "<entry><headword>"+headword+"</headword></entry>";
+  },
+  adjustDocSpec: function (docSpec) {
+    // NOTE: you normally want to use this method if you don't have a custom editor,
+    // but just want to change certain aspects of how Xonomy presents the document.
+    $.each(docSpec.elements, function (elementName, elementSpec) {
+      // Expand <sense> elements by default.
+      if (elementName === 'sense') {
+        elementSpec.collapsed = function (jsElement) { return false; }
+      }
+      // Make <example> read-only
+      if (elementName === 'example') {
+        elementSpec.isReadOnly = true;
+      }
+      // Hide <partOfSpeech>.
+      if (elementName === 'partOfSpeech') {
+        elementSpec.isInvisible = true;
+      }
+    });
   }
 }`
   );
