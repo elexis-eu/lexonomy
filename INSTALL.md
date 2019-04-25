@@ -48,7 +48,7 @@ One of the modules that will be installed on your computer when you run `npm ins
 
 # Configuring your installation
 
-Open the file `website/siteconfig.json`. This contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
+By default, configuration is located in the file `website/siteconfig.json`, however this can be changed by setting the `$LEXONOMY_SITECONFIG` environmental variable. This file contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
 
 ## Base URL
 
