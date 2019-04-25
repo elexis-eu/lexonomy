@@ -1,5 +1,8 @@
 {
   "name": "lexonomy",
+  "description": "A cloud-based, open-source system for writing and publishing dictionaries",
+  "homepage": "https://lexonomy.eu",
+  "license": "MIT",
   "scripts": {
     "dev": "node lexonomy.js",
     "postinstall": "node adminscripts/init.js"
@@ -19,5 +22,9 @@
     "sha1": "^1.1.1",
     "sqlite3": "^4.0.6",
     "xmldom": "^0.1.27"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elexis-eu/lexonomy.git"
   }
 }
