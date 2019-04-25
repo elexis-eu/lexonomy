@@ -1,10 +1,15 @@
 .DEFAULT_GOAL := dev
 
-dev: setup install
+.DEFAULT_GOAL := docker-dev
+
+.PHONY: docker-dev
+docker-dev: docker-setup docker-install
 	docker-compose run --rm --service-ports dev
 
-setup:
+.PHONY: docker-setup
+docker-setup:
 	docker volume create nodemodules
 
-install:
+.PHONY: docker-install
+docker-install:
 	docker-compose run --rm install
