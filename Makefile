@@ -1,4 +1,8 @@
-.DEFAULT_GOAL := dev
+# Convenience TARGETS for bootstrapping a docker-ised dev environment.
+#
+# - docker-dev: prepare everything and run the container
+# - docker-setup: prepare the docker-local volume that will store the node_modules
+# - docker-install: (mostly) run `npm install`
 
 .DEFAULT_GOAL := docker-dev
 
