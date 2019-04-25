@@ -44,12 +44,14 @@ make
 ### Prerequisites
 
 - [Download and install Node.js](https://nodejs.org/en/download/).
-- Go into your copy of the repository and rename files as follows:  
-  In the `website` directory, rename `siteconfig.json.template` to
-  `siteconfig.json`.
-- In your terminal, go to the `website` directory:
+- In your terminal, go to the `website` directory of the repository:
 ```sh
 cd website
+```
+
+- Copy `siteconfig.json.template` to `siteconfig.json`
+```sh
+cp siteconfig.json.template siteconfig.json
 ```
 
 - Install all modules that Lexonomy depends on with this (basic database and
@@ -69,9 +71,6 @@ In your terminal and in the `website` directory, start Lexonomy with this:
 node lexonomy.js
 ```
 
-
-#### Update and put to the right place: - Update the file siteconfig.json according to your needs (see below for details) and run script to 
-
 ## Short interlude: installing libxslt on Windows
 
 One of the modules that will be installed on your computer when you run `npm install` is a module called libxslt. If you are installing the libxslt module on Windows, you may run into all sorts of complications. Here are some hints to get you through them.
@@ -82,7 +81,8 @@ One of the modules that will be installed on your computer when you run `npm ins
 
 - **Unresolved external symbol vsaprintf...**: you need to install an older version of libxslt instead of the latest one: `npm install libxslt@0.6.5`. For more information see [here](https://github.com/albanm/node-libxslt/issues/64) and [here](https://60devs.com/npm-install-specific-version.html).
 
-# Configuring your installation
+
+# Configuring your Lexonomy (for a server installation)
 
 By default, configuration is located in the file `website/siteconfig.json`, however this can be changed by setting the `$LEXONOMY_SITECONFIG` environmental variable. This file contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
 
