@@ -1,40 +1,76 @@
-This page explains what you must do to set up a local installation of Lexonomy on your own computer or server.
+This page explains what you must do to set up a local installation of Lexonomy
+on your own computer or adapt a version to run on a server.
 
-# Getting started
+# Preliminary remarks
 
-Lexonomy is written in [Node.js](https://nodejs.org/en/), which means it runs on both Linux and Windows and you don't need to compile or build anything. You do need to download and install Node.js first though.
+Lexonomy is written in [Node.js](https://nodejs.org/en/), which means it runs
+on both Linux and Windows and you don't need to compile or build anything
+(yourself). You do need an environment with a working `Node.JS executable`.
 
-Download all the source code from this repository, put it in a directory on your computer and rename files as follows:
+You also need to download the source code from this repository into a directory
+on your computer.
 
-- In the `website` directory, rename `siteconfig.json.template` to `siteconfig.json`.
 
-Then, in your terminal, go to the `website` directory:
+# Run Lexonomy locally
 
+Whichever way you choose to run Lexonomy locally, with the default
+configuration:
+- An instance of Lexonomy will start at the address http://localhost:8080/
+- You should be able to navigate to this address with your web browser and see
+  Lexonomy's home page
+
+## Inside a docker environment
+
+Bootstrapping a local development environment in docker has (so far) only been
+tested on Linux. Most likely this also works for MacOS - and most likely does
+*not* work for Windows.
+
+### Prerequisites
+- [docker](https://docs.docker.com/install/) 17.09.0+
+- [docker-compose](https://docs.docker.com/compose/install/) 1.17.0+
+  The two need to accept `version: '3.4'` [docker-compose
+  files](https://docs.docker.com/compose/compose-file/compose-versioning/#version-34)
+- make
+
+### Punch it
+
+```bash
+make
 ```
+
+
+## Inside a user environment
+
+### Prerequisites
+
+- [Download and install Node.js](https://nodejs.org/en/download/).
+- Go into your copy of the repository and rename files as follows:  
+  In the `website` directory, rename `siteconfig.json.template` to
+  `siteconfig.json`.
+- In your terminal, go to the `website` directory:
+```sh
 cd website
 ```
 
-And install all modules that Lexonomy depends on with this (basic database and default user setup is also done during this step):
-
+- Install all modules that Lexonomy depends on with this (basic database and
+  default user setup is also done during this step):
 ```
 npm install
 ```
 
-Update the file siteconfig.json according to your needs (see below for details) and run script to initialize database and admin user:
-
+- Initialize database and admin user:
 ```
 node ./adminscripts/init.js
 ```
 
-Finally, in your terminal and still in the `website` directory, start Lexonomy with this:
-
-```
+### Punch it
+In your terminal and in the `website` directory, start Lexonomy with this:
+```sh
 node lexonomy.js
 ```
 
-This starts an instance of Lexonomy at the address `http://localhost:8080/`. You should be able to navigate to this address with your web browser and see Lexonomy's home page. You will not be able to log in or do anything  yet, we will get to that later.
 
-**Note:** When launched this way, Lexonomy runs on port 8080. To allow it to run on this port, on some Linuxes you should type `sudo node lexonomy.js` instead of `node lexonomy.js`.
+#### Update and put to the right place: - Update the file siteconfig.json according to your needs (see below for details) and run script to 
 
 ## Short interlude: installing libxslt on Windows
 
@@ -81,6 +117,13 @@ This is the path at which Lexonomy listens for incoming HTTP requests on the ser
 ```
 
 This is the port number at which Lexonomy listens for incoming HTTP requests.
+
+**Note:** When launched this way, Lexonomy runs on `port:8080`. To allow it to
+run on a port <1024 like, for example on `port:80`, on some Linuxes you will
+likely have to run Lexonomy with a more priviledged user:
+```bash
+sudo node lexonomy.js
+```
 
 ## Data directory
 
