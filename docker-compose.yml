@@ -1,29 +1,37 @@
 version: '3.4'
 
-x-services:
-  &base
-  image: node:11
-  volumes:
-    - .:/opt/service
-    - ./website/siteconfig.json.template:/opt/service/website/siteconfig.json
-    - nodemodules:/opt/service/website/node_modules
-  working_dir: /opt/service/website
+x-custom:
+  service: &service
+    image: node:11
+    volumes:
+      - .:/opt/service
+      - nodemodules:/opt/service/website/node_modules
+    working_dir: /opt/service/website
+  service_env: &service_env
+    LEXONOMY_SITECONFIG: siteconfig.json.template
 
 services:
   install:
-    << : *base
+    << : *service
     command: npm install --unsafe-perm=true
+    environment:
+      <<: *service_env
   build:
-    << : *base
+    <<: *service
     command: npm run build
+    environment:
+      <<: *service_env
   create-bundles:
-    << : *base
+    <<: *service
     command: npm run create-bundles
+    environment:
+      <<: *service_env
   dev:
-    << : *base
+    <<: *service
     command: npm run dev
     environment:
-      - NODE_ENV=development
+      <<: *service_env
+      NODE_ENV: development
     ports:
       - "8080:8080"
 
