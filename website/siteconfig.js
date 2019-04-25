@@ -9,7 +9,7 @@ function siteconfig_file() {
     if(fs.existsSync(path)) {
       return path;
     } else {
-      throw Error("Cannot locate $LEXONOMY_SITECONFIG file: ${ path }");
+      throw Error(`Cannot locate $LEXONOMY_SITECONFIG file: ${ path }`);
     }
   }
   return path.join(__dirname, "siteconfig.json");
