@@ -9,7 +9,7 @@ Type=simple
 User=apache
 Group=1000
 WorkingDirectory=/opt/lexonomy/website/
-ExecStart=/usr/bin/node --max-old-space-size=16384 /opt/lexonomy/website/lexonomy.js
+ExecStart=/usr/bin/node --max-old-space-size=16384 /opt/lexonomy/website/run.js
 RestartSec=20
 Restart=always
 SyslogIdentifier=lexonomy
