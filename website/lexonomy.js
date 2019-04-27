@@ -16,7 +16,9 @@ const multer = require('multer');
 const upload = multer({ dest: path.join(siteconfig.dataDir, "uploads/") });
 const url=require("url");
 const querystring=require("querystring");
-const libxslt=require("libxslt"); //https://www.npmjs.com/package/libxslt
+const xsltProcessor = require('xslt-processor')
+const xsltProcess = xsltProcessor.xsltProcess;
+const xmlParse = xsltProcessor.xmlParse;
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 const nodemailer = require('nodemailer');
   ops.mailtransporter = nodemailer.createTransport(siteconfig.mailconfig);
@@ -492,7 +494,7 @@ app.get(siteconfig.rootPath+":dictID/:entryID(\\d+)/", function(req, res){
             db.close();
             var html="";
             if(configs.xemplate._xsl) {
-              html=libxslt.parse(configs.xemplate._xsl).apply(xml);
+              html=xsltProcess(xmlParse(xml), xmlParse(configs.xemplate._xsl))
             } else if(configs.xemplate._css) {
               html=xml;
             } else {
@@ -652,7 +654,7 @@ app.post(siteconfig.rootPath+":dictID/entrycreate.json", function(req, res){
           db.close();
           var html="";
           if(configs.xemplate._xsl) {
-            html=libxslt.parse(configs.xemplate._xsl).apply(adjustedXml);
+            html=xsltProcess(xmlParse(adjustedXml), xmlParse(configs.xemplate._xsl));
           } else if(configs.xemplate._css) {
             html=adjustedXml;
           } else {
@@ -679,7 +681,7 @@ app.post(siteconfig.rootPath+":dictID/entryread.json", function(req, res){
           var html="";
           if(xml){
             if(configs.xemplate._xsl) {
-              html=libxslt.parse(configs.xemplate._xsl).apply(xml);
+              html=xsltProcess(xmlParse(xml), xmlParse(configs.xemplate._xsl))
             } else if(configs.xemplate._css) {
               html=xml;
             } else {
@@ -723,7 +725,7 @@ app.post(siteconfig.rootPath+":dictID/entryupdate.json", function(req, res){
           db.close();
           var html="";
           if(configs.xemplate._xsl) {
-            html=libxslt.parse(configs.xemplate._xsl).apply(adjustedXml);
+            html=xsltProcess(xmlParse(adjustedXml), xmlParse(configs.xemplate._xsl))
           } else if(configs.xemplate._css) {
             html=adjustedXml;
           } else {
@@ -1259,8 +1261,8 @@ app.post(siteconfig.rootPath+":dictID/history.json", function(req, res){
           if(xml) {
             var html="";
             if(configs.xemplate._xsl) {
-              if(!stylesheet) stylesheet=libxslt.parse(configs.xemplate._xsl);
-              html=stylesheet.apply(xml);
+              if(!stylesheet) stylesheet=xmlParse(configs.xemplate._xsl);
+              html=xsltProcess(xmlParse(xml), stylesheet)
             } else if(configs.xemplate._css) {
               html=xml;
             } else {
