@@ -28,8 +28,6 @@ const jwt = require("jsonwebtoken");
 //Do this for each request:
 app.use(function (req, res, next) {
   if(!/^\/(widgets|furniture|libs)\//.test(req.url) && !/^\/docs\/.*\.[a-zA-Z0-9]+$/.test(req.url)) { //skip if the request is for a static file
-    //Reload my siteconfig:
-    siteconfig.reload();
     //Log the request:
     if(siteconfig.verbose){
       var bodyCopy={}; for(var key in req.body) { bodyCopy[key]=req.body[key]; if(key=="password") bodyCopy[key]="******"; }
