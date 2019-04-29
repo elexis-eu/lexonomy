@@ -1,0 +1,14 @@
+{
+  "extends": ["standard"],
+  "env": {
+      "browser": true,
+      "node": true
+  },
+  "rules": {
+      "semi": ["error", "always", { "omitLastInOneLineBlock": true }],
+      "semi-spacing": ["error", {"before": false, "after": true}],
+      "no-unexpected-multiline": "error",
+      "quotes": ["error", "double", "avoid-escape"],
+      "eqeqeq": ["error", "smart"]
+  }
+}
