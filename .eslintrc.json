@@ -9,6 +9,8 @@
       "semi-spacing": ["error", {"before": false, "after": true}],
       "no-unexpected-multiline": "error",
       "quotes": ["error", "double", "avoid-escape"],
-      "eqeqeq": ["error", "smart"]
+      "eqeqeq": ["warn", "smart"],
+      "no-useless-escape": "warn",
+      "camelcase": "warn"
   }
 }
