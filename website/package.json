@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "node lexonomy.js",
-    "postinstall": "node adminscripts/init.js"
+    "postinstall": "node adminscripts/init.js",
+    "lint": "eslint lexonomy.js ops.js"
   },
   "dependencies": {
     "cookie-parser": "^1.4.4",

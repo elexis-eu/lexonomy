@@ -11,11 +11,6 @@ x-custom:
     LEXONOMY_SITECONFIG: siteconfig.json.template
 
 services:
-  install:
-    << : *service
-    command: npm install --unsafe-perm=true
-    environment:
-      <<: *service_env
   build:
     <<: *service
     command: npm run build
