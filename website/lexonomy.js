@@ -25,27 +25,18 @@ const nodemailer = require('nodemailer');
 const PORT=process.env.PORT||siteconfig.port||80;
 const jwt = require("jsonwebtoken");
 
-//Do this for each request:
-app.use(function (req, res, next) {
-  if(!/^\/(widgets|furniture|libs)\//.test(req.url) && !/^\/docs\/.*\.[a-zA-Z0-9]+$/.test(req.url)) { //skip if the request is for a static file
-    //Log the request:
-    if(siteconfig.verbose){
-      var bodyCopy={}; for(var key in req.body) { bodyCopy[key]=req.body[key]; if(key=="password") bodyCopy[key]="******"; }
-      var delim="\t"; if(siteconfig.verbose.multiline) {delim="\n";}
-      var str=req.method+delim+req.url+delim+"COOKIES: "+JSON.stringify(req.cookies)+delim+"REQUEST BODY: "+JSON.stringify(bodyCopy)+"\n";
-      if(siteconfig.verbose.multiline && siteconfig.verbose.filename) str+="\n";
-      if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str, function(err){});
-      else console.log(str);
-    }
-  }
-  next();
-});
-
-//Paths to our static files:
-app.use(siteconfig.rootPath+"widgets", express.static(path.join(__dirname, "widgets")));
-app.use(siteconfig.rootPath+"furniture", express.static(path.join(__dirname, "furniture")));
-app.use(siteconfig.rootPath+"libs", express.static(path.join(__dirname, "libs")));
-app.use(siteconfig.rootPath+"docs", express.static(path.join(__dirname, "docs")));
+//Log the request:
+if(siteconfig.verbose){
+  app.use(function (req, res, next) {
+    var bodyCopy={}; for(var key in req.body) { bodyCopy[key]=req.body[key]; if(key=="password") bodyCopy[key]="******"; }
+    var delim="\t"; if(siteconfig.verbose.multiline) {delim="\n";}
+    var str=req.method+delim+req.url+delim+"COOKIES: "+JSON.stringify(req.cookies)+delim+"REQUEST BODY: "+JSON.stringify(bodyCopy)+"\n";
+    if(siteconfig.verbose.multiline && siteconfig.verbose.filename) str+="\n";
+    if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str, function(err){});
+    else console.log(str);
+    next();
+  });
+}
 
 //Path to our views:
 app.set('views', path.join(__dirname, "views")); app.set('view engine', 'ejs') //http://ejs.co/
