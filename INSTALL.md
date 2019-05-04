@@ -3,9 +3,9 @@ on your own computer or adapt a version to run on a server.
 
 # Preliminary remarks
 
-Lexonomy is written in [Node.js](https://nodejs.org/en/), which means it runs
-on both Linux and Windows and you don't need to compile or build anything
-(yourself). You do need an environment with a working `Node.JS executable`.
+Lexonomy's backend is written in [Node.js](https://nodejs.org/en/) and currently being
+rewritten into [Python](https://python.org). That means that as of now you need a working instalation
+of Node and Python 3.
 
 You also need to download the source code from this repository into a directory
 on your computer.
@@ -15,7 +15,9 @@ on your computer.
 
 Whichever way you choose to run Lexonomy locally, with the default
 configuration:
-- An instance of Lexonomy will start at the address http://localhost:8080/
+- An instance of Lexonomy will start at the address http://localhost:8000/, this starts
+  the Python backend and that will start the Node backend automatically too (the startup
+  takes about five seconds).
 - You should be able to navigate to this address with your web browser and see
   Lexonomy's home page
 
@@ -44,6 +46,7 @@ make
 ### Prerequisites
 
 - [Download and install Node.js](https://nodejs.org/en/download/).
+- [Download and install Python 3](https://www.python.org/downloads/)
 - In your terminal, go to the `website` directory of the repository:
 ```sh
 cd website
@@ -68,19 +71,8 @@ node ./adminscripts/init.js
 ### Punch it
 In your terminal and in the `website` directory, start Lexonomy with this:
 ```sh
-node lexonomy.js
+python3 lexonomy.py
 ```
-
-## Short interlude: installing libxslt on Windows
-
-One of the modules that will be installed on your computer when you run `npm install` is a module called libxslt. If you are installing the libxslt module on Windows, you may run into all sorts of complications. Here are some hints to get you through them.
-
-- **Error MSB8036: The Windows SDK version 8.1...**: you need to install Windows SDK 8.1 first. For more information see [here](https://social.msdn.microsoft.com/Forums/en-US/4d035e42-0618-476b-b309-ae2673f14de4/the-windows-sdk-version-81-was-not-found-in-vs-2015-update-3?forum=vssetup) and [here](https://developer.microsoft.com/en-us/windows/downloads/sdk-archive).
-
-- **Error TRK0005: Failed to locate: "CL.exe"**: you need to install Visual C++ first. For more information see [here](https://msdn.microsoft.com/en-IN/library/60k1461a.aspx).
-
-- **Unresolved external symbol vsaprintf...**: you need to install an older version of libxslt instead of the latest one: `npm install libxslt@0.6.5`. For more information see [here](https://github.com/albanm/node-libxslt/issues/64) and [here](https://60devs.com/npm-install-specific-version.html).
-
 
 # Configuring your Lexonomy (for a server installation)
 
@@ -119,8 +111,7 @@ This is the path at which Lexonomy listens for incoming HTTP requests on the ser
 This is the port number at which Lexonomy listens for incoming HTTP requests.
 
 **Note:** When launched this way, Lexonomy runs on `port:8080`. To allow it to
-run on a port <1024 like, for example on `port:80`, on some Linuxes you will
-likely have to run Lexonomy with a more priviledged user:
+run on a privileged port (<1024) like, for example on `port:80`, you need superuser permissions:
 ```bash
 sudo node lexonomy.js
 ```
@@ -141,20 +132,7 @@ If the path given here is relative, it is interpreted relatively to the web appl
 "verbose": false
 ```
 
-If you set this to `true` Lexonomy will report each HTTP request (except requests for static files) to standard output (= to the command line or terminal) – useful for debugging.
-
-You can customize Lexonomy's logging behaviour further by setting `verbose` to an object with the following properties:
-
-```js
-"verbose": {
-  "filename": "../log.txt",
-  "multiline": true
-}
-```
-
-If the `filename` property is not an empty string (or something else that's nullable) then Lexonomy will output the log into a file instead of standard output. The path given here can be absolute or relative, and if it is relative, it is interpreted relatively to the web application's current directory (= the `website` directory).
-
-If the `multiline` property is `true` then each log entry will occupy several lines, with an empty line between entries. This is to make the log more easily readable. If it is `false` then each log entry will be a one-liner.
+If you set this to `true` Lexonomy will report each HTTP request (except requests for static files) to standard error output (= to the command line or terminal) – useful for debugging.
 
 ## Tracking code
 
@@ -192,7 +170,17 @@ The script will tell you that it has created user accounts for the administrator
 
 # Running your installation
 
-Congratulations, your Lexonomy installation is now fully configured and ready to face the world. On this page, we have assumed you are running Lexonomy by typing `node lexonomy.js` into your terminal, which is fine for testing on your own local machine, but not for production. Running a Node.js application in production, as a public-facing website, requires a bit more setting up. At the very least, you need a **process manager** to keep the application running for ever and restart it in case it crashes. Just search the web for something like "Node.js in production" and you will find plenty of instructions.
+Congratulations, your Lexonomy installation is now fully configured and ready to face the world. On this page, we have assumed you are running Lexonomy by typing `python3 lexonomy.py` into your terminal.
 
-Most of the instructions you will find are relevant to Linux. But Lexonomy – like any Node.js application ­– can run on Windows too. Windows servers usually come with their own web server called IIS (Internet Information Server) and this web server can (be made to) play well with Node.js applications: just search the web for "Node.js IIS".
+## Running a standalone server
+
+```
+python3 lexonomy.py
+```
+
+starts a standalone web server. If you have the [Paste](https://pythonpaste.readthedocs.io/en/latest/) Python module installed, it will use that one (it provides a multi-threaded web server). Otherwise it will use a Bottle builtin web server which is single-threaded. To manage the server in a Linux environment, you can use the provided [systemd unit file](website/docs/lexonomy.service)
+
+## Running as CGI or WSGI inside of Apache
+
+You can run Lexonomy inside Apache as CGI or WSGI. For the latter please refer to the relevant [Bottle](http://bottlepy.org) documentation (the Bottle app is WSGI-compatible), for the former you can get inspiration in the [configuration file](website/docs/lexonomy_httpd.conf) that is part of Lexonomy.
 
