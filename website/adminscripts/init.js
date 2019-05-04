@@ -15,7 +15,7 @@ var db = new sqlite3.Database(dbFile, function(err){
   console.log('Connected to ' + dbFile + ' database.')
 });
 // Read the DB Schema into a String
-var dbSchema = fs.readFileSync(path.join(siteconfig.dataDir, siteconfig.dbSchemaFile), 'utf8');
+var dbSchema = fs.readFileSync(siteconfig.dbSchemaFile, 'utf8');
 // Initialise the DB (in case it already exists this will print warninigs)
 db.exec(dbSchema, function(err){
     if (err) {
