@@ -1,7 +1,7 @@
 #header {padding: 10px 14px; height: 38px; border-bottom: 1px solid #1e6bcf; background-image: url(header-back.gif); background-position: right top; background-repeat: no-repeat;}
 #header * {vertical-align: middle;}
 #header a {text-decoration: none;}
-#header a.sitehome {display: inline-block; width: 119px; height: 26px; background-image: url(lexonomy-brackets.png); margin-top: 5px;}
+#header a.sitehome {display: inline-block; width: 119px; height: 34px; background-image: url(lexonomy_logo_blue_on_transparent_with_bleed.png); background-size: 119px auto; margin-top: 5px;}
 #header a.sitehome:hover {position: relative; top: -1px;}
 #header a.dicTitle {display: inline-block; font-size: 20px; padding: 8px 10px; background-color: #4c9ed9; color: #ffffff; border-radius: 4px; }
 #header a.dicTitle:hover {box-shadow: 0px 0px 2px #999999; color: #eeeeee;}
