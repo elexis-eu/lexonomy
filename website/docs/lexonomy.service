@@ -1,0 +1,18 @@
+[Unit]
+Description=Lexonomy server
+After=network.target remote-fs.target nss-lookup.target
+
+
+[Service]
+Environment=NODE_ENV=production
+Type=simple
+User=apache
+Group=1000
+WorkingDirectory=/opt/lexonomy/website/
+ExecStart=/usr/bin/node --max-old-space-size=16384 /opt/lexonomy/website/lexonomy.js
+RestartSec=20
+Restart=always
+SyslogIdentifier=lexonomy
+
+[Install]
+WantedBy=multi-user.target
