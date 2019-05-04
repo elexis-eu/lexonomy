@@ -28,12 +28,11 @@ const jwt = require("jsonwebtoken");
 //Log the request:
 if(siteconfig.verbose){
   app.use(function (req, res, next) {
-    var bodyCopy={}; for(var key in req.body) { bodyCopy[key]=req.body[key]; if(key=="password") bodyCopy[key]="******"; }
-    var delim="\t"; if(siteconfig.verbose.multiline) {delim="\n";}
-    var str=req.method+delim+req.url+delim+"COOKIES: "+JSON.stringify(req.cookies)+delim+"REQUEST BODY: "+JSON.stringify(bodyCopy)+"\n";
-    if(siteconfig.verbose.multiline && siteconfig.verbose.filename) str+="\n";
-    if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str, function(err){});
-    else console.log(str);
+    res.on("finish", function() {
+      console.log("[NODEJS] - - ["
+                  + new Date().toLocaleString("en", {hour12: false}).replace(",","") 
+                  + '] "' + req.method + " " + req.url + " " + req.protocol +'" ' + res.statusCode + " " + res.getHeader('Content-Length'))
+    })
     next();
   });
 }
