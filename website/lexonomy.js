@@ -29,7 +29,7 @@ const jwt = require("jsonwebtoken");
 if(siteconfig.verbose){
   app.use(function (req, res, next) {
     res.on("finish", function() {
-      console.log("[NODEJS] - - ["
+      console.error("[NODEJS] - - ["
                   + new Date().toLocaleString("en", {hour12: false}).replace(",","") 
                   + '] "' + req.method + " " + req.url + " " + req.protocol +'" ' + res.statusCode + " " + res.getHeader('Content-Length'))
     })
@@ -250,7 +250,7 @@ app.get(siteconfig.rootPath+"users/editor/", function(req, res){
 });
 
 //USERS UI, JSON endpoints:
-app.post(siteconfig.rootPath+"users/userlist.json", function(req, res){ //console.log(req.body.criteria, req.body.searchtext, req.body.howmany);
+app.post(siteconfig.rootPath+"users/userlist.json", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     if(!user.isAdmin) res.json({success: false}); else {
       ops.listUsers(req.body.searchtext, req.body.howmany, function(total, entries){
@@ -313,7 +313,7 @@ app.get(siteconfig.rootPath+"dicts/editor/", function(req, res){
 });
 
 //DICTIONARIES UI, JSON endpoints:
-app.post(siteconfig.rootPath+"dicts/dictlist.json", function(req, res){ //console.log(req.body.criteria, req.body.searchtext, req.body.howmany);
+app.post(siteconfig.rootPath+"dicts/dictlist.json", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     if(!user.isAdmin) res.json({success: false}); else {
       ops.listDicts(req.body.searchtext, req.body.howmany, function(total, entries){
@@ -339,7 +339,6 @@ app.get(siteconfig.rootPath+"skelogin.json/:token", function(req, res){
   var secret = siteconfig.sketchengineKey;
   jwt.verify(token, secret, {audience:'lexonomy.eu'}, function(err, decoded) {
     if (err == null) {
-      console.log(decoded)
       ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
         ops.processJWT(user, decoded, function(success, email, sessionkey){
           if (success) {
@@ -600,7 +599,7 @@ app.get(siteconfig.rootPath+":dictID/:doctype/entryeditor/", function(req, res){
 });
 
 //EDITING UI, JSON endpoints:
-app.post(siteconfig.rootPath+":dictID/:doctype/entrylist.json", function(req, res){ //console.log(req.body.criteria, req.body.searchtext, req.body.howmany);
+app.post(siteconfig.rootPath+":dictID/:doctype/entrylist.json", function(req, res){
   if(!ops.dictExists(req.params.dictID)) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
   var db=ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
@@ -1271,12 +1270,12 @@ app.use(function(req, res){ res.status(404).render("404.ejs", {siteconfig: sitec
 process.on('uncaughtException', (err) => {
   //Log the exception:
   if(siteconfig.verbose){
-    console.log(err);
+    console.error(err);
     var str=`Caught exception: ${err}\n`;
     if(siteconfig.verbose.multiline && siteconfig.verbose.filename) str+="\n";
     if(siteconfig.verbose.filename) fs.appendFile(siteconfig.verbose.filename, str, function(err){});
-    else console.log(str);
+    else console.error(str);
   }
 });
 app.listen(PORT);
-console.log("Process ID "+process.pid+" is now listening on port number "+PORT+".");
+console.error("Process ID "+process.pid+" is now listening on port number "+PORT+".");
