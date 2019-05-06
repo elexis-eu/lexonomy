@@ -1,4 +1,5 @@
 Screenful.Move={
+  prefix: window.location.href.replace(/(\/[^\/]+){3}\/?$/, "/"),
   start: function(){
     Screenful.createEnvelope(true);
     $("#envelope").html("<form id='middlebox'><div class='one'></div><div class='two' style='display: none'></div></form>");
