@@ -40,7 +40,10 @@ hop_by_hop = set(["connection", "keep-alive", "proxy-authenticate", "proxy-autho
 
 @error(404)
 def nodejs(error):
-    req = urllib.request.Request("http://" + nodejs_url + request.path, headers=request.headers)
+    url = "http://" + nodejs_url + request.path
+    if request.query_string:
+        url += "?%s" % request.query_string
+    req = urllib.request.Request(url, headers=request.headers)
     if request.method == "POST":
         req.method = "POST"
         req.data = request.body
