@@ -351,10 +351,10 @@ app.get(siteconfig.rootPath+"skelogin.json/:token", function(req, res){
             //login user
             res.cookie("email", email.toLowerCase(), {});
             res.cookie("sessionkey", sessionkey, {});
-            res.redirect(siteconfig.baseUrl)
+            res.redirect("/")
           } else {
             res.cookie("jwt_error", email, {});
-            res.redirect(siteconfig.baseUrl)
+            res.redirect("/")
           }
         });
       });
