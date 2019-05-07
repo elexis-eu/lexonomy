@@ -1302,7 +1302,7 @@ module.exports={
       }});
       var queryData = querystring.stringify({'username':ske_username, 'api_key': ske_apiKey, 'json': data});
       var options = {
-        'host': 'api.sketchengine.co.uk',
+        'host': 'api.sketchengine.eu',
         'path': '/bonito/run.cgi/set_user_options?' + queryData,
         'method': 'GET',
       };

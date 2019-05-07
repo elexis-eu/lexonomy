@@ -4,7 +4,7 @@ Kex.change=function(){};
 
 Kex.settings={
   defaultURL: "https://app.sketchengine.eu/",
-  defaultAPIURL: "https://api.sketchengine.co.uk/bonito/run.cgi"
+  defaultAPIURL: "https://api.sketchengine.eu/bonito/run.cgi"
 }
 
 Kex.ifchange=function(event){
@@ -23,7 +23,7 @@ Kex.render=function(div, json){
   $div.append("<div class='title'>Sketch Engine API URL</div>");
   $div.append("<input class='textbox' id='kex_apiurl'/>");
   $div.find("#kex_apiurl").val(json.apiurl).data("origval", json.apiurl).on("change keyup", Kex.ifchange);
-  $div.append("<div class='instro'>The path to the <code>run.cgi</code> API script in Sketch Engine. Defaults to <code>https://api.sketchengine.co.uk/bonito/run.cgi</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
+  $div.append("<div class='instro'>The path to the <code>run.cgi</code> API script in Sketch Engine. Defaults to <code>https://api.sketchengine.eu/bonito/run.cgi</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
 
   $div.append("<div class='title'>Corpus name</div>");
   $div.append("<input class='textbox' id='kex_corpus'/>");
