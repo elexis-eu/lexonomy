@@ -49,7 +49,7 @@ app.get(siteconfig.rootPath+":dictID/en/", function(req, res){ res.redirect("/"+
 app.get(siteconfig.rootPath, function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     if (user.loggedin && siteconfig.consent != null && siteconfig.consent.terms != null && !user.consent) {
-      res.redirect(siteconfig.baseUrl + 'consent/');
+      res.redirect('/consent/');
     }
     ops.getDictsByUser(user.email, function(dicts){
       var error = null;
@@ -63,14 +63,14 @@ app.get(siteconfig.rootPath, function(req, res){
 });
 app.get(siteconfig.rootPath+"consent/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if (!user.loggedin) res.redirect(siteconfig.baseUrl);
+    if (!user.loggedin) res.redirect("/");
     res.render("consent.ejs", {user: user, siteconfig: siteconfig});
   });
 });
 app.get(siteconfig.rootPath+"login/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     if(/\/login\/$/.test(req.headers.referer)) req.headers.referer=null;
-    res.render("login.ejs", {user: user, redirectUrl: req.headers.referer || siteconfig.baseUrl, siteconfig: siteconfig});
+    res.render("login.ejs", {user: user, redirectUrl: req.headers.referer || "/", siteconfig: siteconfig});
   });
 });
 app.get(siteconfig.rootPath+"logout/", function(req, res){
@@ -78,7 +78,7 @@ app.get(siteconfig.rootPath+"logout/", function(req, res){
     res.clearCookie("email");
     res.clearCookie("sessionkey");
     if(/\/logout\/$/.test(req.headers.referer)) req.headers.referer=null;
-    res.redirect(req.headers.referer || siteconfig.baseUrl);
+    res.redirect(req.headers.referer || "/");
   });
 });
 app.get(siteconfig.rootPath+"make/", function(req, res){
@@ -92,19 +92,19 @@ app.get(siteconfig.rootPath+"make/", function(req, res){
 });
 app.get(siteconfig.rootPath+"signup/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    res.render("signup.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig});
+    res.render("signup.ejs", {user: user, redirectUrl: "/", siteconfig: siteconfig});
   });
 });
 app.get(siteconfig.rootPath+"forgotpwd/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    res.render("forgotpwd.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig});
+    res.render("forgotpwd.ejs", {user: user, redirectUrl: "/", siteconfig: siteconfig});
   });
 });
 app.get(siteconfig.rootPath+"createaccount/:token/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     ops.verifyToken(req.params.token, "register", function(valid){
       var tokenValid = valid;
-      res.render("createaccount.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid});
+      res.render("createaccount.ejs", {user: user, redirectUrl: "/", siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid});
     });
   });
 });
@@ -112,20 +112,20 @@ app.get(siteconfig.rootPath+"recoverpwd/:token/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     ops.verifyToken(req.params.token, "recovery", function(valid){
       var tokenValid = valid;
-      res.render("recoverpwd.ejs", {user: user, redirectUrl: siteconfig.baseUrl, siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid});
+      res.render("recoverpwd.ejs", {user: user, redirectUrl: "/", siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid});
     });
   });
 });
 app.get(siteconfig.rootPath+"changepwd/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     if(/\/changepwd\/$/.test(req.headers.referer)) req.headers.referer=null;
-    res.render("changepwd.ejs", {user: user, redirectUrl: req.headers.referer || siteconfig.baseUrl, siteconfig: siteconfig});
+    res.render("changepwd.ejs", {user: user, redirectUrl: req.headers.referer || "/", siteconfig: siteconfig});
   });
 });
 app.get(siteconfig.rootPath+"userprofile/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
     if(/\/userprofile\/$/.test(req.headers.referer)) req.headers.referer=null;
-    res.render("userprofile.ejs", {user: user, redirectUrl: req.headers.referer || siteconfig.baseUrl, siteconfig: siteconfig});
+    res.render("userprofile.ejs", {user: user, redirectUrl: req.headers.referer || "/", siteconfig: siteconfig});
   });
 });
 
@@ -155,7 +155,7 @@ app.post(siteconfig.rootPath+"consent.json", function(req, res){
 });
 app.post(siteconfig.rootPath+"make.json", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
+    if(!user.loggedin) res.redirect("/"); else {
       ops.makeDict(req.body.url, req.body.template, req.body.title, "", user.email, function(success){
         res.json({success: success});
       });
@@ -164,7 +164,7 @@ app.post(siteconfig.rootPath+"make.json", function(req, res){
 });
 app.post(siteconfig.rootPath+"changepwd.json", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
+    if(!user.loggedin) res.redirect("/"); else {
       ops.changePwd(user.email, req.body.password, function(success){
         res.json({success: success});
       });
@@ -173,7 +173,7 @@ app.post(siteconfig.rootPath+"changepwd.json", function(req, res){
 });
 app.post(siteconfig.rootPath+"changeskeusername.json", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
+    if(!user.loggedin) res.redirect("/"); else {
       ops.changeSkeUserName(user.email, req.body.ske_userName, function(success){
         res.json({success: success});
       });
@@ -182,7 +182,7 @@ app.post(siteconfig.rootPath+"changeskeusername.json", function(req, res){
 });
 app.post(siteconfig.rootPath+"changeskeapi.json", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
+    if(!user.loggedin) res.redirect("/"); else {
       ops.changeSkeApiKey(user.email, req.body.ske_apiKey, function(success){
         res.json({success: success});
       });
@@ -191,7 +191,7 @@ app.post(siteconfig.rootPath+"changeskeapi.json", function(req, res){
 });
 app.post(siteconfig.rootPath+"changeoneclickapi.json", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
+    if(!user.loggedin) res.redirect("/"); else {
       ops.updateUserApiKey(user.email, req.body.apiKey, function(){
         ops.sendApiKeyToSke(user.email, req.body.apiKey, user.ske_username, user.ske_apiKey, function(){});
         res.json({success: true, id: adjustedEntryID, content: json});
@@ -236,7 +236,7 @@ app.get(siteconfig.rootPath+"docs/:docID/", function(req, res){
 //USERS UI, navigator and editor:
 app.get(siteconfig.rootPath+"users/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if(!user.isAdmin) res.redirect(siteconfig.baseUrl); else {
+    if(!user.isAdmin) res.redirect("/"); else {
       res.render("users.ejs", {user: user, siteconfig: siteconfig});
     }
   });
@@ -299,7 +299,7 @@ app.post(siteconfig.rootPath+"users/userdelete.json", function(req, res){
 //DICTIONARIES UI, navigator and editor:
 app.get(siteconfig.rootPath+"dicts/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if(!user.isAdmin) res.redirect(siteconfig.baseUrl); else {
+    if(!user.isAdmin) res.redirect("/"); else {
       res.render("dicts.ejs", {user: user, siteconfig: siteconfig});
     }
   });
@@ -361,7 +361,7 @@ app.get(siteconfig.rootPath+"skelogin.json/:token", function(req, res){
     } else {
       //JWT not verified, error
       res.cookie("jwt_error",err.message,{})
-      res.redirect(siteconfig.baseUrl)
+      res.redirect("/")
     }
   });
 });
@@ -369,7 +369,7 @@ app.get(siteconfig.rootPath+"skelogin.json/:token", function(req, res){
 //ONE-CLICK UI and JSON endpoints:
 app.get(siteconfig.rootPath+"oneclick/", function(req, res){
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function(user){
-    if(!user.loggedin) res.redirect(siteconfig.baseUrl); else {
+    if(!user.loggedin) res.redirect("/"); else {
       res.render("oneclick.ejs", {user: user, siteconfig: siteconfig});
     }
   });
@@ -474,7 +474,7 @@ app.get(siteconfig.rootPath+":dictID/:entryID(\\d+)/", function(req, res){
   var db=ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
     ops.readDictConfigs(db, req.params.dictID, function(configs){
-      if(!configs.publico.public) res.redirect(siteconfig.baseUrl+req.params.dictID+"/"); else {
+      if(!configs.publico.public) res.redirect("/"+req.params.dictID+"/"); else {
         ops.readEntry(db, req.params.dictID, req.params.entryID, function(adjustedEntryID, xml, title){
           if(adjustedEntryID==0) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
           ops.readNabesByEntryID(db, req.params.dictID, req.params.entryID, function(nabes){
@@ -530,7 +530,7 @@ app.get(siteconfig.rootPath+":dictID/search/", function(req, res){
   var db=ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
     ops.readDictConfigs(db, req.params.dictID, function(configs){
-      if(!configs.publico.public) res.redirect(siteconfig.baseUrl+req.params.dictID+"/"); else {
+      if(!configs.publico.public) res.redirect("/"+req.params.dictID+"/"); else {
         ops.listEntriesPublic(db, req.params.dictID, req.query.q, function(entries){
           if(entries.length==1 && entries[0].exactMatch) {
             db.close();
@@ -566,7 +566,7 @@ app.get(siteconfig.rootPath+":dictID/edit/:doctype/", function(req, res){
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
     if(!user.dictAccess) {
       db.close();
-      res.redirect(siteconfig.baseUrl+req.params.dictID+"/");
+      res.redirect("/"+req.params.dictID+"/");
     } else {
       ops.readDictConfigs(db, req.params.dictID, function(configs){
         ops.readDoctypesUsed(db, req.params.dictID, function(doctypesUsed){
@@ -749,7 +749,7 @@ app.get(siteconfig.rootPath+":dictID/resave/", function(req, res){
     ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
       if(!user.canConfig && !user.canEdit && !user.canUpload) {
         db.close();
-        res.redirect(siteconfig.baseUrl+req.params.dictID+"/edit/");
+        res.redirect("/"+req.params.dictID+"/edit/");
       } else {
         ops.getDictStats(db, req.params.dictID, function(stats){
           db.close();
@@ -800,7 +800,7 @@ app.get(siteconfig.rootPath+":dictID/config/", function(req, res){
     ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
       if(!user.canConfig) {
         db.close();
-        res.redirect(siteconfig.baseUrl+req.params.dictID+"/edit/");
+        res.redirect("/"+req.params.dictID+"/edit/");
       } else {
         ops.getDictStats(db, req.params.dictID, function(stats){
           db.close();
@@ -822,7 +822,7 @@ app.get(siteconfig.rootPath+":dictID/config/:page/", function(req, res){
     ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
       if(!user.canConfig) {
         db.close();
-        res.redirect(siteconfig.baseUrl+req.params.dictID+"/edit/");
+        res.redirect("/"+req.params.dictID+"/edit/");
       } else {
         db.close();
         res.render("config-"+req.params.page+".ejs", {user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, xema: configs.xema, titling: configs.titling, flagging: configs.flagging, siteconfig: configs.siteconfig});

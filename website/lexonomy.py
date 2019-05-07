@@ -30,10 +30,6 @@ def server_static(path):
 import urllib.request
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        if "Location" in headers:
-            old_url = headers["Location"]
-            del headers["Location"] # must be like this :(
-            headers["Location"] = old_url.replace(nodejs_url, my_url)
         return None
 opener = urllib.request.build_opener(NoRedirect)
 hop_by_hop = set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailers", "transfer-encoding", "upgrade"])
