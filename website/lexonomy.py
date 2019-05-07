@@ -6,7 +6,7 @@ import os, sys, json
 # configuration
 my_url = "localhost:8000"
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG", "siteconfig.json")))
-nodejs_url = siteconfig["baseUrl"].split("://")[1] + ":" + str(siteconfig["port"])
+nodejs_url = siteconfig["baseUrl"].split("://")[1].rstrip("/")
 cgi = False
 if "SERVER_NAME" in os.environ and "SERVER_PORT" in os.environ:
     my_url = os.environ["SERVER_NAME"] + ":" + os.environ["SERVER_PORT"]
