@@ -182,21 +182,22 @@ Ske.menuRoot=function(htmlID, additional=false){
     var headword = encodeURIComponent(Ske.getHeadword())
     var conc = encodeURIComponent(Ske.getConcordance())
   }
+  var corpus = encodeURIComponent(kex.corpus)
   if(headword) {
     html+="<div class='menuItem')'>";
-      html+="<a target='ske' href='" + kex.url + "/#wordsketch?corpname="+kex.corpus+"&lemma="+headword+"&showresults=1'>";
+      html+="<a target='ske' href='" + kex.url + "/#wordsketch?corpname="+corpus+"&lemma="+headword+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show word sketch";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-        html+="<a target='ske' href='" + kex.url + "/#concordance?corpname="+kex.corpus+"&showresults=1&operations="+conc+"'>";
+        html+="<a target='ske' href='" + kex.url + "/#concordance?corpname="+corpus+"&showresults=1&operations="+conc+"'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show concordance";
       html+="</a>";
     html+="</div>";
     html+="<div class='menuItem')'>";
-      html+="<a target='ske' href='" + kex.url + "/#thesaurus?corpname="+kex.corpus+"&lemma="+headword+"&showresults=1'>";
+      html+="<a target='ske' href='" + kex.url + "/#thesaurus?corpname="+corpus+"&lemma="+headword+"&showresults=1'>";
         html+="<span class='icon'><img src='../../../furniture/ske.png'/></span> ";
         html+="Show thesaurus";
       html+="</a>";

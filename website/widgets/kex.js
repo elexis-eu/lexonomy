@@ -26,9 +26,77 @@ Kex.render=function(div, json){
   $div.append("<div class='instro'>The path to the <code>run.cgi</code> API script in Sketch Engine. Defaults to <code>https://api.sketchengine.eu/bonito/run.cgi</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
 
   $div.append("<div class='title'>Corpus name</div>");
-  $div.append("<input class='textbox' id='kex_corpus'/>");
-  $div.find("#kex_corpus").val(json.corpus).data("origval", json.corpus).on("change keyup", Kex.ifchange);
-  $div.append("<div class='instro'>The identifier Sketch Engine uses internally for the corpus from which you want to pull data into your dictionary, for example <code>bnc2</code> for the British National Corpus.</div>");
+  if (ske_username && ske_apiKey) {
+    $div.append("<input class='textbox' id='kex_corpus' value='Retrieving available corpora from Sketch Engine, please wait...' disabled/>");
+    var corpus_input = $("#kex_corpus")
+    corpus_input.data("corpname", json.corpus)
+    $.get({
+      url: "https://api.sketchengine.eu/ca/api/corpora",
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader ("Authorization", "Basic " + btoa(ske_username + ":" + ske_apiKey));
+  },
+    }).done(function(res) {
+        Kex.corpora = {"user": [], "shared": [], "featured": [], "preloaded": []}
+        res.data.forEach(function(e) {
+          if (e.is_shared)
+            Kex.corpora.shared.push(e)
+          else if (e.owner_id)
+            Kex.corpora.user.push(e)
+          else if (e.is_featured)
+            Kex.corpora.featured.push(e)
+          else
+            Kex.corpora.preloaded.push(e)
+        })
+        corpus_input.easyAutocomplete({
+          theme: "blue-light",
+          data: Kex.corpora,
+          getValue: "name",
+          categories: [
+            {listLocation: "user", header: "<strong>Your own corpora</strong>", maxNumberOfElements: 20},
+            {listLocation: "shared", header: "<strong>Corpora shared with you</strong>", maxNumberOfElements: 20},
+            {listLocation: "featured", header: "<strong>Featured preloaded corpora</strong>", maxNumberOfElements: 20},
+            {listLocation: "preloaded", header: "<strong>Other preloaded corpora</strong>", maxNumberOfElements: 20},
+          ],
+          list: {
+            maxNumberOfElements: 20,
+            match: {
+              enabled: true,
+              method : function(element, phrase) {
+                return element.indexOf(phrase) !== -1;
+              }
+            },
+            onSelectItemEvent: function() {
+              var new_corpus = corpus_input.getSelectedItemData().corpname
+              if (json.corpus != new_corpus) {
+                corpus_input.data("corpname", new_corpus)
+                Kex.change()
+              }
+            }
+          },
+          placeholder: "Type to search in the list of corpora",
+          template: {
+            type: "custom",
+            method: function(value, item) {
+              var size = ""
+              if (item.sizes)
+                size = ", " + (item.sizes.tokencount / 1000000).toFixed(2) + "M tokens"
+              return item.name + " (" + item.language_name + size + ") <a style='display: inline; text-decoration: none' href='" + $.trim($("#kex_url").val()) + "#dashboard?corpname=" + encodeURIComponent(item.corpname) + "' target='ske'>🔗</a>";
+            }
+          }
+        })
+        corpus_input.prop("disabled", false)
+        if (json.corpus) {
+          var corpus = res.data.find(function(el) {return el.corpname == json.corpus})
+          if (corpus)
+            corpus_input.val(corpus.name)
+          else
+            corpus_input.val("Your current corpus is no longer available, please select a new one.")
+        } else
+          corpus_input.val("")
+      })
+    $div.append("<div class='instro'>Select a Sketch Engine corpus from the list of corpora available to you.</div>");
+  } else
+    $div.append("Please setup your Sketch Engine account in your <a href='/userprofile'>profile</a> settings to be able to select a corpus.")
 
   $div.append("<div class='title'>Concordance query</div>");
   $div.append("<input class='textbox' id='kex_concquery'/>");
@@ -59,7 +127,7 @@ Kex.harvest=function(div){
   var ret={};
   ret.url=$.trim( $div.find("#kex_url").val() ) || Kex.settings.defaultURL;
   ret.apiurl=$.trim( $div.find("#kex_apiurl").val() ) || Kex.settings.defaultAPIURL;
-  ret.corpus=$.trim( $div.find("#kex_corpus").val() );
+  ret.corpus=$("#kex_corpus").data("corpname") || ""
   ret.concquery=$.trim( $div.find("#kex_concquery").val() );
   ret.concsampling=$.trim( Math.max(0, $div.find("#kex_concsampling").val()));
   ret.searchElements=[];
