@@ -34,6 +34,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 opener = urllib.request.build_opener(NoRedirect)
 hop_by_hop = set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailers", "transfer-encoding", "upgrade"])
 
+nodejs_pid = None
 @error(404)
 def nodejs(error):
     url = "http://" + nodejs_url + request.path
@@ -50,7 +51,8 @@ def nodejs(error):
     except urllib.error.URLError:
         print("----------- need to start NodeJS server -----------", file=sys.stderr)
         import subprocess, time
-        subprocess.Popen(["node","run.js"], start_new_session=True)
+        global nodejs_pid
+        nodejs_pid = subprocess.Popen(["node","run.js"], start_new_session=True).pid
         time.sleep(5) # give it some time to come up
         res = opener.open(req)
     response.status = res.status
@@ -72,4 +74,7 @@ else: # run a standalone server, prefer the paste server if available over the b
         run(host=host, port=port, debug=debug, reloader=debug, server='paste', interval=0.1)
     except ModuleNotFoundError:
         run(host=host, port=port, debug=debug, reloader=debug, interval=0.1)
+    if nodejs_pid: # if we started NodeJS, we kill it now too
+        import signal
+        os.killpg(os.getpgid(nodejs_pid), signal.SIGTERM)
 
