@@ -6,24 +6,24 @@ var siteconfig = require("./siteconfig").load();
 const https = require("https");
 const ops = require("./ops");
 const xemplatron = require("./widgets/xemplatron.js");
-const xmldom = require("xmldom"); //https://www.npmjs.com/package/xmldom
+const xmldom = require("xmldom"); // https://www.npmjs.com/package/xmldom
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" })); // for parsing application/x-www-form-urlencoded
-app.use(bodyParser.json({ limit: "50mb" })); //for parsing application/json
+app.use(bodyParser.json({ limit: "50mb" })); // for parsing application/json
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 const multer = require("multer");
 const upload = multer({ dest: path.join(siteconfig.dataDir, "uploads/") });
 const url = require("url");
 const querystring = require("querystring");
-const sqlite3 = require("sqlite3").verbose(); //https://www.npmjs.com/package/sqlite3
+const sqlite3 = require("sqlite3").verbose(); // https://www.npmjs.com/package/sqlite3
 const nodemailer = require("nodemailer");
 ops.mailtransporter = nodemailer.createTransport(siteconfig.mailconfig);
 const PORT = process.env.PORT || siteconfig.port || 80;
 const jwt = require("jsonwebtoken");
 const fluxslt = require("fluxslt");
 
-//Log the request:
+// Log the request:
 if (siteconfig.verbose) {
   app.use(function (req, res, next) {
     res.on("finish", function () {
@@ -35,15 +35,15 @@ if (siteconfig.verbose) {
   });
 }
 
-//Path to our views:
-app.set("views", path.join(__dirname, "views")); app.set("view engine", "ejs"); //http://ejs.co/
+// Path to our views:
+app.set("views", path.join(__dirname, "views")); app.set("view engine", "ejs"); // http://ejs.co/
 
-//REDIRECT OLD URLS FROM BETA VERSION:
+// REDIRECT OLD URLS FROM BETA VERSION:
 app.get(siteconfig.rootPath + "_en/", function (req, res) { res.redirect("/") });
 app.get(siteconfig.rootPath + "_info/", function (req, res) { res.redirect("/docs/intro/") });
 app.get(siteconfig.rootPath + ":dictID/en/", function (req, res) { res.redirect("/" + req.params.dictID + "/") });
 
-//SITEWIDE UI:
+// SITEWIDE UI:
 app.get(siteconfig.rootPath, function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (user.loggedin && siteconfig.consent != null && siteconfig.consent.terms != null && !user.consent) {
@@ -127,11 +127,11 @@ app.get(siteconfig.rootPath + "userprofile/", function (req, res) {
   });
 });
 
-//SITEWIDE UI, JSON endpoints:
+// SITEWIDE UI, JSON endpoints:
 app.post(siteconfig.rootPath + "login.json", function (req, res) {
   ops.login(req.body.email, req.body.password, function (success, email, sessionkey) {
     if (success) {
-      //const oneday=86400000; //86,400,000 miliseconds = 24 hours
+      // const oneday=86400000; //86,400,000 miliseconds = 24 hours
       // res.cookie("email", email, {expires: new Date(Date.now() + oneday)});
       // res.cookie("sessionkey", sessionkey, {expires: new Date(Date.now() + oneday)});
       res.cookie("email", email.toLowerCase(), {});
@@ -222,7 +222,7 @@ app.post(siteconfig.rootPath + "recoverpwd.json", function (req, res) {
   });
 });
 
-//DOCS:
+// DOCS:
 app.get(siteconfig.rootPath + "docs/:docID/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     ops.getDoc(req.params.docID, function (doc) {
@@ -231,7 +231,7 @@ app.get(siteconfig.rootPath + "docs/:docID/", function (req, res) {
   });
 });
 
-//USERS UI, navigator and editor:
+// USERS UI, navigator and editor:
 app.get(siteconfig.rootPath + "users/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.redirect("/"); else {
@@ -247,7 +247,7 @@ app.get(siteconfig.rootPath + "users/editor/", function (req, res) {
   });
 });
 
-//USERS UI, JSON endpoints:
+// USERS UI, JSON endpoints:
 app.post(siteconfig.rootPath + "users/userlist.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.json({ success: false }); else {
@@ -294,7 +294,7 @@ app.post(siteconfig.rootPath + "users/userdelete.json", function (req, res) {
   });
 });
 
-//DICTIONARIES UI, navigator and editor:
+// DICTIONARIES UI, navigator and editor:
 app.get(siteconfig.rootPath + "dicts/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.redirect("/"); else {
@@ -310,7 +310,7 @@ app.get(siteconfig.rootPath + "dicts/editor/", function (req, res) {
   });
 });
 
-//DICTIONARIES UI, JSON endpoints:
+// DICTIONARIES UI, JSON endpoints:
 app.post(siteconfig.rootPath + "dicts/dictlist.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.json({ success: false }); else {
@@ -330,9 +330,9 @@ app.post(siteconfig.rootPath + "dicts/dictread.json", function (req, res) {
   });
 });
 
-//SKETCHENGINE LOGIN JSON endpoint:
+// SKETCHENGINE LOGIN JSON endpoint:
 app.get(siteconfig.rootPath + "skelogin.json/:token", function (req, res) {
-  //var token = req.headers.authorization.replace('Bearer ', '');
+  // var token = req.headers.authorization.replace('Bearer ', '');
   var token = req.params.token;
   var secret = siteconfig.sketchengineKey;
   jwt.verify(token, secret, { audience: "lexonomy.eu" }, function (err, decoded) {
@@ -340,13 +340,13 @@ app.get(siteconfig.rootPath + "skelogin.json/:token", function (req, res) {
       ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
         ops.processJWT(user, decoded, function (success, email, sessionkey) {
           if (success) {
-            //successful SkE login, send Lexonomy API key back to SkE
+            // successful SkE login, send Lexonomy API key back to SkE
             ops.prepareApiKeyForSke(user.email, function (apiKey) {
               if (apiKey != false) {
                 ops.sendApiKeyToSke(user.email, apiKey, user.ske_username, user.ske_apiKey, function () {});
               }
             });
-            //login user
+            // login user
             res.cookie("email", email.toLowerCase(), {});
             res.cookie("sessionkey", sessionkey, {});
             res.redirect("/");
@@ -357,14 +357,14 @@ app.get(siteconfig.rootPath + "skelogin.json/:token", function (req, res) {
         });
       });
     } else {
-      //JWT not verified, error
+      // JWT not verified, error
       res.cookie("jwt_error", err.message, {});
       res.redirect("/");
     }
   });
 });
 
-//ONE-CLICK UI and JSON endpoints:
+// ONE-CLICK UI and JSON endpoints:
 app.get(siteconfig.rootPath + "oneclick/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.loggedin) res.redirect("/"); else {
@@ -384,7 +384,7 @@ app.post(siteconfig.rootPath + "oneclickread.json", function (req, res) {
 app.post(siteconfig.rootPath + "oneclickupdate.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.loggedin) res.json({ success: false }); else {
-      //req.body.id, req.body.content
+      // req.body.id, req.body.content
       var adjustedEntryID = req.body.id;
       var json = JSON.parse(req.body.content);
       ops.updateUserApiKey(user.email, json.apikey, function () {
@@ -395,7 +395,7 @@ app.post(siteconfig.rootPath + "oneclickupdate.json", function (req, res) {
   });
 });
 
-//PUSH API:
+// PUSH API:
 app.get(siteconfig.rootPath + "push.api", function (req, res) {
   res.render("pushapi.ejs", { siteconfig: siteconfig });
 });
@@ -455,7 +455,7 @@ app.post(siteconfig.rootPath + "push.api", function (req, res) {
   });
 });
 
-//PUBLIC DICTIONARY UI:
+// PUBLIC DICTIONARY UI:
 app.get(siteconfig.rootPath + ":dictID/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -514,7 +514,7 @@ app.get(siteconfig.rootPath + ":dictID/:entryID(\\d+).xml", function (req, res) 
     ops.exportEntryXml(configs.siteconfig.baseUrl, db, req.params.dictID, req.params.entryID, function (adjustedEntryID, xml) {
       db.close();
       if (adjustedEntryID == 0) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
-      res.setHeader("content-type", "text/xml; charset=utf-8"); //human-readable; application/xml = human-unreadable
+      res.setHeader("content-type", "text/xml; charset=utf-8"); // human-readable; application/xml = human-unreadable
       res.end(xml);
     });
   });
@@ -563,7 +563,7 @@ app.get(siteconfig.rootPath + ":dictID/search/", function (req, res) {
   });
 });
 
-//EDITING UI, navigator and editor:
+// EDITING UI, navigator and editor:
 app.get(siteconfig.rootPath + ":dictID/edit/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -610,7 +610,7 @@ app.get(siteconfig.rootPath + ":dictID/:doctype/entryeditor/", function (req, re
   });
 });
 
-//EDITING UI, JSON endpoints:
+// EDITING UI, JSON endpoints:
 app.post(siteconfig.rootPath + ":dictID/:doctype/entrylist.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -753,7 +753,7 @@ app.post(siteconfig.rootPath + ":dictID/entrydelete.json", function (req, res) {
   });
 });
 
-//RESAVING:
+// RESAVING:
 app.get(siteconfig.rootPath + ":dictID/resave/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -804,7 +804,7 @@ app.post(siteconfig.rootPath + ":dictID/resave.json", function (req, res) {
   });
 });
 
-//CONFIG UI: Screenful.Editor:
+// CONFIG UI: Screenful.Editor:
 app.get(siteconfig.rootPath + ":dictID/config/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -847,7 +847,7 @@ app.get(siteconfig.rootPath + ":dictID/config/:page/", function (req, res) {
   });
 });
 
-//CONFIG UI: JSON endpoints
+// CONFIG UI: JSON endpoints
 app.post(siteconfig.rootPath + ":dictID/configread.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -943,7 +943,7 @@ app.post(siteconfig.rootPath + ":dictID/move.json", function (req, res) {
   });
 });
 
-//DOWNLOAD:
+// DOWNLOAD:
 app.get(siteconfig.rootPath + ":dictID/download/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -975,7 +975,7 @@ app.get(siteconfig.rootPath + ":dictID/download.xml", function (req, res) {
   });
 });
 
-//UPLOAD & IMPORT:
+// UPLOAD & IMPORT:
 app.get(siteconfig.rootPath + ":dictID/upload/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -1055,7 +1055,7 @@ app.get(siteconfig.rootPath + ":dictID/import.json", function (req, res) {
       if (parsedUrl.query.showErrors) {
         ops.showImportErrors(path.join(siteconfig.dataDir, "uploads/" + filename), truncate, function (ret) {
           if (truncate)
-            res.json(ret);
+            {res.json(ret);}
           else {
             res.setHeader("content-type", "text/plain; charset=utf-8");
             res.setHeader("content-disposition", 'attachment; filename="error.log"');
@@ -1071,7 +1071,7 @@ app.get(siteconfig.rootPath + ":dictID/import.json", function (req, res) {
   });
 });
 
-//SKETCH ENGINE PROXY:
+// SKETCH ENGINE PROXY:
 app.get(siteconfig.rootPath + ":dictID/skeget/xampl/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -1088,9 +1088,9 @@ app.get(siteconfig.rootPath + ":dictID/skeget/xampl/", function (req, res) {
       url += "&api_key=" + req.query.apikey;
       url += "&format=json";
       if (req.query.querytype == "skesimple")
-        url += "&iquery=" + encodeURIComponent(req.query.query);
+        {url += "&iquery=" + encodeURIComponent(req.query.query);}
       else
-        url += "&queryselector=cqlrow&cql=" + encodeURIComponent(req.query.query);
+        {url += "&queryselector=cqlrow&cql=" + encodeURIComponent(req.query.query);}
       url += "&viewmode=sen";
       url += "&gdex_enabled=1";
       if (req.query.fromp) url += "&" + req.query.fromp;
@@ -1195,11 +1195,11 @@ app.get(siteconfig.rootPath + ":dictID/skeget/defo/", function (req, res) {
       url += "&username=" + req.query.username;
       url += "&api_key=" + req.query.apikey;
       url += "&format=json";
-      //url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
+      // url+="&q=q[lemma%3d%22"+encodeURIComponent(req.query.lemma)+"%22]";
       url += "&iquery=" + makeQ(req.query.lemma);
       url += "&viewmode=sen";
-      //url+="&gdex_enabled=1";
-      //url+="&attrs=word";
+      // url+="&gdex_enabled=1";
+      // url+="&attrs=word";
       if (req.query.fromp) url += "&" + req.query.fromp;
       https.get(url, function (getres) {
         getres.setEncoding("utf8");
@@ -1227,7 +1227,7 @@ app.get(siteconfig.rootPath + ":dictID/skeget/defo/", function (req, res) {
   });
 });
 
-//SUBENTRIES: JSON endpoint
+// SUBENTRIES: JSON endpoint
 app.get(siteconfig.rootPath + ":dictID/subget/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -1248,7 +1248,7 @@ app.get(siteconfig.rootPath + ":dictID/subget/", function (req, res) {
   });
 });
 
-//HISTORY: JSON endpoint
+// HISTORY: JSON endpoint
 app.post(siteconfig.rootPath + ":dictID/history.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -1283,7 +1283,7 @@ app.post(siteconfig.rootPath + ":dictID/history.json", function (req, res) {
 
 app.use(function (req, res) { res.status(404).render("404.ejs", { siteconfig: siteconfig }) });
 process.on("uncaughtException", (err) => {
-  //Log the exception:
+  // Log the exception:
   if (siteconfig.verbose) {
     console.error(err);
     var str = `Caught exception: ${err}\n`;
