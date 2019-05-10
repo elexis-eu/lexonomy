@@ -77,7 +77,7 @@ body.entrypage #dictheader div.titleContainer span.dictTitle a.dictTitle {font-s
 #sitefooter div.logolint {margin-top: 20px;}
 #sitefooter div.logolint a {display: inline-block; vertical-align: middle; margin-right: 20px;}
 #sitefooter div.logolint a.muni {background-image: url(logo_muni.png); background-size: cover; width: 127px; height: 60px;}
-#sitefooter div.logolint a.ske {background-image: url(logo_ske.png); width: 105px; height: 39px;}
+#sitefooter div.logolint a.ske {background-image: url(logo_ske.png); background-size: cover; width: 105px; height: 39px;}
 
 #viewer {padding: 0px 0px !important; float: left; max-width: 930px; width: 100%}
 
