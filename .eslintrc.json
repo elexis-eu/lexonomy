@@ -12,5 +12,6 @@
       "eqeqeq": ["warn", "smart"],
       "no-useless-escape": "warn",
       "camelcase": "warn"
-  }
+  },
+  "plugins": ["only-warn"]
 }
