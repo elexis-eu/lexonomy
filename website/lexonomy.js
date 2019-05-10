@@ -1054,9 +1054,7 @@ app.get(siteconfig.rootPath + ":dictID/import.json", function (req, res) {
       var truncate = parsedUrl.query.truncate || 0;
       if (parsedUrl.query.showErrors) {
         ops.showImportErrors(path.join(siteconfig.dataDir, "uploads/" + filename), truncate, function (ret) {
-          if (truncate)
-            {res.json(ret);}
-          else {
+          if (truncate) { res.json(ret) } else {
             res.setHeader("content-type", "text/plain; charset=utf-8");
             res.setHeader("content-disposition", 'attachment; filename="error.log"');
             res.end(ret.errorData);
@@ -1087,10 +1085,7 @@ app.get(siteconfig.rootPath + ":dictID/skeget/xampl/", function (req, res) {
       url += "&username=" + req.query.username;
       url += "&api_key=" + req.query.apikey;
       url += "&format=json";
-      if (req.query.querytype == "skesimple")
-        {url += "&iquery=" + encodeURIComponent(req.query.query);}
-      else
-        {url += "&queryselector=cqlrow&cql=" + encodeURIComponent(req.query.query);}
+      if (req.query.querytype == "skesimple") { url += "&iquery=" + encodeURIComponent(req.query.query) } else { url += "&queryselector=cqlrow&cql=" + encodeURIComponent(req.query.query) }
       url += "&viewmode=sen";
       url += "&gdex_enabled=1";
       if (req.query.fromp) url += "&" + req.query.fromp;
