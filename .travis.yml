@@ -1,10 +1,18 @@
-language: node_js
-node_js:
-  - "11"
+matrix:
+  include:
+    - language: node_js
+      node_js:
+        - "12"
+      before_script:
+        - cd website
+        - npm install --ignore-scripts
+      script:
+        - npm run lint
 
-before_script: 
-  - cd website
-  - npm install --ignore-scripts
-
-script:
-  - npm run lint
+    - language: python
+      python: 3.6
+      before_script:
+        - cd website
+        - pip install -r requirements-dev.txt
+      script:
+        - pylint --disable=invalid-name lexonomy.py

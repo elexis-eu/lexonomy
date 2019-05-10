@@ -1,0 +1,4 @@
+bottle==0.12.16
+express==1.0
+Paste==3.0.8
+six==1.12.0

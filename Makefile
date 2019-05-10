@@ -25,5 +25,7 @@ docker-setup:
 .PHONY: docker-install docker-quick-install
 docker-install: docker-setup
 	docker-compose run --rm dev npm install --unsafe-perm=true
+	docker-compose run --rm dev pip install -r requirements.txt
 docker-quick-install: docker-setup
 	docker-compose run --rm dev npm install --unsafe-perm=true --ignore-scripts
+	docker-compose run --rm dev pip install -r requirements-dev.txt
