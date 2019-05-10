@@ -47,6 +47,7 @@ make
 
 - [Download and install Node.js](https://nodejs.org/en/download/).
 - [Download and install Python 3](https://www.python.org/downloads/)
+- [Download and install xsltproc](http://xmlsoft.org/XSLT/xsltproc.html)
 - In your terminal, go to the `website` directory of the repository:
 ```sh
 cd website

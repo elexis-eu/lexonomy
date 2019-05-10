@@ -16,14 +16,12 @@ const multer = require('multer');
 const upload = multer({ dest: path.join(siteconfig.dataDir, "uploads/") });
 const url=require("url");
 const querystring=require("querystring");
-const xsltProcessor = require('xslt-processor')
-const xsltProcess = xsltProcessor.xsltProcess;
-const xmlParse = xsltProcessor.xmlParse;
 const sqlite3 = require('sqlite3').verbose(); //https://www.npmjs.com/package/sqlite3
 const nodemailer = require('nodemailer');
   ops.mailtransporter = nodemailer.createTransport(siteconfig.mailconfig);
 const PORT=process.env.PORT||siteconfig.port||80;
 const jwt = require("jsonwebtoken");
+const fluxslt = require('fluxslt');
 
 //Log the request:
 if(siteconfig.verbose){
@@ -477,11 +475,11 @@ app.get(siteconfig.rootPath+":dictID/:entryID(\\d+)/", function(req, res){
       if(!configs.publico.public) res.redirect("/"+req.params.dictID+"/"); else {
         ops.readEntry(db, req.params.dictID, req.params.entryID, function(adjustedEntryID, xml, title){
           if(adjustedEntryID==0) {res.status(404).render("404.ejs", {siteconfig: siteconfig}); return; }
-          ops.readNabesByEntryID(db, req.params.dictID, req.params.entryID, function(nabes){
+          ops.readNabesByEntryID(db, req.params.dictID, req.params.entryID, async function(nabes){
             db.close();
             var html="";
             if(configs.xemplate._xsl) {
-              html=xsltProcess(xmlParse(xml), xmlParse(configs.xemplate._xsl))
+              html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(xml)
             } else if(configs.xemplate._css) {
               html=xml;
             } else {
@@ -637,11 +635,11 @@ app.post(siteconfig.rootPath+":dictID/entrycreate.json", function(req, res){
       res.json({success: false});
     } else {
       ops.readDictConfigs(db, req.params.dictID, function(configs){
-        ops.createEntry(db, req.params.dictID, null, req.body.content, user.email, {}, function(entryID, adjustedXml){
+        ops.createEntry(db, req.params.dictID, null, req.body.content, user.email, {}, async function(entryID, adjustedXml){
           db.close();
           var html="";
           if(configs.xemplate._xsl) {
-            html=xsltProcess(xmlParse(adjustedXml), xmlParse(configs.xemplate._xsl));
+            html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(adjustedXML)
           } else if(configs.xemplate._css) {
             html=adjustedXml;
           } else {
@@ -663,12 +661,12 @@ app.post(siteconfig.rootPath+":dictID/entryread.json", function(req, res){
       res.json({success: false});
     } else {
       ops.readDictConfigs(db, req.params.dictID, function(configs){
-        ops.readEntry(db, req.params.dictID, req.body.id, function(adjustedEntryID, xml){
+        ops.readEntry(db, req.params.dictID, req.body.id, async function(adjustedEntryID, xml){
           db.close();
           var html="";
           if(xml){
             if(configs.xemplate._xsl) {
-              html=xsltProcess(xmlParse(xml), xmlParse(configs.xemplate._xsl))
+              html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(xml)
             } else if(configs.xemplate._css) {
               html=xml;
             } else {
@@ -708,11 +706,11 @@ app.post(siteconfig.rootPath+":dictID/entryupdate.json", function(req, res){
       res.json({success: false});
     } else {
       ops.readDictConfigs(db, req.params.dictID, function(configs){
-        ops.updateEntry(db, req.params.dictID, req.body.id, req.body.content, user.email, {}, function(adjustedEntryID, adjustedXml, changed){
+        ops.updateEntry(db, req.params.dictID, req.body.id, req.body.content, user.email, {}, async function(adjustedEntryID, adjustedXml, changed){
           db.close();
           var html="";
           if(configs.xemplate._xsl) {
-            html=xsltProcess(xmlParse(adjustedXml), xmlParse(configs.xemplate._xsl))
+            html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(adjustedXML)
           } else if(configs.xemplate._css) {
             html=adjustedXml;
           } else {
@@ -1239,7 +1237,7 @@ app.post(siteconfig.rootPath+":dictID/history.json", function(req, res){
   var db=ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function(user){
     ops.readDictConfigs(db, req.params.dictID, function(configs){
-      ops.readDictHistory(db, req.params.dictID, req.body.id, function(history){
+      ops.readDictHistory(db, req.params.dictID, req.body.id, async function(history){
         db.close();
         var stylesheet=null;
         var domparser=null;
@@ -1248,8 +1246,8 @@ app.post(siteconfig.rootPath+":dictID/history.json", function(req, res){
           if(xml) {
             var html="";
             if(configs.xemplate._xsl) {
-              if(!stylesheet) stylesheet=xmlParse(configs.xemplate._xsl);
-              html=xsltProcess(xmlParse(xml), stylesheet)
+              if(!stylesheet) stylesheet = fluxslt().withStylesheet(configs.xemplate._xsl)
+              html = await stylesheet.runOn(xml)
             } else if(configs.xemplate._css) {
               html=xml;
             } else {
