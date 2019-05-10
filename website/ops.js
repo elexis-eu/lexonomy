@@ -16,8 +16,7 @@ module.exports = {
   getDB: function (dictID, readonly) {
     var mode = (readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE);
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "dicts/" + dictID + ".sqlite"), mode, function (err) {
-      if (err)
-        {throw new Error(err);}
+      if (err) { throw new Error(err) }
     });
     if (!readonly) db.run("PRAGMA journal_mode=WAL");
     db.run("PRAGMA foreign_keys=on");
@@ -143,9 +142,7 @@ module.exports = {
     });
   },
   readDictConfigs: function (db, dictID, callnext) {
-    if (db.dictConfigs)
-      {callnext(db.dictConfigs);}
-    else {
+    if (db.dictConfigs) { callnext(db.dictConfigs) } else {
       var configs = { siteconfig: siteconfig };
       db.all("select * from configs", {}, function (err, rows) {
         if (!err) for (var i = 0; i < rows.length; i++) configs[rows[i].id] = JSON.parse(rows[i].json);
@@ -295,8 +292,7 @@ module.exports = {
         params.$id = entryID;
       }
       db.run(sql, params, function (err) {
-        if (err)
-          {throw new Error(err);}
+        if (err) { throw new Error(err) }
         if (!entryID) entryID = this.lastID;
         db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
           $entry_id: entryID,
@@ -484,28 +480,31 @@ module.exports = {
                 var el = els.pop(); // this is the subentry we'll save now
                 var subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
                 xml = serializer.serializeToString(el);
-                if (subentryID) {module.exports.updateEntry(db, dictID, subentryID, xml, email.toLowerCase(), { refactoredFrom: entryID }, function (subentryID, adjustedXml, changed) {
-                  el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
-                  db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", { $parent_id: entryID, $child_id: subentryID }, function (err) {
+                if (subentryID) {
+                  module.exports.updateEntry(db, dictID, subentryID, xml, email.toLowerCase(), { refactoredFrom: entryID }, function (subentryID, adjustedXml, changed) {
+                    el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
+                    db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", { $parent_id: entryID, $child_id: subentryID }, function (err) {
                     // tell all parents of the subentry (excluding the current entry) that they need a refresh:
-                    if (changed) {
-                      db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id) and id<>$parentID", { $child_id: subentryID, $parentID: entryID }, function (err) {
+                      if (changed) {
+                        db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id) and id<>$parentID", { $child_id: subentryID, $parentID: entryID }, function (err) {
+                          saveNextEl();
+                        });
+                      } else {
                         saveNextEl();
-                      });
-                    } else {
-                      saveNextEl();
-                    }
-                  });
-                });}
-                else {module.exports.createEntry(db, dictID, null, xml, email.toLowerCase(), { refactoredFrom: entryID }, function (subentryID) {
-                  el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
-                  db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", { $parent_id: entryID, $child_id: subentryID }, function (err) {
-                    // tell all parents of the subentry (including the current entry) that they need a refresh:
-                    db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", { $child_id: subentryID }, function (err) {
-                      saveNextEl();
+                      }
                     });
                   });
-                });}
+                } else {
+                  module.exports.createEntry(db, dictID, null, xml, email.toLowerCase(), { refactoredFrom: entryID }, function (subentryID) {
+                    el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
+                    db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", { $parent_id: entryID, $child_id: subentryID }, function (err) {
+                    // tell all parents of the subentry (including the current entry) that they need a refresh:
+                      db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", { $child_id: subentryID }, function (err) {
+                        saveNextEl();
+                      });
+                    });
+                  });
+                }
               } else { // no, there are no more subentries in the current entry that we haven't saved yet
                 xml = serializer.serializeToString(doc);
                 // tell the current entry that it doesn't need refactoring any more:
@@ -623,17 +622,10 @@ module.exports = {
   listEntries: function (db, dictID, doctype, searchtext, modifier, howmany, reversed, fullXML, callnext) {
     module.exports.readDictConfigs(db, dictID, function (configs) {
       if (!searchtext) searchtext = "";
-      if (configs.flagging.flag_element || fullXML)
-        {var entryXML = ", e.xml ";}
-      else
-        {var entryXML = "";}
+      if (configs.flagging.flag_element || fullXML) { var entryXML = ", e.xml " } else { var entryXML = "" }
       var sortdesc = configs.titling.headwordSortDesc || false;
-      if (reversed == "true")
-        {sortdesc = !sortdesc;}
-      if (sortdesc)
-        {sortdesc = " DESC ";}
-      else
-        {sortdesc = "";}
+      if (reversed == "true") { sortdesc = !sortdesc }
+      if (sortdesc) { sortdesc = " DESC " } else { sortdesc = "" }
       if (modifier == "start") {
         var sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML +
           ` from searchables as s
@@ -682,10 +674,8 @@ module.exports = {
         var entries = [];
         for (var i = 0; i < rows.length; i++) {
           var item = { id: rows[i].id, title: rows[i].title };
-          if (configs.flagging.flag_element)
-            {item.flag = extractText(rows[i].xml, configs.flagging.flag_element)[0] || "";}
-          if (fullXML)
-            {item.xml = setHousekeepingAttributes(rows[i].id, rows[i].xml, configs.subbing);}
+          if (configs.flagging.flag_element) { item.flag = extractText(rows[i].xml, configs.flagging.flag_element)[0] || "" }
+          if (fullXML) { item.xml = setHousekeepingAttributes(rows[i].id, rows[i].xml, configs.subbing) }
           if (rows[i].level > 1) item.title += " ← <span class='redirector'>" + rows[i].txt + "</span>";
           entries.push(item);
         }
@@ -714,8 +704,7 @@ module.exports = {
   },
 
   getSortTitle: function (xml, titling) {
-    if (titling.headwordSorting)
-      {return module.exports.getEntryHeadword(xml, titling.headwordSorting);}
+    if (titling.headwordSorting) { return module.exports.getEntryHeadword(xml, titling.headwordSorting) }
     return module.exports.getEntryHeadword(xml, titling.headword);
   },
   getEntryTitle: function (xml, titling, plaintext) {
@@ -727,12 +716,13 @@ module.exports = {
       return ret;
     }
     var ret = module.exports.getEntryHeadword(xml, titling.headword);
-    if (!plaintext)
-      {ret = "<span class='headword'>" + ret + "</span>";}
-    if (titling.headwordAnnotations) {for (var i = 0; i < titling.headwordAnnotations.length; i++) {
-      if (ret != "") ret += " ";
-      ret += extractText(xml, titling.headwordAnnotations[i]).join(" ");
-    }}
+    if (!plaintext) { ret = "<span class='headword'>" + ret + "</span>" }
+    if (titling.headwordAnnotations) {
+      for (var i = 0; i < titling.headwordAnnotations.length; i++) {
+        if (ret != "") ret += " ";
+        ret += extractText(xml, titling.headwordAnnotations[i]).join(" ");
+      }
+    }
     return ret;
   },
   getEntryHeadword: function (xml, headword_elem) {
@@ -781,10 +771,12 @@ module.exports = {
     // if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret = [];
     ret.push(module.exports.getEntryHeadword(xml, titling.headword));
-    if (searchability.searchableElements) {for (var i = 0; i < searchability.searchableElements.length; i++) {
-      var arr = extractText(xml, searchability.searchableElements[i]);
-      arr.map(txt => { if (txt != "" && ret.indexOf(txt) == -1) ret.push(txt); });
-    }}
+    if (searchability.searchableElements) {
+      for (var i = 0; i < searchability.searchableElements.length; i++) {
+        var arr = extractText(xml, searchability.searchableElements[i]);
+        arr.map(txt => { if (txt != "" && ret.indexOf(txt) == -1) ret.push(txt); });
+      }
+    }
     // console.log(ret);
     return ret;
   },
@@ -947,15 +939,12 @@ module.exports = {
 
   checkImportStatus: function (pidfile, errfile, callnext) {
     fs.readFile(pidfile, function (err, pid_data) {
-      if (err)
-        {callnext({ progressMessage: "Import failed", finished: true, errors: false });}
-      else {
+      if (err) { callnext({ progressMessage: "Import failed", finished: true, errors: false }) } else {
         pid_data = pid_data.toString().trim().split(/[\n\r]/);
         var progress = pid_data[pid_data.length - 1];
         var errors = false;
         fs.stat(errfile, function (err, stats) {
-          if (!err && stats.size)
-            {errors = true;}
+          if (!err && stats.size) { errors = true }
           find_process("pid", pid_data[0].substr(4))
             .then(function (list) {
               callnext({ progressMessage: progress, finished: list.length == 0, errors: errors });
@@ -969,10 +958,8 @@ module.exports = {
 
   showImportErrors: function (filepath, truncate, callnext) {
     fs.readFile(filepath + ".err", "utf8", function (err, content) {
-      if (err)
-        {content = "Failed to read error file";}
-      if (truncate)
-        {content = content.substring(0, truncate);}
+      if (err) { content = "Failed to read error file" }
+      if (truncate) { content = content.substring(0, truncate) }
       callnext({ errorData: content, truncated: truncate });
     });
   },
@@ -1509,10 +1496,7 @@ module.exports = {
 
   getLastEditedEntry: function (db, dictID, email, callnext) {
     db.all("select entry_id from history where email=$email order by [when] desc limit 1", { $email: email }, function (err, rows) {
-      if (rows.length > 0)
-        {callnext(rows[0].entry_id);}
-      else
-        {callnext();}
+      if (rows.length > 0) { callnext(rows[0].entry_id) } else { callnext() }
     });
   }
 }; // end of module.exports
@@ -1550,13 +1534,9 @@ function addFlag (entryID, xml, flag, flagconfig) {
   var flag_exists = false;
   xml = xml.replace(re, function (found, $1) { // try replacing existing flag
     flag_exists = true;
-    if (flag)
-      {return "<" + el + ">" + flag + "</" + el + ">";}
-    else
-      {return "";}
+    if (flag) { return "<" + el + ">" + flag + "</" + el + ">" } else { return "" }
   });
-  if (flag_exists)
-    {return xml;}
+  if (flag_exists) { return xml }
   return xml.replace(/^<([^>]+>)/, function (found, $1) { // or add new flag
     return "<" + $1 + "<" + el + ">" + flag + "</" + el + ">";
   });
