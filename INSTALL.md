@@ -29,7 +29,7 @@ tested on Linux. Most likely this also works for MacOS - and most likely does
 
 ### Prerequisites
 - [docker](https://docs.docker.com/install/) 17.09.0+
-- [docker-compose](https://docs.docker.com/compose/install/) 1.17.0+
+- [docker-compose](https://docs.docker.com/compose/install/) 1.17.0+  
   The two need to accept `version: '3.4'` [docker-compose
   files](https://docs.docker.com/compose/compose-file/compose-versioning/#version-34)
 - make
@@ -37,7 +37,28 @@ tested on Linux. Most likely this also works for MacOS - and most likely does
 ### Punch it
 
 ```bash
-make
+$ make
+docker volume create nodemodules
+nodemodules
+docker-compose run --rm dev npm install --unsafe-perm=true
+
+> lexonomy@ postinstall /opt/service/website
+> node adminscripts/init.js
+
+Connected to ../data/lexonomy.sqlite database.
+[...]
+audited 649 packages in 2.509s
+found 0 vulnerabilities
+
+docker-compose run --rm dev pip install -r requirements.txt
+[...]
+Installing collected packages: bottle, express, six, Paste
+Successfully installed Paste-3.0.8 bottle-0.12.16 express-1.0 six-1.12.0
+[...]
+docker-compose run --rm --service-ports dev
+Bottle v0.13-dev server starting up (using WSGIRefServer())...
+Listening on http://0.0.0.0:8000/
+Hit Ctrl-C to quit.
 ```
 
 
