@@ -1,9 +1,9 @@
 const path = require("path");
 const fs = require("fs-extra");
-const xmldom = require("xmldom"); //https://www.npmjs.com/package/xmldom
-const sqlite3 = require("sqlite3").verbose(); //https://www.npmjs.com/package/sqlite3
-const sha1 = require("sha1"); //https://www.npmjs.com/package/sha1
-const markdown = require("markdown").markdown; //https://www.npmjs.com/package/markdown
+const xmldom = require("xmldom"); // https://www.npmjs.com/package/xmldom
+const sqlite3 = require("sqlite3").verbose(); // https://www.npmjs.com/package/sqlite3
+const sha1 = require("sha1"); // https://www.npmjs.com/package/sha1
+const markdown = require("markdown").markdown; // https://www.npmjs.com/package/markdown
 const nodemailer = require("nodemailer");
 const https = require("https");
 const querystring = require("querystring");
@@ -17,13 +17,13 @@ module.exports = {
     var mode = (readonly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE);
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "dicts/" + dictID + ".sqlite"), mode, function (err) {
       if (err)
-        throw new Error(err);
+        {throw new Error(err);}
     });
     if (!readonly) db.run("PRAGMA journal_mode=WAL");
     db.run("PRAGMA foreign_keys=on");
     return db;
   },
-  //get request remote IP, if under proxy get real IP
+  // get request remote IP, if under proxy get real IP
   getRemoteAddress: function (request) {
     var remoteIp = request.connection.remoteAddress.replace("::ffff:", "");
     if (request.headers["x-forwarded-for"] != undefined) {
@@ -144,7 +144,7 @@ module.exports = {
   },
   readDictConfigs: function (db, dictID, callnext) {
     if (db.dictConfigs)
-      callnext(db.dictConfigs);
+      {callnext(db.dictConfigs);}
     else {
       var configs = { siteconfig: siteconfig };
       db.all("select * from configs", {}, function (err, rows) {
@@ -257,13 +257,13 @@ module.exports = {
     });
   },
   deleteEntry: function (db, dictID, entryID, email, historiography, callnext) {
-    //tell my parents that they need a refresh:
+    // tell my parents that they need a refresh:
     db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", { $child_id: entryID }, function (err) {
-      //delete me:
+      // delete me:
       db.run("delete from entries where id=$id", {
         $id: entryID
       }, function (err) {
-        //tell history that have been deleted:
+        // tell history that have been deleted:
         db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
           $entry_id: entryID,
           $action: "delete",
@@ -296,7 +296,7 @@ module.exports = {
       }
       db.run(sql, params, function (err) {
         if (err)
-          throw new Error(err);
+          {throw new Error(err);}
         if (!entryID) entryID = this.lastID;
         db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
           $entry_id: entryID,
@@ -311,9 +311,9 @@ module.exports = {
           $xml: xml,
           $historiography: JSON.stringify(historiography)
         }, function (err) {});
-        //module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
+        // module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
         callnext(entryID, xml);
-        //});
+        // });
       });
     });
   },
@@ -324,9 +324,9 @@ module.exports = {
         var xml = (row ? row.xml : "").replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
         xml = addFlag(entryID, xml, flag, configs.flagging);
 
-        //tell my parents that they need a refresh:
+        // tell my parents that they need a refresh:
         db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", { $child_id: entryID }, function (err) {
-          //update me:
+          // update me:
           db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
             $id: entryID,
             $title: module.exports.getEntryTitle(xml, configs.titling),
@@ -336,7 +336,7 @@ module.exports = {
             $needs_refac: Object.keys(configs.subbing).length > 0 ? 1 : 0,
             $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length > 0 ? 1 : 0
           }, function (err) {
-            //tell history that I have been updated:
+            // tell history that I have been updated:
             db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
               $entry_id: entryID,
               $action: "update",
@@ -360,14 +360,14 @@ module.exports = {
         xml = module.exports.removeSubentryParentTags(xml);
         var newXml = xml.replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
         var oldXml = (row ? row.xml : "").replace(/ xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']/g, "").replace(/(\=)\"([^\"]*)\"/g, "$1'$2'").replace(/ lxnm:(sub)?entryID='[0-9]+'/g, "");
-        if (!row) { //an entry with that ID does not exist: recreate it with that ID:
+        if (!row) { // an entry with that ID does not exist: recreate it with that ID:
           module.exports.createEntry(db, dictID, entryID, xml, email, historiography, callnext);
         } else if (oldXml == newXml) {
           callnext(entryID, xml, false);
         } else {
-          //tell my parents that they need a refresh:
+          // tell my parents that they need a refresh:
           db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", { $child_id: entryID }, function (err) {
-            //update me:
+            // update me:
             db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
               $id: entryID,
               $title: module.exports.getEntryTitle(xml, configs.titling),
@@ -381,7 +381,7 @@ module.exports = {
                 $entry_id: entryID,
                 $txt: module.exports.getEntryTitle(xml, configs.titling, true)
               }, function (err) {});
-              //tell history that I have been updated:
+              // tell history that I have been updated:
               db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
                 $entry_id: entryID,
                 $action: "update",
@@ -390,9 +390,9 @@ module.exports = {
                 $xml: xml,
                 $historiography: JSON.stringify(historiography)
               }, function (err) {});
-              //module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
+              // module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
               callnext(entryID, xml, true);
-              //});
+              // });
             });
           });
         }
@@ -442,25 +442,25 @@ module.exports = {
       });
     });
   },
-  refac: function (db, dictID, callnext) { //takes the first entry that needs refactoring and extracts subentries from it
+  refac: function (db, dictID, callnext) { // takes the first entry that needs refactoring and extracts subentries from it
     module.exports.readDictConfigs(db, dictID, function (configs) {
-      //get the oldest entry that needs refactoring:
+      // get the oldest entry that needs refactoring:
       db.get("select e.id, e.xml, h.email from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 order by h.[when] asc limit 1", function (err, row) {
-        if (!row) { //if no such entry, pass the buck:
+        if (!row) { // if no such entry, pass the buck:
           callnext(false);
-        } else { //if we have found an entry that needs refactoring; this becomes our current entry:
+        } else { // if we have found an entry that needs refactoring; this becomes our current entry:
           const domparser = new xmldom.DOMParser();
           const serializer = new xmldom.XMLSerializer();
           var entryID = row.id; var xml = row.xml; var email = row.email || "";
           var doc = domparser.parseFromString(xml, "text/xml");
           doc.documentElement.setAttributeNS("http://www.lexonomy.eu/", "lxnm:entryID", entryID);
 
-          //in the current entry, remove all <lxnm:subentryParent>:
+          // in the current entry, remove all <lxnm:subentryParent>:
           var _els = doc.getElementsByTagNameNS("http://www.lexonomy.eu/", "subentryParent");
           var els = []; for (var i = 0; i < _els.length; i++) els.push(_els[i]);
           for (var i = 0; i < els.length; i++) els[i].parentNode.removeChild(els[i]);
 
-          //in the current entry, find elements which are subentries, and are not contained inside other subentries:
+          // in the current entry, find elements which are subentries, and are not contained inside other subentries:
           var els = [];
           for (var doctype in configs.subbing) {
             var _els = doc.getElementsByTagName(doctype);
@@ -478,16 +478,16 @@ module.exports = {
           }
 
           db.run("delete from sub where parent_id=$parent_id", { $parent_id: entryID }, function (err) {
-            //keep saving subentries of the current entry until there are no more subentries to save:
+            // keep saving subentries of the current entry until there are no more subentries to save:
             var saveNextEl = function () {
-              if (els.length > 0) { //yes, there are subentries in the current entry that we haven't saved yet
-                var el = els.pop(); //this is the subentry we'll save now
+              if (els.length > 0) { // yes, there are subentries in the current entry that we haven't saved yet
+                var el = els.pop(); // this is the subentry we'll save now
                 var subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
                 xml = serializer.serializeToString(el);
-                if (subentryID) module.exports.updateEntry(db, dictID, subentryID, xml, email.toLowerCase(), { refactoredFrom: entryID }, function (subentryID, adjustedXml, changed) {
+                if (subentryID) {module.exports.updateEntry(db, dictID, subentryID, xml, email.toLowerCase(), { refactoredFrom: entryID }, function (subentryID, adjustedXml, changed) {
                   el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
                   db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", { $parent_id: entryID, $child_id: subentryID }, function (err) {
-                    //tell all parents of the subentry (excluding the current entry) that they need a refresh:
+                    // tell all parents of the subentry (excluding the current entry) that they need a refresh:
                     if (changed) {
                       db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id) and id<>$parentID", { $child_id: subentryID, $parentID: entryID }, function (err) {
                         saveNextEl();
@@ -496,19 +496,19 @@ module.exports = {
                       saveNextEl();
                     }
                   });
-                });
-                else module.exports.createEntry(db, dictID, null, xml, email.toLowerCase(), { refactoredFrom: entryID }, function (subentryID) {
+                });}
+                else {module.exports.createEntry(db, dictID, null, xml, email.toLowerCase(), { refactoredFrom: entryID }, function (subentryID) {
                   el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
                   db.run("insert into sub(parent_id, child_id) values($parent_id, $child_id)", { $parent_id: entryID, $child_id: subentryID }, function (err) {
-                    //tell all parents of the subentry (including the current entry) that they need a refresh:
+                    // tell all parents of the subentry (including the current entry) that they need a refresh:
                     db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", { $child_id: subentryID }, function (err) {
                       saveNextEl();
                     });
                   });
-                });
-              } else { //no, there are no more subentries in the current entry that we haven't saved yet
+                });}
+              } else { // no, there are no more subentries in the current entry that we haven't saved yet
                 xml = serializer.serializeToString(doc);
-                //tell the current entry that it doesn't need refactoring any more:
+                // tell the current entry that it doesn't need refactoring any more:
                 db.run("update entries set xml=$xml, needs_refac=0 where id=$id", { $id: entryID, $xml: xml }, function (err) {
                   callnext(true);
                 });
@@ -520,11 +520,11 @@ module.exports = {
       });
     });
   },
-  refresh: function (db, dictID, callnext) { //takes one entry that needs refreshing and sucks into it the latest versions of its subentries
+  refresh: function (db, dictID, callnext) { // takes one entry that needs refreshing and sucks into it the latest versions of its subentries
     module.exports.readDictConfigs(db, dictID, function (configs) {
-      //get one entry that needs refreshing where none of its children needs refreshing:
+      // get one entry that needs refreshing where none of its children needs refreshing:
       db.get("select pe.id, pe.xml from entries as pe left outer join sub as s on s.parent_id=pe.id left join entries as ce on ce.id=s.child_id where pe.needs_refresh=1 and (ce.needs_refresh is null or ce.needs_refresh=0) limit 1", function (err, row) {
-        if (!row) { //if no such entry, pass the buck:
+        if (!row) { // if no such entry, pass the buck:
           callnext(false);
         } else {
           const domparser = new xmldom.DOMParser();
@@ -532,9 +532,9 @@ module.exports = {
           var parentID = row.id; var parentXml = row.xml;
           var parentDoc = domparser.parseFromString(parentXml, "text/xml");
 
-          //this will be called repeatedly till exhaustion
+          // this will be called repeatedly till exhaustion
           var go = function () {
-            //find an element which is a subentry and which we haven't sucked in yet:
+            // find an element which is a subentry and which we haven't sucked in yet:
             var el = null;
             for (var doctype in configs.subbing) {
               var els = parentDoc.documentElement.getElementsByTagName(doctype);
@@ -546,9 +546,9 @@ module.exports = {
               }
               if (el) break;
             }
-            if (el) { //if such en element exists
+            if (el) { // if such en element exists
               var subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID");
-              //get the subentry from the database and inject it into the parent's xml:
+              // get the subentry from the database and inject it into the parent's xml:
               db.get("select xml from entries where id=$id", { $id: subentryID }, function (err, row) {
                 if (!row) {
                   el.parentNode.removeChild(el);
@@ -560,13 +560,13 @@ module.exports = {
                   elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID);
                   elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:done", "1");
                 }
-                go(); //recursion to the next subentry in the parent entry
+                go(); // recursion to the next subentry in the parent entry
               });
-            } else { //if no such element exists: we are done
+            } else { // if no such element exists: we are done
               var els = parentDoc.documentElement.getElementsByTagName("*");
               for (var i = 0; i < els.length; i++) els[i].removeAttributeNS("http://www.lexonomy.eu/", "done");
               parentXml = serializer.serializeToString(parentDoc);
-              //save the parent's xml (into which all subentries have been injected by now) and tell it that it needs a resave:
+              // save the parent's xml (into which all subentries have been injected by now) and tell it that it needs a resave:
               db.run("update entries set xml=$xml, needs_refresh=0, needs_resave=1 where id=$id", { $id: parentID, $xml: parentXml }, function () {
                 callnext(true);
               });
@@ -577,14 +577,14 @@ module.exports = {
       });
     });
   },
-  resave: function (db, dictID, callnext) { //updates an entry's display title, search keys and so on
+  resave: function (db, dictID, callnext) { // updates an entry's display title, search keys and so on
     module.exports.readDictConfigs(db, dictID, function (configs) {
       var abc = configs.titling.abc; if (!abc || abc.length == 0) abc = configs.siteconfig.defaultAbc;
       const domparser = new xmldom.DOMParser();
       db.all("select id, xml from entries where needs_resave=1 limit 12", {}, function (err, rows) {
         for (var i = 0; i < rows.length; i++) {
           var entryID = rows[i].id; var xml = rows[i].xml;
-          //console.log("resaving: "+entryID);
+          // console.log("resaving: "+entryID);
           var doc = domparser.parseFromString(xml, "text/xml");
           (function (entryID, doc) {
             db.run("update entries set needs_resave=0, title=$title, sortkey=$sortkey where id=$id", {
@@ -624,16 +624,16 @@ module.exports = {
     module.exports.readDictConfigs(db, dictID, function (configs) {
       if (!searchtext) searchtext = "";
       if (configs.flagging.flag_element || fullXML)
-        var entryXML = ", e.xml ";
+        {var entryXML = ", e.xml ";}
       else
-        var entryXML = "";
+        {var entryXML = "";}
       var sortdesc = configs.titling.headwordSortDesc || false;
       if (reversed == "true")
-        sortdesc = !sortdesc;
+        {sortdesc = !sortdesc;}
       if (sortdesc)
-        sortdesc = " DESC ";
+        {sortdesc = " DESC ";}
       else
-        sortdesc = "";
+        {sortdesc = "";}
       if (modifier == "start") {
         var sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML +
           ` from searchables as s
@@ -683,9 +683,9 @@ module.exports = {
         for (var i = 0; i < rows.length; i++) {
           var item = { id: rows[i].id, title: rows[i].title };
           if (configs.flagging.flag_element)
-            item.flag = extractText(rows[i].xml, configs.flagging.flag_element)[0] || "";
+            {item.flag = extractText(rows[i].xml, configs.flagging.flag_element)[0] || "";}
           if (fullXML)
-            item.xml = setHousekeepingAttributes(rows[i].id, rows[i].xml, configs.subbing);
+            {item.xml = setHousekeepingAttributes(rows[i].id, rows[i].xml, configs.subbing);}
           if (rows[i].level > 1) item.title += " ← <span class='redirector'>" + rows[i].txt + "</span>";
           entries.push(item);
         }
@@ -715,7 +715,7 @@ module.exports = {
 
   getSortTitle: function (xml, titling) {
     if (titling.headwordSorting)
-      return module.exports.getEntryHeadword(xml, titling.headwordSorting);
+      {return module.exports.getEntryHeadword(xml, titling.headwordSorting);}
     return module.exports.getEntryHeadword(xml, titling.headword);
   },
   getEntryTitle: function (xml, titling, plaintext) {
@@ -728,16 +728,16 @@ module.exports = {
     }
     var ret = module.exports.getEntryHeadword(xml, titling.headword);
     if (!plaintext)
-      ret = "<span class='headword'>" + ret + "</span>";
-    if (titling.headwordAnnotations) for (var i = 0; i < titling.headwordAnnotations.length; i++) {
+      {ret = "<span class='headword'>" + ret + "</span>";}
+    if (titling.headwordAnnotations) {for (var i = 0; i < titling.headwordAnnotations.length; i++) {
       if (ret != "") ret += " ";
       ret += extractText(xml, titling.headwordAnnotations[i]).join(" ");
-    }
+    }}
     return ret;
   },
   getEntryHeadword: function (xml, headword_elem) {
     if (typeof (xml) != "string") xml = (new xmldom.XMLSerializer()).serializeToString(xml);
-    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
+    // if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret = "";
     var arr = extractText(xml, headword_elem);
     if (arr.length > 0) ret = arr[0];
@@ -745,17 +745,17 @@ module.exports = {
       ret = extractFirstText(xml);
     }
     if (ret == "") ret = "?";
-    if (ret.length > 255) ret = ret.substring(0, 255); //keeping headwords under 255 characters is probably a reeasonable limitation
-    //console.log(ret);
+    if (ret.length > 255) ret = ret.substring(0, 255); // keeping headwords under 255 characters is probably a reeasonable limitation
+    // console.log(ret);
     return ret;
   },
   toSortkey: function (s, abc) {
     const keylength = 15;
     var ret = s.replace(/<[<>]+>/g, "").toLowerCase();
-    //replace any numerals:
+    // replace any numerals:
     var pat = new RegExp("[0-9]{1," + keylength + "}", "g");
     ret = ret.replace(pat, function (x) { while (x.length < keylength + 1) x = "0" + x; return x });
-    //prepare characters:
+    // prepare characters:
     var chars = [];
     var count = 0;
     for (var pos = 0; pos < abc.length; pos++) {
@@ -766,26 +766,26 @@ module.exports = {
       }
     }
     chars.sort(function (a, b) { if (a.char.length > b.char.length) return -1; if (a.char.length < b.char.length) return 1; return 0 });
-    //replace characters:
+    // replace characters:
     for (var i = 0; i < chars.length; i++) {
-      if (!/^[0-9]$/.test(chars[i].char)) { //skip chars that are actually numbers
+      if (!/^[0-9]$/.test(chars[i].char)) { // skip chars that are actually numbers
         while (ret.indexOf(chars[i].char) > -1) ret = ret.replace(chars[i].char, chars[i].key);
       }
     }
-    //remove any remaining characters that aren't a number or an underscore:
+    // remove any remaining characters that aren't a number or an underscore:
     ret = ret.replace(/[^0-9_]/g, "");
     return ret;
   },
   getEntrySearchables: function (xml, searchability, titling) {
     if (typeof (xml) != "string") xml = (new xmldom.XMLSerializer()).serializeToString(xml);
-    //if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
+    // if(typeof(xml)=="string") var doc=(new xmldom.DOMParser()).parseFromString(xml, 'text/xml'); else doc=xml;
     var ret = [];
     ret.push(module.exports.getEntryHeadword(xml, titling.headword));
-    if (searchability.searchableElements) for (var i = 0; i < searchability.searchableElements.length; i++) {
+    if (searchability.searchableElements) {for (var i = 0; i < searchability.searchableElements.length; i++) {
       var arr = extractText(xml, searchability.searchableElements[i]);
       arr.map(txt => { if (txt != "" && ret.indexOf(txt) == -1) ret.push(txt); });
-    }
-    //console.log(ret);
+    }}
+    // console.log(ret);
     return ret;
   },
 
@@ -948,14 +948,14 @@ module.exports = {
   checkImportStatus: function (pidfile, errfile, callnext) {
     fs.readFile(pidfile, function (err, pid_data) {
       if (err)
-        callnext({ progressMessage: "Import failed", finished: true, errors: false });
+        {callnext({ progressMessage: "Import failed", finished: true, errors: false });}
       else {
         pid_data = pid_data.toString().trim().split(/[\n\r]/);
         var progress = pid_data[pid_data.length - 1];
         var errors = false;
         fs.stat(errfile, function (err, stats) {
           if (!err && stats.size)
-            errors = true;
+            {errors = true;}
           find_process("pid", pid_data[0].substr(4))
             .then(function (list) {
               callnext({ progressMessage: progress, finished: list.length == 0, errors: errors });
@@ -970,9 +970,9 @@ module.exports = {
   showImportErrors: function (filepath, truncate, callnext) {
     fs.readFile(filepath + ".err", "utf8", function (err, content) {
       if (err)
-        content = "Failed to read error file";
+        {content = "Failed to read error file";}
       if (truncate)
-        content = content.substring(0, truncate);
+        {content = content.substring(0, truncate);}
       callnext({ errorData: content, truncated: truncate });
     });
   },
@@ -1143,7 +1143,7 @@ module.exports = {
   processJWT: function (user, jwtData, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     if (user.loggedin) {
-      //user logged in = save SkE ID in database
+      // user logged in = save SkE ID in database
       var key = generateKey();
       var now = (new Date()).toISOString();
       db.run("update users set ske_id=$ske_id, ske_username=$ske_username, ske_apiKey=$ske_apiKey, sessionKey=$key, sessionLast=$now where email=$email", { $ske_id: jwtData.user.id, $ske_username: jwtData.user.username, $email: user.email.toLowerCase(), $key: key, $now: now, $ske_apiKey: jwtData.user.api_key }, function (err, row) {
@@ -1151,7 +1151,7 @@ module.exports = {
         callnext(true, user.email.toLowerCase(), key);
       });
     } else {
-      //user not logged in =
+      // user not logged in =
       // if SkE ID in database = log in user
       // if SkE ID not in database = register and log in user
       db.get("select email from users where ske_id=$ske_id", { $ske_id: jwtData.user.id }, function (err, row) {
@@ -1257,7 +1257,7 @@ module.exports = {
           var dictDB = module.exports.getDB(dicts[i].id, true);
           module.exports.readDictConfig(dictDB, dicts[i].id, "users", function (users) {
             dictDB.close();
-            dicts[i].currentUserCanDelete = (users[email] && users[email].canConfig) ? true : false;
+            dicts[i].currentUserCanDelete = !!((users[email] && users[email].canConfig));
             lookup();
           });
           break;
@@ -1290,7 +1290,7 @@ module.exports = {
       } else {
         var lexonomyApiKey;
         if (row.apiKey == "" || row.apiKey == null) {
-          //generate new key
+          // generate new key
           var key = "";
           var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
           while (key.length < 32) {
@@ -1510,12 +1510,12 @@ module.exports = {
   getLastEditedEntry: function (db, dictID, email, callnext) {
     db.all("select entry_id from history where email=$email order by [when] desc limit 1", { $email: email }, function (err, rows) {
       if (rows.length > 0)
-        callnext(rows[0].entry_id);
+        {callnext(rows[0].entry_id);}
       else
-        callnext();
+        {callnext();}
     });
   }
-}; //end of module.exports
+}; // end of module.exports
 
 function clean4xml (txt) {
   return txt
@@ -1551,25 +1551,25 @@ function addFlag (entryID, xml, flag, flagconfig) {
   xml = xml.replace(re, function (found, $1) { // try replacing existing flag
     flag_exists = true;
     if (flag)
-      return "<" + el + ">" + flag + "</" + el + ">";
+      {return "<" + el + ">" + flag + "</" + el + ">";}
     else
-      return "";
+      {return "";}
   });
   if (flag_exists)
-    return xml;
+    {return xml;}
   return xml.replace(/^<([^>]+>)/, function (found, $1) { // or add new flag
     return "<" + $1 + "<" + el + ">" + flag + "</" + el + ">";
   });
 }
 
 function setHousekeepingAttributes (entryID, xml, subbing) {
-  //delete any housekeeping attributes and elements that already exist in the XML:
+  // delete any housekeeping attributes and elements that already exist in the XML:
   xml = xml.replace(/^(<[^>\/]*)\s+xmlns:lxnm=['"]http:\/\/www\.lexonomy\.eu\/["']/, function (found, $1) { return $1 });
   xml = xml.replace(/^(<[^>\/]*)\s+lxnm:entryID=['"][^\"\']*["']/, function (found, $1) { return $1 });
   xml = xml.replace(/^(<[^>\/]*)\s+lxnm:subentryID=['"][^\"\']*["']/, function (found, $1) { return $1 });
-  //get name of the top-level element:
+  // get name of the top-level element:
   var root = ""; xml.replace(/^<([^\s>\/]+)/, function (found, $1) { root = $1 });
-  //set housekeeping attributes:
+  // set housekeeping attributes:
   if (subbing[root]) xml = xml.replace(/^<[^\s>\/]+/, function (found) { return found + " lxnm:subentryID='" + entryID + "'" });
   if (!subbing[root]) xml = xml.replace(/^<[^\s>\/]+/, function (found) { return found + " lxnm:entryID='" + entryID + "'" });
   xml = xml.replace(/^<[^\s>\/]+/, function (found) { return found + " xmlns:lxnm='http://www.lexonomy.eu/'" });
@@ -1582,7 +1582,7 @@ function getDoctype (xml) {
   return ret;
 }
 
-function extractText (xml, elName) { //extract the text contents from thusly named elements, return as array of strings
+function extractText (xml, elName) { // extract the text contents from thusly named elements, return as array of strings
   var ret = [];
   var pat = new RegExp("<" + elName + "[^>]*>([^<]*)</" + elName + ">", "g");
   xml.replace(pat, function (found, $1) {
@@ -1591,7 +1591,7 @@ function extractText (xml, elName) { //extract the text contents from thusly nam
   });
   return ret;
 }
-function extractFirstText (xml) { //extract the text content from the first element that has text content and no child nodes
+function extractFirstText (xml) { // extract the text content from the first element that has text content and no child nodes
   var ret = "";
   var pat = new RegExp("<([^\\s>]+)[^>]*>([^<>]*?)</([^\\s>]+)>", "g");
   xml.replace(pat, function (found, $1, $2, $3) {
