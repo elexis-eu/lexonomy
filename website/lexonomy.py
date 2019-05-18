@@ -148,7 +148,7 @@ if "DEBUG" in os.environ:
     debug=True
 host, port = my_url.split(":")
 if cgi: # we are called as CGI script
-    run(host=host, port=port, debug=debug, reloader=debug, server='cgi', interval=0.1)
+    run(host=host, port=port, debug=debug, server="cgi")
 else: # run a standalone server, prefer the paste server if available over the builtin one
     try:
         import paste
