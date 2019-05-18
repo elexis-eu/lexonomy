@@ -105,6 +105,7 @@ def deleteEntry (db, entryID, email):
     # tell history that I have been deleted:
     db.execute ("insert into history(entry_id, action, [when], email, xml) values(?,?,?,?,?)",
                 (entryID, "delete", datetime.datetime.utcnow(), email, None))
+    db.commit()
 
 def readEntry (db, configs, entryID):
     c = db.execute("select * from entries where id=?", (entryID,))
