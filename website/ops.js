@@ -253,26 +253,6 @@ module.exports = {
       }
     });
   },
-  deleteEntry: function (db, dictID, entryID, email, historiography, callnext) {
-    // tell my parents that they need a refresh:
-    db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", { $child_id: entryID }, function (err) {
-      // delete me:
-      db.run("delete from entries where id=$id", {
-        $id: entryID
-      }, function (err) {
-        // tell history that have been deleted:
-        db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
-          $entry_id: entryID,
-          $action: "delete",
-          $when: (new Date()).toISOString(),
-          $email: email,
-          $xml: null,
-          $historiography: JSON.stringify(historiography)
-        }, function (err) {});
-        callnext();
-      });
-    });
-  },
   createEntry: function (db, dictID, entryID, xml, email, historiography, callnext) {
     module.exports.readDictConfigs(db, dictID, function (configs) {
       var abc = configs.titling.abc; if (!abc || abc.length == 0) abc = configs.siteconfig.defaultAbc;

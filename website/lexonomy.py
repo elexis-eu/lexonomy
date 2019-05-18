@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
-from bottle import route, run, template, error, request, response, static_file
-import os, sys, json
+from bottle import hook, route, get, post, run, template, error, request, response, static_file, abort, redirect
+import os, sys, json, sqlite3, functools, ops
+from ops import siteconfig
 
 # configuration
 my_url = "localhost:8000"
-siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG", "siteconfig.json")))
 nodejs_url = siteconfig["baseUrl"].split("://")[1].rstrip("/")
 cgi = False
 if "SERVER_NAME" in os.environ and "SERVER_PORT" in os.environ:
@@ -34,6 +34,87 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 opener = urllib.request.build_opener(NoRedirect)
 hop_by_hop = set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailers", "transfer-encoding", "upgrade"])
 
+# ignore trailing slashes, urldecode cookies
+@hook('before_request')
+def strip_path():
+    request.environ['PATH_INFO'] = request.environ['PATH_INFO'].rstrip('/')
+    from urllib.parse import unquote
+    for c in request.cookies:
+        request.cookies[c] = unquote(request.cookies[c])
+
+# authentication decorator
+# use @authDict(["canEdit", "canConfig", "canUpload", "canDownload"]) before any handler
+# to ensure that user has appropriate access to the dictionary. Empty list checks read access only.
+# assumes <dictID> in route and "user", "dictDB", "configs" as parameters in the decorated function
+# <dictID> gets open and passed as dictDB alongside the configs
+def authDict(checkRights):
+    def wrap(func):
+        @functools.wraps(func)
+        def wrapper_verifyLoginAndDictAccess(*args, **kwargs):
+            try:
+                conn = ops.getDB(kwargs["dictID"])
+            except IOError:
+                abort(404, "No such dictionary")
+            res, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, conn)
+            for r in checkRights:
+                if not res.get(r, False):
+                    return res
+            del kwargs["dictID"]
+            kwargs["user"] = res
+            kwargs["dictDB"] = conn
+            kwargs["configs"] = configs
+            return func(*args, **kwargs)
+        return wrapper_verifyLoginAndDictAccess
+    return wrap
+
+# authentication decorator
+# use @auth to check that user is authenticated
+# assumes that the decorated function has a "user" parameter which is used to pass the user info
+def auth(func):
+    @functools.wraps(func)
+    def wrapper_verifyLogin(*args, **kwargs):
+        res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+        if not res["loggedin"]:
+            redirect("/")
+        kwargs["user"] = res
+        return func(*args, **kwargs)
+    return wrapper_verifyLogin
+
+@post(siteconfig["rootPath"] + "<dictID>/entrydelete.json")
+@authDict(["canEdit"])
+def entrydelete(user, dictDB, configs):
+    ops.deleteEntry(dictDB, request.forms.id, user["email"])
+    return {"success": True, "id": request.forms.id}
+
+@post(siteconfig["rootPath"]+"<dictID>/entryread.json")
+@authDict([])
+def entryread(user, dictDB, configs):
+    adjustedEntryID, xml, _title = ops.readEntry(dictDB, configs, request.forms.id)
+    adjustedEntryID = int(adjustedEntryID)
+    html = ""
+    if xml:
+        if configs["xemplate"].get("_xsl"):
+            import lxml.etree as ET
+            dom = ET.XML(xml.encode("utf-8"))
+            xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
+            html = str(ET.XSLT(xslt)(dom))
+        elif configs["xemplate"].get("_css"):
+            html = xml
+    return {"success": (adjustedEntryID > 0), "id": adjustedEntryID, "content": xml, "contentHtml": html}
+
+@get(siteconfig["rootPath"] + "consent")
+@auth
+def consent(user):
+    return template("consent.tpl", **{"user": user, "siteconfig": siteconfig})
+
+@get(siteconfig["rootPath"] + "skeget/corpora")
+@auth
+def skeget_corpora(user):
+    req = urllib.request.Request("https://api.sketchengine.eu/ca/api/corpora?username" + request.query.username,
+                                  headers = {"Authorization": "Bearer " + request.query.apikey})
+    return urllib.request.urlopen(req)
+
+# anything we don't know we forward to NodeJS
 nodejs_pid = None
 @error(404)
 def nodejs(error):

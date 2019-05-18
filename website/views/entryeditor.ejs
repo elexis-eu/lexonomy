@@ -61,6 +61,10 @@
 		Screenful.Editor.viewer=null;
 		if(xemplate._xsl || xemplate._css || xemplate[xema.root].shown) {
 			Screenful.Editor.viewer=function(div, entry){
+        if (entry.contentHtml.length == 0) {
+          var doc=(new DOMParser()).parseFromString(entry.content, 'text/xml');
+          entry.contentHtml=Xemplatron.xml2html(doc, xemplate, xema);
+        }
 				$(div).addClass("viewer").html(entry.contentHtml);
 				$(div).find("a.xref").on("click", function(e){
 					var text=$(e.delegateTarget).attr("data-text");
