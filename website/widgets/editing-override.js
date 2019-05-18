@@ -19,7 +19,6 @@ var EditingOverride={};
   }
 
   CodeMirrorOpts.mode="javascript"
-  console.log(CodeMirrorOpts)
   var $block=$("<div class='block theJS'></div>").appendTo($div);
 	$block.append("<div class='title'><a href='javascript:void(null)' onclick=' EditingOverride.exampleJs()'>example</a> JavaScript</div>");
   $block.append("<textarea class='textbox' spellcheck='false'></textarea>");
