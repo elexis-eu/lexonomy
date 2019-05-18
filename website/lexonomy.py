@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from bottle import hook, route, get, post, run, template, error, request, response, static_file, abort, redirect
+from bottle import hook, route, get, post, run, template, error, request, response, static_file, abort, redirect, install
 import os, sys, json, sqlite3, functools, ops
 from ops import siteconfig
 
@@ -41,6 +41,27 @@ def strip_path():
     from urllib.parse import unquote
     for c in request.cookies:
         request.cookies[c] = unquote(request.cookies[c])
+
+# profiler
+def profiler(callback):
+    def wrapper(*args, **kwargs):
+        if request.query.prof:
+            import cProfile, pstats, io
+            profile = cProfile.Profile()
+            profile.enable()
+        body = callback(*args, **kwargs)
+        if request.query.prof:
+            profile.disable()
+            output = io.StringIO()
+            profstats = pstats.Stats(profile, stream=output)
+            output.write("<pre>")
+            profstats.sort_stats('time','calls').print_stats(50)
+            profstats.sort_stats('cumulative').print_stats(50)
+            output.write("</pre>")
+            return output.getvalue()
+        return body
+    return wrapper
+install(profiler)
 
 # authentication decorator
 # use @authDict(["canEdit", "canConfig", "canUpload", "canDownload"]) before any handler
