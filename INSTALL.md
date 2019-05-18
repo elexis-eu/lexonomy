@@ -68,6 +68,7 @@ Hit Ctrl-C to quit.
 
 - [Download and install Node.js](https://nodejs.org/en/download/).
 - [Download and install Python 3](https://www.python.org/downloads/)
+- [Download and install LXML for Python3](https://lxml.de/installation.html)
 - [Download and install xsltproc](http://xmlsoft.org/XSLT/xsltproc.html)
 - In your terminal, go to the `website` directory of the repository:
 ```sh
