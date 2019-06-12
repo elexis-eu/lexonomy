@@ -29,3 +29,7 @@ docker-install: docker-setup
 docker-quick-install: docker-setup
 	docker-compose run --rm dev npm install --unsafe-perm=true --ignore-scripts
 	docker-compose run --rm dev pip install -r requirements-dev.txt
+
+.PHONY: docker-clean
+docker-clean:
+	-docker volume rm nodemodules
