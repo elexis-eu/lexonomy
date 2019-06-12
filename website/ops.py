@@ -2,7 +2,8 @@
 
 import os, sys, json, sqlite3, os.path, datetime
 
-siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG", "siteconfig.json")))
+siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
+                                           "siteconfig.json"), encoding="utf-8"))
 
 defaultDictConfig = { "editing": {"xonomyMode": "nerd"},
                       "searchability": {"searchableElements": []},
