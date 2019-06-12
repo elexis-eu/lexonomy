@@ -1,15 +1,19 @@
 #!/usr/bin/python3
 
-import os, sys, json, sqlite3, os.path, datetime
+import datetime
+import json
+import os
+import os.path
+import sqlite3
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
 
-defaultDictConfig = { "editing": {"xonomyMode": "nerd"},
-                      "searchability": {"searchableElements": []},
-                      "xema": {"elements": {}},
-                      "titling": {"headwordAnnotations": [], "abc": siteconfig["defaultAbc"]},
-                      "flagging": {"flag_element": "", "flags": []} }
+defaultDictConfig = {"editing": {"xonomyMode": "nerd"},
+                     "searchability": {"searchableElements": []},
+                     "xema": {"elements": {}},
+                     "titling": {"headwordAnnotations": [], "abc": siteconfig["defaultAbc"]},
+                     "flagging": {"flag_element": "", "flags": []}}
 
 # db management
 def getDB(dictID):
@@ -17,18 +21,21 @@ def getDB(dictID):
     conn.row_factory = sqlite3.Row
     conn.executescript("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=on")
     return conn
+
 def getMainDB():
-    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"],'lexonomy.sqlite'))
+    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite'))
     conn.row_factory = sqlite3.Row
     return conn
 
 # config
 def readDictConfigs(dictDB):
-    configs = {"siteconfig": siteconfig};
+    configs = {"siteconfig": siteconfig}
     c = dictDB.execute("select * from configs")
     for r in c.fetchall():
         configs[r["id"]] = json.loads(r["json"])
-    for conf in ["ident", "publico", "users", "kex", "titling", "flagging", "searchability", "xampl", "thes", "collx", "defo", "xema", "xemplate", "editing", "subbing"]:
+    for conf in ["ident", "publico", "users", "kex", "titling", "flagging",
+                 "searchability", "xampl", "thes", "collx", "defo", "xema",
+                 "xemplate", "editing", "subbing"]:
         if not conf in configs:
             configs[conf] = defaultDictConfig.get(conf, {})
     return configs
@@ -74,7 +81,7 @@ def addSubentryParentTags(db, entryID, xml):
 def verifyLogin(email, sessionkey):
     conn = getMainDB()
     now = datetime.datetime.utcnow()
-    yesterday = now - datetime.timedelta(days = 1)
+    yesterday = now - datetime.timedelta(days=1)
     email = email.lower()
     c = conn.execute("select email, ske_apiKey, ske_username, apiKey, consent from users where email=? and sessionKey=? and sessionLast>=?", (email, sessionkey, yesterday))
     user = c.fetchone()
@@ -83,8 +90,8 @@ def verifyLogin(email, sessionkey):
     conn.execute("update users set sessionLast=? where email=?", (now, email))
     conn.commit()
     ret = {"loggedin": True, "email": email, "isAdmin": email in siteconfig["admins"],
-            "ske_username": user["ske_username"], "ske_apiKey": user["ske_apiKey"],
-            "apiKey": user["apiKey"], "consent": user["consent"] == 1}
+           "ske_username": user["ske_username"], "ske_apiKey": user["ske_apiKey"],
+           "apiKey": user["apiKey"], "consent": user["consent"] == 1}
     return ret
 
 def verifyLoginAndDictAccess(email, sessionkey, dictDB):
