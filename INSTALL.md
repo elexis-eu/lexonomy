@@ -4,8 +4,8 @@ on your own computer or adapt a version to run on a server.
 # Preliminary remarks
 
 Lexonomy's backend is written in [Node.js](https://nodejs.org/en/) and currently being
-rewritten into [Python](https://python.org). That means that as of now you need a working instalation
-of Node and Python 3.
+rewritten into [Python](https://python.org). That means that as of now you need
+a working installation of Node and Python 3.
 
 You also need to download the source code from this repository into a directory
 on your computer.
@@ -66,8 +66,8 @@ Hit Ctrl-C to quit.
 
 ### Prerequisites
 
-- [Download and install Node.js](https://nodejs.org/en/download/).
-- [Download and install Python 3](https://www.python.org/downloads/)
+- [Download and install Node.js](https://nodejs.org/en/download/) 12+
+- [Download and install Python](https://www.python.org/downloads/) 3.5+
 - [Download and install LXML for Python3](https://lxml.de/installation.html)
 - [Download and install xsltproc](http://xmlsoft.org/XSLT/xsltproc.html)
 - In your terminal, go to the `website` directory of the repository:
