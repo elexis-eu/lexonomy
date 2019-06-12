@@ -1,20 +1,26 @@
+node_js: &node_js
+  language: node_js
+  before_script:
+    - cd website
+    - npm install --ignore-scripts
+  script:
+    - npm run lint
+
+python: &python
+  language: python
+  before_script:
+    - cd website
+    - pip install -r requirements-dev.txt
+  script:
+    - pylint --exit-zero --disable=invalid-name lexonomy.py
+
 matrix:
   include:
-    - language: node_js
-      node_js:
-        - "12"
-      before_script:
-        - cd website
-        - npm install --ignore-scripts
-      script:
-        - npm run lint
+  - <<: *node_js
+    node_js: 12
 
-    - language: python
-      python: 
-        - 3.5
-        - 3.6
-      before_script:
-        - cd website
-        - pip install -r requirements-dev.txt
-      script:
-        - pylint --exit-zero --disable=invalid-name lexonomy.py
+  - <<: *python
+    python: 3.5
+
+  - <<: *python
+    python: 3.6
