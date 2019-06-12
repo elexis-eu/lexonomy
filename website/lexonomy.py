@@ -174,7 +174,7 @@ else: # run a standalone server, prefer the paste server if available over the b
     try:
         import paste
         run(host=host, port=port, debug=debug, reloader=debug, server='paste', interval=0.1)
-    except ModuleNotFoundError:
+    except ImportError:
         run(host=host, port=port, debug=debug, reloader=debug, interval=0.1)
     if nodejs_pid: # if we started NodeJS, we kill it now too
         import signal
