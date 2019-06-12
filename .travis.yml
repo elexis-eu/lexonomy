@@ -10,7 +10,9 @@ matrix:
         - npm run lint
 
     - language: python
-      python: 3.6
+      python: 
+        - 3.5
+        - 3.6
       before_script:
         - cd website
         - pip install -r requirements-dev.txt
