@@ -6,3 +6,7 @@ data/uploads/*
 website/siteconfig.json
 website/node_modules/*
 website/package-lock.json
+
+# Editor files
+__pycache__
+.vscode
