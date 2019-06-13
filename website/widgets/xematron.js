@@ -1,7 +1,7 @@
 var Xematron={};
 
 //takes a xema, returns a Xonomy docSpec:
-Xematron.xema2docspec=function(xema){
+Xematron.xema2docspec=function(xema, stringAsker){
 	var docSpec={
 		elements: {},
 		unknownElement: function(elName){
@@ -100,12 +100,13 @@ Xematron.xema2docspec=function(xema){
 				expanded: true,
 			});
 		}
+		debugger;
 
 		//txt elements are easy:
 		if(xel.filling=="txt"){
 			del.hasText=true;
 			del.oneliner=true;
-			del.asker=Xonomy.askLongString;
+			del.asker=Xonomy[stringAsker] || Xonomy.askLongString;
 			// del.collapsible=function(jsMe){ return (jsMe.getText().length>100 ? true : false); };
 			// del.collapsed=function(jsMe){ return (jsMe.getText().length>100 ? true : false); };
 		}
@@ -130,7 +131,7 @@ Xematron.xema2docspec=function(xema){
 
 			//txt attributes are easy:
 			if(xatt.filling=="txt"){
-				datt.asker=Xonomy.askLongString;
+				datt.asker=Xonomy[stringAsker] || Xonomy.askLongString;
 			}
 
 			//lst attributes are like txt attributes but they also have a picklist:
@@ -193,7 +194,7 @@ Xematron.xema2docspec=function(xema){
 		if(xel.filling=="inl"){
 			del.hasText=true;
 			del.oneliner=true;
-			del.asker=Xonomy.askLongString;
+			del.asker=Xonomy[stringAsker] || Xonomy.askLongString;
 			if(!xel.children) xel.children=[];
 			xel.children.forEach(function(obj){
 				del.inlineMenu.push({
