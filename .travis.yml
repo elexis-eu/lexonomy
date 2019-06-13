@@ -1,4 +1,8 @@
-node_js: &node_js
+###
+### .travis.yml
+###
+
+node_js-lint: &node_js-lint
   language: node_js
   before_script:
     - cd website
@@ -6,7 +10,7 @@ node_js: &node_js
   script:
     - npm run lint
 
-python: &python
+python-lint: &python-lint
   language: python
   before_script:
     - cd website
@@ -14,13 +18,78 @@ python: &python
   script:
     - pylint --exit-zero --disable=invalid-name lexonomy.py
 
-matrix:
+lexonomy-userenv-test: &lexonomy-userenv-test
+  sudo: required
+  os: linux
+  language: python
+  before_install:
+    - cd website
+    - python3 --version
+    - pip3 --version
+    - sudo apt-get update
+    - sudo apt-get -y install xsltproc wget
+  install:
+    - pip3 install -r requirements.txt
+    - cp siteconfig.json.template siteconfig.json
+    - npm install
+    - |
+      python3 lexonomy.py &
+
+lexonomy-dockerenv-test: &lexonomy-dockerenv-test
+  sudo: required
+  os: linux
+  services:
+    - docker
+  addons:
+    apt:
+      sources: 
+        - docker-xenial
+  env:
+    DOCKER_VERSION: 17.09.0~ce-0~ubuntu
+    DOCKER_COMPOSE_VERSION: 1.17.0
+  before_install:
+    - sudo apt-get update
+    - sudo apt-get -y --allow-downgrades install docker-ce=${DOCKER_VERSION}
+    - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+    - chmod +x docker-compose
+    - sudo mv docker-compose /usr/local/bin
+  install:
+    - |
+      make docker-install
+      make docker-dev &
+
+lexonomy-test-script: &lexonomy-test-script
+  script:
+    - wget --server-response --tries=15 --retry-connrefused http://localhost:8000/ -O /dev/null
+
+jobs:
   include:
-  - <<: *node_js
-    node_js: 12
+    - <<: *node_js-lint
+      stage: lint
+      node_js: 12
 
-  - <<: *python
-    python: 3.5
+    - <<: *python-lint
+      stage: lint
+      python: 3.5
 
-  - <<: *python
-    python: 3.6
+    - <<: *python-lint
+      stage: lint
+      python: 3.6
+
+    - <<: *lexonomy-userenv-test
+      <<: *lexonomy-test-script
+      stage: test
+      python: 3.5
+
+    - <<: *lexonomy-userenv-test
+      <<: *lexonomy-test-script
+      stage: test
+      python: 3.6
+
+    - <<: *lexonomy-dockerenv-test
+      <<: *lexonomy-test-script
+      stage: test
+
+stages:
+  - test
+  - lint
