@@ -1777,6 +1777,14 @@ Xonomy.key=function(event){
 			}
 		} else if(!$("#xonomyBubble").length>0) {
 			Xonomy.keyboardMenu(event);
+		} else {
+			// There's an edit widget (xonomyBubble) open right now.
+			if (event.which == 13 && event.ctrlKey) {
+				// Ctrl+Enter submits.
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				$("#xonomyBubble form").trigger('submit');
+			}
 		}
 	}
 	Xonomy.notKeyUp=false;
