@@ -268,6 +268,22 @@ Screenful.Editor={
       }
     }
   },
+  feedbackMessage: function(feedback) {
+    // Server has some feedback about the operation. For example:
+    // - headword already exists
+    // - another user seems to be editing this entry
+    var info = '';
+    var message = Screenful.Loc[feedback.type]; // e.g. saveFeedbackHeadwordExists
+    if (!message) {
+      message = feedback.type; // no localized message; just show the code
+    }
+    if (message) {
+      message += feedback.info ? feedback.info : "";
+    } else {
+      message = "Server feedback: " + JSON.stringify(feedback);
+    }
+    return message;
+  },
   save: function(event){
     Screenful.Editor.hideHistory();
     var id=Screenful.Editor.entryID;
@@ -295,7 +311,11 @@ Screenful.Editor={
             Screenful.Editor.editor(document.getElementById("editor"), data);
     		  }
           $("#container").hide().fadeIn();
-          Screenful.status(Screenful.Loc.ready);
+          if (data.feedback) {
+            Screenful.status(Screenful.Editor.feedbackMessage(data.feedback));
+          } else {
+            Screenful.status(Screenful.Loc.ready);
+          }
           Screenful.Editor.updateToolbar();
           Screenful.Editor.needsSaving=false;
           if(data.redirUrl) window.location=data.redirUrl;
@@ -330,7 +350,11 @@ Screenful.Editor={
             Screenful.Editor.editor(document.getElementById("editor"), data);
 		      }
           $("#container").hide().fadeIn();
-          Screenful.status(Screenful.Loc.ready);
+          if (data.feedback) {
+            Screenful.status(Screenful.Editor.feedbackMessage(data.feedback));
+          } else {
+            Screenful.status(Screenful.Loc.ready);
+          }
           Screenful.Editor.needsSaving=false;
           Screenful.Editor.updateToolbar();
           if(data.redirUrl) window.location=data.redirUrl;

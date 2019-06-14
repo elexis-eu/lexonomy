@@ -14,6 +14,7 @@ Screenful.Loc={
   readingFailed: "Ní ann don iontráil.",
   saving: "Á shábháil...",
   savingFailed: "Níor éirigh liom na sonraí a shábháil.",
+  saveFeedbackHeadwordExists: "WARNING: another entry with this headword exists. ID=",
   deleting: "Á scrios...",
   deletingFailed: "Níor éirigh liom na sonraí a scrios.",
   deleteConfirm: "Cúramach anois! An bhfuil tú cinnte?",

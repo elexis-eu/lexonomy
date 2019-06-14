@@ -643,7 +643,7 @@ app.post(siteconfig.rootPath + ":dictID/entrycreate.json", function (req, res) {
       res.json({ success: false });
     } else {
       ops.readDictConfigs(db, req.params.dictID, function (configs) {
-        ops.createEntry(db, req.params.dictID, null, req.body.content, user.email, {}, async function (entryID, adjustedXml) {
+        ops.createEntry(db, req.params.dictID, null, req.body.content, user.email, {}, async function (entryID, adjustedXml, feedback) {
           db.close();
           var html = "";
           if (configs.xemplate._xsl) {
@@ -654,7 +654,11 @@ app.post(siteconfig.rootPath + ":dictID/entrycreate.json", function (req, res) {
             var doc = (new xmldom.DOMParser()).parseFromString(adjustedXml, "text/xml");
             html = xemplatron.xml2html(doc, configs.xemplate, configs.xema);
           }
-          res.json({ success: true, id: entryID, content: adjustedXml, contentHtml: html });
+          var result = { success: true, id: entryID, content: adjustedXml, contentHtml: html };
+          if (feedback) {
+            result.feedback = feedback;
+          }
+          res.json(result);
         });
       });
     }
@@ -686,7 +690,7 @@ app.post(siteconfig.rootPath + ":dictID/entryupdate.json", function (req, res) {
       res.json({ success: false });
     } else {
       ops.readDictConfigs(db, req.params.dictID, function (configs) {
-        ops.updateEntry(db, req.params.dictID, req.body.id, req.body.content, user.email, {}, async function (adjustedEntryID, adjustedXml, changed) {
+        ops.updateEntry(db, req.params.dictID, req.body.id, req.body.content, user.email, {}, async function (adjustedEntryID, adjustedXml, changed, feedback) {
           db.close();
           var html = "";
           if (configs.xemplate._xsl) {
@@ -697,7 +701,11 @@ app.post(siteconfig.rootPath + ":dictID/entryupdate.json", function (req, res) {
             var doc = (new xmldom.DOMParser()).parseFromString(adjustedXml, "text/xml");
             html = xemplatron.xml2html(doc, configs.xemplate, configs.xema);
           }
-          res.json({ success: true, id: adjustedEntryID, content: adjustedXml, contentHtml: html });
+          var result = { success: true, id: adjustedEntryID, content: adjustedXml, contentHtml: html };
+          if (feedback) {
+            result.feedback = feedback;
+          }
+          res.json(result);
         });
       });
     }

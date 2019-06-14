@@ -266,30 +266,45 @@ module.exports = {
         $needs_refac: Object.keys(configs.subbing).length > 0 ? 1 : 0,
         $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length > 0 ? 1 : 0
       };
-      var sql = "insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values($xml, $title, $sortkey, $needs_refac, $needs_resave, $doctype)";
-      if (entryID) {
-        sql = "insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values($id, $xml, $title, $sortkey, $needs_refac, $needs_resave, $doctype)";
-        params.$id = entryID;
-      }
-      db.run(sql, params, function (err) {
-        if (err) { throw new Error(err) }
-        if (!entryID) entryID = this.lastID;
-        db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
-          $entry_id: entryID,
-          $txt: module.exports.getEntryTitle(xml, configs.titling, true),
-          $level: 1
+
+      // Check if entry title already exists
+      var sql = "select id from entries where title = $title";
+      db.all(sql, {$title: params.$title}, function (err, rows) {
+        if (err) { throw new Error(err); }
+        var feedback;
+        if (rows.length > 0) {
+          // Already exists. Make sure a warning is returned.
+          feedback = {
+            type: "saveFeedbackHeadwordExists",
+            info: rows[0]['id']
+          };
+        }
+
+        var sql = "insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values($xml, $title, $sortkey, $needs_refac, $needs_resave, $doctype)";
+        if (entryID) {
+          sql = "insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values($id, $xml, $title, $sortkey, $needs_refac, $needs_resave, $doctype)";
+          params.$id = entryID;
+        }
+        db.run(sql, params, function (err) {
+          if (err) { throw new Error(err) }
+          if (!entryID) entryID = this.lastID;
+          db.run("insert into searchables(entry_id, txt, level) values($entry_id, $txt, $level)", {
+            $entry_id: entryID,
+            $txt: module.exports.getEntryTitle(xml, configs.titling, true),
+            $level: 1
+          });
+          db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
+            $entry_id: entryID,
+            $action: "create",
+            $when: (new Date()).toISOString(),
+            $email: email,
+            $xml: xml,
+            $historiography: JSON.stringify(historiography)
+          }, function (err) {});
+          // module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
+          callnext(entryID, xml, feedback);
+          // });
         });
-        db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
-          $entry_id: entryID,
-          $action: "create",
-          $when: (new Date()).toISOString(),
-          $email: email,
-          $xml: xml,
-          $historiography: JSON.stringify(historiography)
-        }, function (err) {});
-        // module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
-        callnext(entryID, xml);
-        // });
       });
     });
   },
@@ -344,7 +359,7 @@ module.exports = {
           // tell my parents that they need a refresh:
           db.run("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=$child_id)", { $child_id: entryID }, function (err) {
             // update me:
-            db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", {
+            var params = {
               $id: entryID,
               $title: module.exports.getEntryTitle(xml, configs.titling),
               $sortkey: module.exports.toSortkey(module.exports.getSortTitle(xml, configs.titling), abc),
@@ -352,23 +367,38 @@ module.exports = {
               $doctype: getDoctype(xml),
               $needs_refac: Object.keys(configs.subbing).length > 0 ? 1 : 0,
               $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length > 0 ? 1 : 0
-            }, function (err) {
-              db.run("update searchables set txt=$txt where entry_id=$entry_id and level=1", {
-                $entry_id: entryID,
-                $txt: module.exports.getEntryTitle(xml, configs.titling, true)
-              }, function (err) {});
-              // tell history that I have been updated:
-              db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
-                $entry_id: entryID,
-                $action: "update",
-                $when: (new Date()).toISOString(),
-                $email: email,
-                $xml: xml,
-                $historiography: JSON.stringify(historiography)
-              }, function (err) {});
-              // module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
-              callnext(entryID, xml, true);
-              // });
+            }            
+            // Check if entry title already existed
+            var sql = "select id from entries where title = $title and id <> $id";
+            db.all(sql, {$title: params.$title, $id: params.$id}, function (err, rows) {
+              if (err) { throw new Error(err); }
+              var feedback;
+              if (rows.length > 0) {
+                // Already exists. Make sure a warning is returned.
+                feedback = {
+                  type: "saveFeedbackHeadwordExists",
+                  info: rows[0]['id']
+                };
+              }
+
+              db.run("update entries set doctype=$doctype, xml=$xml, title=$title, sortkey=$sortkey, needs_refac=$needs_refac, needs_resave=$needs_resave where id=$id", params, function (err) {
+                db.run("update searchables set txt=$txt where entry_id=$entry_id and level=1", {
+                  $entry_id: entryID,
+                  $txt: module.exports.getEntryTitle(xml, configs.titling, true)
+                }, function (err) {});
+                // tell history that I have been updated:
+                db.run("insert into history(entry_id, action, [when], email, xml, historiography) values($entry_id, $action, $when, $email, $xml, $historiography)", {
+                  $entry_id: entryID,
+                  $action: "update",
+                  $when: (new Date()).toISOString(),
+                  $email: email,
+                  $xml: xml,
+                  $historiography: JSON.stringify(historiography)
+                }, function (err) {});
+                // module.exports.addSubentryParentTags(db, entryID, xml, function(xml){
+                callnext(entryID, xml, true, feedback);
+                // });
+              });
             });
           });
         }
