@@ -647,7 +647,7 @@ app.post(siteconfig.rootPath + ":dictID/entrycreate.json", function (req, res) {
           db.close();
           var html = "";
           if (configs.xemplate._xsl) {
-            html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(adjustedXML);
+            html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(adjustedXml);
           } else if (configs.xemplate._css) {
             html = adjustedXml;
           } else {
@@ -690,7 +690,7 @@ app.post(siteconfig.rootPath + ":dictID/entryupdate.json", function (req, res) {
           db.close();
           var html = "";
           if (configs.xemplate._xsl) {
-            html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(adjustedXML);
+            html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(adjustedXml);
           } else if (configs.xemplate._css) {
             html = adjustedXml;
           } else {
