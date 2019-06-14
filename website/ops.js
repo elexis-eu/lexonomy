@@ -155,7 +155,7 @@ module.exports = {
   },
   readDictConfig: function (db, dictID, configID, callnext) {
     db.get("select * from configs where id=$id", { $id: configID }, function (err, row) {
-      if (err || !row) config = module.exports.defaultDictConfig(configID); else var config = JSON.parse(row.json);
+      if (err || !row) var config = module.exports.defaultDictConfig(configID); else var config = JSON.parse(row.json);
       callnext(config);
     });
   },
@@ -896,7 +896,7 @@ module.exports = {
       res.setHeader("content-disposition", "attachment; filename=" + dictID + ".xml");
       res.write("<" + dictID + ">\n");
       db.each("select id, xml from entries", {}, function (err, row) {
-        xml = row.xml.replace(/></g, ">\n<");
+        var xml = row.xml.replace(/></g, ">\n<");
         xml = setHousekeepingAttributes(row.id, xml, subbing);
         res.write(xml + "\n");
       }, function (err, rowCount) {
@@ -1182,8 +1182,8 @@ module.exports = {
         callnext({ loggedin: false, email: null });
       } else {
         email = row.email || "";
-        ske_apiKey = row.ske_apiKey;
-        ske_username = row.ske_username;
+        var ske_apiKey = row.ske_apiKey;
+        var ske_username = row.ske_username;
         var now = (new Date()).toISOString();
         db.run("update users set sessionLast=$now where email=$email", { $now: now, $email: email }, function (err, row) {
           db.close();
@@ -1344,7 +1344,7 @@ module.exports = {
         email = row.email || "";
         var lastSeen = ""; if (row.sessionLast) lastSeen = row.sessionLast;
         db.all("select d.id, d.title from user_dict as ud inner join dicts as d on d.id=ud.dict_id  where ud.user_email=$email order by d.title", { $email: email }, function (err, rows) {
-          xml = "<user"; if (lastSeen) xml += " lastSeen='" + lastSeen + "'"; xml += ">";
+          var xml = "<user"; if (lastSeen) xml += " lastSeen='" + lastSeen + "'"; xml += ">";
           for (var i = 0; i < rows.length; i++) {
             xml += "<dict id='" + rows[i].id + "' title='" + clean4xml(rows[i].title) + "'/>";
           }
@@ -1440,7 +1440,7 @@ module.exports = {
         var id = row.id;
         var title = row.title;
         db.all("select u.email from user_dict as ud inner join users as u on u.email=ud.user_email where ud.dict_id=$dictID order by u.email", { $dictID: dictID }, function (err, rows) {
-          xml = "<dict id='" + clean4xml(id) + "' title='" + clean4xml(title) + "'>";
+          var xml = "<dict id='" + clean4xml(id) + "' title='" + clean4xml(title) + "'>";
           for (var i = 0; i < rows.length; i++) {
             xml += "<user email='" + rows[i].email + "'/>";
           }

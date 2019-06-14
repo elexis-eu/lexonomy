@@ -186,7 +186,7 @@ app.post(siteconfig.rootPath + "changeoneclickapi.json", function (req, res) {
     if (!user.loggedin) res.redirect("/"); else {
       ops.updateUserApiKey(user.email, req.body.apiKey, function () {
         ops.sendApiKeyToSke(user.email, req.body.apiKey, user.ske_username, user.ske_apiKey, function () {});
-        res.json({ success: true, id: adjustedEntryID, content: json });
+        res.json({ success: true, id: null, content: null });
       });
     }
   });

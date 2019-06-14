@@ -6,3 +6,4 @@ data/uploads/*
 website/siteconfig.json
 website/node_modules/*
 website/package-lock.json
+website/__pycache__/*
