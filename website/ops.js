@@ -160,7 +160,7 @@ module.exports = {
     });
   },
   defaultDictConfig: function (id) {
-    if (id == "editing") return { xonomyMode: "nerd" };
+    if (id == "editing") return { xonomyMode: "nerd", xonomyTextEditor: "askString" };
     if (id == "searchability") return { searchableElements: [] };
     if (id == "xema") return { elements: {} };
     if (id == "titling") return { headwordAnnotations: [], abc: siteconfig.defaultAbc };

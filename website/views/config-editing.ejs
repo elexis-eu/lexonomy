@@ -31,6 +31,7 @@
 		Screenful.Editor.editor=function(div, entry){
 			Editing.change=Screenful.Editor.changed;
 			if(!entry.content.xonomyMode) entry.content.xonomyMode="nerd";
+			if(!entry.content.xonomyTextEditor) entry.content.xonomyTextEditor="askString";
 			Editing.render(div, entry.content);
 			if(entry.content._js) { //the user is disabling any entry editor customizations
 				delete entry.content._js;

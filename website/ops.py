@@ -9,7 +9,7 @@ import sqlite3
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
 
-defaultDictConfig = {"editing": {"xonomyMode": "nerd"},
+defaultDictConfig = {"editing": {"xonomyMode": "nerd", "xonomyTextEditor": "askString" },
                      "searchability": {"searchableElements": []},
                      "xema": {"elements": {}},
                      "titling": {"headwordAnnotations": [], "abc": siteconfig["defaultAbc"]},

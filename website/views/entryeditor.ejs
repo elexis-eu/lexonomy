@@ -87,7 +87,7 @@
           var docSpec=struct2Xonomy(xmlStructure);
           newXml=initialDocument(xmlStructure);
       <%} else {%>
-        var docSpec=Xematron.xema2docspec(xema);
+        var docSpec=Xematron.xema2docspec(xema, "<%-editing.xonomyTextEditor%>");
       <%}%>
       if(!newXml) newXml=Xematron.xema2xml(xema);
 
