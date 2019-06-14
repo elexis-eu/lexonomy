@@ -19,5 +19,7 @@ body {font-family: sans-serif; background-color: #ffffff; margin: 0; padding: 0;
 
 #statusbar span.wait { background-image: url(loader.gif); display: inline-block; width: 30px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 1em;}
 #statusbar span.warn { background-image: url(exclamation.png); display: inline-block; width: 16px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 0.75em;}
+#statusbar .alertmessage { display: none; color: black; background-color: #ffff77; font-weight: bold; padding: 2px; margin-right: 20px; border: 2px solid black; }
+#statusbar .closeIcon { display: inline-block; width: 16px; height: 16px; position: relative; top: 3px; background-image: url(cross.png); cursor: pointer; }
 
 .wyc { display: inline-block; background-image: url(loader.gif); background-position: center center; background-repeat: no-repeat; width: 30px; height: 10px; }

@@ -17,6 +17,7 @@ Screenful.Loc={
   readingFailed: "No such item.",
   saving: "Saving...",
   savingFailed: "Failed to save.",
+  saveFeedbackHeadwordExists: "WARNING: another entry with this headword exists. ID=",
   deleting: "Deleting...",
   deletingFailed: "Failed to delete.",
   deleteConfirm: "Careful now! Are you sure?",

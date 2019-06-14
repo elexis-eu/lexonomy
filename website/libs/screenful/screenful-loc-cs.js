@@ -15,6 +15,7 @@ Screenful.Loc={
   readingFailed: "Neexistuje.",
   saving: "Ukládá se...",
   savingFailed: "Nepovedlo se to uložit.",
+  saveFeedbackHeadwordExists: "WARNING: another entry with this headword exists. ID=",
   deleting: "Maže se...",
   deletingFailed: "Nepovedlo se to smazat.",
   deleteConfirm: "Pozor s tímhle! Opravdu to chceš smazat?",
