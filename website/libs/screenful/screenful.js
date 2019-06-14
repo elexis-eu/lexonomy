@@ -1,8 +1,9 @@
 var Screenful={
   createEnvelope: function(scrollable){
     var html="<div id='envelope' class='"+(scrollable?"scrollable":"")+"'></div>";
-    if(window.parent==window || (window.parent!=window && !window.parent.Screenful)) html+="<div id='statusbar'><span class='statusmessage'></span></div>";
+    if(window.parent==window || (window.parent!=window && !window.parent.Screenful)) html+="<div id='statusbar'><span class='alertmessage'><span class='text'>(ALERT)</span> <span class='closeIcon'></span></span><span class='statusmessage'></span></div>";
     if($("#footer").length>0) $("#footer").before(html); else $("body").append(html);
+    $("#statusbar .alertmessage .closeIcon").on("click", function () { $("#statusbar .alertmessage").hide(); });
     Screenful.resize();
     $(window).on("resize", Screenful.resize);
     $("body").append("<div id='curtain' style='display: none'></div>")
@@ -19,9 +20,14 @@ var Screenful={
     console.log("STATUS: " + str);
     if(window.parent!=window && window.parent.Screenful) window.parent.Screenful.status(str, style);
     else {
-      if(style=="wait") str="<span class='wait'></span>"+str;
-      if(style=="warn") str="<span class='warn'></span>"+str;
-      $("#statusbar .statusmessage").html(str);
+      if(style==="alert") {
+        $("#statusbar .alertmessage .text").html(str);
+        $("#statusbar .alertmessage").show();
+      } else {
+        if(style=="wait") str="<span class='wait'></span>"+str;
+        if(style=="warn") str="<span class='warn'></span>"+str;
+        $("#statusbar .statusmessage").html(str);
+      }
     }
   },
 

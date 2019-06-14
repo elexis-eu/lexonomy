@@ -312,10 +312,10 @@ Screenful.Editor={
     		  }
           $("#container").hide().fadeIn();
           if (data.feedback) {
-            Screenful.status(Screenful.Editor.feedbackMessage(data.feedback));
-          } else {
-            Screenful.status(Screenful.Loc.ready);
+            Screenful.status(Screenful.Editor.feedbackMessage(data.feedback), "alert");
           }
+          Screenful.status(Screenful.Loc.ready);
+
           Screenful.Editor.updateToolbar();
           Screenful.Editor.needsSaving=false;
           if(data.redirUrl) window.location=data.redirUrl;
@@ -351,10 +351,10 @@ Screenful.Editor={
 		      }
           $("#container").hide().fadeIn();
           if (data.feedback) {
-            Screenful.status(Screenful.Editor.feedbackMessage(data.feedback));
-          } else {
-            Screenful.status(Screenful.Loc.ready);
+            Screenful.status(Screenful.Editor.feedbackMessage(data.feedback), "alert");
           }
+          Screenful.status(Screenful.Loc.ready);
+
           Screenful.Editor.needsSaving=false;
           Screenful.Editor.updateToolbar();
           if(data.redirUrl) window.location=data.redirUrl;
