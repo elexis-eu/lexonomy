@@ -100,7 +100,6 @@ Xematron.xema2docspec=function(xema, stringAsker){
 				expanded: true,
 			});
 		}
-		debugger;
 
 		//txt elements are easy:
 		if(xel.filling=="txt"){
