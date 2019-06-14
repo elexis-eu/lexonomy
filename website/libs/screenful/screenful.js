@@ -17,7 +17,6 @@ var Screenful={
     $("#envelope").css("bottom", (footerHeight+statusbarHeight+2)+"px");
   },
   status: function(str, style){
-    console.log("STATUS: " + str);
     if(window.parent!=window && window.parent.Screenful) window.parent.Screenful.status(str, style);
     else {
       if(style==="alert") {
