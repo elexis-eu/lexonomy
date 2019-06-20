@@ -60,6 +60,7 @@ XemaDesigner.listNodes=function(){
 	var scrollTop=$list.scrollTop();
 	$list.html("");
 	XemaDesigner.listElement(XemaDesigner.xema.root, $list, 0);
+	XemaDesigner.resizeBlinders();
 	var parentless=XemaDesigner.getParentlessElements();
 	if(parentless.length>0){
 		$("<div class='title'><span>Unattached elements</span></div>").appendTo($list);
@@ -100,8 +101,8 @@ XemaDesigner.listElement=function(elName, $list, level){
 					});
 				}
 			}
-			$("<div class='blinder'></div>").appendTo($sublist);
-			//XemaDesigner.resizeBlinders();
+			var $blinder=$("<div class='blinder'></div>").appendTo($sublist);
+			XemaDesigner.resizeBlinders($blinder);
 		}
 	}
 };
@@ -118,14 +119,21 @@ XemaDesigner.plusminus=function($divContainer){
 	}
 	XemaDesigner.resizeBlinders();
 }
-XemaDesigner.resizeBlinders=function(){
-	$(".designer .blinder").each(function(){
-		var $blinder=$(this);
+XemaDesigner.resizeBlinders=function($blinder){
+	if($blinder){
+		go($blinder)
+	} else {
+		$(".designer .blinder").each(function(){
+			var $blinder=$(this);
+			go($blinder)
+		});
+	}
+	function go($blinder){
 		var $prev=$blinder.prev();
 		if($prev.length>0){
 			$blinder.css({top: $prev.position().top+16});
 		}
-	});
+	}
 };
 
 XemaDesigner.selectElement=function(elName){
