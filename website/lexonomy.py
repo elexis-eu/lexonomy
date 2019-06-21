@@ -11,6 +11,10 @@ cgi = False
 if "SERVER_NAME" in os.environ and "SERVER_PORT" in os.environ:
     my_url = os.environ["SERVER_NAME"] + ":" + os.environ["SERVER_PORT"]
     cgi = True
+if "HTTPS" in os.environ and os.environ["HTTPS"] == "on":
+    my_base_url = "https://" + my_url + "/"
+else:
+    my_base_url = "http://" + my_url + "/"
 
 # command-line arguments (unless CGI)
 if not cgi and len(sys.argv) > 1:
@@ -154,7 +158,7 @@ def nodejs(error):
         print("----------- need to start NodeJS server -----------", file=sys.stderr)
         import subprocess, time
         global nodejs_pid
-        nodejs_pid = subprocess.Popen(["node","run.js"], start_new_session=True).pid
+        nodejs_pid = subprocess.Popen(["node","run.js",my_base_url], start_new_session=True).pid
         time.sleep(5) # give it some time to come up
         res = opener.open(req)
     response.status = res.status

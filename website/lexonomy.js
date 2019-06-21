@@ -3,6 +3,9 @@ const app = express();
 const path = require("path");
 const fs = require("fs");
 var siteconfig = require("./siteconfig").load();
+if (process.argv[2]) {
+  siteconfig.baseUrl = process.argv[2];
+}
 const https = require("https");
 const ops = require("./ops");
 const xemplatron = require("./widgets/xemplatron.js");
