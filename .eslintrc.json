@@ -11,7 +11,8 @@
       "quotes": ["error", "double", "avoid-escape"],
       "eqeqeq": ["warn", "smart"],
       "no-useless-escape": "warn",
-      "camelcase": "warn"
-  },
-  "plugins": ["only-warn"]
+      "camelcase": "warn",
+      "handle-callback-err": "warn",
+      "no-redeclare": "warn"
+  }
 }
