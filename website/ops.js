@@ -4,7 +4,6 @@ const xmldom = require("xmldom"); // https://www.npmjs.com/package/xmldom
 const sqlite3 = require("sqlite3").verbose(); // https://www.npmjs.com/package/sqlite3
 const sha1 = require("sha1"); // https://www.npmjs.com/package/sha1
 const markdown = require("markdown").markdown; // https://www.npmjs.com/package/markdown
-const nodemailer = require("nodemailer");
 const https = require("https");
 const querystring = require("querystring");
 const { fork } = require("child_process");
@@ -269,14 +268,14 @@ module.exports = {
 
       // Check if entry title already exists
       var sql = "select id from entries where title = $title";
-      db.all(sql, {$title: params.$title}, function (err, rows) {
-        if (err) { throw new Error(err); }
+      db.all(sql, { $title: params.$title }, function (err, rows) {
+        if (err) { throw new Error(err) }
         var feedback;
         if (rows.length > 0) {
           // Already exists. Make sure a warning is returned.
           feedback = {
             type: "saveFeedbackHeadwordExists",
-            info: rows[0]['id']
+            info: rows[0]["id"]
           };
         }
 
@@ -367,17 +366,17 @@ module.exports = {
               $doctype: getDoctype(xml),
               $needs_refac: Object.keys(configs.subbing).length > 0 ? 1 : 0,
               $needs_resave: configs.searchability.searchableElements && configs.searchability.searchableElements.length > 0 ? 1 : 0
-            }            
+            };
             // Check if entry title already existed
             var sql = "select id from entries where title = $title and id <> $id";
-            db.all(sql, {$title: params.$title, $id: params.$id}, function (err, rows) {
-              if (err) { throw new Error(err); }
+            db.all(sql, { $title: params.$title, $id: params.$id }, function (err, rows) {
+              if (err) { throw new Error(err) }
               var feedback;
               if (rows.length > 0) {
                 // Already exists. Make sure a warning is returned.
                 feedback = {
                   type: "saveFeedbackHeadwordExists",
-                  info: rows[0]['id']
+                  info: rows[0]["id"]
                 };
               }
 
@@ -978,14 +977,16 @@ module.exports = {
     var pidfile = filepath + ".pid";
     var errfile = filepath + ".err";
     if (fs.existsSync(pidfile)) { // = import is in progress, just check status
-      progress = module.exports.checkImportStatus(pidfile, errfile, callnext);
+      module.exports.checkImportStatus(pidfile, errfile, callnext);
     } else { // = start import
+      let pidfile_fd;
+      let errfile_fd;
       try {
         pidfile_fd = fs.openSync(pidfile, "wx");
         errfile_fd = fs.openSync(errfile, "w");
       } catch (e) {
         // somebody created the pidfile meanwhile, the import is probably underway
-        progress = module.exports.checkImportStatus(pidfile, errfile, callnext);
+        module.exports.checkImportStatus(pidfile, errfile, callnext);
       }
       var dbpath = path.join(siteconfig.dataDir, "dicts/" + dictID + ".sqlite");
       fork("adminscripts/import.js", [dbpath, filepath, email], { detached: true, stdio: ["ignore", pidfile_fd, errfile_fd, "ipc"] });
