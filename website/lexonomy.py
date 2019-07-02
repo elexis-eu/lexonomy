@@ -31,7 +31,7 @@ if not cgi and len(sys.argv) > 1:
     nodejs_url = sys.argv[2]
 
 # serve static files
-@route('/<path:re:(widgets|furniture|libs|docs).*>')
+@route('/<path:re:(widgets|furniture|libs).*>')
 def server_static(path):
     return static_file(path, root="./")
 
