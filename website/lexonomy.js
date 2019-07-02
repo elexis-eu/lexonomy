@@ -217,6 +217,7 @@ app.post(siteconfig.rootPath + "recoverpwd.json", function (req, res) {
 });
 
 // DOCS:
+app.use(siteconfig.rootPath+"docs", express.static(path.join(__dirname, "docs")));
 app.get(siteconfig.rootPath + "docs/:docID/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     ops.getDoc(req.params.docID, function (doc) {
