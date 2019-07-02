@@ -1,8 +1,13 @@
 #!/usr/bin/python3
 
-from bottle import hook, route, get, post, run, template, error, request, response, static_file, abort, redirect, install
-import os, sys, json, sqlite3, functools, ops
+import os
+import sys
+import functools
+import ops
 from ops import siteconfig
+
+from bottle import (hook, route, get, post, run, template, error, request,
+                    response, static_file, abort, redirect, install)
 
 # configuration
 my_url = "localhost:8000"
