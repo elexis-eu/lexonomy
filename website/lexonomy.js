@@ -22,6 +22,7 @@ ops.mailtransporter = nodemailer.createTransport(siteconfig.mailconfig);
 const PORT = process.env.PORT || siteconfig.port || 80;
 const jwt = require("jsonwebtoken");
 const fluxslt = require("fluxslt");
+const url = require("url");
 
 // Log the request:
 if (siteconfig.verbose) {
@@ -993,7 +994,7 @@ app.get(siteconfig.rootPath + ":dictID/import/", function (req, res) {
         res.redirect("../edit/");
       } else {
         db.close();
-        var parsedUrl = new URL(req.url);
+        var parsedUrl = url.parse(req.url, true);
         var filename = parsedUrl.query.file;
         var uploadStart = parsedUrl.query.uploadStart;
         res.render("import.ejs", { user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, siteconfig: siteconfig, filename: filename, uploadStart: uploadStart });
@@ -1009,7 +1010,7 @@ app.get(siteconfig.rootPath + ":dictID/import.json", function (req, res) {
     if (!user.canUpload) {
       res.redirect("edit/");
     } else {
-      var parsedUrl = new URL(req.url);
+      var parsedUrl = url.parse(req.url, true);
       var filename = parsedUrl.query.filename;
       var truncate = parsedUrl.query.truncate || 0;
       if (parsedUrl.query.showErrors) {
