@@ -684,56 +684,19 @@ Xonomy.renderDisplayText=function(text, displayText) {
 }
 
 Xonomy.chewText=function(txt) {
-	var ret="";
-	ret+="<span class='word'>"; //start word
-	for(var i=0; i<txt.length; i++) {
-		if(txt[i]==" ") ret+="</span>"; //end word
-		var t=Xonomy.xmlEscape(txt[i])
-		if(i==0 && t==" ") t="<span class='space'>&middot;</span>"; //leading space
-		if(i==txt.length-1 && t==" ") t="<span class='space'>&middot;</span>"; //trailing space
-		var id=Xonomy.nextID();
-		ret+="<span id='"+id+"' class='char focusable' onclick='if((event.ctrlKey||event.metaKey) && $(this).closest(\".element\").hasClass(\"hasInlineMenu\")) Xonomy.charClick(this)'>"+t+"<span class='selector'><span class='inside' onclick='Xonomy.charClick(this.parentNode.parentNode)'></span></span></span>";
-		if(txt[i]==" ") ret+="<span class='word'>"; //start word
-	}
-	ret+="</span>"; //end word
-	return ret;
+	return "<span class='word focusable' onclick='if((event.ctrlKey||event.metaKey) && $(this).closest(\".element\").hasClass(\"hasInlineMenu\")) Xonomy.wordClick(this)'>" + txt + "</span>"
 };
-Xonomy.charClick=function(c) {
+Xonomy.wordClick=function(c) {
 	Xonomy.clickoff();
 	var isReadOnly=( $(c).closest(".readonly").toArray().length>0 );
 	if(!isReadOnly) {
-		Xonomy.notclick=true;
-		if(
-			$(".xonomy .char.on").toArray().length==1 && //if there is precisely one previously selected character
-			$(".xonomy .char.on").closest(".element").is($(c).closest(".element")) //and if it has the same parent element as this character
-		) {
-			var $element=$(".xonomy .char.on").closest(".element");
-			var chars=$element.find(".char").toArray();
-			var iFrom=$.inArray($(".xonomy .char.on").toArray()[0], chars);
-			var iTill=$.inArray(c, chars);
-			if(iFrom>iTill) {var temp=iFrom; iFrom=iTill; iTill=temp;}
-			for(var i=0; i<chars.length; i++) { //highlight all chars between start and end
-				if(i>=iFrom && i<=iTill) $(chars[i]).addClass("on");
-			}
-			//Save for later the info Xonomy needs to know what to wrap:
-			Xonomy.textFromID=$(chars[iFrom]).closest(".textnode").attr("id");
-			Xonomy.textTillID=$(chars[iTill]).closest(".textnode").attr("id");
-			Xonomy.textFromIndex=$.inArray(chars[iFrom], $("#"+Xonomy.textFromID).find(".char").toArray());
-			Xonomy.textTillIndex=$.inArray(chars[iTill], $("#"+Xonomy.textTillID).find(".char").toArray());
-			//Show inline menu etc:
-			var htmlID=$element.attr("id");
-			var content=Xonomy.inlineMenu(htmlID); //compose bubble content
-			if(content!="" && content!="<div class='menu'></div>") {
-				document.body.appendChild(Xonomy.makeBubble(content)); //create bubble
-				Xonomy.showBubble($("#"+htmlID+" .char.on").last()); //anchor bubble to highlighted chars
-			}
-			Xonomy.clearChars=true;
-		} else {
-			$(".xonomy .char.on").removeClass("on");
-			$(c).addClass("on");
-			Xonomy.setFocus(c.id, "char");
+		var htmlID=$element.attr("id");
+		var content=Xonomy.inlineMenu(htmlID); //compose bubble content
+		if(content!="" && content!="<div class='menu'></div>") {
+			document.body.appendChild(Xonomy.makeBubble(content)); //create bubble
+			Xonomy.showBubble($(c).last()); //anchor bubble to the word
 		}
-	}
+  }
 };
 Xonomy.wrap=function(htmlID, param) {
 	Xonomy.clickoff();
@@ -835,7 +798,6 @@ Xonomy.click=function(htmlID, what) {
 		Xonomy.lastClickWhat=what;
 		Xonomy.currentHtmlId=htmlID;
 		Xonomy.currentFocus=what;
-		$(".xonomy .char.on").removeClass("on");
 		var isReadOnly=( $("#"+htmlID).hasClass("readonly") || $("#"+htmlID).closest(".readonly").toArray().length>0 );
 		if(!isReadOnly && (what=="openingTagName" || what=="closingTagName") ) {
 			$("#"+htmlID).addClass("current"); //make the element current
@@ -929,7 +891,6 @@ Xonomy.click=function(htmlID, what) {
 	}
 };
 Xonomy.notclick=false; //should the latest click-off event be ignored?
-Xonomy.clearChars=false; //if true, un-highlight any highlighted characters at the next click-off event
 Xonomy.clickoff=function() { //event handler for the document-wide click-off event.
 	if(!Xonomy.notclick) {
 		Xonomy.currentHtmlId=null;
@@ -937,10 +898,6 @@ Xonomy.clickoff=function() { //event handler for the document-wide click-off eve
 		Xonomy.destroyBubble();
 		$(".xonomy .current").removeClass("current");
 		$(".xonomy .focused").removeClass("focused");
-		if(Xonomy.clearChars) {
-			$(".xonomy .char.on").removeClass("on");
-			Xonomy.clearChars=false;
-		}
 	}
 	Xonomy.notclick=false;
 };
@@ -1734,9 +1691,6 @@ Xonomy.key=function(event){
 				event.preventDefault();
 				event.stopImmediatePropagation();
 				if(Xonomy.currentFocus=="childrenCollapsed") Xonomy.plusminus(Xonomy.currentHtmlId, true);
-				if(Xonomy.currentFocus=="char") {
-					Xonomy.charClick($("#"+Xonomy.currentHtmlId)[0]);
-				}
 				else {
 					Xonomy.click(Xonomy.currentHtmlId, Xonomy.currentFocus);
 					Xonomy.clickoff();
@@ -1826,7 +1780,7 @@ Xonomy.keyboardMenu=function(event){
 },
 
 Xonomy.goDown=function(){
-	if(Xonomy.currentFocus!="openingTagName" && Xonomy.currentFocus!="closingTagName" && Xonomy.currentFocus!="text" && Xonomy.currentFocus!="char") {
+	if(Xonomy.currentFocus!="openingTagName" && Xonomy.currentFocus!="closingTagName" && Xonomy.currentFocus!="text") {
 		Xonomy.goRight();
 	} else {
 		var $el=$("#"+Xonomy.currentHtmlId);
@@ -1835,7 +1789,7 @@ Xonomy.goDown=function(){
 		if(Xonomy.currentFocus=="closingTagName") var $me=$el.find(".tag.closing").last();
 
 		var $candidates=$(".xonomy .focusable:visible").not(".attributeName").not(".attributeValue").not(".childrenCollapsed").not(".rollouter");
-		$candidates=$candidates.not(".char").add($el);
+		$candidates=$candidates.add($el);
 		if(Xonomy.currentFocus=="openingTagName" && $el.hasClass("oneliner")) $candidates=$candidates.not("#"+Xonomy.currentHtmlId+" .tag.closing").not("#"+Xonomy.currentHtmlId+" .children *");
 		if(Xonomy.currentFocus=="openingTagName" && $el.hasClass("oneliner")) $candidates=$candidates.not("#"+Xonomy.currentHtmlId+" .textnode");
 		if($el.hasClass("collapsed")) $candidates=$candidates.not("#"+Xonomy.currentHtmlId+" .tag.closing");
@@ -1849,7 +1803,7 @@ Xonomy.goDown=function(){
 	}
 };
 Xonomy.goUp=function(){
-	if(Xonomy.currentFocus!="openingTagName" && Xonomy.currentFocus!="closingTagName" && Xonomy.currentFocus!="char" && Xonomy.currentFocus!="text") {
+	if(Xonomy.currentFocus!="openingTagName" && Xonomy.currentFocus!="closingTagName" && Xonomy.currentFocus!="text") {
 		Xonomy.goLeft();
 	} else {
 		var $el=$("#"+Xonomy.currentHtmlId);
@@ -1861,8 +1815,6 @@ Xonomy.goUp=function(){
 		$candidates=$candidates.not(".element .oneliner .tag.closing");
 		$candidates=$candidates.not(".element .oneliner .textnode");
 		$candidates=$candidates.not(".element .collapsed .tag.closing");
-		$candidates=$candidates.not(".char");
-		if($el.hasClass("char")) var $candidates=$el.closest(".textnode").first().add($el);
 		if($el.hasClass("textnode")) var $candidates=$el.closest(".element").find(".tag.opening").first().add($el);
 		if($me.hasClass("closing") && $el.hasClass("hasText")) $candidates=$candidates.not("#"+Xonomy.currentHtmlId+" .children *:not(:first-child)");
 		if($me.hasClass("opening") && $el.closest(".element").prev().hasClass("hasText")) {
@@ -1889,7 +1841,6 @@ Xonomy.goRight=function(){
 	if(Xonomy.currentFocus=="rollouter") var $me=$el.find(".rollouter").first();
 
 	var $candidates=$(".xonomy .focusable:visible");
-	$candidates=$candidates.not(".char").add(".hasInlineMenu > .children > .textnode .char:visible");
 
 	var $next=$candidates.eq( $candidates.index($me[0])+1 );
 	if($next.hasClass("attributeName")) Xonomy.setFocus($next.closest(".attribute").prop("id"), "attributeName");
@@ -1899,7 +1850,6 @@ Xonomy.goRight=function(){
 	if($next.hasClass("textnode")) Xonomy.setFocus($next.prop("id"), "text");
 	if($next.hasClass("childrenCollapsed")) Xonomy.setFocus($next.closest(".element").prop("id"), "childrenCollapsed");
 	if($next.hasClass("rollouter")) Xonomy.setFocus($next.closest(".element").prop("id"), "rollouter");
-	if($next.hasClass("char")) Xonomy.setFocus($next.prop("id"), "char");
 };
 Xonomy.goLeft=function(){
 	var $el=$("#"+Xonomy.currentHtmlId);
@@ -1912,7 +1862,6 @@ Xonomy.goLeft=function(){
 	if(Xonomy.currentFocus=="rollouter") var $me=$el.find(".rollouter").first();
 
 	var $candidates=$(".xonomy .focusable:visible");
-	$candidates=$candidates.not(".char").add(".hasInlineMenu > .children > .textnode .char:visible");
 
 	var $next=$candidates.eq( $candidates.index($me[0])-1 );
 	if($next.hasClass("attributeName")) Xonomy.setFocus($next.closest(".attribute").prop("id"), "attributeName");
@@ -1922,5 +1871,4 @@ Xonomy.goLeft=function(){
 	if($next.hasClass("textnode")) Xonomy.setFocus($next.prop("id"), "text");
 	if($next.hasClass("childrenCollapsed")) Xonomy.setFocus($next.closest(".element").prop("id"), "childrenCollapsed");
 	if($next.hasClass("rollouter")) Xonomy.setFocus($next.closest(".element").prop("id"), "rollouter");
-	if($next.hasClass("char")) Xonomy.setFocus($next.prop("id"), "char");
 };
