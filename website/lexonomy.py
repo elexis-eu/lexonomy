@@ -4,6 +4,7 @@ import os
 import sys
 import functools
 import ops
+import re
 from ops import siteconfig
 
 from bottle import (hook, route, get, post, run, template, error, request,
@@ -143,6 +144,41 @@ def skeget_corpora(user):
     req = urllib.request.Request("https://api.sketchengine.eu/ca/api/corpora?username" + request.query.username,
                                   headers = {"Authorization": "Bearer " + request.query.apikey})
     return urllib.request.urlopen(req)
+
+@get(siteconfig["rootPath"] + "login")
+def login():
+    res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+    if res["loggedin"]:
+        redirect("/")
+    if not "Referer" in request.headers:
+        referer = "/"
+    elif re.search(r"/login/$",request.headers["Referer"]):
+        referer = "/"
+    else:
+        referer = request.headers["Referer"]
+    return template("login.tpl", **{"siteconfig": siteconfig, "redirectUrl": referer})
+
+@post(siteconfig["rootPath"] + "login.json")
+def check_login():
+    res = ops.login(request.forms.email, request.forms.password)
+    if res["success"]:
+        response.set_cookie("email", res["email"])
+        response.set_cookie("sessionkey", res["key"])
+        return {"success": True, "sessionkey": res["key"]}
+    else:
+        return {"success": False}
+    
+@get(siteconfig["rootPath"] + "logout")
+def logout():
+    if not "Referer" in request.headers:
+        referer = "/"
+    elif re.search(r"/logout/$",request.headers["Referer"]):
+        referer = "/"
+    else:
+        referer = request.headers["Referer"]
+    response.set_cookie("email", "")
+    response.set_cookie("sessionkey", "")
+    redirect(referer)
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None

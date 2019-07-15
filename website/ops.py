@@ -5,6 +5,9 @@ import json
 import os
 import os.path
 import sqlite3
+import hashlib
+import random
+import string
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -124,3 +127,22 @@ def readEntry (db, configs, entryID):
     if configs["subbing"]:
         xml = addSubentryParentTags(db, entryID, xml)
     return entryID, xml, row["title"]
+
+def generateKey(size=32):
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
+
+def login(email, password):
+    if siteconfig["readonly"]:
+        return {"success": False}
+    conn = getMainDB()
+    passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
+    print(passhash)
+    c = conn.execute("select email from users where email=? and passwordHash=?", (email.lower(), passhash))
+    user = c.fetchone()
+    if not user:
+        return {"success": False}
+    key = generateKey()
+    now = datetime.datetime.utcnow()
+    conn.execute("update users set sessionKey=?, sessionLast=? where email=?", (key, now, email))
+    conn.commit()
+    return {"success": True, "email": user["email"], "key": key}
