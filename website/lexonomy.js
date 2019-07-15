@@ -22,6 +22,16 @@ ops.mailtransporter = nodemailer.createTransport(siteconfig.mailconfig);
 const PORT = process.env.PORT || siteconfig.port || 80;
 const jwt = require("jsonwebtoken");
 const fluxslt = require("fluxslt");
+/* FIXME:
+ * 'url.parse' was deprecated since v11.0.0. Use 'url.URL' constructor instead
+ *
+ * see: https://nodejs.org/api/url.html#url_constructor_new_url_input_base
+ * new URL(input[, base]): new URL('/foo', 'https://example.org/');
+ *
+ * need: base (from request)
+ *
+ * priority: low (see #128)
+ */
 const url = require("url");
 
 // Log the request:
@@ -994,6 +1004,7 @@ app.get(siteconfig.rootPath + ":dictID/import/", function (req, res) {
         res.redirect("../edit/");
       } else {
         db.close();
+        // eslint-disable-next-line node/no-deprecated-api
         var parsedUrl = url.parse(req.url, true);
         var filename = parsedUrl.query.file;
         var uploadStart = parsedUrl.query.uploadStart;
@@ -1010,6 +1021,7 @@ app.get(siteconfig.rootPath + ":dictID/import.json", function (req, res) {
     if (!user.canUpload) {
       res.redirect("edit/");
     } else {
+      // eslint-disable-next-line node/no-deprecated-api
       var parsedUrl = url.parse(req.url, true);
       var filename = parsedUrl.query.filename;
       var truncate = parsedUrl.query.truncate || 0;
