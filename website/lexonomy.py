@@ -169,16 +169,18 @@ def check_login():
         return {"success": False}
     
 @get(siteconfig["rootPath"] + "logout")
-def logout():
+@auth
+def logout(user):
+    ops.logout(user)
     if not "Referer" in request.headers:
         referer = "/"
     elif re.search(r"/logout/$",request.headers["Referer"]):
         referer = "/"
     else:
         referer = request.headers["Referer"]
-    response.set_cookie("email", "")
-    response.set_cookie("sessionkey", "")
-    redirect(referer)
+    response.delete_cookie("email")
+    response.delete_cookie("sessionkey")
+    return redirect(referer)
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None

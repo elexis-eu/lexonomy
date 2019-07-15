@@ -146,3 +146,10 @@ def login(email, password):
     conn.execute("update users set sessionKey=?, sessionLast=? where email=?", (key, now, email))
     conn.commit()
     return {"success": True, "email": user["email"], "key": key}
+
+def logout(user):
+    print(user["email"])
+    conn = getMainDB()
+    conn.execute("update users set sessionKey='', sessionLast='' where email=?", (user["email"],))
+    conn.commit()
+    return True
