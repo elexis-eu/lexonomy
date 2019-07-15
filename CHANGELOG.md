@@ -12,6 +12,7 @@
 
 - Set up minimal CI for testing deployment [\#139](https://github.com/elexis-eu/lexonomy/issues/139)
 - Bootstrap dev environment  [\#108](https://github.com/elexis-eu/lexonomy/issues/108)
+- Use linter to check code style guidelines [\#130](https://github.com/elexis-eu/lexonomy/pull/130) ([iiegn](https://github.com/iiegn))
 - show real IP of request [\#5](https://github.com/elexis-eu/lexonomy/pull/5) ([rambousek](https://github.com/rambousek))
 - add password recovery by email [\#2](https://github.com/elexis-eu/lexonomy/pull/2) ([rambousek](https://github.com/rambousek))
 
@@ -82,7 +83,6 @@
 - Configurable text widget [\#146](https://github.com/elexis-eu/lexonomy/pull/146) ([KCMertens](https://github.com/KCMertens))
 - Warn if headword exists [\#145](https://github.com/elexis-eu/lexonomy/pull/145) ([jan-niestadt](https://github.com/jan-niestadt))
 - Ctrl+Enter submits textarea bubble. [\#144](https://github.com/elexis-eu/lexonomy/pull/144) ([jan-niestadt](https://github.com/jan-niestadt))
-- Discuss fix for 129 [\#130](https://github.com/elexis-eu/lexonomy/pull/130) ([iiegn](https://github.com/iiegn))
 - Add util script for changing password  [\#127](https://github.com/elexis-eu/lexonomy/pull/127) ([gareins](https://github.com/gareins))
 - siteconfig.json now changeable via LEXONOMY\_SITECONFIG [\#123](https://github.com/elexis-eu/lexonomy/pull/123) ([gareins](https://github.com/gareins))
 - Allow user to adjust docSpec. [\#121](https://github.com/elexis-eu/lexonomy/pull/121) ([jan-niestadt](https://github.com/jan-niestadt))
