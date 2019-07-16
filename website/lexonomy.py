@@ -138,6 +138,12 @@ def entryread(user, dictDB, configs):
 def consent(user):
     return template("consent.tpl", **{"user": user, "siteconfig": siteconfig})
 
+@post(siteconfig["rootPath"] + "consent.json")
+@auth
+def save_consent(user):
+    res = ops.setConsent(user["email"], request.forms.consent)
+    return {"success": res}
+
 @get(siteconfig["rootPath"] + "skeget/corpora")
 @auth
 def skeget_corpora(user):
@@ -149,7 +155,7 @@ def skeget_corpora(user):
 def login():
     res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
     if res["loggedin"]:
-        redirect("/")
+        return redirect("/")
     if not "Referer" in request.headers:
         referer = "/"
     elif re.search(r"/login/$",request.headers["Referer"]):
@@ -181,6 +187,60 @@ def logout(user):
     response.delete_cookie("email")
     response.delete_cookie("sessionkey")
     return redirect(referer)
+
+@get(siteconfig["rootPath"] + "signup")
+def signup():
+    res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+    if res["loggedin"]:
+        return redirect("/")
+    return template("signup.tpl", **{"siteconfig": siteconfig, "redirectUrl": "/"})
+
+@post(siteconfig["rootPath"] + "signup.json")
+def send_signup():
+    client_ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    res = ops.sendSignupToken(request.forms.email, client_ip)
+    return {"success": res}
+
+@get(siteconfig["rootPath"] + "createaccount/<token>")
+def create_account(token):
+    res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+    if res["loggedin"]:
+        return redirect("/")
+    valid = ops.verifyToken(token, "register")
+    return template("createaccount.tpl", **{"siteconfig": siteconfig, "redirectUrl": "/", "token": token, "tokenValid": valid})
+
+@post(siteconfig["rootPath"] + "createaccount.json")
+def do_create_account():
+    client_ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    res = ops.createAccount(request.forms.token, request.forms.password, client_ip)
+    return {"success": res}
+
+@get(siteconfig["rootPath"] + "forgotpwd")
+def forgot():
+    res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+    if res["loggedin"]:
+        return redirect("/")
+    return template("forgotpwd.tpl", **{"siteconfig": siteconfig, "redirectUrl": "/"})
+
+@post(siteconfig["rootPath"] + "forgotpwd.json")
+def forgotpwd():
+    client_ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    res = ops.sendToken(request.forms.email, client_ip)
+    return {"success": res}
+
+@get(siteconfig["rootPath"] + "recoverpwd/<token>")
+def recover_pwd(token):
+    res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+    if res["loggedin"]:
+        return redirect("/")
+    valid = ops.verifyToken(token, "recovery")
+    return template("recoverpwd.tpl", **{"siteconfig": siteconfig, "redirectUrl": "/", "token": token, "tokenValid": valid})
+
+@post(siteconfig["rootPath"] + "recoverpwd.json")
+def do_recover_pwd():
+    client_ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+    res = ops.resetPwd(request.forms.token, request.forms.password, client_ip)
+    return {"success": res}
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None

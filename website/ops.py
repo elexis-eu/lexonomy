@@ -8,6 +8,7 @@ import sqlite3
 import hashlib
 import random
 import string
+import smtplib, ssl
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -29,6 +30,20 @@ def getMainDB():
     conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite'))
     conn.row_factory = sqlite3.Row
     return conn
+
+# SMTP
+def sendmail(mailTo, mailSubject, mailText):
+    if siteconfig["mailconfig"] and siteconfig["mailconfig"]["host"] and siteconfig["mailconfig"]["port"]:
+        if siteconfig["mailconfig"]["secure"]:
+            context = ssl.create_default_context()
+            server = smtplib.SMTP_SSL(siteconfig["mailconfig"]["host"], siteconfig["mailconfig"]["port"], context=context)
+        else:
+            server = smtplib.SMTP(siteconfig["mailconfig"]["host"], siteconfig["mailconfig"]["port"])
+        message = "Subject: " + mailSubject + "\n\n" + mailText
+        print(message)
+        server.sendmail(siteconfig["mailconfig"]["from"], mailTo, message)
+        server.quit()
+        
 
 # config
 def readDictConfigs(dictDB):
@@ -151,5 +166,97 @@ def logout(user):
     print(user["email"])
     conn = getMainDB()
     conn.execute("update users set sessionKey='', sessionLast='' where email=?", (user["email"],))
+    conn.commit()
+    return True
+
+def sendSignupToken(email, remoteip):
+    if siteconfig["readonly"]:
+        return False    
+    conn = getMainDB()
+    c = conn.execute("select email from users where email=?", (email.lower(),))
+    user = c.fetchone()
+    if not user:
+        token = hashlib.sha1(hashlib.sha1(random.choice(string.ascii_uppercase).encode("utf-8")).hexdigest().encode("utf-8")).hexdigest()
+        tokenurl = siteconfig["baseUrl"] + "createaccount/" + token
+        expireDate = datetime.datetime.now() + datetime.timedelta(days=2)
+        mailSubject = "Lexonomy signup"
+        mailText = "Dear Lexonomy user,\n\n"
+        mailText += "Somebody (hopefully you, from the address "+remoteip+") requested to create a new Lexonomy account. Please follow the link below to create your account:\n\n"
+        mailText += tokenurl + "\n\n"
+        mailText += "For security reasons this link is only valid for two days (until "+expireDate.isoformat()+"). If you did not request an account, you can safely ignore this message. \n\n"
+        mailText += "Yours,\nThe Lexonomy team"
+        conn.execute("insert into register_tokens (email, requestAddress, token, expiration) values (?, ?, ?, ?)", (email, remoteip, token, expireDate))
+        conn.commit()
+        sendmail(email, mailSubject, mailText)
+        return True
+    else:
+        return False
+
+def sendToken(email, remoteip):
+    if siteconfig["readonly"]:
+        return False    
+    conn = getMainDB()
+    c = conn.execute("select email from users where email=?", (email.lower(),))
+    user = c.fetchone()
+    if user:
+        token = hashlib.sha1(hashlib.sha1(random.choice(string.ascii_uppercase).encode("utf-8")).hexdigest().encode("utf-8")).hexdigest()
+        tokenurl = siteconfig["baseUrl"] + "recoverpwd/" + token
+        expireDate = datetime.datetime.now() + datetime.timedelta(days=2)
+        mailSubject = "Lexonomy password reset"
+        mailText = "Dear Lexonomy user,\n\n"
+        mailText += "Somebody (hopefully you, from the address "+remoteip+") requested a new password for the Lexonomy account "+email+". You can reset your password by clicking the link below:\n\n";
+        mailText += tokenurl + "\n\n"
+        mailText += "For security reasons this link is only valid for two days (until "+expireDate.isoformat()+"). If you did not request a password reset, you can safely ignore this message. \n\n"
+        mailText += "Yours,\nThe Lexonomy team"
+        conn.execute("insert into recovery_tokens (email, requestAddress, token, expiration) values (?, ?, ?, ?)", (email, remoteip, token, expireDate))
+        conn.commit()
+        sendmail(email, mailSubject, mailText)
+        return True
+    else:
+        return False
+
+def verifyToken(token, tokenType):
+    conn = getMainDB()
+    c = conn.execute("select * from "+tokenType+"_tokens where token=? and expiration>=datetime('now') and usedDate is null", (token,))
+    row = c.fetchone()
+    if row:
+        return True
+    else:
+        return False
+
+def createAccount(token, password, remoteip):
+    conn = getMainDB()
+    c = conn.execute("select * from register_tokens where token=? and expiration>=datetime('now') and usedDate is null", (token,))
+    row = c.fetchone()
+    if row:
+        c2 = conn.execute("select * from users where email=?", (row["email"],))
+        row2 = c2.fetchone()
+        if not row2:
+            passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
+            conn.execute("insert into users (email,passwordHash) values (?,?)", (row["email"], passhash))
+            conn.execute("update register_tokens set usedDate=datetime('now'), usedAddress=? where token=?", (remoteip, token))
+            conn.commit()
+            return True
+        else:
+            return False
+    else:
+        return False
+
+def resetPwd(token, password, remoteip):
+    conn = getMainDB()
+    c = conn.execute("select * from recovery_tokens where token=? and expiration>=datetime('now') and usedDate is null", (token,))
+    row = c.fetchone()
+    if row:
+        passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
+        conn.execute("update users set passwordHash=? where email=?", (passhash, row["email"]))
+        conn.execute("update recovery_tokens set usedDate=datetime('now'), usedAddress=? where token=?", (remoteip, token))
+        conn.commit()
+        return True
+    else:
+        return False
+
+def setConsent(email, consent):
+    conn = getMainDB()
+    conn.execute("update users set consent=? where email=?", (consent, email))
     conn.commit()
     return True
