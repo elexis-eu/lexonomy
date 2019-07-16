@@ -9,6 +9,7 @@ import hashlib
 import random
 import string
 import smtplib, ssl
+import urllib
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -259,4 +260,39 @@ def setConsent(email, consent):
     conn = getMainDB()
     conn.execute("update users set consent=? where email=?", (consent, email))
     conn.commit()
+    return True
+
+def changePwd(email, password):
+    conn = getMainDB()
+    passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
+    conn.execute("update users set passwordHash=? where email=?", (passhash, email))
+    conn.commit()
+    return True
+
+def changeSkeUserName(email, ske_userName):
+    conn = getMainDB()
+    conn.execute("update users set ske_username=? where email=?", (ske_userName, email))
+    conn.commit()
+    return True
+
+def changeSkeApiKey(email, ske_apiKey):
+    conn = getMainDB()
+    conn.execute("update users set ske_apiKey=? where email=?", (ske_apiKey, email))
+    conn.commit()
+    return True
+
+def updateUserApiKey(user, apiKey):
+    conn = getMainDB()
+    conn.execute("update users set apiKey=? where email=?", (apiKey, user["email"]))
+    conn.commit()
+    sendApiKeyToSke(user, apiKey)
+    return True
+
+def sendApiKeyToSke(user, apiKey):
+    if user["ske_username"] and user["ske_apiKey"]:
+        print("send API key to SKE")
+        data = json.dumps({"options": {"settings_lexonomyApiKey": apiKey, "settings_lexonomyEmail": user["email"].lower()}})
+        queryData = urllib.parse.urlencode({ "username": user["ske_username"], "api_key": user["ske_apiKey"], "json": data })
+        url = "https://api.sketchengine.eu/bonito/run.cgi/set_user_options?" + queryData
+        res = urllib.request.urlopen(url)
     return True

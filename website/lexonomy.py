@@ -242,6 +242,41 @@ def do_recover_pwd():
     res = ops.resetPwd(request.forms.token, request.forms.password, client_ip)
     return {"success": res}
 
+@get(siteconfig["rootPath"] + "userprofile")
+@auth
+def userprofile(user):
+    if not "Referer" in request.headers:
+        referer = "/"
+    elif re.search(r"/userprofile/$",request.headers["Referer"]):
+        referer = "/"
+    else:
+        referer = request.headers["Referer"]
+    return template("userprofile.tpl", **{"siteconfig": siteconfig, "redirectUrl": referer, "user": user})
+
+@post(siteconfig["rootPath"] + "changepwd.json")
+@auth
+def changepwd(user):
+    res = ops.changePwd(user["email"], request.forms.password)
+    return {"success": res}
+
+@post(siteconfig["rootPath"] + "changeskeusername.json")
+@auth
+def changeskeusername(user):
+    res = ops.changeSkeUserName(user["email"], request.forms.ske_userName)
+    return {"success": res}
+
+@post(siteconfig["rootPath"] + "changeskeapi.json")
+@auth
+def changeskeapi(user):
+    res = ops.changeSkeApiKey(user["email"], request.forms.ske_apiKey)
+    return {"success": res}
+
+@post(siteconfig["rootPath"] + "changeoneclickapi.json")
+@auth
+def changeoneclickapi(user):
+    res = ops.updateUserApiKey(user, request.forms.apiKey)
+    return {"success": res}
+
 # anything we don't know we forward to NodeJS
 nodejs_pid = None
 @error(404)
