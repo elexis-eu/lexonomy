@@ -23,14 +23,12 @@ Group][elexis-lexonomy-group].
 
 ## <a name="issue"></a> Found a Bug?
 If you find a bug, you can help us by [submitting an issue](#submit-issue) to
-our [GitHub Repository][github]. Even better, you can [submit a Pull
-Request](#submit-pr) with a fix.
-
+our [GitHub Repository][github].
 
 ## <a name="feature"></a> Missing a Feature?
-You can *request* a new feature by [submitting an issue](#submit-issue) to our GitHub
-Repository. If you would like to *implement* a new feature, please submit an issue with
-a proposal for your work first.
+You can *request* a new feature by [submitting an issue](#submit-issue) to our
+[GitHub Repository][github].  If you would like to *implement* a new feature,
+please submit an issue with a proposal for your work first.
 
 ## <a name="submit"></a> Submission Guidelines
 
@@ -41,7 +39,7 @@ your problem already exists and the discussion might inform you of workarounds
 readily available.
 
 Before fixing a bug we need to understand and confirm it. In order to
-understand bugs, we will ask you to provide necessary information. 
+understand bugs, we will ask you to provide all necessary information.
 
 You can file new issues by selecting from our [new issue
 templates](https://github.com/elexis-eu/lexonomy/issues/new/choose) and filling
@@ -118,6 +116,7 @@ Help us keep Lexonomy open and inclusive. Please read and follow our [Code of Co
 
 
 [elexis-lexonomy-group]: https://groups.google.com/forum/#!forum/elexis-lexonomy
+[github]: https://github.com/elexis-eu/lexonomy/
 [js-style-guide]: https://standardjs.com/rules.html
 [py-style-guide]: https://www.python.org/dev/peps/pep-0008/
 [CHANGELOG]: https://github.com/elexis-eu/lexonomy/blob/master/CHANGELOG.md
