@@ -85,8 +85,8 @@ the message to be easier to read on GitHub as well as in various git tools.
 ### Subject
 The subject contains a succinct description of the change:
 
+* do capitalize the first letter
 * use the imperative, present tense: "change" not "changed" nor "changes"
-* do not capitalize the first letter
 * no dot (.) at the end
 
 ### Body
