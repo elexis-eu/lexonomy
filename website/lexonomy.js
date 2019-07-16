@@ -60,20 +60,20 @@ app.get(siteconfig.rootPath, function (req, res) {
     });
   });
 });
-app.get(siteconfig.rootPath + "login/", function (req, res) {
+/*app.get(siteconfig.rootPath + "login/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (/\/login\/$/.test(req.headers.referer)) req.headers.referer = null;
     res.render("login.ejs", { user: user, redirectUrl: req.headers.referer || "/", siteconfig: siteconfig });
   });
-});
-app.get(siteconfig.rootPath + "logout/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + "logout/", function (req, res) {
   ops.logout(req.cookies.email, req.cookies.sessionkey, function () {
     res.clearCookie("email");
     res.clearCookie("sessionkey");
     if (/\/logout\/$/.test(req.headers.referer)) req.headers.referer = null;
     res.redirect(req.headers.referer || "/");
   });
-});
+});*/
 app.get(siteconfig.rootPath + "make/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.loggedin) res.redirect("/"); else {
@@ -83,47 +83,47 @@ app.get(siteconfig.rootPath + "make/", function (req, res) {
     }
   });
 });
-app.get(siteconfig.rootPath + "signup/", function (req, res) {
+/*app.get(siteconfig.rootPath + "signup/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     res.render("signup.ejs", { user: user, redirectUrl: "/", siteconfig: siteconfig });
   });
-});
-app.get(siteconfig.rootPath + "forgotpwd/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + "forgotpwd/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     res.render("forgotpwd.ejs", { user: user, redirectUrl: "/", siteconfig: siteconfig });
   });
-});
-app.get(siteconfig.rootPath + "createaccount/:token/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + "createaccount/:token/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     ops.verifyToken(req.params.token, "register", function (valid) {
       var tokenValid = valid;
       res.render("createaccount.ejs", { user: user, redirectUrl: "/", siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid });
     });
   });
-});
-app.get(siteconfig.rootPath + "recoverpwd/:token/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + "recoverpwd/:token/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     ops.verifyToken(req.params.token, "recovery", function (valid) {
       var tokenValid = valid;
       res.render("recoverpwd.ejs", { user: user, redirectUrl: "/", siteconfig: siteconfig, token: req.params.token, tokenValid: tokenValid });
     });
   });
-});
-app.get(siteconfig.rootPath + "changepwd/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + "changepwd/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (/\/changepwd\/$/.test(req.headers.referer)) req.headers.referer = null;
     res.render("changepwd.ejs", { user: user, redirectUrl: req.headers.referer || "/", siteconfig: siteconfig });
   });
-});
-app.get(siteconfig.rootPath + "userprofile/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + "userprofile/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (/\/userprofile\/$/.test(req.headers.referer)) req.headers.referer = null;
     res.render("userprofile.ejs", { user: user, redirectUrl: req.headers.referer || "/", siteconfig: siteconfig });
   });
-});
+});*/
 
 // SITEWIDE UI, JSON endpoints:
-app.post(siteconfig.rootPath + "login.json", function (req, res) {
+/*app.post(siteconfig.rootPath + "login.json", function (req, res) {
   ops.login(req.body.email, req.body.password, function (success, email, sessionkey) {
     if (success) {
       // const oneday=86400000; //86,400,000 miliseconds = 24 hours
@@ -136,8 +136,8 @@ app.post(siteconfig.rootPath + "login.json", function (req, res) {
       res.json({ success: false });
     }
   });
-});
-app.post(siteconfig.rootPath + "consent.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + "consent.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (user.loggedin) {
       ops.setConsent(user.email, req.body.consent, function (success) {
@@ -145,7 +145,7 @@ app.post(siteconfig.rootPath + "consent.json", function (req, res) {
       });
     }
   });
-});
+});*/
 app.post(siteconfig.rootPath + "make.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.loggedin) res.redirect("/"); else {
@@ -155,7 +155,7 @@ app.post(siteconfig.rootPath + "make.json", function (req, res) {
     }
   });
 });
-app.post(siteconfig.rootPath + "changepwd.json", function (req, res) {
+/*app.post(siteconfig.rootPath + "changepwd.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.loggedin) res.redirect("/"); else {
       ops.changePwd(user.email, req.body.password, function (success) {
@@ -181,8 +181,8 @@ app.post(siteconfig.rootPath + "changeskeapi.json", function (req, res) {
       });
     }
   });
-});
-app.post(siteconfig.rootPath + "changeoneclickapi.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + "changeoneclickapi.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.loggedin) res.redirect("/"); else {
       ops.updateUserApiKey(user.email, req.body.apiKey, function () {
@@ -191,31 +191,31 @@ app.post(siteconfig.rootPath + "changeoneclickapi.json", function (req, res) {
       });
     }
   });
-});
-app.post(siteconfig.rootPath + "signup.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + "signup.json", function (req, res) {
   var remoteip = ops.getRemoteAddress(req);
   ops.sendSignupToken(req.body.email, remoteip, function (success) {
     res.json({ success: success });
   });
-});
-app.post(siteconfig.rootPath + "forgotpwd.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + "forgotpwd.json", function (req, res) {
   var remoteip = ops.getRemoteAddress(req);
   ops.sendToken(req.body.email, remoteip, function (success) {
     res.json({ success: success });
   });
-});
-app.post(siteconfig.rootPath + "createaccount.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + "createaccount.json", function (req, res) {
   var remoteip = ops.getRemoteAddress(req);
   ops.createAccount(req.body.token, req.body.password, remoteip, function (success) {
     res.json({ success: success });
   });
-});
-app.post(siteconfig.rootPath + "recoverpwd.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + "recoverpwd.json", function (req, res) {
   var remoteip = ops.getRemoteAddress(req);
   ops.resetPwd(req.body.token, req.body.password, remoteip, function (success) {
     res.json({ success: success });
   });
-});
+});*/
 
 // DOCS:
 app.use(siteconfig.rootPath + "docs", express.static(path.join(__dirname, "docs")));
@@ -327,7 +327,7 @@ app.post(siteconfig.rootPath + "dicts/dictread.json", function (req, res) {
 });
 
 // SKETCHENGINE LOGIN JSON endpoint:
-app.get(siteconfig.rootPath + "skelogin.json/:token", function (req, res) {
+/*app.get(siteconfig.rootPath + "skelogin.json/:token", function (req, res) {
   // var token = req.headers.authorization.replace('Bearer ', '');
   var token = req.params.token;
   var secret = siteconfig.sketchengineKey;
@@ -358,7 +358,7 @@ app.get(siteconfig.rootPath + "skelogin.json/:token", function (req, res) {
       res.redirect("/");
     }
   });
-});
+});*/
 
 // ONE-CLICK UI and JSON endpoints:
 app.get(siteconfig.rootPath + "oneclick/", function (req, res) {

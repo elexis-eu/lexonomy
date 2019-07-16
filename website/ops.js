@@ -994,7 +994,7 @@ module.exports = {
     }
   },
 
-  login: function (email, password, callnext) {
+  /*login: function (email, password, callnext) {
     if (siteconfig.readonly) {
       callnext(false, "", "");
     } else {
@@ -1015,8 +1015,8 @@ module.exports = {
         }
       });
     }
-  },
-  changePwd: function (email, password, callnext) {
+  },*/
+  /*changePwd: function (email, password, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     var hash = sha1(password);
     db.run("update users set passwordHash=$hash where email=$email", { $hash: hash, $email: email.toLowerCase() }, function (err, row) {
@@ -1037,15 +1037,15 @@ module.exports = {
       db.close();
       callnext(true);
     });
-  },
-  setConsent: function (email, consent, callnext) {
+  },*/
+  /*setConsent: function (email, consent, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.run("update users set consent=$consent where email=$email", { $consent: consent, $email: email.toLowerCase() }, function (err, row) {
       db.close();
       callnext(true);
     });
-  },
-  sendSignupToken: function (email, remoteip, callnext) {
+  },*/
+  /*sendSignupToken: function (email, remoteip, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", { $email: email.toLowerCase() }, function (err, row) {
       if (row == undefined) {
@@ -1069,8 +1069,8 @@ module.exports = {
         callnext(false);
       }
     });
-  },
-  sendToken: function (email, remoteip, callnext) {
+  },*/
+  /*sendToken: function (email, remoteip, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email", { $email: email.toLowerCase() }, function (err, row) {
       if (row) {
@@ -1094,15 +1094,15 @@ module.exports = {
         callnext(false);
       }
     });
-  },
-  verifyToken: function (token, type, callnext) {
+  },*/
+  /*verifyToken: function (token, type, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select * from " + type + "_tokens where token=$token and expiration>=datetime('now') and usedDate is null", { $token: token }, function (err, row) {
       db.close();
       if (!row) callnext(false); else callnext(true);
     });
-  },
-  createAccount: function (token, password, remoteip, callnext) {
+  },*/
+  /*createAccount: function (token, password, remoteip, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select * from register_tokens where token=$token and expiration>=datetime('now') and usedDate is null", { $token: token }, function (err, row) {
       if (row) {
@@ -1122,8 +1122,8 @@ module.exports = {
         });
       }
     });
-  },
-  resetPwd: function (token, password, remoteip, callnext) {
+  },*/
+  /*resetPwd: function (token, password, remoteip, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select * from recovery_tokens where token=$token and expiration>=datetime('now') and usedDate is null", { $token: token }, function (err, row) {
       if (row) {
@@ -1137,8 +1137,8 @@ module.exports = {
         });
       }
     });
-  },
-  processJWT: function (user, jwtData, callnext) {
+  },*/
+  /*processJWT: function (user, jwtData, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     if (user.loggedin) {
       // user logged in = save SkE ID in database
@@ -1179,7 +1179,7 @@ module.exports = {
         }
       });
     }
-  },
+  },*/
   verifyLogin: function (email, sessionkey, callnext) {
     var yesterday = (new Date()); yesterday.setHours(yesterday.getHours() - 24); yesterday = yesterday.toISOString();
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
@@ -1279,7 +1279,7 @@ module.exports = {
       }
     });
   },
-  prepareApiKeyForSke: function (email, callnext) {
+  /*prepareApiKeyForSke: function (email, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select apiKey, ske_username, ske_apiKey from users where email=$email", { $email: email.toLowerCase() }, function (err, row) {
       if (!row || siteconfig.readonly) {
@@ -1303,8 +1303,8 @@ module.exports = {
         callnext(lexonomyApiKey);
       }
     });
-  },
-  sendApiKeyToSke: function (email, apiKey, ske_username, ske_apiKey, callnext) {
+  },*/
+  /*sendApiKeyToSke: function (email, apiKey, ske_username, ske_apiKey, callnext) {
     console.log("send API key to SkE");
     if (ske_username != "" && ske_apiKey != "") {
       var data = JSON.stringify({ options: {
@@ -1331,7 +1331,7 @@ module.exports = {
       });
       req.end();
     }
-  },
+  },*/
   getDoc: function (docID, callnext) {
     var doc = { id: docID, title: "", html: "" };
     fs.readFile("docs/" + docID + ".md", "utf8", function (err, content) {
