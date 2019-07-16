@@ -5,6 +5,7 @@ import sys
 import functools
 import ops
 import re
+import jwt
 from ops import siteconfig
 
 from bottle import (hook, route, get, post, run, template, error, request,
@@ -168,8 +169,8 @@ def login():
 def check_login():
     res = ops.login(request.forms.email, request.forms.password)
     if res["success"]:
-        response.set_cookie("email", res["email"])
-        response.set_cookie("sessionkey", res["key"])
+        response.set_cookie("email", res["email"], path="/")
+        response.set_cookie("sessionkey", res["key"], path="/")
         return {"success": True, "sessionkey": res["key"]}
     else:
         return {"success": False}
@@ -184,8 +185,8 @@ def logout(user):
         referer = "/"
     else:
         referer = request.headers["Referer"]
-    response.delete_cookie("email")
-    response.delete_cookie("sessionkey")
+    response.delete_cookie("email", path="/")
+    response.delete_cookie("sessionkey", path="/")
     return redirect(referer)
 
 @get(siteconfig["rootPath"] + "signup")
@@ -276,6 +277,28 @@ def changeskeapi(user):
 def changeoneclickapi(user):
     res = ops.updateUserApiKey(user, request.forms.apiKey)
     return {"success": res}
+
+@get(siteconfig["rootPath"] + "skelogin.json/<token>")
+def skelogin(token):
+    secret = siteconfig["sketchengineKey"]
+    print(token, secret)
+    try:
+        jwtdata = jwt.decode(token, secret, audience="lexonomy.eu")
+        user = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+        res = ops.processJWT(user, jwtdata)
+        if res["success"]:
+            response.set_cookie("email", res["email"].lower(), path="/")
+            response.set_cookie("sessionkey", res["key"], path="/")
+            return redirect("/")
+        else:
+            print(res["error"])
+            response.set_cookie("jwt_error", str(res["error"]), path="/")
+            return redirect("/")
+    except Exception as e:
+        print(str(e))
+        response.set_cookie("jwt_error", str(e), path="/")
+        return redirect("/")
+    
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None

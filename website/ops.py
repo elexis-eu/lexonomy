@@ -10,6 +10,7 @@ import random
 import string
 import smtplib, ssl
 import urllib
+import jwt
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -296,3 +297,53 @@ def sendApiKeyToSke(user, apiKey):
         url = "https://api.sketchengine.eu/bonito/run.cgi/set_user_options?" + queryData
         res = urllib.request.urlopen(url)
     return True
+
+def prepareApiKeyForSke(email):
+    conn = getMainDB()
+    c = conn.execute("select * from users where email=?", (email,))
+    row = c.fetchone()
+    if row:
+        if row["apiKey"] == None or row["apiKey"] == "":
+            lexapi = generateKey()
+            conn.execute("update users set apiKey=? where email=?", (lexapi, email))
+            conn.commit()
+        else:
+            lexapi = row["apiKey"]
+        sendApiKeyToSke(row, lexapi)
+    return True
+    
+
+def processJWT(user, jwtdata):
+    print(jwtdata)
+    print(user)
+    conn = getMainDB()
+    c = conn.execute("select * from users where ske_id=?", (jwtdata["user"]["id"],))
+    row = c.fetchone()
+    key = generateKey()
+    now = datetime.datetime.utcnow()
+    if row:
+        #if SkE ID in database = log in user
+        conn.execute("update users set sessionKey=?, sessionLast=? where email=?", (key, now, row["email"]))
+        conn.commit()
+        prepareApiKeyForSke(row["email"])
+        return {"success": True, "email": row["email"], "key": key}
+    else:
+        if user["loggedin"]:
+            #user logged in = save SkE ID in database
+            conn.execute("update users set ske_id=?, ske_username=?, ske_apiKey=?, sessionKey=?, sessionLast=? where email=?", (jwtdata["user"]["id"], jwtdata["user"]["username"], jwtdata["user"]["api_key"], key, now, user["email"]))
+            conn.commit()
+            prepareApiKeyForSke(user["email"])
+            return {"success": True, "email": user["email"], "key": key}
+        else:
+            #user not logged in = register and log in
+            email = jwtdata["user"]["email"].lower()
+            c2 = conn.execute("select * from users where email=?", (email,))
+            row2 = c2.fetchone()
+            if not row2:
+                lexapi = generateKey()
+                conn.execute("insert into users (email, passwordHash, ske_id, ske_username, ske_apiKey, sessionKey, sessionLast, apiKey) values (?, null, ?, ?, ?, ?, ?, ?)", (email, jwtdata["user"]["id"], jwtdata["user"]["username"], jwtdata["user"]["api_key"], key, now, lexapi))
+                conn.commit()
+                prepareApiKeyForSke(email)
+                return {"success": True, "email": email, "key": key}
+            else:
+                return {"success": False, "error": "user with email " + email + " already exists. Log-in and connect account to SkE."}
