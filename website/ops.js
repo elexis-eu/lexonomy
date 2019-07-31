@@ -1332,7 +1332,7 @@ module.exports = {
       req.end();
     }
   },*/
-  getDoc: function (docID, callnext) {
+  /*getDoc: function (docID, callnext) {
     var doc = { id: docID, title: "", html: "" };
     fs.readFile("docs/" + docID + ".md", "utf8", function (err, content) {
       if (!err) {
@@ -1342,7 +1342,7 @@ module.exports = {
       }
       callnext(doc);
     });
-  },
+  },*/
   markdown: function (str) {
     var tree = markdown.parse(str);
     str = markdown.renderJsonML(markdown.toHTMLTree(tree));

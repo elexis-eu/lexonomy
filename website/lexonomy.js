@@ -218,14 +218,14 @@ app.post(siteconfig.rootPath + "changeskeapi.json", function (req, res) {
 });*/
 
 // DOCS:
-app.use(siteconfig.rootPath + "docs", express.static(path.join(__dirname, "docs")));
+/*app.use(siteconfig.rootPath + "docs", express.static(path.join(__dirname, "docs")));
 app.get(siteconfig.rootPath + "docs/:docID/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     ops.getDoc(req.params.docID, function (doc) {
       res.render("doc.ejs", { user: user, siteconfig: siteconfig, doc: doc });
     });
   });
-});
+});*/
 
 // USERS UI, navigator and editor:
 app.get(siteconfig.rootPath + "users/", function (req, res) {

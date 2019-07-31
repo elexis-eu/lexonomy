@@ -12,6 +12,8 @@ import smtplib, ssl
 import urllib
 import jwt
 import shutil
+import markdown
+import re
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -425,3 +427,14 @@ def moveDict(oldID, newID):
     attachDict(dictDB, newID)
     return True
 
+def getDoc(docID):
+    if os.path.isfile("docs/"+docID+".md"):
+        doc = {"id": docID, "title":"", "html": ""}
+        html = markdown.markdown(open("docs/"+docID+".md").read())
+        title = re.search('<h1>([^<]*)</h1>', html)
+        if title:
+            doc["title"] = re.sub('<\/?h1>','', title.group(0))
+        doc["html"] = html
+        return doc
+    else:
+        return False

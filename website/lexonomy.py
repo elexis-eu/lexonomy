@@ -326,6 +326,15 @@ def skelogin(token):
         print(str(e))
         response.set_cookie("jwt_error", str(e), path="/")
         return redirect("/")
+
+@get(siteconfig["rootPath"] + "docs/<file>")
+def getdoc(file):
+    resDoc = ops.getDoc(file)
+    if resDoc:
+        res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+        return template("doc.tpl", **{"siteconfig": siteconfig, "user": res, "doc": resDoc})
+    else:
+        return static_file("/docs/"+file, root="./")    
     
 
 # anything we don't know we forward to NodeJS
