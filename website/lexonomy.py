@@ -77,7 +77,7 @@ install(profiler)
 # authentication decorator
 # use @authDict(["canEdit", "canConfig", "canUpload", "canDownload"]) before any handler
 # to ensure that user has appropriate access to the dictionary. Empty list checks read access only.
-# assumes <dictID> in route and "user", "dictDB", "configs" as parameters in the decorated function
+# assumes <dictID> in route and "dictID", "user", "dictDB", "configs" as parameters in the decorated function
 # <dictID> gets open and passed as dictDB alongside the configs
 def authDict(checkRights):
     def wrap(func):
@@ -91,7 +91,6 @@ def authDict(checkRights):
             for r in checkRights:
                 if not res.get(r, False):
                     return res
-            del kwargs["dictID"]
             kwargs["user"] = res
             kwargs["dictDB"] = conn
             kwargs["configs"] = configs
@@ -114,13 +113,13 @@ def auth(func):
 
 @post(siteconfig["rootPath"] + "<dictID>/entrydelete.json")
 @authDict(["canEdit"])
-def entrydelete(user, dictDB, configs):
+def entrydelete(dictID, user, dictDB, configs):
     ops.deleteEntry(dictDB, request.forms.id, user["email"])
     return {"success": True, "id": request.forms.id}
 
 @post(siteconfig["rootPath"]+"<dictID>/entryread.json")
 @authDict([])
-def entryread(user, dictDB, configs):
+def entryread(dictID, user, dictDB, configs):
     adjustedEntryID, xml, _title = ops.readEntry(dictDB, configs, request.forms.id)
     adjustedEntryID = int(adjustedEntryID)
     html = ""
@@ -253,6 +252,35 @@ def userprofile(user):
     else:
         referer = request.headers["Referer"]
     return template("userprofile.tpl", **{"siteconfig": siteconfig, "redirectUrl": referer, "user": user})
+
+@get(siteconfig["rootPath"] + "make")
+@auth
+def makedict(user):
+    return template("make.tpl", **{"siteconfig": siteconfig, "suggested": ops.suggestDictId(), "user": user})
+
+@post(siteconfig["rootPath"] + "make.json")
+@auth
+def makedictjson(user):
+    res = ops.makeDict(request.forms.url, request.forms.template, request.forms.title, "", user["email"])
+    return {"success": res}
+
+@post(siteconfig["rootPath"]+"<dictID>/clone.json")
+@authDict(["canConfig"])
+def clonedict(dictID, user, dictDB, configs):
+    res = ops.cloneDict(dictID, user["email"])
+    return res
+
+@post(siteconfig["rootPath"]+"<dictID>/destroy.json")
+@authDict(["canConfig"])
+def destroydict(dictID, user, dictDB, configs):
+    res = ops.destroyDict(dictID)
+    return {"success": res}
+
+@post(siteconfig["rootPath"]+"<dictID>/move.json")
+@authDict(["canConfig"])
+def movedict(dictID, user, dictDB, configs):
+    res = ops.moveDict(dictID, request.forms.url)
+    return {"success": res}
 
 @post(siteconfig["rootPath"] + "changepwd.json")
 @auth

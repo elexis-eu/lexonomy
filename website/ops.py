@@ -11,6 +11,7 @@ import string
 import smtplib, ssl
 import urllib
 import jwt
+import shutil
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -20,6 +21,8 @@ defaultDictConfig = {"editing": {"xonomyMode": "nerd", "xonomyTextEditor": "askS
                      "xema": {"elements": {}},
                      "titling": {"headwordAnnotations": [], "abc": siteconfig["defaultAbc"]},
                      "flagging": {"flag_element": "", "flags": []}}
+
+prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent", "userprofile"];
 
 # db management
 def getDB(dictID):
@@ -147,6 +150,9 @@ def readEntry (db, configs, entryID):
 
 def generateKey(size=32):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
+
+def generateDictId(size=8):
+    return ''.join(random.choice("abcdefghijkmnpqrstuvwxy23456789") for _ in range(size))
 
 def login(email, password):
     if siteconfig["readonly"]:
@@ -347,3 +353,75 @@ def processJWT(user, jwtdata):
                 return {"success": True, "email": email, "key": key}
             else:
                 return {"success": False, "error": "user with email " + email + " already exists. Log-in and connect account to SkE."}
+
+
+def dictExists(dictID):
+    return os.path.isfile(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+
+def suggestDictId():
+    dictid = generateDictId()
+    while dictid in prohibitedDictIDs or dictExists(dictid):
+        dictid = generateDictId()
+    return dictid
+
+def makeDict(dictID, template, title, blurb, email):
+    if title == "":
+        title = "?"
+    if blurb == "":
+        blurb = "Yet another Lexonomy dictionary."
+    if dictID in prohibitedDictIDs or dictExists(dictID):
+        return False
+    shutil.copy("dictTemplates/" + template + ".sqlite", os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    users = {email: {"canEdit": True, "canConfig": True, "canDownload": True, "canUpload": True}}
+    dictDB = getDB(dictID)
+    dictDB.execute("update configs set json=? where id='users'", (json.dumps(users),))
+    ident = {"title": title, "blurb": blurb}
+    dictDB.execute("update configs set json=? where id='ident'", (json.dumps(ident),))
+    dictDB.commit()
+    attachDict(dictDB, dictID)
+    return True
+
+def attachDict(dictDB, dictID):
+    configs = readDictConfigs(dictDB)
+    conn = getMainDB()
+    conn.execute("delete from dicts where id=?", (dictID,))
+    conn.execute("delete from user_dict where dict_id=?", (dictID,))
+    title = configs["ident"]["title"]
+    conn.execute("insert into dicts(id, title) values (?, ?)", (dictID, title))
+    for email in configs["users"]:
+        conn.execute("insert into user_dict(dict_id, user_email) values (?, ?)", (dictID, email.lower()))
+    conn.commit()
+
+def cloneDict(dictID, email):
+    newID = suggestDictId()
+    shutil.copy(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"), os.path.join(siteconfig["dataDir"], "dicts/" + newID + ".sqlite"))
+    newDB = getDB(newID)
+    res = newDB.execute("select json from configs where id='ident'")
+    row = res.fetchone()
+    ident = {"title": "?", "blurb": "?"}
+    if row:
+        ident = json.loads(row["json"])
+        ident["title"] = "Clone of " + ident["title"]
+    newDB.execute("update configs set json=? where id='ident'", (json.dumps(ident),))
+    newDB.commit()
+    return {"success": True, "dictID": newID, "title": ident["title"]}
+
+def destroyDict(dictID):
+    conn = getMainDB()
+    conn.execute("delete from dicts where id=?", (dictID,))
+    conn.execute("delete from user_dict where dict_id=?", (dictID,))
+    conn.commit()
+    os.remove(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    return True
+
+def moveDict(oldID, newID):
+    if newID in prohibitedDictIDs or dictExists(newID):
+        return False
+    shutil.move(os.path.join(siteconfig["dataDir"], "dicts/" + oldID + ".sqlite"), os.path.join(siteconfig["dataDir"], "dicts/" + newID + ".sqlite"))
+    conn = getMainDB()
+    conn.execute("delete from dicts where id=?", (oldID,))
+    conn.commit()
+    dictDB = getDB(newID)
+    attachDict(dictDB, newID)
+    return True
+

@@ -74,7 +74,7 @@ app.get(siteconfig.rootPath, function (req, res) {
     res.redirect(req.headers.referer || "/");
   });
 });*/
-app.get(siteconfig.rootPath + "make/", function (req, res) {
+/*app.get(siteconfig.rootPath + "make/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.loggedin) res.redirect("/"); else {
       ops.suggestDictID(function (suggested) {
@@ -82,7 +82,7 @@ app.get(siteconfig.rootPath + "make/", function (req, res) {
       });
     }
   });
-});
+});*/
 /*app.get(siteconfig.rootPath + "signup/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     res.render("signup.ejs", { user: user, redirectUrl: "/", siteconfig: siteconfig });
@@ -146,7 +146,7 @@ app.get(siteconfig.rootPath + "make/", function (req, res) {
     }
   });
 });*/
-app.post(siteconfig.rootPath + "make.json", function (req, res) {
+/*app.post(siteconfig.rootPath + "make.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.loggedin) res.redirect("/"); else {
       ops.makeDict(req.body.url, req.body.template, req.body.title, "", user.email, function (success) {
@@ -154,7 +154,7 @@ app.post(siteconfig.rootPath + "make.json", function (req, res) {
       });
     }
   });
-});
+});*/
 /*app.post(siteconfig.rootPath + "changepwd.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.loggedin) res.redirect("/"); else {
@@ -855,7 +855,7 @@ app.post(siteconfig.rootPath + ":dictID/randomone.json", function (req, res) {
     }
   });
 });
-app.post(siteconfig.rootPath + ":dictID/destroy.json", function (req, res) {
+/*app.post(siteconfig.rootPath + ":dictID/destroy.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -870,8 +870,8 @@ app.post(siteconfig.rootPath + ":dictID/destroy.json", function (req, res) {
       });
     }
   });
-});
-app.post(siteconfig.rootPath + ":dictID/clone.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + ":dictID/clone.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -886,8 +886,8 @@ app.post(siteconfig.rootPath + ":dictID/clone.json", function (req, res) {
       });
     }
   });
-});
-app.post(siteconfig.rootPath + ":dictID/move.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + ":dictID/move.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -902,7 +902,7 @@ app.post(siteconfig.rootPath + ":dictID/move.json", function (req, res) {
       });
     }
   });
-});
+});*/
 
 // DOWNLOAD:
 app.get(siteconfig.rootPath + ":dictID/download/", function (req, res) {

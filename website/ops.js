@@ -39,12 +39,12 @@ module.exports = {
   dictExists: function (dictID) {
     return fs.existsSync(path.join(siteconfig.dataDir, "dicts/" + dictID + ".sqlite"));
   },
-  suggestDictID: function (callnext) {
+  /*suggestDictID: function (callnext) {
     var id;
     do { id = generateDictID() } while (prohibitedDictIDs.indexOf(id) > -1 || module.exports.dictExists(id));
     callnext(id);
-  },
-  makeDict: function (dictID, template, title, blurb, email, callnext) {
+  },*/
+  /*makeDict: function (dictID, template, title, blurb, email, callnext) {
     if (!title) title = "?";
     if (!blurb) blurb = "Yet another Lexonomy dictionary.";
     if (prohibitedDictIDs.indexOf(dictID) > -1 || module.exports.dictExists(dictID)) {
@@ -66,8 +66,8 @@ module.exports = {
         });
       });
     }
-  },
-  renameDict: function (oldDictID, newDictID, callnext) {
+  },*/
+  /*renameDict: function (oldDictID, newDictID, callnext) {
     if (prohibitedDictIDs.indexOf(newDictID) > -1 || module.exports.dictExists(newDictID)) {
       callnext(false);
     } else {
@@ -84,7 +84,7 @@ module.exports = {
         });
       });
     }
-  },
+  },*/
   attachDict: function (dictDB, dictID, callnext) {
     module.exports.readDictConfigs(dictDB, dictID, function (configs) {
       var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function () { db.run("PRAGMA foreign_keys=on") });
@@ -105,7 +105,7 @@ module.exports = {
       });
     });
   },
-  destroyDict: function (dictID, callnext) {
+  /*destroyDict: function (dictID, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function () { db.run("PRAGMA foreign_keys=on") });
     db.run("delete from dicts where id=$dictID", { $dictID: dictID }, function (err) {
       if (err) console.log(err);
@@ -118,8 +118,8 @@ module.exports = {
         });
       });
     });
-  },
-  cloneDict: function (dictID, email, callnext) {
+  },*/
+  /*cloneDict: function (dictID, email, callnext) {
     module.exports.suggestDictID(function (cloneDictID) {
       fs.copy(path.join(siteconfig.dataDir, "dicts/" + dictID + ".sqlite"), path.join(siteconfig.dataDir, "dicts/" + cloneDictID + ".sqlite"), function (err) {
         var cloneDictDB = module.exports.getDB(cloneDictID);
@@ -139,7 +139,7 @@ module.exports = {
         });
       });
     });
-  },
+  },*/
   readDictConfigs: function (db, dictID, callnext) {
     if (db.dictConfigs) { callnext(db.dictConfigs) } else {
       var configs = { siteconfig: siteconfig };
@@ -1520,7 +1520,7 @@ function clean4xml (txt) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
-function generateKey () {
+/*function generateKey () {
   var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   var key = "";
   while (key.length < 32) {
@@ -1528,7 +1528,7 @@ function generateKey () {
     key += alphabet[i];
   }
   return key;
-}
+}*/
 function generateDictID () {
   var alphabet = "abcdefghijkmnpqrstuvwxy23456789";
   var id = "";
