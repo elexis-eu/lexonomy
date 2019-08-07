@@ -1240,7 +1240,7 @@ module.exports = {
       callnext();
     });
   },
-  getDictsByUser: function (email, callnext) {
+  /*getDictsByUser: function (email, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     var sql = "select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email=$email order by d.title";
     var dicts = [];
@@ -1265,7 +1265,7 @@ module.exports = {
         callnext(dicts);
       }
     }
-  },
+  },*/
   verifyUserApiKey: function (email, apikey, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE);
     db.get("select email from users where email=$email and apiKey=$key", { $email: email.toLowerCase(), $key: apikey }, function (err, row) {

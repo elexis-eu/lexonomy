@@ -111,6 +111,20 @@ def auth(func):
         return func(*args, **kwargs)
     return wrapper_verifyLogin
 
+
+#homepage
+@get(siteconfig["rootPath"])
+def home():
+    res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+    if res["loggedin"] and siteconfig["consent"] and siteconfig["consent"]["terms"] and not res["consent"]:
+        return redirect("/consent/")
+    dicts = ops.getDictsByUser(res["email"])
+    error = ""
+    if request.cookies.jwt_error:
+        error = request.cookies.jwt_error
+        response.delete_cookie("jwt_error", path="/")
+    return template("home.tpl", **{"user": res, "siteconfig": siteconfig, "dicts": dicts, "error": error})
+
 @post(siteconfig["rootPath"] + "<dictID>/entrydelete.json")
 @authDict(["canEdit"])
 def entrydelete(dictID, user, dictDB, configs):
@@ -335,7 +349,7 @@ def getdoc(file):
         return template("doc.tpl", **{"siteconfig": siteconfig, "user": res, "doc": resDoc})
     else:
         return static_file("/docs/"+file, root="./")    
-    
+
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None

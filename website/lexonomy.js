@@ -45,7 +45,7 @@ app.get(siteconfig.rootPath + "_info/", function (req, res) { res.redirect("/doc
 app.get(siteconfig.rootPath + ":dictID/en/", function (req, res) { res.redirect("/" + req.params.dictID + "/") });
 
 // SITEWIDE UI:
-app.get(siteconfig.rootPath, function (req, res) {
+/*app.get(siteconfig.rootPath, function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (user.loggedin && siteconfig.consent != null && siteconfig.consent.terms != null && !user.consent) {
       res.redirect("/consent/");
@@ -59,7 +59,7 @@ app.get(siteconfig.rootPath, function (req, res) {
       res.render("home.ejs", { siteconfig: siteconfig, user: user, dicts: dicts, error: error });
     });
   });
-});
+});*/
 /*app.get(siteconfig.rootPath + "login/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (/\/login\/$/.test(req.headers.referer)) req.headers.referer = null;
