@@ -450,3 +450,41 @@ def getDictsByUser(email):
             info["currentUserCanDelete"] = True
         dicts.append(info)
     return dicts
+
+def listUsers(searchtext, howmany):
+    conn = getMainDB()
+    c = conn.execute("select * from users where email like ? order by email limit ?", ("%"+searchtext+"%", howmany))
+    users = []
+    for r in c.fetchall():
+        users.append({"id": r["email"], "title": r["email"]})
+    c = conn.execute("select count(*) as total from users where email like ?", ("%"+searchtext+"%", ))
+    r = c.fetchone()
+    total = r["total"]
+    return {"entries":users, "total": total}
+
+def createUser(xml):
+    import xml.etree.ElementTree as ET
+    root = ET.fromstring(xml)
+    email = root.attrib["email"]
+    passhash = hashlib.sha1(root.attrib["password"].encode("utf-8")).hexdigest();
+    conn = getMainDB()
+    conn.execute("insert into users(email, passwordHash) values(?, ?)", (email.lower(), passhash))
+    conn.commit()
+    return {"entryID": email, "adjustedXml": readUser(email)["xml"]}
+
+def readUser(email):
+    conn = getMainDB()
+    c = conn.execute("select * from users where email=?", (email.lower(), ))
+    r = c.fetchone()
+    if r:
+        if r["sessionLast"]:
+            xml =  "<user lastSeen='"+r["sessionLast"]+"'>"
+        else:
+            xml =  "<user>"
+        c2 = conn.execute("select d.id, d.title from user_dict as ud inner join dicts as d on d.id=ud.dict_id  where ud.user_email=? order by d.title", (r["email"], ))
+        for r2 in c2.fetchall():
+            xml += "<dict id='" + r2["id"] + "' title='" + r2["title"] + "'/>"
+        xml += "</user>"
+        return {"email": r["email"], "xml": xml}
+    else:
+        return {"email":"", "xml":""}

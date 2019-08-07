@@ -228,23 +228,23 @@ app.get(siteconfig.rootPath + "docs/:docID/", function (req, res) {
 });*/
 
 // USERS UI, navigator and editor:
-app.get(siteconfig.rootPath + "users/", function (req, res) {
+/*app.get(siteconfig.rootPath + "users/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.redirect("/"); else {
       res.render("users.ejs", { user: user, siteconfig: siteconfig });
     }
   });
-});
-app.get(siteconfig.rootPath + "users/editor/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + "users/editor/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.redirect("about:blank"); else {
       res.render("usereditor.ejs", { user: user, siteconfig: siteconfig });
     }
   });
-});
+});*/
 
 // USERS UI, JSON endpoints:
-app.post(siteconfig.rootPath + "users/userlist.json", function (req, res) {
+/*app.post(siteconfig.rootPath + "users/userlist.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.json({ success: false }); else {
       ops.listUsers(req.body.searchtext, req.body.howmany, function (total, entries) {
@@ -252,8 +252,8 @@ app.post(siteconfig.rootPath + "users/userlist.json", function (req, res) {
       });
     }
   });
-});
-app.post(siteconfig.rootPath + "users/usercreate.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + "users/usercreate.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.json({ success: false }); else {
       ops.createUser(req.body.content, function (entryID, adjustedXml) {
@@ -270,7 +270,7 @@ app.post(siteconfig.rootPath + "users/userread.json", function (req, res) {
       });
     }
   });
-});
+});*/
 app.post(siteconfig.rootPath + "users/userupdate.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.json({ success: false }); else {

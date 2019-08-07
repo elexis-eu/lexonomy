@@ -1350,7 +1350,7 @@ module.exports = {
     return str;
   },
 
-  listUsers: function (searchtext, howmany, callnext) {
+  /*listUsers: function (searchtext, howmany, callnext) {
     var sql1 = "select * from users where email like $like order by email limit $howmany";
     var sql2 = "select count(*) as total from users where email like $like";
     var like = "%" + searchtext + "%";
@@ -1367,7 +1367,7 @@ module.exports = {
         callnext(total, entries);
       });
     });
-  },
+  },*/
   readUser: function (email, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.get("select * from users where email=$email", { $email: email.toLowerCase() }, function (err, row) {
@@ -1395,7 +1395,7 @@ module.exports = {
       callnext();
     });
   },
-  createUser: function (xml, callnext) {
+  /*createUser: function (xml, callnext) {
     var doc = (new xmldom.DOMParser()).parseFromString(xml, "text/xml");
     var email = doc.documentElement.getAttribute("email");
     var passwordHash = sha1(doc.documentElement.getAttribute("password"));
@@ -1407,7 +1407,7 @@ module.exports = {
       db.close();
       module.exports.readUser(email, function (email, xml) { callnext(email, xml) });
     });
-  },
+  },*/
   updateUser: function (email, xml, callnext) {
     var doc = (new xmldom.DOMParser()).parseFromString(xml, "text/xml");
     if (!doc.documentElement.getAttribute("password")) {

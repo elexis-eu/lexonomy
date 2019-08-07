@@ -111,6 +111,18 @@ def auth(func):
         return func(*args, **kwargs)
     return wrapper_verifyLogin
 
+# admin authentication decorator
+# use @auth to check that user is authenticated and admin
+# assumes that the decorated function has a "user" parameter which is used to pass the user info
+def authAdmin(func):
+    @functools.wraps(func)
+    def wrapper_verifyLoginAdmin(*args, **kwargs):
+        res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+        if not res["loggedin"] or not res["isAdmin"]:
+            redirect("/")
+        kwargs["user"] = res
+        return func(*args, **kwargs)
+    return wrapper_verifyLoginAdmin
 
 #homepage
 @get(siteconfig["rootPath"])
@@ -350,6 +362,37 @@ def getdoc(file):
     else:
         return static_file("/docs/"+file, root="./")    
 
+@get(siteconfig["rootPath"] + "users")
+@authAdmin
+def users(user):
+    return template("users.tpl", **{"siteconfig": siteconfig, "user": user})
+
+@get(siteconfig["rootPath"] + "users/editor")
+@authAdmin
+def usereditor(user):
+    return template("usereditor.tpl", **{"siteconfig": siteconfig, "user": user})
+
+@post(siteconfig["rootPath"] + "users/userlist.json")
+@authAdmin
+def userelist(user):
+    res = ops.listUsers(request.forms.searchtext, request.forms.howmany)
+    return {"success": True, "entries": res["entries"], "total": res["total"]}
+
+@post(siteconfig["rootPath"] + "users/usercreate.json")
+@authAdmin
+def usercreate(user):
+    res = ops.createUser(request.forms.content)
+    return {"success": True, "id": res["entryID"], "content": res["adjustedXml"]}
+
+@post(siteconfig["rootPath"] + "users/userread.json")
+@authAdmin
+def userread(user):
+    res = ops.readUser(request.forms.id)
+    if res["email"] == "":
+        return {"success": False}
+    else:
+        return {"success": True, "id": res["email"], "content": res["xml"]}
+    
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None
