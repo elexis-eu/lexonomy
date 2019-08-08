@@ -291,7 +291,7 @@ app.post(siteconfig.rootPath + "users/userread.json", function (req, res) {
 });*/
 
 // DICTIONARIES UI, navigator and editor:
-app.get(siteconfig.rootPath + "dicts/", function (req, res) {
+/*app.get(siteconfig.rootPath + "dicts/", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.redirect("/"); else {
       res.render("dicts.ejs", { user: user, siteconfig: siteconfig });
@@ -304,10 +304,10 @@ app.get(siteconfig.rootPath + "dicts/editor/", function (req, res) {
       res.render("dicteditor.ejs", { user: user, siteconfig: siteconfig });
     }
   });
-});
+});*/
 
 // DICTIONARIES UI, JSON endpoints:
-app.post(siteconfig.rootPath + "dicts/dictlist.json", function (req, res) {
+/*app.post(siteconfig.rootPath + "dicts/dictlist.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.json({ success: false }); else {
       ops.listDicts(req.body.searchtext, req.body.howmany, function (total, entries) {
@@ -324,7 +324,7 @@ app.post(siteconfig.rootPath + "dicts/dictread.json", function (req, res) {
       });
     }
   });
-});
+});*/
 
 // SKETCHENGINE LOGIN JSON endpoint:
 /*app.get(siteconfig.rootPath + "skelogin.json/:token", function (req, res) {

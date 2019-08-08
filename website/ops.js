@@ -1368,7 +1368,7 @@ module.exports = {
       });
     });
   },*/
-  readUser: function (email, callnext) {
+  /*readUser: function (email, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.get("select * from users where email=$email", { $email: email.toLowerCase() }, function (err, row) {
       if (!row) callnext("", ""); else {
@@ -1385,8 +1385,8 @@ module.exports = {
         });
       }
     });
-  },
-  deleteUser: function (email, callnext) {
+  },*/
+  /*deleteUser: function (email, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function () { db.run("PRAGMA foreign_keys=on") });
     db.run("delete from users where email=$email", {
       $email: email.toLowerCase()
@@ -1394,7 +1394,7 @@ module.exports = {
       db.close();
       callnext();
     });
-  },
+  },*/
   /*createUser: function (xml, callnext) {
     var doc = (new xmldom.DOMParser()).parseFromString(xml, "text/xml");
     var email = doc.documentElement.getAttribute("email");
@@ -1446,7 +1446,7 @@ module.exports = {
     });
   },
 
-  listDicts: function (searchtext, howmany, callnext) {
+  /*listDicts: function (searchtext, howmany, callnext) {
     var sql1 = "select * from dicts where id like $like or title like $like order by id limit $howmany";
     var sql2 = "select count(*) as total from dicts where id like $like or title like $like";
     var like = "%" + searchtext + "%";
@@ -1463,8 +1463,8 @@ module.exports = {
         callnext(total, entries);
       });
     });
-  },
-  readDict: function (dictID, callnext) {
+  },*/
+  /*readDict: function (dictID, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.get("select * from dicts where id=$dictID", { $dictID: dictID }, function (err, row) {
       if (!row) callnext("", ""); else {
@@ -1481,7 +1481,7 @@ module.exports = {
         });
       }
     });
-  },
+  },*/
 
   readDictHistory: function (db, dictID, entryID, callnext) {
     module.exports.readDictConfig(db, dictID, "subbing", function (subbing) {

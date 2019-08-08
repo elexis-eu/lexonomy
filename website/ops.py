@@ -504,3 +504,28 @@ def readUser(email):
         return {"email": r["email"], "xml": xml}
     else:
         return {"email":"", "xml":""}
+
+def listDicts(searchtext, howmany):
+    conn = getMainDB()
+    c = conn.execute("select * from dicts where id like ? or title like ? order by id limit ?", ("%"+searchtext+"%", "%"+searchtext+"%", howmany))
+    dicts = []
+    for r in c.fetchall():
+        dicts.append({"id": r["id"], "title": r["title"]})
+    c = conn.execute("select count(*) as total from dicts where id like ? or title like ?", ("%"+searchtext+"%", "%"+searchtext+"%"))
+    r = c.fetchone()
+    total = r["total"]
+    return {"entries": dicts, "total": total}
+
+def readDict(dictId):
+    conn = getMainDB()
+    c = conn.execute("select * from dicts where id=?", (dictId, ))
+    r = c.fetchone()
+    if r:
+        xml =  "<dict id='"+r["id"]+"' title='"+r["title"]+"'>"
+        c2 = conn.execute("select u.email from user_dict as ud inner join users as u on u.email=ud.user_email where ud.dict_id=? order by u.email", (r["id"], ))
+        for r2 in c2.fetchall():
+            xml += "<user email='" + r2["email"] + "'/>"
+        xml += "</dict>"
+        return {"id": r["id"], "xml": xml}
+    else:
+        return {"id":"", "xml":""}

@@ -404,7 +404,31 @@ def userread(user):
         return {"success": False}
     else:
         return {"success": True, "id": res["email"], "content": res["xml"]}
-    
+
+@get(siteconfig["rootPath"] + "dicts")
+@authAdmin
+def dicts(user):
+    return template("dicts.tpl", **{"siteconfig": siteconfig, "user": user})
+
+@get(siteconfig["rootPath"] + "dicts/editor")
+@authAdmin
+def dicteditor(user):
+    return template("dicteditor.tpl", **{"siteconfig": siteconfig, "user": user})
+
+@post(siteconfig["rootPath"] + "dicts/dictlist.json")
+@authAdmin
+def dictlist(user):
+    res = ops.listDicts(request.forms.searchtext, request.forms.howmany)
+    return {"success": True, "entries": res["entries"], "total": res["total"]}
+
+@post(siteconfig["rootPath"] + "dicts/dictread.json")
+@authAdmin
+def dictread(user):
+    res = ops.readDict(request.forms.id)
+    if res["id"] == "":
+        return {"success": False}
+    else:
+        return {"success": True, "id": res["id"], "content": res["xml"]}
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None
