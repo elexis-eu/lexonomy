@@ -199,7 +199,7 @@ module.exports = {
       }
     };
   },
-  readRandomOne: function (db, dictID, callnext) {
+  /*readRandomOne: function (db, dictID, callnext) {
     module.exports.readDictConfig(db, dictID, "xema", function (xema) {
       var sql_random = "select id, title, xml from entries where id in (select id from entries where doctype=$doctype order by random() limit 1)";
       db.get(sql_random, { $doctype: xema.root }, function (err, row) {
@@ -210,7 +210,7 @@ module.exports = {
         }
       });
     });
-  },
+  },*/
   flagForResave: function (db, dictID, callnext) {
     db.run("update entries set needs_resave=1", {}, function (err) {
       if (err) console.log(err);
@@ -232,7 +232,7 @@ module.exports = {
     });
   },
 
-  readEntry: function (db, dictID, entryID, callnext) {
+  /*readEntry: function (db, dictID, entryID, callnext) {
     db.get("select * from entries where id=$id", { $id: entryID }, function (err, row) {
       if (!row) {
         var entryID = 0;
@@ -251,7 +251,7 @@ module.exports = {
         });
       }
     });
-  },
+  },*/
   createEntry: function (db, dictID, entryID, xml, email, historiography, callnext) {
     module.exports.readDictConfigs(db, dictID, function (configs) {
       var abc = configs.titling.abc; if (!abc || abc.length == 0) abc = configs.siteconfig.defaultAbc;
@@ -790,7 +790,7 @@ module.exports = {
     return ret;
   },
 
-  readNabesByEntryID: function (db, dictID, entryID, callnext) {
+  /*readNabesByEntryID: function (db, dictID, entryID, callnext) {
     module.exports.readDictConfig(db, dictID, "xema", function (xema) {
       var sql_before = `select e1.id, e1.title
         from entries as e1
@@ -815,7 +815,7 @@ module.exports = {
         });
       });
     });
-  },
+  },*/
   readNabesByText: function (db, dictID, text, callnext) {
     module.exports.readDictConfigs(db, dictID, function (configs) {
       var sql_before = `select e1.id, e1.title
@@ -844,7 +844,7 @@ module.exports = {
       });
     });
   },
-  readRandoms: function (db, dictID, callnext) {
+  /*readRandoms: function (db, dictID, callnext) {
     module.exports.readDictConfig(db, dictID, "xema", function (xema) {
       var limit = 75;
       var sql_randoms = "select id, title from entries where doctype=$doctype and id in (select id from entries order by random() limit $limit) order by sortkey";
@@ -861,7 +861,7 @@ module.exports = {
         });
       });
     });
-  },
+  },*/
   listEntriesPublic: function (db, dictID, searchtext, callnext) {
     module.exports.readDictConfig(db, dictID, "xema", function (xema) {
       var howmany = 100;
@@ -885,7 +885,7 @@ module.exports = {
       });
     });
   },
-  exportEntryXml: function (baseUrl, db, dictID, entryID, callnext) {
+  /*exportEntryXml: function (baseUrl, db, dictID, entryID, callnext) {
     db.get("select * from entries where id=$id", { $id: entryID }, function (err, row) {
       if (!row) {
         var entryID = 0;
@@ -918,7 +918,7 @@ module.exports = {
         });
       }
     });
-  },
+  },*/
   download: function (db, dictID, res) {
     module.exports.readDictConfig(db, dictID, "subbing", function (subbing) {
       res.setHeader("content-type", "text/xml; charset=utf-8");

@@ -123,8 +123,8 @@ def verifyLoginAndDictAccess(email, sessionkey, dictDB):
     ret = verifyLogin(email, sessionkey)
     configs = readDictConfigs(dictDB)
     dictAccess = configs["users"].get(email)
-    if not dictAccess and not ret["isAdmin"]:
-        return {"loggedin": True, "email": email, "dictAccess": False, "isAdmin": False}
+    if not dictAccess and (not "isAdmin" in ret or not ret["isAdmin"]):
+        return {"loggedin": True, "email": email, "dictAccess": False, "isAdmin": False}, configs
     ret["dictAccess"] = dictAccess
     for r in ["canEdit", "canConfig", "canDownload", "canUpload"]:
         ret[r] = ret["isAdmin"] or (dictAccess and dictAccess[r])
@@ -463,7 +463,7 @@ def listUsers(searchtext, howmany):
     return {"entries":users, "total": total}
 
 def createUser(xml):
-    import xml.etree.ElementTree as ET
+    from lxml import etree as ET
     root = ET.fromstring(xml)
     email = root.attrib["email"]
     passhash = hashlib.sha1(root.attrib["password"].encode("utf-8")).hexdigest();
@@ -473,7 +473,7 @@ def createUser(xml):
     return {"entryID": email, "adjustedXml": readUser(email)["xml"]}
 
 def updateUser(email, xml):
-    import xml.etree.ElementTree as ET
+    from lxml import etree as ET
     root = ET.fromstring(xml)
     if root.attrib['password']:
         passhash = hashlib.sha1(root.attrib["password"].encode("utf-8")).hexdigest();
@@ -533,3 +533,83 @@ def readDict(dictId):
 def clean4xml(text):
     return text.replace("&", "&amp;").replace('"', "&quot;").replace("'", "&apos;").replace("<", "&lt;").replace(">", "&gt;");
 
+def markdown_text(text):
+    return markdown.markdown(text).replace("<a href=\"http", "<a target=\"_blank\" href=\"http")
+
+def setHousekeepingAttributes(entryID, xml, subbing):
+    #delete any housekeeping attributes and elements that already exist in the XML
+    xml = re.sub(r"^(<[^>\/]*)\s+xmlns:lxnm=['\"]http:\/\/www\.lexonomy\.eu\/[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>\/]*)\s+lxnm:entryID=['\"][^\"\']*[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>\/]*)\s+lxnm:subentryID=['\"][^\"\']*[\"']", r"\1", xml)
+    #get name of the top-level element
+    root = ""
+    root = re.match(r"^<([^\s>\/]+)", xml).group(1)
+    #set housekeeping attributes
+    if root in subbing:
+        xml = re.sub(r"^<([^\s>\/]+)", r"<\1 lxnm:subentryID='"+entryID+"'", xml)
+    else:
+        xml = re.sub(r"^<([^\s>\/]+)", r"<\1 lxnm:entryID='"+entryID+"'", xml)
+    xml = re.sub(r"^<([^\s>\/]+)", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/'", xml)
+    return xml
+
+def readEntry(dictDB, dictID, entryID, configs):
+    c = dictDB.execute("select * from entries where id=?", (entryID,))
+    row = c.fetchone()
+    if row:
+        xml = setHousekeepingAttributes(entryID, row["xml"], configs["subbing"])
+        return {"entryID": row["id"], "xml": xml,  "title": row["title"]}
+    else:
+        return {"entryID": 0, "xml": "",  "title": ""}
+
+def exportEntryXml(dictDB, dictID, entryID, configs, baseUrl):
+    c = dictDB.execute("select * from entries where id=?", (entryID,))
+    row = c.fetchone()
+    if row:
+        xml = setHousekeepingAttributes(entryID, row["xml"], configs["subbing"])
+        attribs = " this=\"" + baseUrl + dictID + "/" + str(row["id"]) + ".xml\""
+        c2 = dictDB.execute("select e1.id, e1.title from entries as e1 where e1.sortkey<(select sortkey from entries where id=?) order by e1.sortkey desc limit 1", (entryID, ))
+        r2 = c2.fetchone()
+        if r2:
+            attribs += " previous=\"" + baseUrl + dictID + "/" + str(r2["id"]) + ".xml\""
+        c2 = dictDB.execute("select e1.id, e1.title from entries as e1 where e1.sortkey>(select sortkey from entries where id=?) order by e1.sortkey asc limit 1", (entryID, ))
+        r2 = c2.fetchone()
+        if r2:
+            attribs += " next=\"" + baseUrl + dictID + "/" + str(r2["id"]) + ".xml\""
+        xml = "<lexonomy" + attribs + ">" + xml + "</lexonomy>"
+        return {"entryID": row["id"], "xml": xml}
+    else:
+        return {"entryID": 0, "xml": ""}
+
+def readNabesByEntryID(dictDB, dictID, entryID, configs):
+    nabes = []
+    #before
+    c = dictDB.execute("select e1.id, e1.title from entries as e1 where e1.doctype=? and e1.sortkey<=(select sortkey from entries where id=?) order by e1.sortkey desc limit 8", (configs["xema"]["root"], entryID))
+    for r in c.fetchall():
+        nabes.insert(0, {"id": r["id"], "title": r["title"]})
+    #after
+    c = dictDB.execute("select e1.id, e1.title from entries as e1 where e1.doctype=? and e1.sortkey>(select sortkey from entries where id=?) order by e1.sortkey asc limit 15", (configs["xema"]["root"], entryID))
+    for r in c.fetchall():
+        nabes.append({"id": r["id"], "title": r["title"]})
+    return nabes
+
+def readRandoms(dictDB):
+    configs = readDictConfigs(dictDB)
+    limit = 75
+    more = False
+    randoms = []
+    c = dictDB.execute("select id, title from entries where doctype=? and id in (select id from entries order by random() limit ?) order by sortkey", (configs["xema"]["root"], limit))
+    for r in c.fetchall():
+        randoms.append({"id": r["id"], "title": r["title"]})
+    c = dictDB.execute("select count(*) as total from entries")
+    r = c.fetchone()
+    if r["total"] > limit:
+        more = True
+    return {"entries": randoms, "more": more}
+
+def readRandomOne(dictDB, dictID, configs):
+    c = dictDB.execute("select id, title, xml from entries where id in (select id from entries where doctype=? order by random() limit 1)", (configs["xema"]["root"], ))
+    r = c.fetchone()
+    if r:
+        return {"id": r["id"], "title": r["title"], "xml": r["xml"]}
+    else:
+        return {"id": 0, "title": "", "xml": ""}

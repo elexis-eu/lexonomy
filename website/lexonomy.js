@@ -452,7 +452,7 @@ app.post(siteconfig.rootPath + "push.api", function (req, res) {
 });
 
 // PUBLIC DICTIONARY UI:
-app.get(siteconfig.rootPath + ":dictID/", function (req, res) {
+/*app.get(siteconfig.rootPath + ":dictID/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -462,8 +462,8 @@ app.get(siteconfig.rootPath + ":dictID/", function (req, res) {
       res.render("dict.ejs", { user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, dictBlurb: blurb, publico: configs.publico, siteconfig: configs.siteconfig });
     });
   });
-});
-app.get(siteconfig.rootPath + ":dictID/:entryID(\\d+)/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + ":dictID/:entryID(\\d+)/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -500,8 +500,8 @@ app.get(siteconfig.rootPath + ":dictID/:entryID(\\d+)/", function (req, res) {
       }
     });
   });
-});
-app.get(siteconfig.rootPath + ":dictID/:entryID(\\d+).xml", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + ":dictID/:entryID(\\d+).xml", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.readDictConfigs(db, req.params.dictID, function (configs) {
@@ -514,8 +514,8 @@ app.get(siteconfig.rootPath + ":dictID/:entryID(\\d+).xml", function (req, res) 
       res.end(xml);
     });
   });
-});
-app.post(siteconfig.rootPath + ":dictID/random.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + ":dictID/random.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.readDictConfigs(db, req.params.dictID, function (configs) {
@@ -526,7 +526,7 @@ app.post(siteconfig.rootPath + ":dictID/random.json", function (req, res) {
       });
     }
   });
-});
+});*/
 app.get(siteconfig.rootPath + ":dictID/search/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
@@ -840,7 +840,7 @@ app.post(siteconfig.rootPath + ":dictID/configupdate.json", function (req, res) 
     }
   });
 });
-app.post(siteconfig.rootPath + ":dictID/randomone.json", function (req, res) {
+/*app.post(siteconfig.rootPath + ":dictID/randomone.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -854,7 +854,7 @@ app.post(siteconfig.rootPath + ":dictID/randomone.json", function (req, res) {
       });
     }
   });
-});
+});*/
 /*app.post(siteconfig.rootPath + ":dictID/destroy.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID);

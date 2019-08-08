@@ -6,6 +6,7 @@ import functools
 import ops
 import re
 import jwt
+import json
 from ops import siteconfig
 
 from bottle import (hook, route, get, post, run, template, error, request,
@@ -118,7 +119,7 @@ def authAdmin(func):
     @functools.wraps(func)
     def wrapper_verifyLoginAdmin(*args, **kwargs):
         res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
-        if not res["loggedin"] or not res["isAdmin"]:
+        if not res["loggedin"] or not "isAdmin" in res or not res["isAdmin"]:
             redirect("/")
         kwargs["user"] = res
         return func(*args, **kwargs)
@@ -429,6 +430,74 @@ def dictread(user):
         return {"success": False}
     else:
         return {"success": True, "id": res["id"], "content": res["xml"]}
+
+@get(siteconfig["rootPath"]+"<dictID>")
+def publicdict(dictID):
+    if not ops.dictExists(dictID):
+        return redirect("/")
+    user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
+    blurb = ops.markdown_text(configs["ident"]["blurb"])
+    return template("dict.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": blurb, "publico": configs["publico"]})
+
+@get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>")
+def publicentry(dictID, entryID):
+    if not ops.dictExists(dictID):
+        return redirect("/")
+    dictDB = ops.getDB(dictID)
+    user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
+    if not configs["publico"]["public"]:
+        return redirect("/"+dictID)
+    res = ops.readEntry(dictDB, dictID, entryID, configs)
+    if res["entryID"] == 0:
+        return redirect("/"+dictID)
+    nabes = ops.readNabesByEntryID(dictDB, dictID, entryID, configs)
+    if "_xsl" in configs["xemplate"]:
+        from lxml import etree
+        xslt_root = etree.XML(configs["xemplate"]["_xsl"])
+        transform = etree.XSLT(xslt_root)
+        doc_root = etree.XML(res["xml"])
+        html = transform(doc_root)
+    elif "_css" in configs["xemplate"]:
+        html = res["xml"]
+    else:
+        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", res["xml"])+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+        #rewrite xemplatron to python, too?
+    css = ""
+    if "_css" in configs["xemplate"]:
+        css = configs["xemplate"]["_css"]
+    return template("dict-entry.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "entryID": res["entryID"], "nabes": nabes, "html": html, "title": res["title"], "css": css})
+
+@get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>.xml")
+def publicentryxml(dictID, entryID):
+    if not ops.dictExists(dictID):
+        return redirect("/")
+    dictDB = ops.getDB(dictID)
+    user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
+    if not configs["publico"]["public"]:
+        return redirect("/"+dictID)
+    if not "licence" in configs["publico"] or not siteconfig["licences"][configs["publico"]["licence"]]["canDownloadXml"]:
+        return redirect("/"+dictID)
+    res = ops.exportEntryXml(dictDB, dictID, entryID, configs, siteconfig["baseUrl"])
+    if res["entryID"] == 0:
+        return redirect("/"+dictID)
+    response.content_type = "text/xml; charset=utf-8"
+    return res["xml"]
+
+@post(siteconfig["rootPath"]+"<dictID>/random.json")
+def publicrandom(dictID):
+    if not ops.dictExists(dictID):
+        return redirect("/")
+    dictDB = ops.getDB(dictID)
+    configs = ops.readDictConfigs(dictDB)
+    if not configs["publico"]["public"]:
+        return {"more": False, "entries": []}
+    res = ops.readRandoms(dictDB)
+    return res
+
+@post(siteconfig["rootPath"]+"<dictID>/randomone.json")
+@authDict(["canConfig"])
+def randomone(dictID, user, dictDB, configs):
+    return ops.readRandomOne(dictDB, dictID, configs)
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None
