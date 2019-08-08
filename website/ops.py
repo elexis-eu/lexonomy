@@ -499,7 +499,7 @@ def readUser(email):
             xml =  "<user>"
         c2 = conn.execute("select d.id, d.title from user_dict as ud inner join dicts as d on d.id=ud.dict_id  where ud.user_email=? order by d.title", (r["email"], ))
         for r2 in c2.fetchall():
-            xml += "<dict id='" + r2["id"] + "' title='" + r2["title"] + "'/>"
+            xml += "<dict id='" + r2["id"] + "' title='" + clean4xml(r2["title"]) + "'/>"
         xml += "</user>"
         return {"email": r["email"], "xml": xml}
     else:
@@ -521,7 +521,7 @@ def readDict(dictId):
     c = conn.execute("select * from dicts where id=?", (dictId, ))
     r = c.fetchone()
     if r:
-        xml =  "<dict id='"+r["id"]+"' title='"+r["title"]+"'>"
+        xml =  "<dict id='"+clean4xml(r["id"])+"' title='"+clean4xml(r["title"])+"'>"
         c2 = conn.execute("select u.email from user_dict as ud inner join users as u on u.email=ud.user_email where ud.dict_id=? order by u.email", (r["id"], ))
         for r2 in c2.fetchall():
             xml += "<user email='" + r2["email"] + "'/>"
@@ -529,3 +529,7 @@ def readDict(dictId):
         return {"id": r["id"], "xml": xml}
     else:
         return {"id":"", "xml":""}
+
+def clean4xml(text):
+    return text.replace("&", "&amp;").replace('"', "&quot;").replace("'", "&apos;").replace("<", "&lt;").replace(">", "&gt;");
+

@@ -1512,14 +1512,14 @@ module.exports = {
   }
 }; // end of module.exports
 
-function clean4xml (txt) {
+/*function clean4xml (txt) {
   return txt
     .replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-}
+}*/
 /*function generateKey () {
   var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   var key = "";
