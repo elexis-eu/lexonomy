@@ -271,7 +271,7 @@ app.post(siteconfig.rootPath + "users/userread.json", function (req, res) {
     }
   });
 });*/
-app.post(siteconfig.rootPath + "users/userupdate.json", function (req, res) {
+/*app.post(siteconfig.rootPath + "users/userupdate.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.json({ success: false }); else {
       ops.updateUser(req.body.id, req.body.content, function (adjustedEntryID, adjustedXml) {
@@ -279,8 +279,8 @@ app.post(siteconfig.rootPath + "users/userupdate.json", function (req, res) {
       });
     }
   });
-});
-app.post(siteconfig.rootPath + "users/userdelete.json", function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + "users/userdelete.json", function (req, res) {
   ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
     if (!user.isAdmin) res.json({ success: false }); else {
       ops.deleteUser(req.body.id, function () {
@@ -288,7 +288,7 @@ app.post(siteconfig.rootPath + "users/userdelete.json", function (req, res) {
       });
     }
   });
-});
+});*/
 
 // DICTIONARIES UI, navigator and editor:
 app.get(siteconfig.rootPath + "dicts/", function (req, res) {

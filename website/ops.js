@@ -1408,7 +1408,7 @@ module.exports = {
       module.exports.readUser(email, function (email, xml) { callnext(email, xml) });
     });
   },*/
-  updateUser: function (email, xml, callnext) {
+  /*updateUser: function (email, xml, callnext) {
     var doc = (new xmldom.DOMParser()).parseFromString(xml, "text/xml");
     if (!doc.documentElement.getAttribute("password")) {
       module.exports.readUser(email, function (email, xml) { callnext(email, xml) });
@@ -1425,7 +1425,7 @@ module.exports = {
         });
       });
     }
-  },
+  },*/
   readUserApiKey: function (email, callnext) {
     var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READONLY);
     db.get("select apiKey from users where email=$email", { $email: email.toLowerCase() }, function (err, row) {

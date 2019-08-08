@@ -378,11 +378,23 @@ def userelist(user):
     res = ops.listUsers(request.forms.searchtext, request.forms.howmany)
     return {"success": True, "entries": res["entries"], "total": res["total"]}
 
+@post(siteconfig["rootPath"] + "users/userupdate.json")
+@authAdmin
+def userupdate(user):
+    res = ops.updateUser(request.forms.id, request.forms.content)
+    return {"success": True, "id": res["email"], "content": res["xml"]}
+
 @post(siteconfig["rootPath"] + "users/usercreate.json")
 @authAdmin
 def usercreate(user):
     res = ops.createUser(request.forms.content)
     return {"success": True, "id": res["entryID"], "content": res["adjustedXml"]}
+
+@post(siteconfig["rootPath"] + "users/userdelete.json")
+@authAdmin
+def userdelete(user):
+    res = ops.deleteUser(request.forms.id)
+    return {"success": True, "id": request.forms.id}
 
 @post(siteconfig["rootPath"] + "users/userread.json")
 @authAdmin

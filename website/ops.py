@@ -472,6 +472,22 @@ def createUser(xml):
     conn.commit()
     return {"entryID": email, "adjustedXml": readUser(email)["xml"]}
 
+def updateUser(email, xml):
+    import xml.etree.ElementTree as ET
+    root = ET.fromstring(xml)
+    if root.attrib['password']:
+        passhash = hashlib.sha1(root.attrib["password"].encode("utf-8")).hexdigest();
+        conn = getMainDB()
+        conn.execute("update users set passwordHash=? where email=?", (passhash, email.lower()))
+        conn.commit()
+    return readUser(email)
+
+def deleteUser(email):
+    conn = getMainDB()
+    conn.execute("delete from users where email=?", (email.lower(),))
+    conn.commit()
+    return True
+
 def readUser(email):
     conn = getMainDB()
     c = conn.execute("select * from users where email=?", (email.lower(), ))
