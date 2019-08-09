@@ -537,6 +537,7 @@ def markdown_text(text):
     return markdown.markdown(text).replace("<a href=\"http", "<a target=\"_blank\" href=\"http")
 
 def setHousekeepingAttributes(entryID, xml, subbing):
+    entryID = str(entryID)
     #delete any housekeeping attributes and elements that already exist in the XML
     xml = re.sub(r"^(<[^>\/]*)\s+xmlns:lxnm=['\"]http:\/\/www\.lexonomy\.eu\/[\"']", r"\1", xml)
     xml = re.sub(r"^(<[^>\/]*)\s+lxnm:entryID=['\"][^\"\']*[\"']", r"\1", xml)
@@ -613,3 +614,55 @@ def readRandomOne(dictDB, dictID, configs):
         return {"id": r["id"], "title": r["title"], "xml": r["xml"]}
     else:
         return {"id": 0, "title": "", "xml": ""}
+
+def download(dictDB, dictID, configs):
+    resxml = "<"+dictID+">"
+    c = dictDB.execute("select id, xml from entries")
+    for r in c.fetchall():
+        resxml += setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
+        resxml += "\n"
+    resxml += "</"+dictID+">"
+    return resxml
+
+def purge(dictDB, email, historiography):
+    dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', ?, ?, xml, ? from entries", (str(datetime.datetime.utcnow()), email, json.dumps(historiography)))
+    dictDB.execute("delete from entries")
+    dictDB.commit()
+    dictDB.execute("vacuum")
+    dictDB.commit()
+    return True
+
+def showImportErrors(filename, truncate):
+    with open(filename+".err", "r") as content_file:
+        content = content_file.read()
+    if (truncate):
+        content = content[0:truncate]
+    return {"errorData": content, "truncated": truncate}
+
+def importfile(dictID, filename, email):
+    import subprocess
+    pidfile = filename + ".pid";
+    errfile = filename + ".err";
+    if os.path.isfile(pidfile):
+        return checkImportStatus(pidfile, errfile)
+    try:
+        pidfile_f = open(pidfile, "w")
+        errfile_f = open(errfile, "w")
+    except:
+        return checkImportStatus(pidfile, errfile)
+    dbpath = os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")
+    p = subprocess.Popen(["adminscripts/import.js", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
+    return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
+
+def checkImportStatus(pidfile, errfile):
+    with open(pidfile, "r") as content_file:
+        content = content_file.read()
+    pid_data = re.split(r"[\n\r]", content)
+    progress = pid_data[-1]
+    finished = False
+    if "100%" in progress:
+        finished = True
+    errors = False
+    if os.path.isfile(errfile) and os.stat(errfile).st_size:
+        errors = True
+    return {"progressMessage": progress, "finished": finished, "errors": errors}

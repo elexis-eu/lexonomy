@@ -7,6 +7,7 @@ import ops
 import re
 import jwt
 import json
+import datetime
 from ops import siteconfig
 
 from bottle import (hook, route, get, post, run, template, error, request,
@@ -498,6 +499,59 @@ def publicrandom(dictID):
 @authDict(["canConfig"])
 def randomone(dictID, user, dictDB, configs):
     return ops.readRandomOne(dictDB, dictID, configs)
+
+@get(siteconfig["rootPath"]+"<dictID>/download")
+@authDict(["canDownload"])
+def download(dictID, user, dictDB, configs):
+    return template("download.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"]})
+
+@get(siteconfig["rootPath"]+"<dictID>/download.xml")
+@authDict(["canDownload"])
+def downloadxml(dictID, user, dictDB, configs):
+    response.content_type = "text/xml; charset=utf-8"
+    response.set_header("Content-Disposition", "attachment; filename="+dictID+".xml")
+    return ops.download(dictDB, dictID, configs)
+
+@get(siteconfig["rootPath"]+"<dictID>/upload")
+@authDict(["canUpload"])
+def upload(dictID, user, dictDB, configs):
+    return template("upload.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"]})
+
+@post(siteconfig["rootPath"]+"<dictID>/upload.html")
+@authDict(["canUpload"])
+def uploadhtml(dictID, user, dictDB, configs):
+    import tempfile
+    if not request.files.get("myfile"):
+        return "<html><body>false</body></html>"
+    else:
+        upload = request.files.get("myfile")
+        uploadStart = str(datetime.datetime.utcnow())
+        temppath = tempfile.mkdtemp()
+        upload.save(temppath)
+        filepath = temppath+"/"+upload.filename
+        if request.forms.purge == "on":
+            ops.purge(dictDB, user["email"], { "uploadStart": uploadStart, "filename": filepath })
+        return "<html><body>../import/?file=" + filepath + "&amp;uploadStart=" + uploadStart + "</body></html>"
+
+@get(siteconfig["rootPath"]+"<dictID>/import")
+@authDict(["canUpload"])
+def importhtml(dictID, user, dictDB, configs):
+    return template("import.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "filename": request.query.file, "uploadStart": request.query.uploadStart})
+
+@get(siteconfig["rootPath"]+"<dictID>/import.json")
+@authDict(["canUpload"])
+def importjson(dictID, user, dictDB, configs):
+    print(dict(request.query))
+    truncate = 0
+    if request.query.truncate:
+        truncate = int(request.query.truncate)
+    if request.query.showErrors:
+        response.content_type = "text/plain; charset=utf-8"
+        response.set_header("Content-Disposition", "attachment; filename=error.log")
+        return ops.showImportErrors(request.query.filename, truncate)
+    else:
+        return ops.importfile(dictID, request.query.filename, user["email"])
+
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None

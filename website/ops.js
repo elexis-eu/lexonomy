@@ -919,7 +919,7 @@ module.exports = {
       }
     });
   },*/
-  download: function (db, dictID, res) {
+  /*download: function (db, dictID, res) {
     module.exports.readDictConfig(db, dictID, "subbing", function (subbing) {
       res.setHeader("content-type", "text/xml; charset=utf-8");
       res.setHeader("content-disposition", "attachment; filename=" + dictID + ".xml");
@@ -933,8 +933,8 @@ module.exports = {
         res.end();
       });
     });
-  },
-  purge: function (db, dictID, email, historiography, callnext) {
+  },*/
+  /*purge: function (db, dictID, email, historiography, callnext) {
     db.run("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', $when, $email, xml, $historiography from entries", {
       $when: (new Date()).toISOString(),
       $email: email.toLowerCase(),
@@ -944,9 +944,9 @@ module.exports = {
         callnext();
       });
     });
-  },
+  },*/
 
-  checkImportStatus: function (pidfile, errfile, callnext) {
+  /*checkImportStatus: function (pidfile, errfile, callnext) {
     fs.readFile(pidfile, function (err, pid_data) {
       if (err) { callnext({ progressMessage: "Import failed", finished: true, errors: false }) } else {
         pid_data = pid_data.toString().trim().split(/[\n\r]/);
@@ -963,17 +963,17 @@ module.exports = {
         });
       }
     });
-  },
+  },*/
 
-  showImportErrors: function (filepath, truncate, callnext) {
+  /*showImportErrors: function (filepath, truncate, callnext) {
     fs.readFile(filepath + ".err", "utf8", function (err, content) {
       if (err) { content = "Failed to read error file" }
       if (truncate) { content = content.substring(0, truncate) }
       callnext({ errorData: content, truncated: truncate });
     });
-  },
+  },*/
 
-  import: function (dictID, filepath, email, callnext) {
+  /*import: function (dictID, filepath, email, callnext) {
     var pidfile = filepath + ".pid";
     var errfile = filepath + ".err";
     if (fs.existsSync(pidfile)) { // = import is in progress, just check status
@@ -992,7 +992,7 @@ module.exports = {
       fork("adminscripts/import.js", [dbpath, filepath, email], { detached: true, stdio: ["ignore", pidfile_fd, errfile_fd, "ipc"] });
       callnext({ progressMessage: "Import started. Please wait...", finished: false, errors: false });
     }
-  },
+  },*/
 
   /*login: function (email, password, callnext) {
     if (siteconfig.readonly) {

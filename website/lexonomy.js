@@ -905,7 +905,7 @@ app.post(siteconfig.rootPath + ":dictID/configupdate.json", function (req, res) 
 });*/
 
 // DOWNLOAD:
-app.get(siteconfig.rootPath + ":dictID/download/", function (req, res) {
+/*app.get(siteconfig.rootPath + ":dictID/download/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.readDictConfigs(db, req.params.dictID, function (configs) {
@@ -934,10 +934,10 @@ app.get(siteconfig.rootPath + ":dictID/download.xml", function (req, res) {
       }
     });
   });
-});
+});*/
 
 // UPLOAD & IMPORT:
-app.get(siteconfig.rootPath + ":dictID/upload/", function (req, res) {
+/*app.get(siteconfig.rootPath + ":dictID/upload/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.readDictConfigs(db, req.params.dictID, function (configs) {
@@ -951,8 +951,8 @@ app.get(siteconfig.rootPath + ":dictID/upload/", function (req, res) {
       }
     });
   });
-});
-app.post(siteconfig.rootPath + ":dictID/upload.html", upload.single("myfile"), function (req, res) {
+});*/
+/*app.post(siteconfig.rootPath + ":dictID/upload.html", upload.single("myfile"), function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID);
   ops.readDictConfigs(db, req.params.dictID, function (configs) {
@@ -983,8 +983,8 @@ app.post(siteconfig.rootPath + ":dictID/upload.html", upload.single("myfile"), f
       }
     });
   });
-});
-app.get(siteconfig.rootPath + ":dictID/import/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + ":dictID/import/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.readDictConfigs(db, req.params.dictID, function (configs) {
@@ -1001,8 +1001,8 @@ app.get(siteconfig.rootPath + ":dictID/import/", function (req, res) {
       }
     });
   });
-});
-app.get(siteconfig.rootPath + ":dictID/import.json", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + ":dictID/import.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -1028,7 +1028,7 @@ app.get(siteconfig.rootPath + ":dictID/import.json", function (req, res) {
       }
     }
   });
-});
+});*/
 
 // SKETCH ENGINE PROXY:
 app.get(siteconfig.rootPath + ":dictID/skeget/xampl/", function (req, res) {
