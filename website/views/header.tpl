@@ -13,7 +13,7 @@
   %if current=="edit" and len(doctypes)>1:
     <div class="doctypes">
       %for doct in doctypes:
-        <a class="doctype {{"current" if doct==doctype else ""}}" href="{{rootPath}}{{dictID}}/edit/{doct}}/"><span class="tech"><span class="brak">&lt;</span><span class="elm">{{doct}}</span><span class="brak">&gt;</span></span></a>
+        <a class="doctype {{"current" if doct==doctype else ""}}" href="{{rootPath}}{{dictID}}/edit/{{doct}}/"><span class="tech"><span class="brak">&lt;</span><span class="elm">{{doct}}</span><span class="brak">&gt;</span></span></a>
       %end
     </div>
   %end

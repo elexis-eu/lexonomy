@@ -448,25 +448,25 @@ def publicentry(dictID, entryID):
     user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
     if not configs["publico"]["public"]:
         return redirect("/"+dictID)
-    res = ops.readEntry(dictDB, dictID, entryID, configs)
-    if res["entryID"] == 0:
+    adjustedEntryID, xml, _title = ops.readEntry(dictDB, configs, entryID)
+    if adjustedEntryID == 0:
         return redirect("/"+dictID)
     nabes = ops.readNabesByEntryID(dictDB, dictID, entryID, configs)
     if "_xsl" in configs["xemplate"]:
         from lxml import etree
         xslt_root = etree.XML(configs["xemplate"]["_xsl"])
         transform = etree.XSLT(xslt_root)
-        doc_root = etree.XML(res["xml"])
+        doc_root = etree.XML(xml)
         html = transform(doc_root)
     elif "_css" in configs["xemplate"]:
-        html = res["xml"]
+        html = xml
     else:
         html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", res["xml"])+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
         #rewrite xemplatron to python, too?
     css = ""
     if "_css" in configs["xemplate"]:
         css = configs["xemplate"]["_css"]
-    return template("dict-entry.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "entryID": res["entryID"], "nabes": nabes, "html": html, "title": res["title"], "css": css})
+    return template("dict-entry.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "entryID": res["entryID"], "nabes": nabes, "html": html, "title": _title, "css": css})
 
 @get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>.xml")
 def publicentryxml(dictID, entryID):
@@ -541,7 +541,6 @@ def importhtml(dictID, user, dictDB, configs):
 @get(siteconfig["rootPath"]+"<dictID>/import.json")
 @authDict(["canUpload"])
 def importjson(dictID, user, dictDB, configs):
-    print(dict(request.query))
     truncate = 0
     if request.query.truncate:
         truncate = int(request.query.truncate)
@@ -552,6 +551,42 @@ def importjson(dictID, user, dictDB, configs):
     else:
         return ops.importfile(dictID, request.query.filename, user["email"])
 
+@get(siteconfig["rootPath"]+"<dictID>/edit")
+@authDict(["canEdit"])
+def dictedit(dictID, user, dictDB, configs):
+    return redirect("/"+dictID+"/edit/"+configs["xema"]["root"])
+
+@get(siteconfig["rootPath"]+"<dictID>/edit/<doctype>")
+@authDict(["canEdit"])
+def dicteditdoc(dictID, doctype, user, dictDB, configs):
+    doctypesUsed = ops.readDoctypesUsed(dictDB)
+    doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys()) + doctypesUsed
+    doctypes = list(set(doctypes))
+    return template("edit.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "flagging":configs["flagging"], "doctypes": doctypes, "doctype": doctype, "xonomyMode": configs["editing"]["xonomyMode"]})
+
+@get(siteconfig["rootPath"]+"<dictID>/<doctype>/entryeditor")
+@authDict(["canEdit"])
+def entryeditor(dictID, doctype, user, dictDB, configs):
+    if "_xsl" in configs["xemplate"]:
+        configs["xemplate"]["_xsl"] = "dummy"
+    configs["xema"]["_root"] = configs["xema"]["root"]
+    if doctype in configs["xema"]["elements"]:
+        configs["xema"]["root"] = doctype
+    return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"]})
+
+@post(siteconfig["rootPath"]+"<dictID>/<doctype>/entrylist.json")
+@authDict(["canEdit"])
+def entrylist(dictID, doctype, user, dictDB, configs):
+    if request.forms.id:
+        if request.forms.id == "last":
+            entryID = ops.getLastEditedEntry(dictDB, user["email"])
+            return {"success": True, "entryID": entryID}
+        else:
+            entries = ops.listEntriesById(dictDB, request.forms.id, configs)
+            return {"success": True, "entries": entries}
+    else:
+        total, entries = ops.listEntries(dictDB, dictID, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.howmany, request.forms.sortdesc, False)
+        return {"success": True, "entries": entries, "total": total}
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None

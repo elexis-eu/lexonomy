@@ -65,22 +65,6 @@ def readDictConfigs(dictDB):
             configs[conf] = defaultDictConfig.get(conf, {})
     return configs
 
-def setHousekeepingAttributes(entryID, xml, subbing):
-    # delete any housekeeping attributes and elements that already exist in the XML:
-    import re
-    xml = re.sub('^(<[^>/]*)\s+xmlns:lxnm=[\'"]http://www\.lexonomy\.eu/["\']', "\g<1>", xml)
-    xml = re.sub('^(<[^>/]*)\s+lxnm:entryID=[\'"][^"\']*["\']', "\g<1>", xml)
-    xml = re.sub('^(<[^>/]*)\s+lxnm:subentryID=[\'"][^"\']*["\']', "\g<1>", xml)
-    # get name of the top-level element:
-    root = re.match('<([^\s>/]+)', xml).group(1)
-    # set housekeeping attributes:
-    if root in subbing:
-        attr = "subentryID"
-    else:
-        attr = "entryID"
-    xml = re.sub('^<[^\s>/]+', "\g<0> lxnm:%s='%s'" % (attr, entryID), xml)
-    return re.sub('^<[^\s>/]+', "\g<0> xmlns:lxnm='http://www.lexonomy.eu/'", xml)
-
 def addSubentryParentTags(db, entryID, xml):
     from xml.dom import minidom, Node
     doc = minidom.parseString(xml)
@@ -553,15 +537,6 @@ def setHousekeepingAttributes(entryID, xml, subbing):
     xml = re.sub(r"^<([^\s>\/]+)", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/'", xml)
     return xml
 
-def readEntry(dictDB, dictID, entryID, configs):
-    c = dictDB.execute("select * from entries where id=?", (entryID,))
-    row = c.fetchone()
-    if row:
-        xml = setHousekeepingAttributes(entryID, row["xml"], configs["subbing"])
-        return {"entryID": row["id"], "xml": xml,  "title": row["title"]}
-    else:
-        return {"entryID": 0, "xml": "",  "title": ""}
-
 def exportEntryXml(dictDB, dictID, entryID, configs, baseUrl):
     c = dictDB.execute("select * from entries where id=?", (entryID,))
     row = c.fetchone()
@@ -666,3 +641,77 @@ def checkImportStatus(pidfile, errfile):
     if os.path.isfile(errfile) and os.stat(errfile).st_size:
         errors = True
     return {"progressMessage": progress, "finished": finished, "errors": errors}
+
+def readDoctypesUsed(dictDB):
+    c = dictDB.execute("select doctype from entries group by doctype order by count(*) desc")
+    doctypes = []
+    for r in c.fetchall():
+        doctypes.append(r["doctype"])
+    return doctypes
+
+def getLastEditedEntry(dictDB, email):
+    c = dictDB.execute("select entry_id from history where email=? order by [when] desc limit 1", (email, ))
+    r = c.fetchone()
+    if r:
+        return str(r["entry_id"])
+    else:
+        return ""
+
+def listEntriesById(dictDB, entryID, configs):
+    c = dictDB.execute("select e.id, e.title, e.xml from entries as e where e.id=?", (entryID,))
+    entries = []
+    for r in c.fetchall():
+        xml = setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
+        entries.append({"id": r["id"], "title": r["title"], "xml": xml})
+    return entries
+
+def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
+    if "flag_element" in configs["flagging"] or fullXML:
+        entryXML = ", e.xml "
+    else:
+        entryXML = ""
+    if "headwordSortDesc" in configs["titling"]:
+        sortdesc = configs["titling"]["headwordSortDesc"]
+    else:
+        sortdesc = False
+    if reverse:
+        sortdesc = not sortdesc
+    if sortdesc:
+        sortdesc = " DESC "
+    else:
+        sortdesc = ""
+
+    if modifier == "start":
+        sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by e.sortkey" + sortdesc + ", s.level limit ?"
+        params1 = (doctype, searchtext+"%", howmany)
+        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ?"
+        params2 = (doctype, searchtext+"%")
+    elif modifier == "wordstart":
+        sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (s.txt like ? or s.txt like ?) group by e.id order by e.sortkey" + sortdesc + ", s.level limit ?"
+        params1 = (doctype, searchtext + "%", "% " + searchtext + "%", howmany)
+        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (s.txt like ? or s.txt like ?)"
+        params2 = (doctype, searchtext + "%", "% " + searchtext + "%")
+    elif modifier == "substring":
+        sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by e.sortkey" + sortdesc + ", s.level limit ?"
+        params1 = (doctype, "% " + searchtext + "%", howmany)
+        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ?"
+        params2 = (doctype, "% " + searchtext + "%")
+    c1 = dictDB.execute(sql1, params1)
+    entries = []
+    for r1 in c1.fetchall():
+        item = {"id": r1["id"], "title": r1["title"]}
+        if "flag_element" in configs["flagging"]:
+            item["flag"] = extractText(r1["xml"], next(iter(configs["flagging"]["flag_element"]), ""))
+        if fullXML:
+            item["xml"] = setHousekeepingAttributes(r1["id"], r1["xml"], configs["subbing"])
+        if r1["level"] > 1:
+            item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
+        entries.append(item)
+    c2 = dictDB.execute(sql2, params2)
+    r2 = c2.fetchone()
+    total = r2["total"]
+    return total, entries
+
+def extractText(xml, elName):
+    pat = r"<" + elName + "[^>]*>([^<]*)</" + elName + ">"
+    return re.findall(pat, xml)

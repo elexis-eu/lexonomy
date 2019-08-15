@@ -560,15 +560,15 @@ app.get(siteconfig.rootPath + ":dictID/search/", function (req, res) {
 });
 
 // EDITING UI, navigator and editor:
-app.get(siteconfig.rootPath + ":dictID/edit/", function (req, res) {
+/*app.get(siteconfig.rootPath + ":dictID/edit/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.readDictConfig(db, req.params.dictID, "xema", function (xema) {
     db.close();
     res.redirect(xema.root + "/");
   });
-});
-app.get(siteconfig.rootPath + ":dictID/edit/:doctype/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + ":dictID/edit/:doctype/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -587,8 +587,8 @@ app.get(siteconfig.rootPath + ":dictID/edit/:doctype/", function (req, res) {
       });
     }
   });
-});
-app.get(siteconfig.rootPath + ":dictID/:doctype/entryeditor/", function (req, res) {
+});*/
+/*app.get(siteconfig.rootPath + ":dictID/:doctype/entryeditor/", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -600,14 +600,14 @@ app.get(siteconfig.rootPath + ":dictID/:doctype/entryeditor/", function (req, re
         db.close();
         if (configs.xemplate._xsl) configs.xemplate._xsl = "dummy";
         configs.xema._root = configs.xema.root; if (configs.xema.elements[req.params.doctype]) configs.xema.root = req.params.doctype;
-        res.render("entryeditor.ejs", { user: user, dictID: req.params.dictID, doctype: req.params.doctype, xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, thes: configs.thes, collx: configs.collx, defo: configs.defo, titling: configs.titling, flagging: configs.flagging, siteconfig: siteconfig, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing });
+        res.render("entryeditor.ejs", { xema: configs.xema, xemplate: configs.xemplate, kex: configs.kex, xampl: configs.xampl, thes: configs.thes, collx: configs.collx, defo: configs.defo, titling: configs.titling, css: configs.xemplate._css, editing: configs.editing, subbing: configs.subbing });
       });
     }
   });
-});
+});*/
 
 // EDITING UI, JSON endpoints:
-app.post(siteconfig.rootPath + ":dictID/:doctype/entrylist.json", function (req, res) {
+/*app.post(siteconfig.rootPath + ":dictID/:doctype/entrylist.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID, true);
   ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
@@ -635,7 +635,7 @@ app.post(siteconfig.rootPath + ":dictID/:doctype/entrylist.json", function (req,
       }
     }
   });
-});
+});*/
 app.post(siteconfig.rootPath + ":dictID/entrycreate.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID);

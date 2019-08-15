@@ -225,12 +225,12 @@ module.exports = {
       callnext(resaveNeeded);
     });
   },
-  readDoctypesUsed: function (db, dictID, callnext) {
+  /*readDoctypesUsed: function (db, dictID, callnext) {
     db.all("select doctype from entries group by doctype order by count(*) desc", {}, function (err, rows) {
       var doctypes = (!err && rows) ? rows.map(row => row.doctype) : [];
       callnext(doctypes);
     });
-  },
+  },*/
 
   /*readEntry: function (db, dictID, entryID, callnext) {
     db.get("select * from entries where id=$id", { $id: entryID }, function (err, row) {
@@ -695,7 +695,7 @@ module.exports = {
       });
     });
   },
-  listEntriesById: function (db, dictID, entryID, callnext) {
+  /*listEntriesById: function (db, dictID, entryID, callnext) {
     var sql = "select e.id, e.title, e.xml from entries as e where e.id=$entryID";
     var params = { $entryID: entryID };
     module.exports.readDictConfig(db, dictID, "subbing", function (subbing) {
@@ -710,7 +710,7 @@ module.exports = {
         callnext(entries);
       });
     });
-  },
+  },*/
 
   getSortTitle: function (xml, titling) {
     if (titling.headwordSorting) { return module.exports.getEntryHeadword(xml, titling.headwordSorting) }
@@ -1505,11 +1505,11 @@ module.exports = {
     });
   },
 
-  getLastEditedEntry: function (db, dictID, email, callnext) {
+  /*getLastEditedEntry: function (db, dictID, email, callnext) {
     db.all("select entry_id from history where email=$email order by [when] desc limit 1", { $email: email }, function (err, rows) {
       if (rows.length > 0) { callnext(rows[0].entry_id) } else { callnext() }
     });
-  }
+  }*/
 }; // end of module.exports
 
 /*function clean4xml (txt) {
@@ -1529,7 +1529,7 @@ module.exports = {
   }
   return key;
 }*/
-function generateDictID () {
+/*function generateDictID () {
   var alphabet = "abcdefghijkmnpqrstuvwxy23456789";
   var id = "";
   while (id.length < 8) {
@@ -1537,7 +1537,7 @@ function generateDictID () {
     id += alphabet[i];
   }
   return "z" + id;
-}
+}*/
 
 function addFlag (entryID, xml, flag, flagconfig) {
   var el = flagconfig.flag_element;
