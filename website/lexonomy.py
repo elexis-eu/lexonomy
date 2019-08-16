@@ -179,6 +179,81 @@ def skeget_corpora(user):
                                   headers = {"Authorization": "Bearer " + request.query.apikey})
     return urllib.request.urlopen(req)
 
+@get(siteconfig["rootPath"] + "<dictID>/skeget/xampl")
+@authDict(["canEdit"])
+def skeget_xampl(dictID, user, dictDB, configs):
+    url = request.query.url
+    url += "/first"
+    url += "?corpname=" + urllib.parse.quote_plus(request.query.corpus)
+    url += "&username=" + request.query.username
+    url += "&api_key=" + request.query.apikey
+    url += "&format=json"
+    if request.query.querytype == "skesimple":
+        url += "&iquery=" + urllib.parse.quote_plus(request.query.query)
+    else:
+        url += "&queryselector=cqlrow&cql=" + urllib.parse.quote_plus(request.query.query)
+    url += "&viewmode=sen"
+    url += "&gdex_enabled=1"
+    if request.query.fromp:
+        url += "&" + request.query.fromp
+    req = urllib.request.Request(url, headers = {"Authorization": "Bearer " + request.query.apikey})
+    res = urllib.request.urlopen(req)
+    data = json.loads(res.read())
+    return data
+
+@get(siteconfig["rootPath"] + "<dictID>/skeget/thes")
+@authDict(["canEdit"])
+def skeget_thes(dictID, user, dictDB, configs):
+    url = request.query.url
+    url += "/thes"
+    url += "?corpname=" + urllib.parse.quote_plus(request.query.corpus)
+    url += "&username=" + request.query.username
+    url += "&api_key=" + request.query.apikey
+    url += "&format=json"
+    url += "&lemma=" + urllib.parse.quote_plus(request.query.lemma)
+    if request.query.fromp:
+        url += "&" + request.query.fromp
+    req = urllib.request.Request(url, headers = {"Authorization": "Bearer " + request.query.apikey})
+    res = urllib.request.urlopen(req)
+    data = json.loads(res.read())
+    return data
+
+@get(siteconfig["rootPath"] + "<dictID>/skeget/collx")
+@authDict(["canEdit"])
+def skeget_collx(dictID, user, dictDB, configs):
+    url = request.query.url
+    url += "/wsketch"
+    url += "?corpname=" + urllib.parse.quote_plus(request.query.corpus)
+    url += "&username=" + request.query.username
+    url += "&api_key=" + request.query.apikey
+    url += "&format=json"
+    url += "&lemma=" + urllib.parse.quote_plus(request.query.lemma)
+    url += "&structured=0"
+    if request.query.fromp:
+        url += "&" + request.query.fromp
+    req = urllib.request.Request(url, headers = {"Authorization": "Bearer " + request.query.apikey})
+    res = urllib.request.urlopen(req)
+    data = json.loads(res.read())
+    return data
+
+@get(siteconfig["rootPath"] + "<dictID>/skeget/defo")
+@authDict(["canEdit"])
+def skeget_defo(dictID, user, dictDB, configs):
+    url = request.query.url
+    url += "/view"
+    url += "?corpname=" + urllib.parse.quote_plus(request.query.corpus)
+    url += "&username=" + request.query.username
+    url += "&api_key=" + request.query.apikey
+    url += "&format=json"
+    url += "&iquery=" + ops.makeQuery(request.query.lemma)
+    url += "&viewmode=sen"
+    if request.query.fromp:
+        url += "&" + request.query.fromp
+    req = urllib.request.Request(url, headers = {"Authorization": "Bearer " + request.query.apikey})
+    res = urllib.request.urlopen(req)
+    data = json.loads(res.read())
+    return data
+
 @get(siteconfig["rootPath"] + "login")
 def login():
     res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)

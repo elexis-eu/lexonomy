@@ -760,3 +760,10 @@ def flagForRefac(dictDB):
     dictDB.commit()
     return (c.rowcount > 0)
 
+def makeQuery(lemma):
+    words = []
+    for w in lemma.split(" "):
+        if w != "":
+            words.append('[lc="'+w+'"+|+lemma_lc="'+w+'"]')
+    ret = re.sub(" ","+", lemma) + ";q=aword," + "".join(words) + ";q=p+0+0>0+1+[ws(\".*\",+\"definitions\",+\".*\")];exceptmethod=PREV-CONC"
+    return ret
