@@ -164,36 +164,6 @@ app.get(siteconfig.rootPath + ":dictID/search/", function (req, res) {
 
 
 // EDITING UI, JSON endpoints:
-app.post(siteconfig.rootPath + ":dictID/entrycreate.json", function (req, res) {
-  if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
-  var db = ops.getDB(req.params.dictID);
-  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
-    if (!user.canEdit) {
-      db.close();
-      res.json({ success: false });
-    } else {
-      ops.readDictConfigs(db, req.params.dictID, function (configs) {
-        ops.createEntry(db, req.params.dictID, null, req.body.content, user.email, {}, async function (entryID, adjustedXml, feedback) {
-          db.close();
-          var html = "";
-          if (configs.xemplate._xsl) {
-            html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(adjustedXml);
-          } else if (configs.xemplate._css) {
-            html = adjustedXml;
-          } else {
-            var doc = (new xmldom.DOMParser()).parseFromString(adjustedXml, "text/xml");
-            html = xemplatron.xml2html(doc, configs.xemplate, configs.xema);
-          }
-          var result = { success: true, id: entryID, content: adjustedXml, contentHtml: html };
-          if (feedback) {
-            result.feedback = feedback;
-          }
-          res.json(result);
-        });
-      });
-    }
-  });
-});
 app.post(siteconfig.rootPath + ":dictID/entryflag.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
   var db = ops.getDB(req.params.dictID);
@@ -206,36 +176,6 @@ app.post(siteconfig.rootPath + ":dictID/entryflag.json", function (req, res) {
         ops.flagEntry(db, req.params.dictID, req.body.id, req.body.flag, user.email, {}, function () {
           db.close();
           res.json({ success: true, id: req.body.id });
-        });
-      });
-    }
-  });
-});
-app.post(siteconfig.rootPath + ":dictID/entryupdate.json", function (req, res) {
-  if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
-  var db = ops.getDB(req.params.dictID);
-  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
-    if (!user.canEdit) {
-      db.close();
-      res.json({ success: false });
-    } else {
-      ops.readDictConfigs(db, req.params.dictID, function (configs) {
-        ops.updateEntry(db, req.params.dictID, req.body.id, req.body.content, user.email, {}, async function (adjustedEntryID, adjustedXml, changed, feedback) {
-          db.close();
-          var html = "";
-          if (configs.xemplate._xsl) {
-            html = await fluxslt().withStylesheet(configs.xemplate._xsl).runOn(adjustedXml);
-          } else if (configs.xemplate._css) {
-            html = adjustedXml;
-          } else {
-            var doc = (new xmldom.DOMParser()).parseFromString(adjustedXml, "text/xml");
-            html = xemplatron.xml2html(doc, configs.xemplate, configs.xema);
-          }
-          var result = { success: true, id: adjustedEntryID, content: adjustedXml, contentHtml: html };
-          if (feedback) {
-            result.feedback = feedback;
-          }
-          res.json(result);
         });
       });
     }

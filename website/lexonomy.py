@@ -161,6 +161,44 @@ def entryread(dictID, user, dictDB, configs):
             html = xml
     return {"success": (adjustedEntryID > 0), "id": adjustedEntryID, "content": xml, "contentHtml": html}
 
+@post(siteconfig["rootPath"]+"<dictID>/entryupdate.json")
+@authDict(["canEdit"])
+def entryupdate(dictID, user, dictDB, configs):
+    adjustedEntryID, adjustedXml, changed, feedback = ops.updateEntry(dictDB, configs, request.forms.id, request.forms.content, user["email"], {})
+    html = ""
+    if configs["xemplate"].get("_xsl"):
+        import lxml.etree as ET
+        dom = ET.XML(adjustedXml.encode("utf-8"))
+        xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
+        html = str(ET.XSLT(xslt)(dom))
+    elif configs["xemplate"].get("_css"):
+        html = adjustedXml
+    else:
+        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", adjustedXml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+    result = {"success": True, "id": adjustedEntryID, "content": adjustedXml, "contentHtml": html}
+    if feedback:
+        result["feedback"] = feedback
+    return result
+
+@post(siteconfig["rootPath"]+"<dictID>/entrycreate.json")
+@authDict(["canEdit"])
+def entrycreate(dictID, user, dictDB, configs):
+    adjustedEntryID, adjustedXml, feedback = ops.createEntry(dictDB, configs, None, request.forms.content, user["email"], {})
+    html = ""
+    if configs["xemplate"].get("_xsl"):
+        import lxml.etree as ET
+        dom = ET.XML(adjustedXml.encode("utf-8"))
+        xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
+        html = str(ET.XSLT(xslt)(dom))
+    elif configs["xemplate"].get("_css"):
+        html = adjustedXml
+    else:
+        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", adjustedXml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+    result = {"success": True, "id": adjustedEntryID, "content": adjustedXml, "contentHtml": html}
+    if feedback:
+        result["feedback"] = feedback
+    return result
+
 @get(siteconfig["rootPath"] + "consent")
 @auth
 def consent(user):
@@ -652,6 +690,7 @@ def entryeditor(dictID, doctype, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/<doctype>/entrylist.json")
 @authDict(["canEdit"])
 def entrylist(dictID, doctype, user, dictDB, configs):
+    print(request.forms)
     if request.forms.id:
         if request.forms.id == "last":
             entryID = ops.getLastEditedEntry(dictDB, user["email"])

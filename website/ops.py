@@ -86,6 +86,9 @@ def addSubentryParentTags(db, entryID, xml):
             el.appendChild(pel)
     return doc.toxml()
 
+def removeSubentryParentTags(xml):
+    return re.sub(r"<lxnm:subentryParent[^>]*>", "", xml)
+
 # auth
 def verifyLogin(email, sessionkey):
     conn = getMainDB()
@@ -114,7 +117,7 @@ def verifyLoginAndDictAccess(email, sessionkey, dictDB):
         ret[r] = ret["isAdmin"] or (dictAccess and dictAccess[r])
     return ret, configs
 
-def deleteEntry (db, entryID, email):
+def deleteEntry(db, entryID, email):
     # tell my parents that they need a refresh:
     db.execute ("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (entryID,))
     # delete me:
@@ -124,7 +127,7 @@ def deleteEntry (db, entryID, email):
                 (entryID, "delete", datetime.datetime.utcnow(), email, None))
     db.commit()
 
-def readEntry (db, configs, entryID):
+def readEntry(db, configs, entryID):
     c = db.execute("select * from entries where id=?", (entryID,))
     row = c.fetchone()
     if not row:
@@ -133,6 +136,133 @@ def readEntry (db, configs, entryID):
     if configs["subbing"]:
         xml = addSubentryParentTags(db, entryID, xml)
     return entryID, xml, row["title"]
+
+def createEntry(dictDB, configs, entryID, xml, email, historiography):
+    if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
+        abc = configs["titling"].get("abc")
+    else:
+        abc = configs["siteconfig"]["defaultAbc"]
+    xml = setHousekeepingAttributes(entryID, xml, configs["subbing"])
+    xml = removeSubentryParentTags(xml)
+    title = getEntryTitle(xml, configs["titling"])
+    sortkey = toSortKey(getSortTitle(xml, configs["titling"]), abc)
+    doctype = getDoctype(xml)
+    needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
+    needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
+    # entry title already exists?
+    c = dictDB.execute("select id from entries where title = ? and id <> ?", (title, entryID))
+    r = c.fetchone()
+    feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
+    if entryID:
+        sql = "insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values(?, ?, ?, ?, ?, ?, ?)"
+        params = (entryID, xml, title, sortkey, needs_refac, needs_resave, doctype)
+    else:
+        sql = "insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values(?, ?, ?, ?, ?, ?)"
+        params = (xml, title, sortkey, needs_refac, needs_resave, doctype)
+    c = dictDB.execute(sql, params)
+    entryID = c.lastrowid
+    dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
+    dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "create", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
+    dictDB.commit()
+    return entryID, xml, feedback
+
+def updateEntry(dictDB, configs, entryID, xml, email, historiography):
+    c = dictDB.execute("select id, xml from entries where id=?", (entryID, ))
+    row = c.fetchone()
+    if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
+        abc = configs["titling"].get("abc")
+    else:
+        abc = configs["siteconfig"]["defaultAbc"]
+    xml = setHousekeepingAttributes(entryID, xml, configs["subbing"])
+    xml = removeSubentryParentTags(xml)
+    newxml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
+    newxml = re.sub(r"(\=)\"([^\"]*)\"", r"\1'\2'", newxml)
+    newxml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", newxml)
+    if not row:
+        adjustedEntryID, adjustedXml, feedback = createEntry(dictDB, configs, entryID, xml, email, historiography)
+        return adjustedEntryID, adjustedXml, True, feedback
+    else:
+        oldxml = row["xml"]
+        oldxml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", oldxml)
+        oldxml = re.sub(r"(\=)\"([^\"]*)\"", r"\1'\2'", oldxml)
+        oldxml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", oldxml)
+        if oldxml == newxml:
+            return entryID, xml, False, None
+        else:
+            dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (entryID,))
+            title = getEntryTitle(xml, configs["titling"])
+            sortkey = toSortKey(getSortTitle(xml, configs["titling"]), abc)
+            doctype = getDoctype(xml)
+            needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
+            needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
+            # entry title already exists?
+            c = dictDB.execute("select id from entries where title = ? and id <> ?", (title, entryID))
+            r = c.fetchone()
+            feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
+            dictDB.execute("update entries set doctype=?, xml=?, title=?, sortkey=?, needs_refac=?, needs_resave=? where id=?", (doctype, xml, title, sortkey, needs_refac, needs_resave, entryID))
+            dictDB.execute("update searchables set txt=? where entry_id=? and level=1", (getEntryTitle(xml, configs["titling"], True), entryID))
+            dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
+            dictDB.commit()
+            return entryID, xml, True, feedback
+
+def getEntryTitle(xml, titling, plaintext=False):
+    if titling.get("headwordAnnotationsType") == "advanced":
+        el = re.findall(r"%\([^)]+\)", titling["headwordAnnotationsAdvanced"])[0]
+        return extractText(xml, el[2:-1])
+    ret = getEntryHeadword(xml, titling["headword"])
+    if not plaintext:
+        ret = "<span class='headword'>" + ret + "</span>"
+    if titling.get("headwordAnnotations"):
+        for hw in titling.get("headwordAnnotations"):
+            ret += " " if ret != "" else ""
+            ret += " ".join(extractText(xml, hw))
+    return ret
+
+def getEntryHeadword(xml, headword_elem):
+    ret = "?"
+    arr = extractText(xml, headword_elem)
+    if len(arr)>0:
+        ret = arr[0]
+    else:
+        ret = extractFirstText(xml)
+    if len(ret) > 255:
+        ret = ret[0:255]
+    return ret
+
+def toSortKey_num(match):
+    return str(match.group(0)).zfill(15)
+
+def toSortKey(s, abc):
+    keylength = 15
+    ret = re.sub(r"<[<>]+>", "", s).lower()
+    pat = r"[0-9]{1," + str(keylength) + "}"
+    ret = re.sub(pat, toSortKey_num, ret)
+    chars = []
+    count = 0
+    for pos in abc:
+        count += 1
+        key = "_"+str(count).zfill(keylength-1)
+        for i, pos2 in enumerate(pos):
+            if i > 0:
+                count += 1
+            chars.append({"char":pos2, "key": key})
+    chars.sort(key=lambda x:len(x["char"]), reverse=True)
+    for item in chars:
+        if not re.match(r"^[0-9]$", item["char"]):
+            ret = re.sub(item["char"], item["key"], ret)
+    ret = re.sub(r"[^0-9_]", "", ret)
+    return ret
+
+def getDoctype(xml):
+    pat = r"^<([^>\/\s]+)"
+    for match in re.findall(pat, xml):
+        return match
+    return ""
+
+def getSortTitle(xml, titling):
+    if titling.get("headwordSorting"):
+        return getEntryHeadword(xml, titling["headwordSorting"])
+    return getEntryHeadword(xml, titling["headword"])
 
 def generateKey(size=32):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
@@ -696,6 +826,8 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
         params1 = (doctype, "% " + searchtext + "%", howmany)
         sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ?"
         params2 = (doctype, "% " + searchtext + "%")
+    print(sql2)
+    print(params2)
     c1 = dictDB.execute(sql1, params1)
     entries = []
     for r1 in c1.fetchall():
