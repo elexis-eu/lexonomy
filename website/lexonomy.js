@@ -39,36 +39,6 @@ if (siteconfig.verbose) {
 // Path to our views:
 app.set("views", path.join(__dirname, "views")); app.set("view engine", "ejs"); // http://ejs.co/
 
-// ONE-CLICK UI and JSON endpoints:
-app.get(siteconfig.rootPath + "oneclick/", function (req, res) {
-  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
-    if (!user.loggedin) res.redirect("/"); else {
-      res.render("oneclick.ejs", { user: user, siteconfig: siteconfig });
-    }
-  });
-});
-app.post(siteconfig.rootPath + "oneclickread.json", function (req, res) {
-  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
-    if (!user.loggedin) res.json({ success: false }); else {
-      ops.readUserApiKey(user.email, function (apikey) {
-        res.json({ success: true, id: "oneclick", content: { apikey: apikey } });
-      });
-    }
-  });
-});
-app.post(siteconfig.rootPath + "oneclickupdate.json", function (req, res) {
-  ops.verifyLogin(req.cookies.email, req.cookies.sessionkey, function (user) {
-    if (!user.loggedin) res.json({ success: false }); else {
-      // req.body.id, req.body.content
-      var adjustedEntryID = req.body.id;
-      var json = JSON.parse(req.body.content);
-      ops.updateUserApiKey(user.email, json.apikey, function () {
-        ops.sendApiKeyToSke(user.email, json.apikey, user.ske_username, user.ske_apiKey, function () {});
-        res.json({ success: true, id: adjustedEntryID, content: json });
-      });
-    }
-  });
-});
 
 // PUSH API:
 app.get(siteconfig.rootPath + "push.api", function (req, res) {
