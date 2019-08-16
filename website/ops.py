@@ -715,3 +715,48 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
 def extractText(xml, elName):
     pat = r"<" + elName + "[^>]*>([^<]*)</" + elName + ">"
     return re.findall(pat, xml)
+
+def extractFirstText(xml):
+    pat = r"<([^\\s>]+)[^>]*>([^<>]*?)</([^\\s>]+)>"
+    for match in re.findall(pat, xml):
+        if match[0] == match[2] and match[1].strip() != "":
+            return match[1].strip()
+    return ""
+
+def getDictStats(dictDB):
+    res = {"entryCount": 0, "needResave": 0}
+    c = dictDB.execute("select count(*) as entryCount from entries")
+    r = c.fetchone()
+    res["entryCount"] = r["entryCount"]
+    c = dictDB.execute("select count(*) as needResave from entries where needs_resave=1 or needs_refresh=1 or needs_refac=1")
+    r = c.fetchone()
+    res["needResave"] = r["needResave"]
+    return res
+
+def updateDictConfig(dictDB, dictID, configID, content):
+    dictDB.execute("delete from configs where id=?", (configID, ))
+    dictDB.execute("insert into configs(id, json) values(?, ?)", (configID, json.dumps(content)))
+    dictDB.commit()
+    
+    if configID == "ident" or configID == "users":
+        attachDict(dictDB, dictID)
+        return content, False
+    elif configID == "titling" or configID == "searchability":
+        resaveNeeded = flagForResave(dictDB)
+        return content, resaveNeeded
+    elif configID == "subbing":
+        refacNeeded = flagForRefac(dictDB)
+        return content, refacNeeded
+    else:
+        return content, False
+
+def flagForResave(dictDB):
+    c = dictDB.execute("update entries set needs_resave=1")
+    dictDB.commit()
+    return (c.rowcount > 0)
+
+def flagForRefac(dictDB):
+    c = dictDB.execute("update entries set needs_refac=1")
+    dictDB.commit()
+    return (c.rowcount > 0)
+

@@ -588,6 +588,29 @@ def entrylist(dictID, doctype, user, dictDB, configs):
         total, entries = ops.listEntries(dictDB, dictID, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.howmany, request.forms.sortdesc, False)
         return {"success": True, "entries": entries, "total": total}
 
+@get(siteconfig["rootPath"]+"<dictID>/config")
+@authDict(["canConfig"])
+def config(dictID, user, dictDB, configs):
+    stats = ops.getDictStats(dictDB)
+    return template("config.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "needResave": stats["needResave"], "hasXemaOverride": ("_xonomyDocSpec" in configs["xema"] or "_dtd" in configs["xema"]), "hasXemplateOverride": ("_xsl" in configs["xemplate"] or "_css" in configs["xemplate"]), "hasEditingOverride": ("_js" in configs["editing"])})
+
+@get(siteconfig["rootPath"]+"<dictID>/config/<page>")
+@authDict(["canConfig"])
+def configpage(dictID, page, user, dictDB, configs):
+    return template("config-"+page+".tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "xema": configs["xema"], "titling": configs["titling"], "flagging": configs["flagging"]})
+
+@post(siteconfig["rootPath"]+"<dictID>/configread.json")
+@authDict(["canConfig"])
+def configread(dictID, user, dictDB, configs):
+    return {"success": True, "id": request.forms.id, "content": configs[request.forms.id]}
+
+@post(siteconfig["rootPath"]+"<dictID>/configupdate.json")
+@authDict(["canConfig"])
+def configupdate(dictID, user, dictDB, configs):
+    adjustedJson, resaveNeeded = ops.updateDictConfig(dictDB, dictID, request.forms.id, json.loads(request.forms.content))
+    redirUrl = "../../resave" if resaveNeeded else None
+    return {"success": True, "id": request.forms.id, "content": adjustedJson, redirUrl: redirUrl}
+
 # anything we don't know we forward to NodeJS
 nodejs_pid = None
 @error(404)

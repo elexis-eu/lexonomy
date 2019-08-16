@@ -39,26 +39,6 @@ module.exports = {
   dictExists: function (dictID) {
     return fs.existsSync(path.join(siteconfig.dataDir, "dicts/" + dictID + ".sqlite"));
   },
-  attachDict: function (dictDB, dictID, callnext) {
-    module.exports.readDictConfigs(dictDB, dictID, function (configs) {
-      var db = new sqlite3.Database(path.join(siteconfig.dataDir, "lexonomy.sqlite"), sqlite3.OPEN_READWRITE, function () { db.run("PRAGMA foreign_keys=on") });
-      db.run("delete from dicts where id=$dictID", { $dictID: dictID }, function (err) {
-        if (err) console.log(err);
-        var title = configs.ident.title;
-        db.run("insert into dicts(id, title) values ($dictID, $title)", { $dictID: dictID, $title: title }, function (err) {
-          if (err) console.log(err);
-          db.run("delete from user_dict where dict_id=$dictID", { $dictID: dictID }, function (err) {
-            if (err) console.log(err);
-            for (var email in configs.users) {
-              db.run("insert into user_dict(dict_id, user_email) values ($dictID, $email)", { $dictID: dictID, $email: email.toLowerCase() }, function (err) { if (err) console.log(err); });
-            }
-            db.close();
-            callnext();
-          });
-        });
-      });
-    });
-  },
   readDictConfigs: function (db, dictID, callnext) {
     if (db.dictConfigs) { callnext(db.dictConfigs) } else {
       var configs = { siteconfig: siteconfig };
@@ -84,53 +64,6 @@ module.exports = {
     if (id == "titling") return { headwordAnnotations: [], abc: siteconfig.defaultAbc };
     if (id == "flagging") return { flag_element: "", flags: [] };
     return {};
-  },
-  updateDictConfig: function (db, dictID, configID, json, callnext) {
-    db.get("select id from configs where id=$id", { $id: configID }, function (err, row) {
-      if (row) {
-        db.run("update configs set json=$json where id=$id", { $id: configID, $json: JSON.stringify(json, null, "\t") }, function (err) {
-          afterwards();
-        });
-      } else {
-        db.run("delete from configs where id=$id", { $id: configID }, function (err) {
-          db.run("insert into configs(id, json) values($id, $json)", { $id: configID, $json: JSON.stringify(json, null, "\t") }, function (err) {
-            afterwards();
-          });
-        });
-      }
-    });
-    var afterwards = function () {
-      if (configID == "ident" || configID == "users") {
-        db.dictConfigs = null;
-        module.exports.attachDict(db, dictID, function () {
-          callnext(json, false);
-        });
-      } else if (configID == "titling" || configID == "titling" || configID == "searchability") {
-        module.exports.flagForResave(db, dictID, function (resaveNeeded) {
-          callnext(json, resaveNeeded);
-        });
-      } else if (configID == "subbing") {
-        module.exports.flagForRefac(db, dictID, function (resaveNeeded) {
-          callnext(json, resaveNeeded);
-        });
-      } else {
-        callnext(json, false);
-      }
-    };
-  },
-  flagForResave: function (db, dictID, callnext) {
-    db.run("update entries set needs_resave=1", {}, function (err) {
-      if (err) console.log(err);
-      var resaveNeeded = (this.changes > 0);
-      callnext(resaveNeeded);
-    });
-  },
-  flagForRefac: function (db, dictID, callnext) {
-    db.run("update entries set needs_refac=1", {}, function (err) {
-      if (err) console.log(err);
-      var resaveNeeded = (this.changes > 0);
-      callnext(resaveNeeded);
-    });
   },
   createEntry: function (db, dictID, entryID, xml, email, historiography, callnext) {
     module.exports.readDictConfigs(db, dictID, function (configs) {
