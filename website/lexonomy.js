@@ -120,58 +120,6 @@ app.post(siteconfig.rootPath + ":dictID/entryflag.json", function (req, res) {
   });
 });
 
-// RESAVING:
-app.get(siteconfig.rootPath + ":dictID/resave/", function (req, res) {
-  if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
-  var db = ops.getDB(req.params.dictID, true);
-  ops.readDictConfigs(db, req.params.dictID, function (configs) {
-    ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
-      if (!user.canConfig && !user.canEdit && !user.canUpload) {
-        db.close();
-        res.redirect("/" + req.params.dictID + "/edit/");
-      } else {
-        ops.getDictStats(db, req.params.dictID, function (stats) {
-          db.close();
-          res.render("resave.ejs", { user: user, dictID: req.params.dictID, dictTitle: configs.ident.title, awayUrl: "../../" + req.params.dictID + "/edit/", todo: stats.entryCount, siteconfig: siteconfig });
-        });
-      }
-    });
-  });
-});
-app.post(siteconfig.rootPath + ":dictID/resave.json", function (req, res) {
-  if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
-  var db = ops.getDB(req.params.dictID);
-  db.run("BEGIN TRANSACTION");
-  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
-    if (!user.canConfig && !user.canEdit && !user.canUpload) {
-      db.run("COMMIT");
-      db.close();
-      res.json({ todo: 0 });
-    } else {
-      var counter = 0;
-      let go = function () {
-        ops.refac(db, req.params.dictID, function (any) {
-          ops.refresh(db, req.params.dictID, function (any) {
-            ops.resave(db, req.params.dictID, function () {
-              ops.getDictStats(db, req.params.dictID, function (stats) {
-                counter++;
-                if (stats.needResave && counter <= 127) {
-                  go();
-                } else {
-                  db.run("COMMIT");
-                  db.close(function () { res.json({ todo: stats.needResave }) });
-                }
-              });
-            });
-          });
-        });
-      };
-      go();
-    }
-  });
-});
-
-
 
 // SUBENTRIES: JSON endpoint
 app.get(siteconfig.rootPath + ":dictID/subget/", function (req, res) {

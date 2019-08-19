@@ -963,7 +963,7 @@ def refac(dictDB, dictID, configs):
             subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID")
             xml = el.toxml()
             if subentryID:
-               adjustedEntryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, xml, email.lower(), {"refactoredFrom":entryID})
+                adjustedEntryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, xml, email.lower(), {"refactoredFrom":entryID})
                 el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID)
                 dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
                 if changed:
@@ -995,9 +995,9 @@ def refresh(dictDB, dictID, configs):
         for doctype in configs["subbing"]:
             els = parentDoc.documentElement.getElementsByTagName(doctype)
             for el in els:
-                if (el and not el.hasAttributeNS("http://www.lexonomy.eu/", "subentryID"):
+                if el and not el.hasAttributeNS("http://www.lexonomy.eu/", "subentryID"):
                     el = None
-                if (el and el.hasAttributeNS("http://www.lexonomy.eu/", "done"):
+                if el and el.hasAttributeNS("http://www.lexonomy.eu/", "done"):
                     el = None
                 if el:
                     break
@@ -1027,4 +1027,32 @@ def refresh(dictDB, dictID, configs):
                 return True
 
 def resave(dictDB, dictID, configs):
+    if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
+        abc = configs["titling"].get("abc")
+    else:
+        abc = configs["siteconfig"]["defaultAbc"]
+    c = dictDB.execute("select id, xml from entries where needs_resave=1 limit 12")
+    for r in c.fetchall():
+        entryID = r["id"]
+        xml = r["xml"]
+        doc = minidom.parseString(xml)
+        dictDB.execute("update entries set needs_resave=0, title=?, sortkey=? where id=?", (getEntryTitle(xml, configs["titling"]), toSortKey(getSortTitle(xml, configs["titling"]), abc), entryID))
+        dictDB.execute("delete from searchables where entry_id=?", (entryID,))
+        dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"]), 1))
+        headword = getEntryHeadword(xml, configs["titling"].get("headword"))
+        for searchable in getEntrySearchables(xml, configs):
+            if searchable != headword:
+                dictDB.execute("insert into searchables(entry_id, txt, level) values(?,?,?)", (entryID, searchable, 2))
+    dictDB.commit()
+    return True
 
+def getEntrySearchables(xml, configs):
+    ret = []
+    ret.append(getEntryHeadword(xml, configs["titling"].get("headword")))
+    if configs["searchability"].get("searchableElements"):
+        for sel in configs["searchability"].get("searchableElements"):
+            for txt in extractText(xml, sel):
+                if txt != "" and txt not in ret:
+                    ret.append(txt)
+    return ret
+            
