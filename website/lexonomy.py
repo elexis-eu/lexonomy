@@ -740,6 +740,26 @@ def dictsearch(dictID):
         nabes = ops.readNabesByText(dictDB, dictID, configs, request.query.q)
         return template("dict-search.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes})
 
+@get(siteconfig["rootPath"]+"<dictID>/resave")
+@authDict(["canEdit","canConfig","canUpload"])
+def resave(dictID, user, dictDB, configs):
+    stats = ops.getDictStats(dictDB)
+    return template("resave.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "awayUrl": "../../"+dictID+"/edit", "todo": stats["entryCount"]})
+
+@post(siteconfig["rootPath"]+"<dictID>/resave.json")
+@authDict(["canEdit","canConfig","canUpload"])
+def resavejson(dictID, user, dictDB, configs):
+    count = 0
+    stats = ops.getDictStats(dictDB)
+    while stats["needResave"] and counter <= 127:
+        ops.refac(dictDB, dictID, configs)
+        ops.refresh(dictDB, dictID, configs)
+        ops.resave(dictDB, dictID, configs)
+        stats = ops.getDictStats(dictDB)
+        count += 1
+    return {"todo": stats["needResave"]}
+    
+
 # anything we don't know we forward to NodeJS
 nodejs_pid = None
 @error(404)

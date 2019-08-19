@@ -926,3 +926,105 @@ def makeQuery(lemma):
             words.append('[lc="'+w+'"+|+lemma_lc="'+w+'"]')
     ret = re.sub(" ","+", lemma) + ";q=aword," + "".join(words) + ";q=p+0+0>0+1+[ws(\".*\",+\"definitions\",+\".*\")];exceptmethod=PREV-CONC"
     return ret
+
+def refac(dictDB, dictID, configs):
+    from xml.dom import minidom, Node
+    c = dictDB.execute("select e.id, e.xml, h.email from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 order by h.[when] asc limit 1")
+    r = c.fetchone()
+    if not r:
+        return False
+    entryID = r["id"]
+    xml = r["xml"]
+    email = r["email"] or ""
+    doc = minidom.parseString(xml)
+    doc.documentElement.setAttributeNS("http://www.lexonomy.eu/", "lxnm:entryID", entryID)
+    #in the current entry, remove all <lxnm:subentryParent>
+    _els = doc.getElementsByTagNameNS("http://www.lexonomy.eu/", "subentryParent")
+    for el in _els:
+        el.parentNode.removeChild(el)
+    # in the current entry, find elements which are subentries, and are not contained inside other subentries
+    els = []
+    for doctype in configs["subbing"]:
+        _els = doc.getElementsByTagName(doctype)
+        for el in _els:
+            isSubSub = False
+            p = el.parentNode
+            while p.parentNode and p.parentNode.noteType == 1:
+                if configs["subbing"].get(p.tagName):
+                    isSubSub = True
+                p = p.parentNode
+            if not isSubSub:
+                els.append(el)
+    dictDB.execute("delete from sub where parent_id=?", (entryID, ))
+    # keep saving subentries of the current entry until there are no more subentries to save:
+    if len(els) > 0:
+        while len(els) > 0:
+            el = els.pop()
+            subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID")
+            xml = el.toxml()
+            if subentryID:
+               adjustedEntryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, xml, email.lower(), {"refactoredFrom":entryID})
+                el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID)
+                dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
+                if changed:
+                    dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?) and id<>?", (subentryID, entryID))
+            else:
+                adjustedEntryID, adjustedXml, feedback = createEntry(dictDB, configs, None, xml, email.lower(), {"refactoredFrom":entryID})
+                el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID)
+                dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
+                dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (subentryID, ))
+    else:
+        xml = doc.toxml()
+        dictDB.execute("update entries set xml=?, needs_refac=0 where id=?", (xml, entryID))
+    dictDB.commit()
+
+def refresh(dictDB, dictID, configs):
+    # takes one entry that needs refreshing and sucks into it the latest versions of its subentries
+    # get one entry that needs refreshing where none of its children needs refreshing
+    c = dictDB.execute("select pe.id, pe.xml from entries as pe left outer join sub as s on s.parent_id=pe.id left join entries as ce on ce.id=s.child_id where pe.needs_refresh=1 and (ce.needs_refresh is null or ce.needs_refresh=0) limit 1")
+    r = c.fetchone()
+    if not r:
+        return False
+    parentID = r["id"]
+    parentXml = r["xml"]
+    parentDoc = minidom.parseString(parentXml)
+    # this will be called repeatedly till exhaustion
+    while True:
+        # find an element which is a subentry and which we haven't sucked in yet:
+        el = None
+        for doctype in configs["subbing"]:
+            els = parentDoc.documentElement.getElementsByTagName(doctype)
+            for el in els:
+                if (el and not el.hasAttributeNS("http://www.lexonomy.eu/", "subentryID"):
+                    el = None
+                if (el and el.hasAttributeNS("http://www.lexonomy.eu/", "done"):
+                    el = None
+                if el:
+                    break
+            if el:
+                break
+        if el: #if such en element exists
+            subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID")
+            # get the subentry from the database and inject it into the parent's xml:
+            c = dictDB.execute("select xml from entries where id=?", (subentryID, ))
+            r = c.fetchone()
+            if not r:
+                el.parentNode.removeChild(el)
+            else:
+                childXml = r["xml"]
+                childDoc = minidom.parseString(childXml)
+                elNew = childDoc.documentElement
+                el.parentNode.replaceChild(elNew, el)
+                elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID)
+                elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:done", "1")
+        else: #if no such element exists: we are done
+            els = parentDoc.documentElement.getElementsByTagName("*")
+            for el in els:
+                el.removeAttributeNS("http://www.lexonomy.eu/", "done")
+                parentXml = parentDoc.toxml()
+                # save the parent's xml (into which all subentries have been injected by now) and tell it that it needs a resave:
+                db.execute("update entries set xml=?, needs_refresh=0, needs_resave=1 where id=?", (parentXml, parentID))
+                return True
+
+def resave(dictDB, dictID, configs):
+
