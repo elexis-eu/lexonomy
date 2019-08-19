@@ -698,6 +698,23 @@ def readNabesByEntryID(dictDB, dictID, entryID, configs):
         nabes.append({"id": r["id"], "title": r["title"]})
     return nabes
 
+def readNabesByText(dictDB, dictID, configs, text):
+    nabes = []
+    if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
+        abc = configs["titling"].get("abc")
+    else:
+        abc = configs["siteconfig"]["defaultAbc"]
+    sortkey = toSortKey(text, abc)
+    #before
+    c = dictDB.execute("select e1.id, e1.title from entries as e1 where doctype=? and e1.sortkey<=? order by e1.sortkey desc limit 8", (configs["xema"]["root"], sortkey))
+    for r in c.fetchall():
+        nabes.insert(0, {"id": r["id"], "title": r["title"]})
+    #after
+    c = dictDB.execute("select e1.id, e1.title from entries as e1 where doctype=? and e1.sortkey>? order by e1.sortkey asc limit 15", (configs["xema"]["root"], sortkey))
+    for r in c.fetchall():
+        nabes.append({"id": r["id"], "title": r["title"]})
+    return nabes
+
 def readRandoms(dictDB):
     configs = readDictConfigs(dictDB)
     limit = 75
@@ -826,8 +843,6 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
         params1 = (doctype, "% " + searchtext + "%", howmany)
         sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ?"
         params2 = (doctype, "% " + searchtext + "%")
-    print(sql2)
-    print(params2)
     c1 = dictDB.execute(sql1, params1)
     entries = []
     for r1 in c1.fetchall():
@@ -843,6 +858,18 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
     r2 = c2.fetchone()
     total = r2["total"]
     return total, entries
+
+def listEntriesPublic(dictDB, dictID, configs, searchtext):
+    howmany = 100
+    sql_list = "select s.txt, min(s.level) as level, e.id, e.title, case when s.txt=? then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like ? and e.doctype=? group by e.id order by priority, level, e.sortkey, s.level limit ?"
+    c1 = dictDB.execute(sql_list, ("%"+searchtext+"%", "%"+searchtext+"%", configs["xema"].get("root"), howmany))
+    entries = []
+    for r1 in c1.fetchall():
+        item = {"id": r1["id"], "title": r1["title"], "exactMatch": (r1["level"] == 1 and r1["priority"] == 1)}
+        if r1["level"] > 1:
+            item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
+        entries.append(item)
+    return entries
 
 def extractText(xml, elName):
     pat = r"<" + elName + "[^>]*>([^<]*)</" + elName + ">"

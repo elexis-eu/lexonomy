@@ -587,57 +587,6 @@ module.exports = {
     return ret;
   },
 
-  readNabesByText: function (db, dictID, text, callnext) {
-    module.exports.readDictConfigs(db, dictID, function (configs) {
-      var sql_before = `select e1.id, e1.title
-        from entries as e1
-        where doctype=$doctype and e1.sortkey<=$sortkey
-        order by e1.sortkey desc
-        limit 8`;
-      var sql_after = `select e1.id, e1.title
-        from entries as e1
-        where doctype=$doctype and e1.sortkey>$sortkey
-        order by e1.sortkey asc
-        limit 15`;
-      var abc = configs.titling.abc; if (!abc || abc.length == 0) abc = configs.siteconfig.defaultAbc;
-      var sortkey = module.exports.toSortkey(text, abc);
-      var nabes = [];
-      db.all(sql_before, { $sortkey: sortkey, $doctype: configs.xema.root }, function (err, rows) {
-        for (var i = 0; i < rows.length; i++) {
-          nabes.unshift({ id: rows[i].id, title: rows[i].title });
-        }
-        db.all(sql_after, { $sortkey: sortkey, $doctype: configs.xema.root }, function (err, rows) {
-          for (var i = 0; i < rows.length; i++) {
-            nabes.push({ id: rows[i].id, title: rows[i].title });
-          }
-          callnext(nabes);
-        });
-      });
-    });
-  },
-  listEntriesPublic: function (db, dictID, searchtext, callnext) {
-    module.exports.readDictConfig(db, dictID, "xema", function (xema) {
-      var howmany = 100;
-      var sql_list = `select s.txt, min(s.level) as level, e.id, e.title,
-        case when s.txt=$searchtext then 1 else 2 end as priority
-        from searchables as s
-        inner join entries as e on e.id=s.entry_id
-        where s.txt like $like and e.doctype=$doctype
-        group by e.id
-        order by priority, level, e.sortkey, s.level
-        limit $howmany`;
-      var like = "%" + searchtext + "%";
-      db.all(sql_list, { $howmany: howmany, $like: like, $searchtext: searchtext, $doctype: xema.root }, function (err, rows) {
-        var entries = [];
-        for (var i = 0; i < rows.length; i++) {
-          var item = { id: rows[i].id, title: rows[i].title, exactMatch: (rows[i].level == 1 && rows[i].priority == 1) };
-          if (rows[i].level > 1) item.title += " ← <span class='redirector'>" + rows[i].txt + "</span>";
-          entries.push(item);
-        }
-        callnext(entries);
-      });
-    });
-  },
 
   verifyLogin: function (email, sessionkey, callnext) {
     var yesterday = (new Date()); yesterday.setHours(yesterday.getHours() - 24); yesterday = yesterday.toISOString();

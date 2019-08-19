@@ -100,38 +100,6 @@ app.post(siteconfig.rootPath + "push.api", function (req, res) {
   });
 });
 
-app.get(siteconfig.rootPath + ":dictID/search/", function (req, res) {
-  if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
-  var db = ops.getDB(req.params.dictID, true);
-  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
-    ops.readDictConfigs(db, req.params.dictID, function (configs) {
-      if (!configs.publico.public) res.redirect("/" + req.params.dictID + "/"); else {
-        ops.listEntriesPublic(db, req.params.dictID, req.query.q, function (entries) {
-          if (entries.length == 1 && entries[0].exactMatch) {
-            db.close();
-            res.redirect("../" + entries[0].id + "/");
-          } else {
-            ops.readNabesByText(db, req.params.dictID, req.query.q, function (nabes) {
-              db.close();
-              res.render("dict-search.ejs", {
-                user: user,
-                dictID: req.params.dictID,
-                dictTitle: configs.ident.title,
-                dictBlurb: configs.ident.blurb,
-                publico: configs.publico,
-                siteconfig: configs.siteconfig,
-                q: req.query.q,
-                entries: entries,
-                nabes: nabes
-              });
-            });
-          }
-        });
-      }
-    });
-  });
-});
-
 
 // EDITING UI, JSON endpoints:
 app.post(siteconfig.rootPath + ":dictID/entryflag.json", function (req, res) {

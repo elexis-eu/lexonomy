@@ -574,12 +574,12 @@ def publicentry(dictID, entryID):
     elif "_css" in configs["xemplate"]:
         html = xml
     else:
-        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", res["xml"])+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", xml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
         #rewrite xemplatron to python, too?
     css = ""
     if "_css" in configs["xemplate"]:
         css = configs["xemplate"]["_css"]
-    return template("dict-entry.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "entryID": res["entryID"], "nabes": nabes, "html": html, "title": _title, "css": css})
+    return template("dict-entry.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "entryID": adjustedEntryID, "nabes": nabes, "html": html, "title": _title, "css": css})
 
 @get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>.xml")
 def publicentryxml(dictID, entryID):
@@ -724,6 +724,21 @@ def configupdate(dictID, user, dictDB, configs):
     adjustedJson, resaveNeeded = ops.updateDictConfig(dictDB, dictID, request.forms.id, json.loads(request.forms.content))
     redirUrl = "../../resave" if resaveNeeded else None
     return {"success": True, "id": request.forms.id, "content": adjustedJson, redirUrl: redirUrl}
+
+@get(siteconfig["rootPath"]+"<dictID>/search")
+def dictsearch(dictID):
+    if not ops.dictExists(dictID):
+        return redirect("/")
+    dictDB = ops.getDB(dictID)
+    user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
+    if not configs["publico"]["public"]:
+        return redirect("/"+dictID)
+    entries = ops.listEntriesPublic(dictDB, dictID, configs, request.query.q)
+    if len(entries) == 1 and entries[0]["exactMatch"]:
+        redirect("/"+dictID+"/"+entries[0]["id"])
+    else:
+        nabes = ops.readNabesByText(dictDB, dictID, configs, request.query.q)
+        return template("dict-search.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes})
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None
