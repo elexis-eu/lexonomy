@@ -102,27 +102,6 @@ app.post(siteconfig.rootPath + "push.api", function (req, res) {
 
 
 
-// SUBENTRIES: JSON endpoint
-app.get(siteconfig.rootPath + ":dictID/subget/", function (req, res) {
-  if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
-  var db = ops.getDB(req.params.dictID, true);
-  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
-    if (!user.canEdit) {
-      db.close();
-      res.json({ success: false });
-    } else {
-      ops.listEntries(db, req.params.dictID, req.query.doctype, req.query.lemma, "wordstart", 100, false, true, function (total, entries) {
-        db.close();
-        res.json({ success: true, total: total, entries: entries });
-      });
-      // res.json([
-      //   {id: 123, title: "<span class='headword'>hello world 1</span> aha", xml: "<exampleContainer/>"},
-      //   {id: 345, title: "<span class='headword'>hello world 2</span> aha", xml: "<exampleContainer/>"},
-      // ]);
-    }
-  });
-});
-
 // HISTORY: JSON endpoint
 app.post(siteconfig.rootPath + ":dictID/history.json", function (req, res) {
   if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }

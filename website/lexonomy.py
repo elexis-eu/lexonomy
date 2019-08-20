@@ -186,6 +186,12 @@ def entryflag(dictID, user, dictDB, configs):
     ops.flagEntry(dictDB, dictID, configs, request.forms.id, request.forms.flag, user["email"], {})
     return {"success": True, "id": request.forms.id}
 
+@get(siteconfig["rootPath"]+"<dictID>/subget")
+@authDict(["canEdit"])
+def subget(dictID, user, dictDB, configs):
+    total, entries = ops.listEntries(dictDB, dictID, configs, request.query.doctype, request.query.lemma, "wordstart", 100, False, True)
+    return {"success": True, "total": total, "entries": entries}
+
 @get(siteconfig["rootPath"] + "consent")
 @auth
 def consent(user):
