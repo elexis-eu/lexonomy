@@ -1055,4 +1055,41 @@ def getEntrySearchables(xml, configs):
                 if txt != "" and txt not in ret:
                     ret.append(txt)
     return ret
-            
+
+def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
+    if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
+        abc = configs["titling"].get("abc")
+    else:
+        abc = configs["siteconfig"]["defaultAbc"]
+    c = dictDB.execute("select id, xml from entries where id=?", (entryID,))
+    row = c.fetchone()
+    xml = row["xml"] if row else ""
+    xml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
+    xml = re.sub(r"(\=)\"([^\"]*)\"", "\1='\2'", xml)
+    xml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", xml)
+    xml = addFlag(entryID, xml, flag, configs["flagging"])
+
+    # tell my parents that they need a refresh:
+    dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (entryID, ))
+    # update me
+    needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
+    needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
+    dictDB.execute("update entries set doctype=?, xml=?, title=?, sortkey=$sortkey, needs_refac=?, needs_resave=? where id=?", (getDoctype(xml), xml, getEntryTitle(xml, configs["titling"]), toSortKey(getSortTitle(xml, configs["titling"]), abc), needs_refac, needs_resave, entryID))
+    dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
+    dictDB.commit()
+    return entryID
+
+def addFlag(entryID, xml, flag, flagconfig):
+    el = flagconfig.get("flag_element")
+    regex = r"<" + el + "[^>]*>[^<]*</" + el + ">"
+    xml = re.sub(regex, lambda m: addFlag_replace(m, flag, el), xml)
+    if re.search(regex, xml):
+        return xml
+    xml = re.sub(r"^<([^>]+>)", lambda m: addFlag_replace2(m, flag, el), xml, 1)
+    return xml
+    
+def addFlag_replace(match, flag, el):
+    return "<" + el + ">" + flag + "</" + el + ">" if flag else ""
+
+def addFlag_replace2(match, flag, el):
+    return "<" +  str(match.group(1)) + "<" + el + ">" + flag + "</" + el + ">"

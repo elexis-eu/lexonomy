@@ -101,25 +101,6 @@ app.post(siteconfig.rootPath + "push.api", function (req, res) {
 });
 
 
-// EDITING UI, JSON endpoints:
-app.post(siteconfig.rootPath + ":dictID/entryflag.json", function (req, res) {
-  if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
-  var db = ops.getDB(req.params.dictID);
-  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
-    if (!user.canEdit) {
-      db.close();
-      res.json({ success: false });
-    } else {
-      ops.readDictConfigs(db, req.params.dictID, function (configs) {
-        ops.flagEntry(db, req.params.dictID, req.body.id, req.body.flag, user.email, {}, function () {
-          db.close();
-          res.json({ success: true, id: req.body.id });
-        });
-      });
-    }
-  });
-});
-
 
 // SUBENTRIES: JSON endpoint
 app.get(siteconfig.rootPath + ":dictID/subget/", function (req, res) {
