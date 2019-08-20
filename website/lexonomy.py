@@ -826,33 +826,9 @@ def pushapi():
             return {"success": False}
 
 
-# anything we don't know we forward to NodeJS
-nodejs_pid = None
 @error(404)
-def nodejs(error):
-    url = "http://" + nodejs_url + request.path
-    if request.query_string:
-        url += "?%s" % request.query_string
-    req = urllib.request.Request(url, headers=request.headers)
-    if request.method == "POST":
-        req.method = "POST"
-        req.data = request.body
-    try:
-        res = opener.open(req)
-    except urllib.error.HTTPError as e:
-        res = e
-    except urllib.error.URLError:
-        print("----------- need to start NodeJS server -----------", file=sys.stderr)
-        import subprocess, time
-        global nodejs_pid
-        nodejs_pid = subprocess.Popen(["node","run.js",my_base_url], start_new_session=True).pid
-        time.sleep(5) # give it some time to come up
-        res = opener.open(req)
-    response.status = res.status
-    for h, v in res.getheaders():
-        if h.lower() not in hop_by_hop:
-            response.add_header(h, v)
-    return res
+def error404(error):
+    return template("404.tpl", **{"siteconfig": siteconfig})
 
 # deployment
 debug=False

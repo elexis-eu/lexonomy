@@ -3,13 +3,13 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<%-include("head.ejs")%>
+		%include("head.tpl")
 		<title>404</title>
-		<link type="text/css" rel="stylesheet" href="<%-siteconfig.baseUrl%>furniture/public.css" />
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}furniture/public.css" />
 	</head>
 	<body class="homepage">
 		<div id="header">
-			<a class="sitehome" href="<%-siteconfig.baseUrl%>"></a>
+			<a class="sitehome" href="{{siteconfig["baseUrl"]}}"></a>
 		</div>
 
 		<div class="invelope">
