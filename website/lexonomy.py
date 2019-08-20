@@ -778,6 +778,53 @@ def resavejson(dictID, user, dictDB, configs):
         count += 1
     return {"todo": stats["needResave"]}
     
+@get(siteconfig["rootPath"] + "push.api")
+def pushtest():
+    return template("pushapi.tpl", **{"siteconfig": siteconfig})
+
+@post(siteconfig["rootPath"] + "push.api")
+def pushapi():
+    data = json.loads(request.body.getvalue().decode('utf-8'))
+    user = ops.verifyUserApiKey(data["email"], data["apikey"])
+    if not user["valid"]:
+        return {"success": False}
+    else:
+        if data["command"] == "makeDict":
+            dictID = ops.suggestDictId()
+            dictTitle = re.sub(r"^\s+", "", data["dictTitle"])
+            if dictTitle == "":
+                dictTitle = dictID
+            dictBlurb = data["dictBlurb"]
+            poses = data["poses"]
+            labels = data["labels"]
+            res = ops.makeDict(dictID, "push", dictTitle, dictBlurb, user["email"])
+            if not res:
+                return {"success": False}
+            else:
+                dictDB = ops.getDB(dictID)
+                configs = ops.readDictConfigs(dictDB)
+                if configs["xema"]["elements"].get("partOfSpeech"):
+                    for pos in poses:
+                        configs["xema"]["elements"]["partOfSpeech"]["values"].append({"value": pos, "caption": ""})
+                if configs["xema"]["elements"].get("collocatePartOfSpeech"):
+                    for pos in poses:
+                        configs["xema"]["elements"]["collocatePartOfSpeech"]["values"].append({"value": pos, "caption":""})
+                if configs["xema"]["elements"].get("label"):
+                    for label in labels:
+                        configs["xema"]["elements"]["label"]["values"].append({"value":label, "caption": ""})
+                ops.updateDictConfig(dictDB, dictID, "xema", configs["xema"])
+                return {"success": True, "dictID": dictID}
+        elif data["command"] == "createEntries":
+            dictID = data["dictID"]
+            entryXmls = data["entryXmls"]
+            dictDB = ops.getDB(dictID)
+            configs = ops.readDictConfigs(dictDB)
+            for entry in entryXmls:
+                ops.createEntry(dictDB, configs, None, entry, user["email"], {"apikey": data["apikey"]})
+            return {"success": True}
+        else:
+            return {"success": False}
+
 
 # anything we don't know we forward to NodeJS
 nodejs_pid = None

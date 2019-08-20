@@ -40,67 +40,6 @@ if (siteconfig.verbose) {
 app.set("views", path.join(__dirname, "views")); app.set("view engine", "ejs"); // http://ejs.co/
 
 
-// PUSH API:
-app.get(siteconfig.rootPath + "push.api", function (req, res) {
-  res.render("pushapi.ejs", { siteconfig: siteconfig });
-});
-app.post(siteconfig.rootPath + "push.api", function (req, res) {
-  var json = req.body;
-  var email = json.email;
-  var apikey = json.apikey;
-  ops.verifyUserApiKey(email, apikey, function (user) {
-    if (!user.valid) {
-      res.json({ success: false });
-    } else {
-      if (json.command == "makeDict") {
-        ops.suggestDictID(function (dictID) {
-          var dictTitle = json.dictTitle.replace(/^\s+/g, "").replace(/\s+$/g, ""); if (!dictTitle) dictTitle = dictID;
-          var dictBlurb = json.dictBlurb;
-          var poses = json.poses;
-          var labels = json.labels;
-          ops.makeDict(dictID, "push", dictTitle, dictBlurb, email, function (success) {
-            if (!success) res.json({ success: false }); else {
-              var db = ops.getDB(dictID);
-              ops.readDictConfig(db, dictID, "xema", function (xema) {
-                if (xema.elements["partOfSpeech"]) for (var i = 0; i < poses.length; i++) xema.elements["partOfSpeech"].values.push({ value: poses[i], caption: "" });
-                if (xema.elements["collocatePartOfSpeech"]) for (var i = 0; i < poses.length; i++) xema.elements["collocatePartOfSpeech"].values.push({ value: poses[i], caption: "" });
-                if (xema.elements["label"]) for (var i = 0; i < labels.length; i++) xema.elements["label"].values.push({ value: labels[i], caption: "" });
-                ops.updateDictConfig(db, dictID, "xema", xema, function () {
-                  db.close();
-                  res.json({ success: true, dictID: dictID });
-                });
-              });
-            }
-          });
-        });
-      } else if (json.command == "createEntries") {
-        var dictID = json.dictID;
-        var entryXmls = json.entryXmls;
-        var db = ops.getDB(dictID);
-        db.run("BEGIN TRANSACTION");
-        db.serialize(function () {
-          var doneCount = 0;
-          for (var i = 0; i < entryXmls.length; i++) {
-            var xml = entryXmls[i];
-            ops.createEntry(db, dictID, null, xml, email, { apikey: apikey }, function () {
-              doneCount++;
-              if (doneCount >= entryXmls.length) {
-                db.run("COMMIT");
-                db.close(function () {
-                  res.json({ success: true });
-                });
-              }
-            });
-          }
-        });
-      } else {
-        res.json({ success: false });
-      }
-    }
-  });
-});
-
-
 
 
 app.use(function (req, res) { res.status(404).render("404.ejs", { siteconfig: siteconfig }) });

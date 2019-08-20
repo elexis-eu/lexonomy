@@ -1104,3 +1104,11 @@ def readDictHistory(dictDB, dictID, configs, entryID):
         history.append({"entry_id": row["entry_id"], "revision_id": row["id"], "content": xml, "action": row["action"], "when": row["when"], "email": row["email"] or "", "historiography": json.loads(row["historiography"])})
     return history
 
+def verifyUserApiKey(email, apikey):
+    conn = getMainDB()
+    c = conn.execute("select email from users where email=? and apiKey=?", (email, apikey))
+    row = c.fetchone()
+    if not row or siteconfig["readonly"]:
+        return {"valid": False}
+    else:
+        return {"valid": True, "email": email or ""}
