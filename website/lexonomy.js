@@ -102,38 +102,6 @@ app.post(siteconfig.rootPath + "push.api", function (req, res) {
 
 
 
-// HISTORY: JSON endpoint
-app.post(siteconfig.rootPath + ":dictID/history.json", function (req, res) {
-  if (!ops.dictExists(req.params.dictID)) { res.status(404).render("404.ejs", { siteconfig: siteconfig }); return }
-  var db = ops.getDB(req.params.dictID, true);
-  ops.verifyLoginAndDictAccess(req.cookies.email, req.cookies.sessionkey, db, req.params.dictID, function (user) {
-    ops.readDictConfigs(db, req.params.dictID, function (configs) {
-      ops.readDictHistory(db, req.params.dictID, req.body.id, async function (history) {
-        db.close();
-        var stylesheet = null;
-        var domparser = null;
-        for (var i = 0; i < history.length; i++) {
-          var xml = history[i].content;
-          if (xml) {
-            var html = "";
-            if (configs.xemplate._xsl) {
-              if (!stylesheet) stylesheet = fluxslt().withStylesheet(configs.xemplate._xsl);
-              html = await stylesheet.runOn(xml);
-            } else if (configs.xemplate._css) {
-              html = xml;
-            } else {
-              if (!domparser) domparser = new xmldom.DOMParser();
-              var doc = domparser.parseFromString(xml, "text/xml");
-              html = xemplatron.xml2html(doc, configs.xemplate, configs.xema);
-            }
-            history[i].contentHtml = html;
-          }
-        }
-        res.json(history);
-      });
-    });
-  });
-});
 
 app.use(function (req, res) { res.status(404).render("404.ejs", { siteconfig: siteconfig }) });
 process.on("uncaughtException", (err) => {

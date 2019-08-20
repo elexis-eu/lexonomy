@@ -1093,3 +1093,14 @@ def addFlag_replace(match, flag, el):
 
 def addFlag_replace2(match, flag, el):
     return "<" +  str(match.group(1)) + "<" + el + ">" + flag + "</" + el + ">"
+
+def readDictHistory(dictDB, dictID, configs, entryID):
+    history = []
+    c = dictDB.execute("select * from history where entry_id=? order by [when] desc", (entryID,))
+    for row in c.fetchall():
+        xml = row["xml"]
+        if row["xml"]:
+            xml = setHousekeepingAttributes(entryID, row["xml"], configs["subbing"])
+        history.append({"entry_id": row["entry_id"], "revision_id": row["id"], "content": xml, "action": row["action"], "when": row["when"], "email": row["email"] or "", "historiography": json.loads(row["historiography"])})
+    return history
+

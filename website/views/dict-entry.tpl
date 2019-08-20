@@ -45,7 +45,7 @@
 			<div id="dictheader">
 				<div class="titleContainer"><span class="dictTitle"><a class="dictTitle" href="../../{{dictID}}/">{{dictTitle}}</a>
 %if user["dictAccess"]:
-<a href="../../<%=dictID%>/edit/" class="editLink">Edit</a>
+<a href="../../{{dictID}}/edit/" class="editLink">Edit</a>
 %end
 </span></div>
 				<form class="searchContainer" action="../../{{dictID}}/search/" method="GET"><span class="searchbox"><input class="searchbox" name="q"/><input type="submit" class="submit" value="&nbsp;"/></span></form>

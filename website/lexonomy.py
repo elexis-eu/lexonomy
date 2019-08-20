@@ -159,6 +159,8 @@ def entryread(dictID, user, dictDB, configs):
             html = str(ET.XSLT(xslt)(dom))
         elif configs["xemplate"].get("_css"):
             html = xml
+        else:
+            html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", xml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
     return {"success": (adjustedEntryID > 0), "id": adjustedEntryID, "content": xml, "contentHtml": html}
 
 @post(siteconfig["rootPath"]+"<dictID>/entryupdate.json")
@@ -191,6 +193,30 @@ def entryflag(dictID, user, dictDB, configs):
 def subget(dictID, user, dictDB, configs):
     total, entries = ops.listEntries(dictDB, dictID, configs, request.query.doctype, request.query.lemma, "wordstart", 100, False, True)
     return {"success": True, "total": total, "entries": entries}
+
+@post(siteconfig["rootPath"]+"<dictID>/history.json")
+def history(dictID):
+    if not ops.dictExists(dictID):
+        return redirect("/")
+    user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
+    history = ops.readDictHistory(ops.getDB(dictID), dictID, configs, request.forms.id)
+    res_history = []
+    for item in history:
+        xml = item["content"]
+        html = ""
+        if xml:
+            if configs["xemplate"].get("_xsl"):
+                import lxml.etree as ET
+                dom = ET.XML(xml.encode("utf-8"))
+                xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
+                html = str(ET.XSLT(xslt)(dom))
+            elif configs["xemplate"].get("_css"):
+                html = xml
+            else:
+                html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", xml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+        item["contentHtml"] = html
+        res_history.append(item)
+    return {"history":res_history}
 
 @get(siteconfig["rootPath"] + "consent")
 @auth

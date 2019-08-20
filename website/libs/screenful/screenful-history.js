@@ -3,11 +3,11 @@ Screenful.History={
     Screenful.Editor.entryID=entryID;
     $("#history").html("<div class='leftie'></div>");
     $.ajax({url: Screenful.History.historyUrl, dataType: "json", method: "POST", data: {id: entryID}}).done(function(data){
-      if(!data.length) {
+      if(!data.history.length) {
         //no history for this entry
       } else {
-        for(var i=0; i<data.length; i++){
-          var hist=data[i];
+        for(var i=0; i<data.history.length; i++){
+          var hist=data.history[i];
           if(!Screenful.History.isDeletion(hist)) {
             var $div=$("<div class='revision'></div>").appendTo($("#history"));
             Screenful.History.drawRevision($div, hist, data.length-i, (i==0));

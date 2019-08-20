@@ -464,27 +464,6 @@ module.exports = {
   },
 
 
-  readDictHistory: function (db, dictID, entryID, callnext) {
-    module.exports.readDictConfig(db, dictID, "subbing", function (subbing) {
-      db.all("select * from history where entry_id=$entryID order by [when] desc", { $entryID: entryID }, function (err, rows) {
-        var history = [];
-        for (var i = 0; i < rows.length; i++) {
-          var row = rows[i];
-          if (row.xml) row.xml = setHousekeepingAttributes(row.entry_id, row.xml, subbing);
-          history.push({
-            "entry_id": row.entry_id,
-            "revision_id": row.id,
-            "content": row.xml,
-            "action": row.action,
-            "when": row.when,
-            "email": row.email || "",
-            "historiography": JSON.parse(row.historiography)
-          });
-        }
-        callnext(history);
-      });
-    });
-  },
 
 }; // end of module.exports
 
