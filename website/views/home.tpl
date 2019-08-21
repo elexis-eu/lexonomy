@@ -141,6 +141,9 @@
 			<div id="sitefooter">
 				<div class="right"><a href="https://github.com/elexis-eu/lexonomy" class="github" title="GitHub" target="_blank"></a></div>
 				<div>Lexonomy is developed as part of <a href="https://elex.is/">ELEXIS</a> project.</div>
+				%if version != "":
+				<div>Build version: {{version}}</div>
+				%end
 				<div class="logolint">
 					<a class="muni" target="_blank" href="https://www.muni.cz/" title="Masaryk University"></a>
 					<a class="ske" target="_blank" href="https://www.sketchengine.co.uk/" title="Sketch Engine"></a>

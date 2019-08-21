@@ -134,10 +134,14 @@ def home():
         return redirect("/consent/")
     dicts = ops.getDictsByUser(res["email"])
     error = ""
+    version = ""
+    if os.path.isfile("version.txt"):
+        with open("version.txt", "r") as version_file:
+            version = version_file.read()
     if request.cookies.jwt_error:
         error = request.cookies.jwt_error
         response.delete_cookie("jwt_error", path="/")
-    return template("home.tpl", **{"user": res, "siteconfig": siteconfig, "dicts": dicts, "error": error})
+    return template("home.tpl", **{"user": res, "siteconfig": siteconfig, "dicts": dicts, "error": error, "version": version})
 
 @post(siteconfig["rootPath"] + "<dictID>/entrydelete.json")
 @authDict(["canEdit"])
