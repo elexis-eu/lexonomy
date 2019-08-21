@@ -68,7 +68,6 @@
 							$("form#login").on("submit", function(e){
 					      var email=$("form#login div.field.email input").val();
 					      var password=$("form#login div.field.password input").val();
-								console.log(email, password);
 					      if(email!="" && password!="") {
 									$.ajax({url: "login.json", dataType: "json", method: "POST", data: {email: email, password: password}}).done(function(data){
 							      if(data.success) window.location.reload();
