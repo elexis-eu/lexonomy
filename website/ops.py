@@ -47,7 +47,6 @@ def sendmail(mailTo, mailSubject, mailText):
         else:
             server = smtplib.SMTP(siteconfig["mailconfig"]["host"], siteconfig["mailconfig"]["port"])
         message = "Subject: " + mailSubject + "\n\n" + mailText
-        print(message)
         server.sendmail(siteconfig["mailconfig"]["from"], mailTo, message)
         server.quit()
         
@@ -275,7 +274,6 @@ def login(email, password):
         return {"success": False}
     conn = getMainDB()
     passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
-    print(passhash)
     c = conn.execute("select email from users where email=? and passwordHash=?", (email.lower(), passhash))
     user = c.fetchone()
     if not user:
@@ -287,7 +285,6 @@ def login(email, password):
     return {"success": True, "email": user["email"], "key": key}
 
 def logout(user):
-    print(user["email"])
     conn = getMainDB()
     conn.execute("update users set sessionKey='', sessionLast='' where email=?", (user["email"],))
     conn.commit()
@@ -413,7 +410,6 @@ def updateUserApiKey(user, apiKey):
 
 def sendApiKeyToSke(user, apiKey):
     if user["ske_username"] and user["ske_apiKey"]:
-        print("send API key to SKE")
         data = json.dumps({"options": {"settings_lexonomyApiKey": apiKey, "settings_lexonomyEmail": user["email"].lower()}})
         queryData = urllib.parse.urlencode({ "username": user["ske_username"], "api_key": user["ske_apiKey"], "json": data })
         url = "https://api.sketchengine.eu/bonito/run.cgi/set_user_options?" + queryData
@@ -436,8 +432,6 @@ def prepareApiKeyForSke(email):
     
 
 def processJWT(user, jwtdata):
-    print(jwtdata)
-    print(user)
     conn = getMainDB()
     c = conn.execute("select * from users where ske_id=?", (jwtdata["user"]["id"],))
     row = c.fetchone()

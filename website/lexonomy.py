@@ -14,8 +14,7 @@ from bottle import (hook, route, get, post, run, template, error, request,
                     response, static_file, abort, redirect, install)
 
 # configuration
-my_url = "localhost:8000"
-nodejs_url = siteconfig["baseUrl"].split("://")[1].rstrip("/")
+my_url = siteconfig["baseUrl"].split("://")[1].rstrip("/")
 cgi = False
 if "SERVER_NAME" in os.environ and "SERVER_PORT" in os.environ:
     my_url = os.environ["SERVER_NAME"] + ":" + os.environ["SERVER_PORT"]
@@ -27,12 +26,11 @@ else:
 
 # command-line arguments (unless CGI)
 if not cgi and len(sys.argv) > 1:
-    if sys.argv[1] in ["-h", "--help"] or len(sys.argv) != 3:
-        print("Usage: %s SERVER:PORT LEXONOMY:PORT, which default to %s and %s" % (sys.argv[0], my_url, nodejs_url), file=sys.stderr)
+    if sys.argv[1] in ["-h", "--help"] or len(sys.argv) != 2:
+        print("Usage: %s SERVER:PORT, which default to %s" % (sys.argv[0], my_url), file=sys.stderr)
         print(sys.argv, file=sys.stderr)
         sys.exit(1)
     my_url = sys.argv[1]
-    nodejs_url = sys.argv[2]
 
 # serve static files
 @route('/<path:re:(widgets|furniture|libs).*>')
@@ -473,7 +471,6 @@ def changeoneclickapi(user):
 @get(siteconfig["rootPath"] + "skelogin.json/<token>")
 def skelogin(token):
     secret = siteconfig["sketchengineKey"]
-    print(token, secret)
     try:
         jwtdata = jwt.decode(token, secret, audience="lexonomy.eu")
         user = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
@@ -487,7 +484,6 @@ def skelogin(token):
             response.set_cookie("jwt_error", str(res["error"]), path="/")
             return redirect("/")
     except Exception as e:
-        print(str(e))
         response.set_cookie("jwt_error", str(e), path="/")
         return redirect("/")
 
@@ -713,7 +709,6 @@ def entryeditor(dictID, doctype, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/<doctype>/entrylist.json")
 @authDict(["canEdit"])
 def entrylist(dictID, doctype, user, dictDB, configs):
-    print(request.forms)
     if request.forms.id:
         if request.forms.id == "last":
             entryID = ops.getLastEditedEntry(dictDB, user["email"])
@@ -847,7 +842,4 @@ else: # run a standalone server, prefer the paste server if available over the b
         run(host=host, port=port, debug=debug, reloader=debug, server='paste', interval=0.1)
     except ImportError:
         run(host=host, port=port, debug=debug, reloader=debug, interval=0.1)
-    if nodejs_pid: # if we started NodeJS, we kill it now too
-        import signal
-        os.killpg(os.getpgid(nodejs_pid), signal.SIGTERM)
 
