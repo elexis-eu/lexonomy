@@ -767,7 +767,7 @@ def importfile(dictID, filename, email):
     except:
         return checkImportStatus(pidfile, errfile)
     dbpath = os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")
-    p = subprocess.Popen(["adminscripts/import.js", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
+    p = subprocess.Popen(["adminscripts/import.py", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
     return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
 
 def checkImportStatus(pidfile, errfile):
