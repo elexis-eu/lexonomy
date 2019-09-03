@@ -7,11 +7,8 @@ import os.path
 import sqlite3
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
-                                           "../siteconfig.json"), encoding="utf-8"))
-if siteconfig["dataDir"][0] == "/":
-    path = os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite')
-else:
-    path = os.path.join("../", siteconfig["dataDir"], 'lexonomy.sqlite')
+                                           "siteconfig.json"), encoding="utf-8"))
+path = os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite')
 print("Updating lexonomy database: %s" % path)
 conn = sqlite3.connect(path)
 conn.row_factory = sqlite3.Row
