@@ -769,7 +769,7 @@ def resave(dictID, user, dictDB, configs):
 def resavejson(dictID, user, dictDB, configs):
     count = 0
     stats = ops.getDictStats(dictDB)
-    while stats["needResave"] and counter <= 127:
+    while stats["needResave"] and count <= 127:
         ops.refac(dictDB, dictID, configs)
         ops.refresh(dictDB, dictID, configs)
         ops.resave(dictDB, dictID, configs)

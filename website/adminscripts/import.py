@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 import os.path
 import sqlite3
 import sys
@@ -12,6 +13,7 @@ if len(sys.argv) < 3:
     print("       -p   purge dictionary before importing")
     sys.exit()
 
+print("PID "+ str(os.getpid()))
 print("Import started. Please wait...")
 args = sys.argv[1:]
 purge = False

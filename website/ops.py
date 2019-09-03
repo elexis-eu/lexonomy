@@ -774,7 +774,11 @@ def checkImportStatus(pidfile, errfile):
     with open(pidfile, "r") as content_file:
         content = content_file.read()
     pid_data = re.split(r"[\n\r]", content)
-    progress = pid_data[-1]
+    if pid_data[-1] == "":
+        progress = pid_data[-2]
+    else:
+        progress = pid_data[-1]
+    print(progress)
     finished = False
     if "100%" in progress:
         finished = True
