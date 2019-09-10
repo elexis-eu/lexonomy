@@ -879,7 +879,7 @@ def extractText(xml, elName):
     return re.findall(pat, xml)
 
 def extractFirstText(xml):
-    pat = r"<([^\\s>]+)[^>]*>([^<>]*?)</([^\\s>]+)>"
+    pat = r"<([^ ^\\s>]+)[^>]*>([^<>]*?)</([^\\s>]+)>"
     for match in re.findall(pat, xml):
         if match[0] == match[2] and match[1].strip() != "":
             return match[1].strip()
