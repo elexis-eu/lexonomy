@@ -208,7 +208,7 @@ def getEntryTitle(xml, titling, plaintext=False):
     if titling.get("headwordAnnotationsType") == "advanced":
         el = re.findall(r"%\([^)]+\)", titling["headwordAnnotationsAdvanced"])[0]
         return extractText(xml, el[2:-1])
-    ret = getEntryHeadword(xml, titling["headword"])
+    ret = getEntryHeadword(xml, titling.get("headword"))
     if not plaintext:
         ret = "<span class='headword'>" + ret + "</span>"
     if titling.get("headwordAnnotations"):
@@ -260,8 +260,8 @@ def getDoctype(xml):
 
 def getSortTitle(xml, titling):
     if titling.get("headwordSorting"):
-        return getEntryHeadword(xml, titling["headwordSorting"])
-    return getEntryHeadword(xml, titling["headword"])
+        return getEntryHeadword(xml, titling.get("headwordSorting"))
+    return getEntryHeadword(xml, titling.get("headword"))
 
 def generateKey(size=32):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
@@ -778,7 +778,6 @@ def checkImportStatus(pidfile, errfile):
         progress = pid_data[-2]
     else:
         progress = pid_data[-1]
-    print(progress)
     finished = False
     if "100%" in progress:
         finished = True
