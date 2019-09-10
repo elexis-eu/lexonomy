@@ -732,12 +732,15 @@ def readRandomOne(dictDB, dictID, configs):
         return {"id": 0, "title": "", "xml": ""}
 
 def download(dictDB, dictID, configs):
-    resxml = "<"+dictID+">"
+    rootname = dictID.lstrip(" 0123456789")
+    if rootname == "":
+        rootname = "lexonomy"
+    resxml = "<"+rootname+">"
     c = dictDB.execute("select id, xml from entries")
     for r in c.fetchall():
         resxml += setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
         resxml += "\n"
-    resxml += "</"+dictID+">"
+    resxml += "</"+rootname+">"
     return resxml
 
 def purge(dictDB, email, historiography):
