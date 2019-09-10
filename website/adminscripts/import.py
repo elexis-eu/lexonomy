@@ -42,8 +42,6 @@ entryTag = ''
 entryCount = 0
 
 class handlerFirst(xml.sax.ContentHandler):
-    def __init__(self):
-        xml.sax.ContentHandler.__init__(self)
     def startElement( self, name, attrs):
         global rootTag
         global entryTag
@@ -58,37 +56,21 @@ class handlerFirst(xml.sax.ContentHandler):
         global entryTag
         if name == entryTag:
             entryCount += 1
-
-class handlerSecond(xml.sax.ContentHandler):
-    def __init__(self):
-        xml.sax.ContentHandler.__init__(self)
-    def startElement( self, name, attrs):
-        loc = self._locator
-        print(loc.getColumnNumber())
-        global rootTag
-        global entryTag
-        if rootTag == "":
-            rootTag = name
-        elif entryTag == "":
-            entryTag = name
-        else:
-            pass
-    def endElement( self, name):
-        global entryCount
-        global entryTag
-        if name == entryTag:
-            entryCount += 1
-
 
 xmldata = open(filename, 'r').read()
 try:
-    saxParser = xml.sax.parseString(xmldata, handlerFirst())
+    saxParser = xml.sax.parseString("<!DOCTYPE foo SYSTEM 'x.dtd'>\n"+xmldata, handlerFirst())
+    xmldata = "<!DOCTYPE foo SYSTEM 'x.dtd'>\n"+xmldata
 except xml.sax._exceptions.SAXParseException as e:
-    xmldata = "<fakeroot>"+xmldata+"</fakeroot>"
-    rootTag = ""
-    entryTag = ""
-    entryCount = 0
-    saxParser = xml.sax.parseString(xmldata, handlerFirst())
+    if "junk after document element" in str(e):
+        xmldata = "<!DOCTYPE foo SYSTEM 'x.dtd'>\n<fakeroot>"+xmldata+"</fakeroot>"
+        rootTag = ""
+        entryTag = ""
+        entryCount = 0
+        saxParser = xml.sax.parseString(xmldata, handlerFirst())
+    else:
+        print(e, file=sys.stderr)
+        sys.exit()
 
 print("Detected %d entries in '%s' element" % (entryCount, entryTag))
 
@@ -117,6 +99,7 @@ for event, node in doc:
         else:
             sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype) values(?, 1, 1, 1, ?)"
             params = (entry, entryTag)
+        print(entry)
         c = db.execute(sql, params)
         if entryID == None:
             entryID = c.lastrowid

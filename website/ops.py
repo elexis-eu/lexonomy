@@ -935,7 +935,7 @@ def refac(dictDB, dictID, configs):
     xml = r["xml"]
     email = r["email"] or ""
     doc = minidom.parseString(xml)
-    doc.documentElement.setAttributeNS("http://www.lexonomy.eu/", "lxnm:entryID", entryID)
+    doc.documentElement.setAttributeNS("http://www.lexonomy.eu/", "lxnm:entryID", str(entryID))
     #in the current entry, remove all <lxnm:subentryParent>
     _els = doc.getElementsByTagNameNS("http://www.lexonomy.eu/", "subentryParent")
     for el in _els:
@@ -972,11 +972,12 @@ def refac(dictDB, dictID, configs):
                 dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
                 dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (subentryID, ))
     else:
-        xml = doc.toxml()
+        xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
         dictDB.execute("update entries set xml=?, needs_refac=0 where id=?", (xml, entryID))
     dictDB.commit()
 
 def refresh(dictDB, dictID, configs):
+    from xml.dom import minidom, Node
     # takes one entry that needs refreshing and sucks into it the latest versions of its subentries
     # get one entry that needs refreshing where none of its children needs refreshing
     c = dictDB.execute("select pe.id, pe.xml from entries as pe left outer join sub as s on s.parent_id=pe.id left join entries as ce on ce.id=s.child_id where pe.needs_refresh=1 and (ce.needs_refresh is null or ce.needs_refresh=0) limit 1")
@@ -1018,13 +1019,15 @@ def refresh(dictDB, dictID, configs):
         else: #if no such element exists: we are done
             els = parentDoc.documentElement.getElementsByTagName("*")
             for el in els:
-                el.removeAttributeNS("http://www.lexonomy.eu/", "done")
-                parentXml = parentDoc.toxml()
+                if el.getAttributeNS("http://www.lexonomy.eu/", "done"):
+                    el.removeAttributeNS("http://www.lexonomy.eu/", "done")
+                parentXml = parentDoc.toxml().replace('<?xml version="1.0" ?>', '').strip()
                 # save the parent's xml (into which all subentries have been injected by now) and tell it that it needs a resave:
-                db.execute("update entries set xml=?, needs_refresh=0, needs_resave=1 where id=?", (parentXml, parentID))
+                dictDB.execute("update entries set xml=?, needs_refresh=0, needs_resave=1 where id=?", (parentXml, parentID))
                 return True
 
 def resave(dictDB, dictID, configs):
+    from xml.dom import minidom, Node
     if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
         abc = configs["titling"].get("abc")
     else:
