@@ -870,6 +870,8 @@ def listEntriesPublic(dictDB, dictID, configs, searchtext):
 
 def extractText(xml, elName):
     elName = str(elName)
+    if elName == "":
+        return []
     pat = r"<" + elName + "[^>]*>([^<]*)</" + elName + ">"
     return re.findall(pat, xml)
 
