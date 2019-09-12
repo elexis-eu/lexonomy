@@ -235,7 +235,6 @@ def save_consent(user):
 @auth
 def skeget_corpora(user):
     import base64
-    print(user)
     req = urllib.request.Request("https://api.sketchengine.eu/ca/api/corpora",
                                   headers = {"Authorization": "Basic " + base64.b64encode(str.encode(str(user['ske_username'])+':'+str(user['ske_apiKey']))).decode('ascii')})
     ske_response = urllib.request.urlopen(req)
