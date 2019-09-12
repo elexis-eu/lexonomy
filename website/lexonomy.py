@@ -234,9 +234,13 @@ def save_consent(user):
 @get(siteconfig["rootPath"] + "skeget/corpora")
 @auth
 def skeget_corpora(user):
-    req = urllib.request.Request("https://api.sketchengine.eu/ca/api/corpora?username" + request.query.username,
-                                  headers = {"Authorization": "Bearer " + request.query.apikey})
-    return urllib.request.urlopen(req)
+    import base64
+    print(user)
+    req = urllib.request.Request("https://api.sketchengine.eu/ca/api/corpora",
+                                  headers = {"Authorization": "Basic " + base64.b64encode(str.encode(str(user['ske_username'])+':'+str(user['ske_apiKey']))).decode('ascii')})
+    ske_response = urllib.request.urlopen(req)
+    response.headers['Content-Type'] = ske_response.getheader('Content-Type')
+    return ske_response
 
 @get(siteconfig["rootPath"] + "<dictID>/skeget/xampl")
 @authDict(["canEdit"])
