@@ -753,7 +753,7 @@ app.post(siteconfig.rootPath + ":dictID/resave.json", function (req, res) {
       res.json({ todo: 0 });
     } else {
       var counter = 0;
-      let go = function () {
+      const go = function () {
         ops.refac(db, req.params.dictID, function (any) {
           ops.refresh(db, req.params.dictID, function (any) {
             ops.resave(db, req.params.dictID, function () {

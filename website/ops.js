@@ -1307,10 +1307,12 @@ module.exports = {
   sendApiKeyToSke: function (email, apiKey, ske_username, ske_apiKey, callnext) {
     console.log("send API key to SkE");
     if (ske_username != "" && ske_apiKey != "") {
-      var data = JSON.stringify({ options: {
-        settings_lexonomyApiKey: apiKey,
-        settings_lexonomyEmail: email.toLowerCase()
-      } });
+      var data = JSON.stringify({
+        options: {
+          settings_lexonomyApiKey: apiKey,
+          settings_lexonomyEmail: email.toLowerCase()
+        }
+      });
       var queryData = querystring.stringify({ "username": ske_username, "api_key": ske_apiKey, "json": data });
       var options = {
         "host": "api.sketchengine.eu",
