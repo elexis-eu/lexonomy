@@ -184,6 +184,25 @@ def entryupdate(dictID, user, dictDB, configs):
         result["feedback"] = feedback
     return result
 
+@post(siteconfig["rootPath"]+"<dictID>/entrycreate.json")
+@authDict(["canEdit"])
+def entrycreate(dictID, user, dictDB, configs):
+    adjustedEntryID, adjustedXml, feedback = ops.createEntry(dictDB, configs, None, request.forms.content, user["email"], {})
+    html = ""
+    if configs["xemplate"].get("_xsl"):
+        import lxml.etree as ET
+        dom = ET.XML(adjustedXml.encode("utf-8"))
+        xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
+        html = str(ET.XSLT(xslt)(dom))
+    elif configs["xemplate"].get("_css"):
+        html = adjustedXml
+    else:
+        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", adjustedXml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+    result = {"success": True, "id": adjustedEntryID, "content": adjustedXml, "contentHtml": html}
+    if feedback:
+        result["feedback"] = feedback
+    return result
+
 @post(siteconfig["rootPath"]+"<dictID>/entryflag.json")
 @authDict(["canEdit"])
 def entryflag(dictID, user, dictDB, configs):

@@ -514,6 +514,7 @@ def cloneDict(dictID, email):
         ident["title"] = "Clone of " + ident["title"]
     newDB.execute("update configs set json=? where id='ident'", (json.dumps(ident),))
     newDB.commit()
+    attachDict(newDB, newID)
     return {"success": True, "dictID": newID, "title": ident["title"]}
 
 def destroyDict(dictID):
