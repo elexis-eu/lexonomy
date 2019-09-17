@@ -756,8 +756,10 @@ def showImportErrors(filename, truncate):
     with open(filename+".err", "r") as content_file:
         content = content_file.read()
     if (truncate):
-        content = content[0:truncate]
-    return {"errorData": content, "truncated": truncate}
+        content = content[0:truncate].replace("<", "&lt;")
+        return {"errorData": content, "truncated": truncate}
+    else:
+        return content
 
 def importfile(dictID, filename, email):
     import subprocess
