@@ -69,20 +69,30 @@ except xml.sax._exceptions.SAXParseException as e:
         entryCount = 0
         saxParser = xml.sax.parseString(xmldata, handlerFirst())
     else:
-        print(e, file=sys.stderr)
-        sys.exit()
-
-print("Detected %d entries in '%s' element" % (entryCount, entryTag))
+        if entryTag == "":
+            print("Not possible to detect element name for entry, please fix errors:")
+            print(e, file=sys.stderr)
+            sys.exit()
 
 # second pass, we know what the entry is and can import that
-import xml.dom.pulldom
 import re
-doc = xml.dom.pulldom.parseString(xmldata)
+
+entryCount = xmldata.count('<'+entryTag)
 entryInserted = 0
-for event, node in doc:
-    if event == xml.dom.pulldom.START_ELEMENT and node.tagName == entryTag:
-        doc.expandNode(node)
-        entry = re.sub(r"\>[\r\n]+\s*\<","><", node.toxml())
+print("Detected %d entries in '%s' element" % (entryCount, entryTag))
+
+re_entry = re.compile(r'<'+entryTag+'[^>]*>.*?</'+entryTag+'>', re.MULTILINE|re.DOTALL|re.UNICODE)
+for entry in re.findall(re_entry, xmldata):
+    skip = False
+    try:
+        xml.sax.parseString(entry, xml.sax.handler.ContentHandler())
+    except xml.sax._exceptions.SAXParseException as e:
+        skip = True
+        print("Skipping entry, XML parsing error: " + str(e), file=sys.stderr)
+        print("Skipping entry, XML parsing error: " + str(e))
+        print("Entry with error: " + entry, file=sys.stderr)
+        entryInserted += 1
+    if not skip:
         pat = r'^<[^>]*\s+lxnm:(sub)?entryID=[\'"]([0-9]+)["\']'
         entryID = None
         action = "create"
@@ -99,7 +109,6 @@ for event, node in doc:
         else:
             sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype) values(?, 1, 1, 1, ?)"
             params = (entry, entryTag)
-        print(entry)
         c = db.execute(sql, params)
         if entryID == None:
             entryID = c.lastrowid
@@ -107,6 +116,6 @@ for event, node in doc:
 
         entryInserted += 1
         print("\r%.2d%% (%d/%d entries imported)" % ((entryInserted/entryCount*100), entryInserted, entryCount))
-
+        
 db.commit() 
 
