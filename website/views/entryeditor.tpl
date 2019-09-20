@@ -30,7 +30,7 @@
     </style>
     %if "_js" in editing:
       <script type="text/javascript">
-        var customizeEditor={{editing["_js"]}};
+        var customizeEditor={{!editing["_js"]}};
         var usingOwnEditor=customizeEditor.editor && customizeEditor.harvester;
       </script>
     %else:
