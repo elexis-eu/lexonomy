@@ -14,6 +14,7 @@ import jwt
 import shutil
 import markdown
 import re
+from collections import defaultdict
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -62,6 +63,11 @@ def readDictConfigs(dictDB):
                  "xemplate", "editing", "subbing"]:
         if not conf in configs:
             configs[conf] = defaultDictConfig.get(conf, {})
+
+    for key in configs.keys():
+        if type(configs[key]) is dict:
+            configs[key] = defaultdict(lambda: None, configs[key])
+
     return configs
 
 def addSubentryParentTags(db, entryID, xml):
