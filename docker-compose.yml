@@ -11,16 +11,27 @@ x-custom:
     LEXONOMY_SITECONFIG: siteconfig.json.template
 
 services:
+  changelog:
+    image: ferrarimarco/github-changelog-generator
+    volumes:
+      - .:/usr/local/src/your-app
+    working_dir: /usr/local/src/your-app
+    user: "${COMPOSE_USER:-1000:1000}"
+    environment:
+      HOME: /usr/local/src/your-app
+
   build:
     <<: *service
     command: npm run build
     environment:
       <<: *service_env
+
   create-bundles:
     <<: *service
     command: npm run create-bundles
     environment:
       <<: *service_env
+
   dev:
     <<: *service
     command: python3 lexonomy.py 0.0.0.0:8000 0.0.0.0:8080
