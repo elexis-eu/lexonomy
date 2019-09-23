@@ -79,7 +79,7 @@ install(profiler)
 # to ensure that user has appropriate access to the dictionary. Empty list checks read access only.
 # assumes <dictID> in route and "dictID", "user", "dictDB", "configs" as parameters in the decorated function
 # <dictID> gets open and passed as dictDB alongside the configs
-def authDict(checkRights):
+def authDict(checkRights, errorRedirect=False):
     def wrap(func):
         @functools.wraps(func)
         def wrapper_verifyLoginAndDictAccess(*args, **kwargs):
@@ -90,7 +90,10 @@ def authDict(checkRights):
             res, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, conn)
             for r in checkRights:
                 if not res.get(r, False):
-                    return res
+                    if errorRedirect:
+                        redirect("/"+kwargs["dictID"])
+                    else:
+                        return res
             kwargs["user"] = res
             kwargs["dictDB"] = conn
             kwargs["configs"] = configs
@@ -706,7 +709,7 @@ def importjson(dictID, user, dictDB, configs):
         return ops.importfile(dictID, request.query.filename, user["email"])
 
 @get(siteconfig["rootPath"]+"<dictID>/edit")
-@authDict(["canEdit"])
+@authDict(["canEdit"], True)
 def dictedit(dictID, user, dictDB, configs):
     return redirect("/"+dictID+"/edit/"+configs["xema"]["root"])
 
