@@ -31,10 +31,7 @@ Kex.render=function(div, json){
     var corpus_input = $("#kex_corpus")
     corpus_input.data("corpname", json.corpus)
     $.get({
-      url: "https://api.sketchengine.eu/ca/api/corpora",
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader ("Authorization", "Basic " + btoa(ske_username + ":" + ske_apiKey));
-  },
+      url: "/skeget/corpora",
     }).done(function(res) {
         Kex.corpora = {"user": [], "shared": [], "featured": [], "preloaded": []}
         res.data.forEach(function(e) {
