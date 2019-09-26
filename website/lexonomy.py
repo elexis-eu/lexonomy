@@ -658,19 +658,19 @@ def randomone(dictID, user, dictDB, configs):
     return ops.readRandomOne(dictDB, dictID, configs)
 
 @get(siteconfig["rootPath"]+"<dictID>/download")
-@authDict(["canDownload"])
+@authDict(["canDownload"], True)
 def download(dictID, user, dictDB, configs):
     return template("download.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"]})
 
 @get(siteconfig["rootPath"]+"<dictID>/download.xml")
-@authDict(["canDownload"])
+@authDict(["canDownload"], True)
 def downloadxml(dictID, user, dictDB, configs):
     response.content_type = "text/xml; charset=utf-8"
     response.set_header("Content-Disposition", "attachment; filename="+dictID+".xml")
     return ops.download(dictDB, dictID, configs)
 
 @get(siteconfig["rootPath"]+"<dictID>/upload")
-@authDict(["canUpload"])
+@authDict(["canUpload"], True)
 def upload(dictID, user, dictDB, configs):
     return template("upload.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"]})
 
@@ -691,7 +691,7 @@ def uploadhtml(dictID, user, dictDB, configs):
         return "<html><body>../import/?file=" + filepath + "&amp;uploadStart=" + uploadStart + "</body></html>"
 
 @get(siteconfig["rootPath"]+"<dictID>/import")
-@authDict(["canUpload"])
+@authDict(["canUpload"], True)
 def importhtml(dictID, user, dictDB, configs):
     return template("import.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "filename": request.query.file, "uploadStart": request.query.uploadStart})
 
@@ -714,7 +714,7 @@ def dictedit(dictID, user, dictDB, configs):
     return redirect("/"+dictID+"/edit/"+configs["xema"]["root"])
 
 @get(siteconfig["rootPath"]+"<dictID>/edit/<doctype>")
-@authDict(["canEdit"])
+@authDict(["canEdit"], True)
 def dicteditdoc(dictID, doctype, user, dictDB, configs):
     doctypesUsed = ops.readDoctypesUsed(dictDB)
     doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys()) + doctypesUsed
@@ -722,7 +722,7 @@ def dicteditdoc(dictID, doctype, user, dictDB, configs):
     return template("edit.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "flagging":configs["flagging"], "doctypes": doctypes, "doctype": doctype, "xonomyMode": configs["editing"]["xonomyMode"]})
 
 @get(siteconfig["rootPath"]+"<dictID>/<doctype>/entryeditor")
-@authDict(["canEdit"])
+@authDict(["canEdit"], True)
 def entryeditor(dictID, doctype, user, dictDB, configs):
     if "_xsl" in configs["xemplate"]:
         configs["xemplate"]["_xsl"] = "dummy"
@@ -746,13 +746,13 @@ def entrylist(dictID, doctype, user, dictDB, configs):
         return {"success": True, "entries": entries, "total": total}
 
 @get(siteconfig["rootPath"]+"<dictID>/config")
-@authDict(["canConfig"])
+@authDict(["canConfig"], True)
 def config(dictID, user, dictDB, configs):
     stats = ops.getDictStats(dictDB)
     return template("config.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "needResave": stats["needResave"], "hasXemaOverride": ("_xonomyDocSpec" in configs["xema"] or "_dtd" in configs["xema"]), "hasXemplateOverride": ("_xsl" in configs["xemplate"] or "_css" in configs["xemplate"]), "hasEditingOverride": ("_js" in configs["editing"])})
 
 @get(siteconfig["rootPath"]+"<dictID>/config/<page>")
-@authDict(["canConfig"])
+@authDict(["canConfig"], True)
 def configpage(dictID, page, user, dictDB, configs):
     return template("config-"+page+".tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "xema": configs["xema"], "titling": configs["titling"], "flagging": configs["flagging"]})
 
