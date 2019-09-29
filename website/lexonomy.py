@@ -155,6 +155,7 @@ def entrydelete(dictID, user, dictDB, configs):
 def entryread(dictID, user, dictDB, configs):
     adjustedEntryID, xml, _title = ops.readEntry(dictDB, configs, request.forms.id)
     adjustedEntryID = int(adjustedEntryID)
+    xml = xml.replace(">\n<", "><")
     html = ""
     if xml:
         if configs["xemplate"].get("_xsl"):
@@ -165,7 +166,7 @@ def entryread(dictID, user, dictDB, configs):
         elif configs["xemplate"].get("_css"):
             html = xml
         else:
-            html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", xml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+            html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('" + xml.replace("'","\\'").replace("\n","") + "', " + json.dumps(configs["xemplate"]) + ", " + json.dumps(configs["xema"]) + "));</script>"
     return {"success": (adjustedEntryID > 0), "id": adjustedEntryID, "content": xml, "contentHtml": html}
 
 @post(siteconfig["rootPath"]+"<dictID>/entryupdate.json")
