@@ -96,7 +96,7 @@
 						%for dict in dicts:
 							<div class="dict" id="dict_{{dict["id"]}}">
 								<a class="dictTitle" href="{{dict["id"]}}/">{{dict["title"]}}</a>
-								%if dict["currentUserCanDelete"]:
+								%if dict.get("currentUserCanDelete"):
                                                                     <a class="dictAction" href="javascript:void(null)" onclick="destroyDict('{{dict["id"]}}')">Delete</a>
                                                                 %end
 								<a class="dictAction" href="javascript:void(null)" onclick="cloneDict('{{dict["id"]}}')">Clone</a>
