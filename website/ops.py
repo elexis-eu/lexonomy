@@ -745,7 +745,7 @@ def readRandomOne(dictDB, dictID, configs):
         return {"id": 0, "title": "", "xml": ""}
 
 def download_xslt(configs):
-    if 'download' in configs and configs['download']['xslt'][0] == "<": # Is this a problem?
+    if 'download' in configs and 'xslt' in configs['download'] and configs['download']['xslt'][0] == "<": # Is this a problem?
         import lxml.etree as ET
         try:
             xslt_dom = ET.XML(configs["download"]["xslt"].encode("utf-8"))
@@ -757,7 +757,7 @@ def download_xslt(configs):
             try:
                 dom = ET.XML(xml_txt)
                 xml_transformed_dom = xslt(dom)
-                xml_transformed_byt = ET.tostring(xml_transformed_dom, xml_declaration=False)
+                xml_transformed_byt = ET.tostring(xml_transformed_dom, xml_declaration=False, encoding="utf-8")
                 xml_transformed = xml_transformed_byt.decode('utf-8')
                 return xml_transformed, True
             except ET.XMLSyntaxError as e:
