@@ -58,6 +58,6 @@
 			</div>
 		</div>
 
-		{{siteconfig["trackingCode"]}}
+		{{!siteconfig["trackingCode"]}}
 	</body>
 </html>
