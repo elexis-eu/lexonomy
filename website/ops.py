@@ -857,7 +857,7 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
     for r1 in c1.fetchall():
         item = {"id": r1["id"], "title": r1["title"]}
         if "flag_element" in configs["flagging"]:
-            item["flag"] = extractText(r1["xml"], next(iter(configs["flagging"]["flag_element"]), ""))
+            item["flag"] = extractText(r1["xml"], configs["flagging"]["flag_element"])
         if fullXML:
             item["xml"] = setHousekeepingAttributes(r1["id"], r1["xml"], configs["subbing"])
         if r1["level"] > 1:
