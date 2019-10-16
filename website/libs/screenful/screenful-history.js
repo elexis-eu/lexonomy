@@ -10,7 +10,7 @@ Screenful.History={
           var hist=data.history[i];
           if(!Screenful.History.isDeletion(hist)) {
             var $div=$("<div class='revision'></div>").appendTo($("#history"));
-            Screenful.History.drawRevision($div, hist, data.length-i, (i==0));
+            Screenful.History.drawRevision($div, hist, data.history.length-i, (i==0));
             if(i==0) Screenful.History.zoomRevision(Screenful.History.getRevisionID(hist), true);
           }
           var $div=$("<div class='interRevision'></div>").appendTo($("#history"));
