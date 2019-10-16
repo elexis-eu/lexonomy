@@ -1006,6 +1006,8 @@ def refresh(dictDB, dictID, configs):
         return False
     parentID = r["id"]
     parentXml = r["xml"]
+    if not "xmlns:lxnm" in parentXml:
+        parentXml = parentXml.replace("<entry", '<entry xmlns:lxnm="http://www.lexonomy.eu/" ')
     parentDoc = minidom.parseString(parentXml)
     # this will be called repeatedly till exhaustion
     while True:
@@ -1056,6 +1058,8 @@ def resave(dictDB, dictID, configs):
     for r in c.fetchall():
         entryID = r["id"]
         xml = r["xml"]
+        if not "xmlns:lxnm" in xml:
+            xml = xml.replace("<entry", '<entry xmlns:lxnm="http://www.lexonomy.eu/" ')
         doc = minidom.parseString(xml)
         dictDB.execute("update entries set needs_resave=0, title=?, sortkey=? where id=?", (getEntryTitle(xml, configs["titling"]), toSortKey(getSortTitle(xml, configs["titling"]), abc), entryID))
         dictDB.execute("delete from searchables where entry_id=?", (entryID,))
