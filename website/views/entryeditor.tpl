@@ -25,8 +25,8 @@
     <script type="text/javascript" src="../../../libs/js.cookie.js"></script>
     <style>
       .xonomy div.layby.open {width: 55%}
-      {{css}}
-      {{editing.get("_css")}}
+      {{!css}}
+      {{!editing.get("_css")}}
     </style>
     %if "_js" in editing:
       <script type="text/javascript">
