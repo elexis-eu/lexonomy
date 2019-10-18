@@ -612,9 +612,9 @@ def publicentry(dictID, entryID):
     nabes = ops.readNabesByEntryID(dictDB, dictID, entryID, configs)
     if "_xsl" in configs["xemplate"]:
         from lxml import etree
-        xslt_root = etree.XML(configs["xemplate"]["_xsl"])
+        xslt_root = etree.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
         transform = etree.XSLT(xslt_root)
-        doc_root = etree.XML(xml)
+        doc_root = etree.XML(xml.encode("utf-8"))
         html = transform(doc_root)
     elif "_css" in configs["xemplate"]:
         html = xml
