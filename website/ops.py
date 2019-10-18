@@ -119,7 +119,7 @@ def verifyLoginAndDictAccess(email, sessionkey, dictDB):
         return {"loggedin": ret["loggedin"], "email": email, "dictAccess": False, "isAdmin": False}, configs
     ret["dictAccess"] = dictAccess
     for r in ["canEdit", "canConfig", "canDownload", "canUpload"]:
-        ret[r] = ret["isAdmin"] or (dictAccess and dictAccess[r])
+        ret[r] = ret.get("isAdmin") or (dictAccess and dictAccess[r])
     return ret, configs
 
 def deleteEntry(db, entryID, email):
