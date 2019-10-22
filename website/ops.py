@@ -665,7 +665,7 @@ def setHousekeepingAttributes(entryID, xml, subbing):
     xml = re.sub(r"^(<[^>\/]*)\s+lxnm:subentryID=['\"][^\"\']*[\"']", r"\1", xml)
     #get name of the top-level element
     root = ""
-    root = re.search(r"^<([^\s>\/]+)", xml, flags=re.M).group(1)
+    root = re.match(r"^<([^\s>\/]+)", xml).group(1)
     #set housekeeping attributes
     if root in subbing:
         xml = re.sub(r"^<([^\s>\/]+)", r"<\1 lxnm:subentryID='"+entryID+"'", xml)
