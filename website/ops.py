@@ -60,7 +60,7 @@ def readDictConfigs(dictDB):
         configs[r["id"]] = json.loads(r["json"])
     for conf in ["ident", "publico", "users", "kex", "titling", "flagging",
                  "searchability", "xampl", "thes", "collx", "defo", "xema",
-                 "xemplate", "editing", "subbing", "download"]:
+                 "xemplate", "editing", "subbing"]:
         if not conf in configs:
             configs[conf] = defaultDictConfig.get(conf, {})
 
@@ -744,51 +744,15 @@ def readRandomOne(dictDB, dictID, configs):
     else:
         return {"id": 0, "title": "", "xml": ""}
 
-def download_xslt(configs):
-    if 'download' in configs and configs['download']['xslt'][0] == "<": # Is this a problem?
-        import lxml.etree as ET
-        try:
-            xslt_dom = ET.XML(configs["download"]["xslt"].encode("utf-8"))
-            xslt = ET.XSLT(xslt_dom)
-        except (ET.XSLTParseError, ET.XMLSyntaxError) as e:
-            return "Failed to parse XSL: {}".format(e), False
-
-        def transform(xml_txt):
-            try:
-                dom = ET.XML(xml_txt)
-                xml_transformed_dom = xslt(dom)
-                xml_transformed_byt = ET.tostring(xml_transformed_dom, xml_declaration=False)
-                xml_transformed = xml_transformed_byt.decode('utf-8')
-                return xml_transformed, True
-            except ET.XMLSyntaxError as e:
-                return "Failed to parse content: {}".format(e), False
-            except ET.XSLTParseError as e:
-                return "Failed to use XSL: {}".format(e), False
-    else:
-        def transform(xml_text):
-            return xml_text, True
-
-    return transform
-
-
 def download(dictDB, dictID, configs):
     rootname = dictID.lstrip(" 0123456789")
     if rootname == "":
         rootname = "lexonomy"
     resxml = "<"+rootname+">"
     c = dictDB.execute("select id, xml from entries")
-
-    transform = download_xslt(configs)
-
     for r in c.fetchall():
-        xml = setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
-        xml_xsl, success = transform(xml)
-        if not success:
-            return xml_xsl, 400
-
-        resxml += xml_xsl
+        resxml += setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
         resxml += "\n"
-
     resxml += "</"+rootname+">"
     return resxml
 
