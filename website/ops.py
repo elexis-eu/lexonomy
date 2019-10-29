@@ -1099,7 +1099,6 @@ def resave(dictDB, dictID, configs):
         xml = r["xml"]
         if not "xmlns:lxnm" in xml:
             xml = re.sub(r"<([^>^ ]*) ", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", xml)
-        doc = minidom.parseString(xml)
         dictDB.execute("update entries set needs_resave=0, title=?, sortkey=? where id=?", (getEntryTitle(xml, configs["titling"]), toSortKey(getSortTitle(xml, configs["titling"]), abc), entryID))
         dictDB.execute("delete from searchables where entry_id=?", (entryID,))
         dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"]), 1))
