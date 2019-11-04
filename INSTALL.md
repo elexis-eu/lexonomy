@@ -3,9 +3,8 @@ on your own computer or adapt a version to run on a server.
 
 # Preliminary remarks
 
-Lexonomy's backend is written in [Node.js](https://nodejs.org/en/) and currently being
-rewritten into [Python](https://python.org). That means that as of now you need
-a working installation of Node and Python 3.
+Lexonomy's backend is written in [Python](https://python.org). That means that as of now you need
+a working installation of Python 3.
 
 You also need to download the source code from this repository into a directory
 on your computer.
@@ -15,9 +14,7 @@ on your computer.
 
 Whichever way you choose to run Lexonomy locally, with the default
 configuration:
-- An instance of Lexonomy will start at the address http://localhost:8000/, this starts
-  the Python backend and that will start the Node backend automatically too (the startup
-  takes about five seconds).
+- An instance of Lexonomy will start at the address http://localhost:8000/
 - You should be able to navigate to this address with your web browser and see
   Lexonomy's home page
 
@@ -66,10 +63,9 @@ Hit Ctrl-C to quit.
 
 ### Prerequisites
 
-- [Download and install Node.js](https://nodejs.org/en/download/) 12+
 - [Download and install Python](https://www.python.org/downloads/) 3.5+
-- [Download and install LXML for Python3](https://lxml.de/installation.html)
-- [Download and install xsltproc](http://xmlsoft.org/XSLT/xsltproc.html)
+- [Download and install the JWT module for Python3](https://github.com/jpadilla/pyjwt)
+- [Download and install the LXML module for Python3](https://lxml.de/installation.html)
 - In your terminal, go to the `website` directory of the repository:
 ```sh
 cd website
@@ -80,15 +76,9 @@ cd website
 cp siteconfig.json.template siteconfig.json
 ```
 
-- Install all modules that Lexonomy depends on with this (basic database and
-  default user setup is also done during this step):
-```
-npm install
-```
-
 - Initialize database and admin user:
 ```
-node ./adminscripts/init.js
+python3 ./adminscripts/init.py
 ```
 
 ### Punch it
@@ -136,7 +126,7 @@ This is the port number at which Lexonomy listens for incoming HTTP requests.
 **Note:** When launched this way, Lexonomy runs on `port:8080`. To allow it to
 run on a privileged port (<1024) like, for example on `port:80`, you need superuser permissions:
 ```bash
-sudo node lexonomy.js
+sudo python3 lexonomy.py
 ```
 
 ## Data directory
@@ -186,7 +176,7 @@ This is an array of one or more e-mail addresses. People listed here are adminis
 Once you have updated `website/siteconfig.json` you need to run an initialization script to create user accounts for the administrators listed under `admins`. To do this, go to your terminal, go the `website` directory and run this:
 
 ```
-node adminscripts/init.js
+python3 adminscripts/init.py
 ```
 
 The script will tell you that it has created user accounts for the administrators and what their passwords are. You can use this information to log into your local installation of Lexonomy (and perhaps change the password then).
