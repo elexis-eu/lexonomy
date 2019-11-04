@@ -66,6 +66,7 @@ Hit Ctrl-C to quit.
 - [Download and install Python](https://www.python.org/downloads/) 3.5+
 - [Download and install the JWT module for Python3](https://github.com/jpadilla/pyjwt)
 - [Download and install the LXML module for Python3](https://lxml.de/installation.html)
+- [Download and install the Markdown module for Python3](https://python-markdown.github.io/)
 - In your terminal, go to the `website` directory of the repository:
 ```sh
 cd website
