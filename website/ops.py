@@ -211,7 +211,7 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
             return entryID, xml, True, feedback
 
 def getEntryTitle(xml, titling, plaintext=False):
-    if titling.get("headwordAnnotationsType") == "advanced":
+    if titling.get("headwordAnnotationsType") == "advanced" and not plaintext:
         ret = titling["headwordAnnotationsAdvanced"]
         for el in re.findall(r"%\([^)]+\)", titling["headwordAnnotationsAdvanced"]):
             text = ""
