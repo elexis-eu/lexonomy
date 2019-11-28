@@ -95,6 +95,9 @@
 						<div class="yourdicts">Your dictionaries</div>
 						%for dict in dicts:
 							<div class="dict" id="dict_{{dict["id"]}}">
+								%if dict.get("broken"):
+								<img src="/furniture/cancel.png"/>
+								%end
 								<a class="dictTitle" href="{{dict["id"]}}/">{{dict["title"]}}</a>
 								%if dict.get("currentUserCanDelete"):
                                                                     <a class="dictAction" href="javascript:void(null)" onclick="destroyDict('{{dict["id"]}}')">Delete</a>
