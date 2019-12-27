@@ -1133,7 +1133,7 @@ def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
     xml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
     xml = re.sub(r"\=\"([^\"]*)\"", r"='\1'", xml)
     xml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", xml)
-    xml = addFlag(entryID, xml, flag, configs["flagging"])
+    xml = addFlag(xml, flag, configs["flagging"], configs["xema"])
 
     # tell my parents that they need a refresh:
     dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (entryID, ))
@@ -1145,20 +1145,65 @@ def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
     dictDB.commit()
     return entryID
 
-def addFlag(entryID, xml, flag, flagconfig):
-    el = flagconfig.get("flag_element")
-    regex = r"<" + el + "[^>]*>[^<]*</" + el + ">"
-    xml = re.sub(regex, lambda m: addFlag_replace(m, flag, el), xml)
-    if re.search(regex, xml):
-        return xml
-    xml = re.sub(r"^<([^>]+>)", lambda m: addFlag_replace2(m, flag, el), xml, 1)
-    return xml
-    
-def addFlag_replace(match, flag, el):
-    return "<" + el + ">" + flag + "</" + el + ">" if flag else ""
 
-def addFlag_replace2(match, flag, el):
-    return "<" +  str(match.group(1)) + "<" + el + ">" + flag + "</" + el + ">"
+def addFlag(xml, flag, flagconfig, xemaconfig):
+    flag_element = flagconfig["flag_element"]
+
+    path = getFlagElementPath(xemaconfig, flag_element)
+    loc1, loc2 = getFlagElementInString(path, xml)
+
+    return "{0}<{1}>{2}</{1}>{3}".format(
+            xml[:loc1], flag_element, flag, xml[loc2:])
+           
+            
+def getFlagElementPath(xema, flag_element):
+    result = getFlagElementPath_recursive(xema, flag_element, xema["root"])
+    if result is not None:
+        result.insert(0, xema["root"])
+    return result
+
+
+def getFlagElementPath_recursive(xema, flag_element, current_element):
+    # try all children
+    for child_props in xema["elements"][current_element]["children"]:
+        next_el = child_props["name"]
+
+        # if we get to the flag element, return!
+        if next_el == flag_element:
+            return [flag_element]
+
+        # else, recursive search, depth first
+        path = getFlagElementPath_recursive(xema, flag_element, next_el)
+
+        # if returned is not None, then we found what we need, just prepend to the returned path
+        if path is not None:
+            return [next_el] + path
+
+    # nothing useful found, return None
+    return None
+
+
+def getFlagElementInString(path, xml):
+    start_out, end_out = 0, len(xml)
+    start_in, end_in = 0, len(xml)
+
+    # find each element in path to flag element, start with outmost one
+    for path_element in path:
+        regex = re.compile("<{}[^>]*>([\s\S]*?)</{}>".format(path_element, path_element))
+        match = regex.search(xml, start_in, end_in)
+
+        # we can not find the element, just return to the beginning of outer element
+        if match is None:
+            return (start_in, start_in)
+
+        start_out = match.start(0)
+        end_out = match.end(0)
+        start_in = match.start(1)
+        end_in = match.end(1)
+
+    # we found it! Return the span where flag element exists in xml
+    return (start_out, end_out)
+
 
 def readDictHistory(dictDB, dictID, configs, entryID):
     history = []
