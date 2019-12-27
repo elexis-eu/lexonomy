@@ -1131,7 +1131,7 @@ def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
     row = c.fetchone()
     xml = row["xml"] if row else ""
     xml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
-    xml = re.sub(r"(\=)\"([^\"]*)\"", "\1='\2'", xml)
+    xml = re.sub(r"\=\"([^\"]*)\"", r"='\1'", xml)
     xml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", xml)
     xml = addFlag(entryID, xml, flag, configs["flagging"])
 
