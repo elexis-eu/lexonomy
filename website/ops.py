@@ -780,7 +780,7 @@ def download(dictDB, dictID, configs):
     rootname = dictID.lstrip(" 0123456789")
     if rootname == "":
         rootname = "lexonomy"
-    resxml = "<"+rootname+">"
+    yield "<"+rootname+">"
     c = dictDB.execute("select id, xml from entries")
 
     transform = download_xslt(configs)
@@ -791,11 +791,10 @@ def download(dictDB, dictID, configs):
         if not success:
             return xml_xsl, 400
 
-        resxml += xml_xsl
-        resxml += "\n"
+        yield xml_xsl
+        yield "\n"
 
-    resxml += "</"+rootname+">"
-    return resxml
+    yield "</"+rootname+">"
 
 def purge(dictDB, email, historiography):
     dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', ?, ?, xml, ? from entries", (str(datetime.datetime.utcnow()), email, json.dumps(historiography)))
