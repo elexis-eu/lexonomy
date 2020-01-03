@@ -37,14 +37,6 @@ if not cgi and len(sys.argv) > 1:
 def server_static(path):
     return static_file(path, root="./")
 
-# we propagate redirects from NodeJS back to client
-import urllib.request
-class NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
-opener = urllib.request.build_opener(NoRedirect)
-hop_by_hop = set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailers", "transfer-encoding", "upgrade"])
-
 # ignore trailing slashes, urldecode cookies
 @hook('before_request')
 def strip_path():
