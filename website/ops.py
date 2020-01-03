@@ -493,7 +493,9 @@ def makeDict(dictID, template, title, blurb, email):
         blurb = "Yet another Lexonomy dictionary."
     if dictID in prohibitedDictIDs or dictExists(dictID):
         return False
-    shutil.copy("dictTemplates/" + template + ".sqlite", os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    if not template.startswith("/"):
+        template = "dictTemplates/" + template + ".sqlite"
+    shutil.copy(template, os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
     users = {email: {"canEdit": True, "canConfig": True, "canDownload": True, "canUpload": True}}
     dictDB = getDB(dictID)
     dictDB.execute("update configs set json=? where id='users'", (json.dumps(users),))
