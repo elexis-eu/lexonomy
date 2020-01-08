@@ -771,7 +771,7 @@ def download_xslt(configs):
                 return "Failed to use XSL: {}".format(e), False
     else:
         def transform(xml_text):
-            return xml_text, True
+            return re.sub("><",">\n<",xml_text), True
 
     return transform
 
