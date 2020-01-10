@@ -7,6 +7,7 @@ import sys
 import datetime
 import json
 import xml.sax
+import re
 
 if len(sys.argv) < 3:
     print("Usage: ./import.py [-p] PATH_TO_DICTIONARY.sqlite FILE_TO_IMPORT.xml [AUTHOR_EMAIL]")
@@ -58,6 +59,7 @@ class handlerFirst(xml.sax.ContentHandler):
             entryCount += 1
 
 xmldata = open(filename, 'r').read()
+xmldata = re.sub(r'<\?xml[^?]*\?>', '', xmldata)
 try:
     saxParser = xml.sax.parseString("<!DOCTYPE foo SYSTEM 'x.dtd'>\n"+xmldata, handlerFirst())
     xmldata = "<!DOCTYPE foo SYSTEM 'x.dtd'>\n"+xmldata
