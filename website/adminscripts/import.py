@@ -60,6 +60,7 @@ class handlerFirst(xml.sax.ContentHandler):
 
 xmldata = open(filename, 'r').read()
 xmldata = re.sub(r'<\?xml[^?]*\?>', '', xmldata)
+xmldata = re.sub(r'<!DOCTYPE.*>', '', xmldata)
 try:
     saxParser = xml.sax.parseString("<!DOCTYPE foo SYSTEM 'x.dtd'>\n"+xmldata, handlerFirst())
     xmldata = "<!DOCTYPE foo SYSTEM 'x.dtd'>\n"+xmldata
