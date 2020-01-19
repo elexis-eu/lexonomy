@@ -14,6 +14,7 @@ import jwt
 import shutil
 import markdown
 import re
+import secrets
 from collections import defaultdict
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
@@ -309,7 +310,7 @@ def sendSignupToken(email, remoteip):
     c = conn.execute("select email from users where email=?", (email.lower(),))
     user = c.fetchone()
     if not user:
-        token = hashlib.sha1(hashlib.sha1(random.choice(string.ascii_uppercase).encode("utf-8")).hexdigest().encode("utf-8")).hexdigest()
+        token = secrets.token_hex()
         tokenurl = siteconfig["baseUrl"] + "createaccount/" + token
         expireDate = datetime.datetime.now() + datetime.timedelta(days=2)
         mailSubject = "Lexonomy signup"
@@ -332,7 +333,7 @@ def sendToken(email, remoteip):
     c = conn.execute("select email from users where email=?", (email.lower(),))
     user = c.fetchone()
     if user:
-        token = hashlib.sha1(hashlib.sha1(random.choice(string.ascii_uppercase).encode("utf-8")).hexdigest().encode("utf-8")).hexdigest()
+        token = secrets.token_hex()
         tokenurl = siteconfig["baseUrl"] + "recoverpwd/" + token
         expireDate = datetime.datetime.now() + datetime.timedelta(days=2)
         mailSubject = "Lexonomy password reset"
