@@ -14,6 +14,7 @@ import jwt
 import shutil
 import markdown
 import re
+import secrets
 from collections import defaultdict
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
@@ -36,6 +37,11 @@ def getDB(dictID):
 
 def getMainDB():
     conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite'))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def getLinkDB():
+    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'crossref.sqlite'))
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -309,7 +315,7 @@ def sendSignupToken(email, remoteip):
     c = conn.execute("select email from users where email=?", (email.lower(),))
     user = c.fetchone()
     if not user:
-        token = hashlib.sha1(hashlib.sha1(random.choice(string.ascii_uppercase).encode("utf-8")).hexdigest().encode("utf-8")).hexdigest()
+        token = secrets.token_hex()
         tokenurl = siteconfig["baseUrl"] + "createaccount/" + token
         expireDate = datetime.datetime.now() + datetime.timedelta(days=2)
         mailSubject = "Lexonomy signup"
@@ -332,7 +338,7 @@ def sendToken(email, remoteip):
     c = conn.execute("select email from users where email=?", (email.lower(),))
     user = c.fetchone()
     if user:
-        token = hashlib.sha1(hashlib.sha1(random.choice(string.ascii_uppercase).encode("utf-8")).hexdigest().encode("utf-8")).hexdigest()
+        token = secrets.token_hex()
         tokenurl = siteconfig["baseUrl"] + "recoverpwd/" + token
         expireDate = datetime.datetime.now() + datetime.timedelta(days=2)
         mailSubject = "Lexonomy password reset"
@@ -493,7 +499,9 @@ def makeDict(dictID, template, title, blurb, email):
         blurb = "Yet another Lexonomy dictionary."
     if dictID in prohibitedDictIDs or dictExists(dictID):
         return False
-    shutil.copy("dictTemplates/" + template + ".sqlite", os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    if not template.startswith("/"):
+        template = "dictTemplates/" + template + ".sqlite"
+    shutil.copy(template, os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
     users = {email: {"canEdit": True, "canConfig": True, "canDownload": True, "canUpload": True}}
     dictDB = getDB(dictID)
     dictDB.execute("update configs set json=? where id='users'", (json.dumps(users),))
@@ -769,7 +777,7 @@ def download_xslt(configs):
                 return "Failed to use XSL: {}".format(e), False
     else:
         def transform(xml_text):
-            return xml_text, True
+            return re.sub("><",">\n<",xml_text), True
 
     return transform
 
@@ -778,7 +786,7 @@ def download(dictDB, dictID, configs):
     rootname = dictID.lstrip(" 0123456789")
     if rootname == "":
         rootname = "lexonomy"
-    resxml = "<"+rootname+">"
+    yield "<"+rootname+">\n"
     c = dictDB.execute("select id, xml from entries")
 
     transform = download_xslt(configs)
@@ -789,11 +797,10 @@ def download(dictDB, dictID, configs):
         if not success:
             return xml_xsl, 400
 
-        resxml += xml_xsl
-        resxml += "\n"
+        yield xml_xsl
+        yield "\n"
 
-    resxml += "</"+rootname+">"
-    return resxml
+    yield "</"+rootname+">\n"
 
 def purge(dictDB, email, historiography):
     dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', ?, ?, xml, ? from entries", (str(datetime.datetime.utcnow()), email, json.dumps(historiography)))
@@ -1223,3 +1230,50 @@ def verifyUserApiKey(email, apikey):
         return {"valid": False}
     else:
         return {"valid": True, "email": email or ""}
+
+def links_add(source_dict, source_id, target_dict, target_id):
+    conn = getLinkDB()
+    c = conn.execute("select * from links where source_dict=? and source_id=? and target_dict=? and target_id=?", (source_dict, source_id, target_dict, target_id))
+    row = c.fetchone()
+    if not row:
+        conn.execute("insert into links (source_dict, source_id, target_dict, target_id) values (?,?,?,?)", (source_dict, source_id, target_dict, target_id))
+        conn.commit()
+    c = conn.execute("select * from links where source_dict=? and source_id=? and target_dict=? and target_id=?", (source_dict, source_id, target_dict, target_id))
+    row = c.fetchone()
+    return {"link_id": row["link_id"], "source_dict": row["source_dict"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_id": row["target_id"]}
+
+def links_delete(dictID, linkID):
+    conn = getLinkDB()
+    conn.execute("delete from links where source_dict=? and link_id=?", (dictID, linkID))
+    conn.commit()
+    c = conn.execute("select * from links where link_id=?", (linkID, ))
+    if len(c.fetchall()) > 0:
+        return False
+    else:
+        return True
+
+def links_get(source_dict, source_id, target_dict, target_id):
+    params = []
+    where = []
+    if source_dict != "":
+        where.append("source_dict=?")
+        params.append(source_dict)
+    if source_id != "":
+        where.append("source_id=?")
+        params.append(source_id)
+    if target_dict != "":
+        where.append("target_dict=?")
+        params.append(target_dict)
+    if target_id != "":
+        where.append("target_id=?")
+        params.append(target_id)
+    query = "select * from links"
+    if len(where) > 0:
+        query += " where " + " and ".join(where)
+    conn = getLinkDB()
+    c = conn.execute(query, tuple(params))
+    res = []
+    for row in c.fetchall():
+        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_id": row["target_id"]})
+    return res
+
