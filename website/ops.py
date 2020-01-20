@@ -40,6 +40,11 @@ def getMainDB():
     conn.row_factory = sqlite3.Row
     return conn
 
+def getLinkDB():
+    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'crossref.sqlite'))
+    conn.row_factory = sqlite3.Row
+    return conn
+
 # SMTP
 def sendmail(mailTo, mailSubject, mailText):
     if siteconfig["mailconfig"] and siteconfig["mailconfig"]["host"] and siteconfig["mailconfig"]["port"]:
@@ -1225,3 +1230,54 @@ def verifyUserApiKey(email, apikey):
         return {"valid": False}
     else:
         return {"valid": True, "email": email or ""}
+
+def links_add(source_dict, source_id, target_dict, target_id):
+    conn = getLinkDB()
+    c = conn.execute("select * from links where source_dict=? and source_id=? and target_dict=? and target_id=?", (source_dict, source_id, target_dict, target_id))
+    row = c.fetchone()
+    if not row:
+        conn.execute("insert into links (source_dict, source_id, target_dict, target_id) values (?,?,?,?)", (source_dict, source_id, target_dict, target_id))
+        conn.commit()
+    c = conn.execute("select * from links where source_dict=? and source_id=? and target_dict=? and target_id=?", (source_dict, source_id, target_dict, target_id))
+    row = c.fetchone()
+    return {"link_id": row["link_id"], "source_dict": row["source_dict"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_id": row["target_id"]}
+
+def links_delete(dictID, linkID):
+    conn = getLinkDB()
+    conn.execute("delete from links where source_dict=? and link_id=?", (dictID, linkID))
+    conn.commit()
+    c = conn.execute("select * from links where link_id=?", (linkID, ))
+    if len(c.fetchall()) > 0:
+        return False
+    else:
+        return True
+
+def links_get(source_dict, source_id, target_dict, target_id):
+    print(source_dict)
+    print(source_id)
+    print(target_dict)
+    print(target_id)
+    params = []
+    where = []
+    if source_dict != "":
+        where.append("source_dict=?")
+        params.append(source_dict)
+    if source_id != "":
+        where.append("source_id=?")
+        params.append(source_id)
+    if target_dict != "":
+        where.append("target_dict=?")
+        params.append(target_dict)
+    if target_id != "":
+        where.append("target_id=?")
+        params.append(target_id)
+    query = "select * from links"
+    if len(where) > 0:
+        query += " where " + " and ".join(where)
+    conn = getLinkDB()
+    c = conn.execute(query, tuple(params))
+    res = []
+    for row in c.fetchall():
+        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_id": row["target_id"]})
+    return res
+
