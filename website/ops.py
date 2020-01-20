@@ -1267,10 +1267,6 @@ def links_delete(dictID, linkID):
         return True
 
 def links_get(source_dict, source_id, target_dict, target_id):
-    print(source_dict)
-    print(source_id)
-    print(target_dict)
-    print(target_id)
     params = []
     where = []
     if source_dict != "":

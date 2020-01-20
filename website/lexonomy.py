@@ -887,8 +887,6 @@ def linksto(dictID, user, dictDB, configs):
     res = ops.links_get(source_dict, source_id, dictID, target_id)
     return {"links": res}
 
-
-
 @error(404)
 def error404(error):
     return template("404.tpl", **{"siteconfig": siteconfig})
