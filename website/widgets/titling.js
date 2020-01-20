@@ -73,6 +73,17 @@ Titling.render=function(div, json){
     if($block.find("textarea.abc").val()!=Titling.abc2txt(json.abc)) Titling.change();
   });
   $block.append("<div class='instro'>This order is used to sort entries alphabetically in the entry list.</div>");
+
+  var $numberEntries=$("<div class='block abc'></div>").appendTo($div);
+	$numberEntries.append("<div class='title'>Number of entries to be shown in the entry list at once</div>");
+	$numberEntries.append("<input type='number' id='numberEntries'></input>");
+    var $inpt = $numberEntries.find("input#numberEntries");
+    var $ne = json.numberEntries || 1000; // just hardcoded, at least better than before. Ideally, this would come from siteconfig.numberEntries
+    $inpt.val("" + $ne);
+    $inpt.on("keyup change", function(e){
+        Titling.change();
+    });
+    $numberEntries.append("<div class='instro'>If your dictionary contains large entries (large XML files), it is recommended to reduce this number for quicker loading of entry list.</div>");
 };
 Titling.harvest=function(div){
   var ret={};
@@ -82,6 +93,7 @@ Titling.harvest=function(div){
   ret.headwordAnnotations=[];
   ret.headwordAnnotationsType=$('[name="hwannotype"]:checked').val();
   ret.headwordAnnotationsAdvanced=$(".advancedAnnotations").val();
+  ret.numberEntries=Number($("input#numberEntries").val());
   $(".pillarform .block.headwordAnnotations .scrollbox label input").each(function(){
     var $input=$(this);
     if($input.prop("checked")) ret.headwordAnnotations.push($input.attr("data-name"));
