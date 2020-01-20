@@ -720,7 +720,8 @@ def dicteditdoc(dictID, doctype, user, dictDB, configs):
     doctypesUsed = ops.readDoctypesUsed(dictDB)
     doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys()) + doctypesUsed
     doctypes = list(set(doctypes))
-    return template("edit.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "flagging":configs["flagging"], "doctypes": doctypes, "doctype": doctype, "xonomyMode": configs["editing"]["xonomyMode"]})
+    numberEntries = configs["titling"]["numberEntries"] if "numberEntries" in configs["titling"] else 1000 # magic number again, still better than before, will not refactor to really fix
+    return template("edit.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "flagging":configs["flagging"], "doctypes": doctypes, "doctype": doctype, "xonomyMode": configs["editing"]["xonomyMode"], "numberEntries": numberEntries})
 
 @get(siteconfig["rootPath"]+"<dictID>/<doctype>/entryeditor")
 @authDict(["canEdit"], True)

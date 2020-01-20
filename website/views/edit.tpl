@@ -23,7 +23,7 @@
 		<script type="text/javascript">
 		Screenful.Navigator.listUrl="../../../{{dictID}}/{{doctype}}/entrylist.json";
 		Screenful.Navigator.listByIdUrl="../../../{{dictID}}/{{doctype}}/entrylist.json";
-		Screenful.Navigator.stepSize=1000;
+		Screenful.Navigator.stepSize={{!JSON(numberEntries)}};
 		Screenful.Navigator.showNumbers=false;
 		Screenful.Navigator.sortDesc=false;
 		Screenful.Navigator.editorUrl="../../../{{dictID}}/{{doctype}}/entryeditor/";
