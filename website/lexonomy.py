@@ -850,6 +850,44 @@ def pushapi():
         else:
             return {"success": False}
 
+@get(siteconfig["rootPath"] + "<dictID>/links/add")
+@authDict(["canEdit"])
+def linksadd(dictID, user, dictDB, configs):
+    source_dict = dictID
+    source_id = request.query.source_id
+    target_dict = request.query.target_dict
+    target_id = request.query.target_id
+    if source_dict == "" or source_id == "" or target_dict == "" or target_id == "":
+        return {"success": False, "error": "missing parameters"}
+    else:
+        res = ops.links_add(source_dict, source_id, target_dict, target_id)
+        return {"success": True, "links": res}
+
+@get(siteconfig["rootPath"] + "<dictID>/links/delete/<linkID>")
+@authDict(["canEdit"])
+def linksdelete(dictID, linkID, user, dictDB, configs):
+    res = ops.links_delete(dictID, linkID)
+    return {"success": res}
+
+@get(siteconfig["rootPath"] + "<dictID>/links/from")
+@authDict([])
+def linksfrom(dictID, user, dictDB, configs):
+    source_id = request.query.source_id
+    target_dict = request.query.target_dict
+    target_id = request.query.target_id
+    res = ops.links_get(dictID, source_id, target_dict, target_id)
+    return {"links": res}
+
+@get(siteconfig["rootPath"] + "<dictID>/links/to")
+@authDict([])
+def linksto(dictID, user, dictDB, configs):
+    source_dict = request.query.source_dict
+    source_id = request.query.source_id
+    target_id = request.query.target_id
+    res = ops.links_get(source_dict, source_id, dictID, target_id)
+    return {"links": res}
+
+
 
 @error(404)
 def error404(error):
