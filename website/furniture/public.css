@@ -27,7 +27,6 @@ body.entrypage #dictheader div.titleContainer span.dictTitle a.dictTitle {font-s
 @media (max-width: 800px) { body.entrypage #dictheader div.titleContainer span.dictTitle a.dictTitle {font-size: 23px; padding: 5px 10px;} }
 #dictheader div.titleContainer span.dictTitle a.dictTitle:hover {box-shadow: 0px 0px 2px #999999; color: #eeeeee;}
 #dictheader div.titleContainer span.dictTitle a.editLink {font-size: 16px; border: 1px solid transparent; border-radius: 100px; border-color: #666666; color: #666666; background-color: #ffffff; padding: 5px 10px; text-decoration: none; position: absolute; top: -15px; right: -25px;}
-@media (max-width: 800px){ #dictheader div.titleContainer span.dictTitle a.editLink {display: none;} }
 #dictheader div.titleContainer span.dictTitle a.editLink:hover {color: #666666; box-shadow: 0px 0px 2px #999999;}
 #dictheader form.searchContainer {margin-top: 20px;}
 @media (max-width: 800px) { body.entrypage #dictheader form.searchContainer {margin-top: 15px;} }
