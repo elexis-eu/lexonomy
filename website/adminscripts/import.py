@@ -58,9 +58,9 @@ class handlerFirst(xml.sax.ContentHandler):
         if name == entryTag:
             entryCount += 1
 
-xmldata = open(filename, 'r').read()
+xmldata = open(filename, 'rb').read().decode('utf-8-sig')
 xmldata = re.sub(r'<\?xml[^?]*\?>', '', xmldata)
-xmldata = re.sub(r'<!DOCTYPE.*>', '', xmldata)
+xmldata = re.sub(r'<!DOCTYPE[^>]*>', '', xmldata)
 try:
     saxParser = xml.sax.parseString("<!DOCTYPE foo SYSTEM 'x.dtd'>\n"+xmldata, handlerFirst())
     xmldata = "<!DOCTYPE foo SYSTEM 'x.dtd'>\n"+xmldata
