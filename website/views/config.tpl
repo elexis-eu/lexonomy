@@ -35,7 +35,8 @@
 					%else:
 					<div class="signpost"><a href="../../{{dictID}}/config/editing/">Entry editor</a></div>
 					%end
-                    <div class="signpost"><a href="../../{{dictID}}/config/download/">Download settings</a></div>
+					<div class="signpost"><a href="../../{{dictID}}/config/download/">Download settings</a></div>
+					<div class="signpost"><a href="../../{{dictID}}/config/links/">Manual linking</a></div>
 				</div>
 				<div class="signposts">
 					<div class="title">Entry settings</div>
