@@ -833,6 +833,9 @@ def pushapi():
                         configs["xema"]["elements"]["label"]["values"].append({"value":label, "caption": ""})
                 ops.updateDictConfig(dictDB, dictID, "xema", configs["xema"])
                 return {"success": True, "dictID": dictID}
+        elif data["command"] == "listDicts":
+            dicts = ops.getDictsByUser(user["email"])
+            return {"entries": dicts, "success": True}
         elif data["command"] == "createEntries":
             dictID = data["dictID"]
             entryXmls = data["entryXmls"]
