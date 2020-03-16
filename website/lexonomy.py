@@ -500,11 +500,9 @@ def skelogin(token):
             response.set_cookie("sessionkey", res["key"], path="/")
             return redirect("/")
         else:
-            print(res["error"])
             response.set_cookie("jwt_error", str(res["error"]), path="/")
             return redirect("/")
     except Exception as e:
-        response.set_cookie("jwt_error", str(e), path="/")
         return redirect("/")
 
 @get(siteconfig["rootPath"] + "docs/<file>")
