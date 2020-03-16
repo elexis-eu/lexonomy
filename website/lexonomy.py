@@ -10,11 +10,12 @@ import json
 import datetime
 import urllib.request
 from ops import siteconfig
-
+import bottle
 from bottle import (hook, route, get, post, run, template, error, request,
                     response, static_file, abort, redirect, install)
 
 # configuration
+bottle.BaseRequest.MEMFILE_MAX = 10 * 1024 * 1024 #10MB upload
 my_url = siteconfig["baseUrl"].split("://")[1].rstrip("/")
 cgi = False
 if "SERVER_NAME" in os.environ and "SERVER_PORT" in os.environ:
