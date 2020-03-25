@@ -721,9 +721,10 @@ def entryeditor(dictID, doctype, user, dictDB, configs):
     if "_xsl" in configs["xemplate"]:
         configs["xemplate"]["_xsl"] = "dummy"
     configs["xema"]["_root"] = configs["xema"]["root"]
+    userdicts = ops.getDictsByUser(user["email"])
     if doctype in configs["xema"]["elements"]:
         configs["xema"]["root"] = doctype
-    return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"]})
+    return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"], "linking": configs["links"], "userdicts": userdicts})
 
 @post(siteconfig["rootPath"]+"<dictID>/<doctype>/entrylist.json")
 @authDict(["canEdit"])
@@ -847,13 +848,15 @@ def pushapi():
 @authDict(["canEdit"])
 def linksadd(dictID, user, dictDB, configs):
     source_dict = dictID
+    source_el = request.query.source_el
     source_id = request.query.source_id
     target_dict = request.query.target_dict
+    target_el = request.query.target_el
     target_id = request.query.target_id
-    if source_dict == "" or source_id == "" or target_dict == "" or target_id == "":
+    if source_dict == "" or source_id == "" or target_dict == "" or target_id == "" or source_el == "" or target_el == "":
         return {"success": False, "error": "missing parameters"}
     else:
-        res = ops.links_add(source_dict, source_id, target_dict, target_id)
+        res = ops.links_add(source_dict, source_el, source_id, target_dict, target_el, target_id)
         return {"success": True, "links": res}
 
 @get(siteconfig["rootPath"] + "<dictID>/links/delete/<linkID>")
@@ -865,19 +868,35 @@ def linksdelete(dictID, linkID, user, dictDB, configs):
 @get(siteconfig["rootPath"] + "<dictID>/links/from")
 @authDict([])
 def linksfrom(dictID, user, dictDB, configs):
+    source_el = request.query.source_el
     source_id = request.query.source_id
     target_dict = request.query.target_dict
+    target_el = request.query.target_el
     target_id = request.query.target_id
-    res = ops.links_get(dictID, source_id, target_dict, target_id)
+    res = ops.links_get(dictID, source_el, source_id, target_dict, target_el, target_id)
     return {"links": res}
 
 @get(siteconfig["rootPath"] + "<dictID>/links/to")
 @authDict([])
 def linksto(dictID, user, dictDB, configs):
     source_dict = request.query.source_dict
+    source_el = request.query.source_el
     source_id = request.query.source_id
+    target_el = request.query.target_el
     target_id = request.query.target_id
-    res = ops.links_get(source_dict, source_id, dictID, target_id)
+    res = ops.links_get(source_dict, source_el, source_id, dictID, target_el, target_id)
+    return {"links": res}
+
+@get(siteconfig["rootPath"]+"<dictID>/linkablelist.json")
+@authDict([])
+def linkablelist(dictID, user, dictDB, configs):
+    res = ops.getDictLinkables(dictDB)
+    return {"linkables": res}
+
+@get(siteconfig["rootPath"]+"<dictID>/entrylinks.json")
+@authDict([])
+def entrylinks(dictID, user, dictDB, configs):
+    res = ops.getEntryLinks(dictDB, dictID, request.query.id)
     return {"links": res}
 
 @error(404)
