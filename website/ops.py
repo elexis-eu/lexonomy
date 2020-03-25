@@ -1356,6 +1356,7 @@ def getDictLinkables(dictDB):
     for r in c.fetchall():
         ret.append({"element": r["element"], "link": r["txt"], "entry": r["entry_id"]})
     return ret
+<<<<<<< HEAD
 
 def addAutoNumbers(dictDB, dictID, countElem, storeElem):
     from xml.dom import minidom, Node
