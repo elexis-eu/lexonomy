@@ -18,6 +18,8 @@
     <script type="text/javascript" src="../../../libs/xonomy-tools/dtdconvert/dtd2xonomy.js"></script>
     <script type="text/javascript" src="../../../widgets/xemplatron.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../widgets/xemplatron.css" />
+    <script type="text/javascript" src="../../../widgets/xrefs.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../../widgets/xrefs.css" />
     <script type="text/javascript" src="../../../widgets/ske.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../widgets/ske.css" />
     <script type="text/javascript" src="../../../widgets/sub.js"></script>
@@ -64,6 +66,8 @@
     var defo={{!JSON(defo)}};
     var titling={{!JSON(titling)}};
     var flagging={{!JSON(flagging)}};
+    var linking={{!JSON(linking)}};
+    var userdicts={{!JSON(userdicts)}};
     var ske_username = {{!JSON(user.get("ske_username"))}};
     var ske_apiKey = {{!JSON(user.get("ske_apiKey"))}};
     if(!xemplate[xema.root]) xemplate[xema.root]={shown: false};
@@ -119,6 +123,7 @@
       Xonomy.setMode(Cookies.get("xonomyMode_{{dictID}}") || "{{editing["xonomyMode"]}}");
       Ske.extendDocspec(docSpec, xema);
       Sub.extendDocspec(docSpec, xema);
+      Xrefs.extendDocspec(docSpec, xema);
       docSpec.onchange=Screenful.Editor.changed;
       if(uneditable) {
         for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
@@ -160,7 +165,6 @@
       return Screenful.cleanupXml(str);
     };
     </script>
-
     <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-history.css" />
     <script type="text/javascript" src="../../../libs/screenful/screenful-history.js"></script>
     <script type="text/javascript">

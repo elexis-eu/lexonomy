@@ -146,6 +146,8 @@ def readEntry(db, configs, entryID):
     xml = setHousekeepingAttributes(entryID, row["xml"], configs["subbing"])
     if configs["subbing"]:
         xml = addSubentryParentTags(db, entryID, xml)
+    if configs["links"]:
+        xml = updateEntryLinkables(db, entryID, xml, configs, False, False)
     return entryID, xml, row["title"]
 
 def createEntry(dictDB, configs, entryID, xml, email, historiography):
@@ -189,14 +191,17 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
     newxml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
     newxml = re.sub(r"(\=)\"([^\"]*)\"", r"\1'\2'", newxml)
     newxml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", newxml)
+    newxml = re.sub(r" lxnm:linkable='[^']+'", "", newxml)
     if not row:
         adjustedEntryID, adjustedXml, feedback = createEntry(dictDB, configs, entryID, xml, email, historiography)
+        adjustedXml = updateEntryLinkables(dictDB, adjustedEntryID, adjustedXml, configs, True, True)
         return adjustedEntryID, adjustedXml, True, feedback
     else:
         oldxml = row["xml"]
         oldxml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", oldxml)
         oldxml = re.sub(r"(\=)\"([^\"]*)\"", r"\1'\2'", oldxml)
         oldxml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", oldxml)
+        oldxml = re.sub(r" lxnm:linkable='[^']+'", "", oldxml)
         if oldxml == newxml:
             return entryID, xml, False, None
         else:
@@ -214,6 +219,7 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
             dictDB.execute("update searchables set txt=? where entry_id=? and level=1", (getEntryTitle(xml, configs["titling"], True), entryID))
             dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
             dictDB.commit()
+            adjustedXml = updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
             return entryID, xml, True, feedback
 
 def getEntryTitle(xml, titling, plaintext=False):
@@ -674,6 +680,7 @@ def setHousekeepingAttributes(entryID, xml, subbing):
     xml = re.sub(r"^(<[^>\/]*)\s+xmlns:lxnm=['\"]http:\/\/www\.lexonomy\.eu\/[\"']", r"\1", xml)
     xml = re.sub(r"^(<[^>\/]*)\s+lxnm:entryID=['\"][^\"\']*[\"']", r"\1", xml)
     xml = re.sub(r"^(<[^>\/]*)\s+lxnm:subentryID=['\"][^\"\']*[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>\/]*)\s+lxnm:linkable=['\"][^\"\']*[\"']", r"\1", xml)
     #get name of the top-level element
     root = ""
     root = re.search(r"^<([^\s>\/]+)", xml, flags=re.M).group(1)
@@ -975,6 +982,13 @@ def updateDictConfig(dictDB, dictID, configID, content):
     elif configID == "titling" or configID == "searchability":
         resaveNeeded = flagForResave(dictDB)
         return content, resaveNeeded
+    elif configID == "links":
+        resaveNeeded = flagForResave(dictDB)
+        c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='linkables'")
+        if not c.fetchone():
+            dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT)")
+            dictDB.execute("CREATE INDEX link ON linkables (txt)")
+        return content, resaveNeeded
     elif configID == "subbing":
         refacNeeded = flagForRefac(dictDB)
         return content, refacNeeded
@@ -1121,8 +1135,8 @@ def resave(dictDB, dictID, configs):
     for r in c.fetchall():
         entryID = r["id"]
         xml = r["xml"]
-        if not "xmlns:lxnm" in xml:
-            xml = re.sub(r"<([^>^ ]*) ", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", xml)
+        xml = re.sub(r"\s+xmlns:lxnm=['\"]http:\/\/www\.lexonomy\.eu\/[\"']", "", xml)
+        xml = re.sub(r"^<([^>^ ]*) ", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", xml)
         dictDB.execute("update entries set needs_resave=0, title=?, sortkey=? where id=?", (getEntryTitle(xml, configs["titling"]), toSortKey(getSortTitle(xml, configs["titling"]), abc), entryID))
         dictDB.execute("delete from searchables where entry_id=?", (entryID,))
         dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
@@ -1130,8 +1144,47 @@ def resave(dictDB, dictID, configs):
         for searchable in getEntrySearchables(xml, configs):
             if searchable != headword:
                 dictDB.execute("insert into searchables(entry_id, txt, level) values(?,?,?)", (entryID, searchable, 2))
+        updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
     dictDB.commit()
     return True
+
+def getEntryLinks(dictDB, dictID, entryID):
+    ret = {"out": [], "in": []}
+    c = dictDB.execute("SELECT * FROM linkables WHERE entry_id=?", (entryID,))
+    conn = getLinkDB()
+    for r in c.fetchall():
+        ret["out"] = ret["out"] + links_get(dictID, r["element"], r["txt"], "", "", "")
+        ret["in"] = ret["in"] + links_get("", "", "", dictID, r["element"], r["txt"])
+    return ret
+        
+
+def updateEntryLinkables(dictDB, entryID, xml, configs, save=True, save_xml=True):
+    from xml.dom import minidom, Node
+    doc = minidom.parseString(xml)
+    ret = []
+    for linkref in configs["links"].values():
+        for el in doc.getElementsByTagName(linkref["linkElement"]):
+            identifier = linkref["identifier"]
+            for pattern in re.findall(r"%\([^)]+\)", linkref["identifier"]):
+                text = ""
+                extract = extractText(el.toxml(), pattern[2:-1])
+                extractfull = extractText(xml, pattern[2:-1])
+                if len(extract) > 0:
+                    text = extract[0]
+                elif len(extractfull) > 0:
+                    text = extractfull[0]
+                identifier = identifier.replace(pattern, text)
+            el.setAttribute('lxnm:linkable', identifier)
+            ret.append({'element': linkref["linkElement"], "identifier": identifier})
+    xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
+    if save:
+        dictDB.execute("delete from linkables where entry_id=?", (entryID,))
+        for linkable in ret:
+            dictDB.execute("insert into linkables(entry_id, txt, element) values(?,?,?)", (entryID, linkable["identifier"], linkable["element"]))
+    if save_xml and len(ret)>0:
+        dictDB.execute("update entries set xml=? where id=?", (xml, entryID))
+    dictDB.commit()
+    return xml
 
 def getEntrySearchables(xml, configs):
     ret = []
@@ -1245,16 +1298,16 @@ def verifyUserApiKey(email, apikey):
     else:
         return {"valid": True, "email": email or ""}
 
-def links_add(source_dict, source_id, target_dict, target_id):
+def links_add(source_dict, source_el, source_id, target_dict, target_el, target_id):
     conn = getLinkDB()
-    c = conn.execute("select * from links where source_dict=? and source_id=? and target_dict=? and target_id=?", (source_dict, source_id, target_dict, target_id))
+    c = conn.execute("select * from links where source_dict=? and source_element=? and source_id=? and target_dict=? and target_element=? and target_id=?", (source_dict, source_el, source_id, target_dict, target_el, target_id))
     row = c.fetchone()
     if not row:
-        conn.execute("insert into links (source_dict, source_id, target_dict, target_id) values (?,?,?,?)", (source_dict, source_id, target_dict, target_id))
+        conn.execute("insert into links (source_dict, source_element, source_id, target_dict, target_element, target_id) values (?,?,?,?,?,?)", (source_dict, source_el, source_id, target_dict, target_el, target_id))
         conn.commit()
-    c = conn.execute("select * from links where source_dict=? and source_id=? and target_dict=? and target_id=?", (source_dict, source_id, target_dict, target_id))
+    c = conn.execute("select * from links where source_dict=? and source_element=? and source_id=? and target_dict=? and target_element=? and target_id=?", (source_dict, source_el, source_id, target_dict, target_el, target_id))
     row = c.fetchone()
-    return {"link_id": row["link_id"], "source_dict": row["source_dict"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_id": row["target_id"]}
+    return {"link_id": row["link_id"], "source_dict": row["source_dict"], "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_el": row["target_element"], "target_id": row["target_id"]}
 
 def links_delete(dictID, linkID):
     conn = getLinkDB()
@@ -1266,18 +1319,24 @@ def links_delete(dictID, linkID):
     else:
         return True
 
-def links_get(source_dict, source_id, target_dict, target_id):
+def links_get(source_dict, source_el, source_id, target_dict, target_el, target_id):
     params = []
     where = []
     if source_dict != "":
         where.append("source_dict=?")
         params.append(source_dict)
+    if source_el != "":
+        where.append("source_element=?")
+        params.append(source_el)
     if source_id != "":
         where.append("source_id=?")
         params.append(source_id)
     if target_dict != "":
         where.append("target_dict=?")
         params.append(target_dict)
+    if target_el != "":
+        where.append("target_element=?")
+        params.append(target_el)
     if target_id != "":
         where.append("target_id=?")
         params.append(target_id)
@@ -1288,6 +1347,12 @@ def links_get(source_dict, source_id, target_dict, target_id):
     c = conn.execute(query, tuple(params))
     res = []
     for row in c.fetchall():
-        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_id": row["target_id"]})
+        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_el": row["target_element"], "target_id": row["target_id"]})
     return res
 
+def getDictLinkables(dictDB):
+    ret = []
+    c = dictDB.execute("SELECT * FROM linkables ORDER BY entry_id, element, txt")
+    for r in c.fetchall():
+        ret.append({"element": r["element"], "link": r["txt"], "entry": r["entry_id"]})
+    return ret

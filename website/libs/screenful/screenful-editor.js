@@ -242,6 +242,23 @@ Screenful.Editor={
       			  Screenful.status(Screenful.Loc.ready);
       			  Screenful.Editor.updateToolbar();
       			  if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.setEntryAsCurrent(data.id);
+              $.ajax({url: url.replace("entryread", "entrylinks"), method: "GET", data: {id: id}}).done(function(data){
+                var links = data.links;
+                if (links.out.length > 0) {
+                  $('#viewer').append('<span id="outlinks"><h4>Outgoing links</h4></span>');
+                  for (var link in links.out) {
+                    var linkdata = links.out[link];
+                    $('#outlinks').append('<ul>'+linkdata["source_id"]+' → '+linkdata['target_dict']+' : '+linkdata['target_el']+' : '+linkdata['target_id']+'</ul>');
+                  }
+                }
+                if (links.in.length > 0) {
+                  $('#viewer').append('<span id="inlinks"><h4>Incoming links</h4></span>');
+                  for (var link in links.in) {
+                    var linkdata = links.in[link];
+                    $('#inlinks').append('<ul>'+linkdata["target_id"]+' ← '+linkdata['source_dict']+' : '+linkdata['source_el']+' : '+linkdata['source_id']+'</ul>');
+                  }
+                }
+              });
       			}
     			});
     		}
