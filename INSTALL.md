@@ -31,8 +31,6 @@ tested on Linux. Most likely this also works for MacOS - and most likely does
   files](https://docs.docker.com/compose/compose-file/compose-versioning/#version-3)
 - make
 
-### Configuration
-
 Make sure that your docker-compose points to the right volume locations on the host:
 ```
 - <path to siteconfig.json>:/opt/service/website/siteconfig.json
@@ -42,19 +40,19 @@ Make sure that your docker-compose points to the right volume locations on the h
 For siteconfig.json you can use the default template, just make sure, that the server will listen on 0.0.0.0 instead of localhost.
 
 Initialize database and admin user:
-```bash
+```
 docker-compose exec python3 adminscripts/init.js
 ```
 This will create a database file inside your data volume.
 
 Now you can run Lexonomy:
-```bash
+```
 docker-compose up -d
 ```
 This command will also build the Docker image, if there wasn't one built beforehand.
 
 You can also manually build the image with:
-```bash
+```
 docker-compose build
 ```
 
