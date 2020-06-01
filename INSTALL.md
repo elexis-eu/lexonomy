@@ -18,44 +18,44 @@ configuration:
 - You should be able to navigate to this address with your web browser and see
   Lexonomy's home page
 
-## Inside a docker environment
+## Inside a Docker environment
 
-Bootstrapping a local development environment in docker has (so far) only been
+Bootstrapping a local development environment in Docker has (so far) only been
 tested on Linux. Most likely this also works for MacOS - and most likely does
 *not* work for Windows.
 
 ### Prerequisites
 - [docker](https://docs.docker.com/install/) 17.09.0+
 - [docker-compose](https://docs.docker.com/compose/install/) 1.17.0+  
-  The two need to accept `version: '3.4'` [docker-compose
-  files](https://docs.docker.com/compose/compose-file/compose-versioning/#version-34)
+  The two need to accept `version: '3'` [docker-compose
+  files](https://docs.docker.com/compose/compose-file/compose-versioning/#version-3)
 - make
 
-### Punch it
+### Configuration
 
+Make sure that your docker-compose points to the right volume locations on the host:
+```
+- <path to siteconfig.json>:/opt/service/website/siteconfig.json
+- <path to data directory>:/opt/service/data
+```
+
+For siteconfig.json you can use the default template, just make sure, that the server will listen on 0.0.0.0 instead of localhost.
+
+Initialize database and admin user:
 ```bash
-$ make
-docker volume create nodemodules
-nodemodules
-docker-compose run --rm dev npm install --unsafe-perm=true
+docker-compose exec python3 adminscripts/init.js
+```
+This will create a database file inside your data volume.
 
-> lexonomy@ postinstall /opt/service/website
-> node adminscripts/init.js
+Now you can run Lexonomy:
+```bash
+docker-compose up -d
+```
+This command will also build the Docker image, if there wasn't one built beforehand.
 
-Connected to ../data/lexonomy.sqlite database.
-[...]
-audited 649 packages in 2.509s
-found 0 vulnerabilities
-
-docker-compose run --rm dev pip install -r requirements.txt
-[...]
-Installing collected packages: bottle, express, six, Paste
-Successfully installed Paste-3.0.8 bottle-0.12.16 express-1.0 six-1.12.0
-[...]
-docker-compose run --rm --service-ports dev
-Bottle v0.13-dev server starting up (using WSGIRefServer())...
-Listening on http://0.0.0.0:8000/
-Hit Ctrl-C to quit.
+You can also manually build the image with:
+```bash
+docker-compose build
 ```
 
 
