@@ -1,0 +1,47 @@
+version: '3.4'
+
+x-custom:
+  service: &service
+    image: nikolaik/python-nodejs:python3.6-nodejs12
+    volumes:
+      - .:/opt/service
+      - nodemodules:/opt/service/website/node_modules
+    working_dir: /opt/service/website
+  service_env: &service_env
+    LEXONOMY_SITECONFIG: siteconfig.json.template
+
+services:
+  changelog:
+    image: ferrarimarco/github-changelog-generator
+    volumes:
+      - .:/usr/local/src/your-app
+    working_dir: /usr/local/src/your-app
+    user: "${COMPOSE_USER:-1000:1000}"
+    environment:
+      HOME: /usr/local/src/your-app
+
+  build:
+    <<: *service
+    command: npm run build
+    environment:
+      <<: *service_env
+
+  create-bundles:
+    <<: *service
+    command: npm run create-bundles
+    environment:
+      <<: *service_env
+
+  dev:
+    <<: *service
+    command: python3 lexonomy.py 0.0.0.0:8000 0.0.0.0:8080
+    environment:
+      <<: *service_env
+      NODE_ENV: development
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+
+volumes:
+  nodemodules:
+    external: true
