@@ -49,6 +49,7 @@
 					<div class="signpost"><a href="../../{{dictID}}/config/titling/">Headwords</a></div>
 				  <div class="signpost"><a href="../../{{dictID}}/config/flagging/">Flags</a></div>
 					<div class="signpost"><a href="../../{{dictID}}/config/searchability/">Search</a></div>
+					<div class="signpost"><a href="../../{{dictID}}/config/autonumber/">Auto-numbering</a></div>
 				</div>
 				<div class="signposts">
 					<div class="title">Publishing</div>
