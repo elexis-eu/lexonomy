@@ -61,6 +61,7 @@ Screenful.Loc={
   uploadFail: "The upload has failed.",
   uploadSuccess: "The upload has succeeded.",
   history: "History",
+  link: "Direct link",
   version: "Version",
   clone: "Clone",
   sourceCode: "Source code",

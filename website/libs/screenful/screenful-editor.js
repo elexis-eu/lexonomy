@@ -53,6 +53,7 @@ Screenful.Editor={
   populateToolbar: function(){
     var $toolbar=$("#toolbar");
     if(Screenful.History) $("<button id='butHistory' class='iconOnly' title='"+Screenful.Loc.history+"'>&nbsp;</button>").appendTo($toolbar).on("click", Screenful.Editor.history);
+    $("<button id='butLink' class='iconOnly' title='"+Screenful.Loc.link+"'>&nbsp;</button>").appendTo($toolbar).on("click", Screenful.Editor.showLink);
     if(Screenful.Editor.allowSourceCode) $("<button id='butSourceCode' class='iconOnly' title='"+Screenful.Loc.sourceCode+"'>&nbsp;</button>").appendTo($toolbar).on("click", Screenful.Editor.sourceCode);
     $("<span id='errorMessage' style='display: none;'></span>").appendTo($toolbar);
     if(!Screenful.Editor.singleton) {
@@ -441,6 +442,19 @@ Screenful.Editor={
     $("#history").hide();
     if($("#container").hasClass("withHistory")) $("#container").removeClass("withHistory").html("<div id='viewer'></div>");
     Screenful.Editor.updateToolbar();
+  },
+  showLink: function() {
+    var link = window.location.protocol + '//' + window.location.host + '/';
+    var paths = window.location.pathname.split('/');
+    link += paths[1] + '/edit/' + paths[2] + '/';
+    if (Screenful.Editor.entryID && $("#viewer").length>0) {
+      link += 'view' + Screenful.Editor.entryID;
+      prompt("Direct link to view this entry", link);
+    }
+    if (Screenful.Editor.entryID && $("#editor").length>0) {
+      link += Screenful.Editor.entryID;
+      prompt("Direct link to edit this entry", link);
+    }
   },
   clone: function(event){
     if(Screenful.Editor.entryID && $("#editor").length>0){ //we have an existing entry open for editing

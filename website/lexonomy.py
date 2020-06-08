@@ -706,14 +706,15 @@ def importjson(dictID, user, dictDB, configs):
 def dictedit(dictID, user, dictDB, configs):
     return redirect("/"+dictID+"/edit/"+configs["xema"]["root"])
 
+@get(siteconfig["rootPath"]+"<dictID>/edit/<doctype>/<selectedID>")
 @get(siteconfig["rootPath"]+"<dictID>/edit/<doctype>")
 @authDict(["canEdit"], True)
-def dicteditdoc(dictID, doctype, user, dictDB, configs):
+def dicteditdoc(dictID, doctype, user, dictDB, configs, selectedID=""):
     doctypesUsed = ops.readDoctypesUsed(dictDB)
     doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys()) + doctypesUsed
     doctypes = list(set(doctypes))
     numberEntries = configs["titling"]["numberEntries"] if "numberEntries" in configs["titling"] else 1000 # magic number again, still better than before, will not refactor to really fix
-    return template("edit.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "flagging":configs["flagging"], "doctypes": doctypes, "doctype": doctype, "xonomyMode": configs["editing"]["xonomyMode"], "numberEntries": numberEntries})
+    return template("edit.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "flagging":configs["flagging"], "doctypes": doctypes, "doctype": doctype, "xonomyMode": configs["editing"]["xonomyMode"], "numberEntries": numberEntries, "selectedID": selectedID})
 
 @get(siteconfig["rootPath"]+"<dictID>/<doctype>/entryeditor")
 @authDict(["canEdit"], True)
