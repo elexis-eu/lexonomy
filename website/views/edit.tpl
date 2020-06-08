@@ -61,6 +61,23 @@
 		Screenful.Navigator.flags={{!JSON(flagging["flags"])}};
 		Screenful.Navigator.entryFlagUrl="../../../{{dictID}}/entryflag.json";
 
+		$(function() {
+			var selectedID = "{{selectedID}}";
+			if (selectedID != "") {
+				$('[name=editframe]').on("load", function() {
+					var editorWindow = $('[name=editframe]').contents()[0];
+					if (selectedID.match(/^[0-9]*$/)) {
+						editorWindow.defaultView.Screenful.Editor.edit(null, selectedID);
+						$('[name=editframe]').contents().find('#butEdit').click();
+
+					}
+					if (selectedID.match(/^view[0-9]*$/)) {
+						editorWindow.defaultView.Screenful.Editor.view(null, selectedID.substring(4));
+						$('[name=editframe]').contents().find('#butView').click();
+					}
+				});
+			}
+		});
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-aftersave.css" />
 		<script type="text/javascript" src="../../../libs/screenful/screenful-aftersave.js"></script>
