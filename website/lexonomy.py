@@ -764,6 +764,12 @@ def configupdate(dictID, user, dictDB, configs):
     redirUrl = "../../resave" if resaveNeeded else None
     return {"success": True, "id": request.forms.id, "content": adjustedJson, redirUrl: redirUrl}
 
+@post(siteconfig["rootPath"]+"<dictID>/autonumber.json")
+@authDict(["canConfig"])
+def configupdate(dictID, user, dictDB, configs):
+    ops.addAutoNumbers(dictDB, dictID, request.forms.countElem, request.forms.storeElem)
+    return {"success": True}
+
 @get(siteconfig["rootPath"]+"<dictID>/search")
 def dictsearch(dictID):
     if not ops.dictExists(dictID):
