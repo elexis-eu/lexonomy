@@ -49,7 +49,6 @@
     </script>
     %end
     <script type="text/javascript">
-{{JSON(user)}}
     Screenful.Editor.createUrl="../../../{{dictID}}/entrycreate.json";
     Screenful.Editor.readUrl="../../../{{dictID}}/entryread.json";
     Screenful.Editor.updateUrl="../../../{{dictID}}/entryupdate.json";
