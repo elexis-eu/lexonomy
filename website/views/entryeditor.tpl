@@ -41,6 +41,15 @@
         var usingOwnEditor=false;
       </script>
     %end
+    %if user["loggedin"] == False:
+    <script type="text/javascript">
+      if (window.parent) {
+        window.parent.location="/";
+      } else {
+        window.location="/";
+      }
+    </script>
+    %end
     <script type="text/javascript">
     Screenful.Editor.createUrl="../../../{{dictID}}/entrycreate.json";
     Screenful.Editor.readUrl="../../../{{dictID}}/entryread.json";
@@ -59,8 +68,8 @@
     var flagging={{!JSON(flagging)}};
     var linking={{!JSON(linking)}};
     var userdicts={{!JSON(userdicts)}};
-    var ske_username = {{!JSON(user["ske_username"])}};
-    var ske_apiKey = {{!JSON(user["ske_apiKey"])}};
+    var ske_username = {{!JSON(user.get("ske_username"))}};
+    var ske_apiKey = {{!JSON(user.get("ske_apiKey"))}};
     if(!xemplate[xema.root]) xemplate[xema.root]={shown: false};
     if(xemplate[xema.root].shown=="false") xemplate[xema.root].shown=false;
     Screenful.Editor.viewer=null;
@@ -188,18 +197,7 @@
       return {id: revision.entry_id, content: revision.content, contentHtml: revision.contentHtml};
     };
     </script>
-
-    <!--open an entry on page load if the URL is eg. "www.lexonomy.eu/mydictionary/edit/entry/#123456"-->
-    <script type="text/javascript">
-    function autoOpen(){
-      if(window.parent && window.parent.location.hash){
-        var entryID=window.parent.location.hash.replace(/^\#/, "");
-        Screenful.Editor.open(null, entryID);
-      }
-    }
-    </script>
-
   </head>
-  <body onload="autoOpen()">
+  <body>
   </body>
 </html>

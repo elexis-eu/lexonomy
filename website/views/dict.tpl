@@ -60,7 +60,7 @@
 		<div class="invelope top">
 			<div id="dictheader">
 				<div class="titleContainer"><span class="dictTitle"><a class="dictTitle" href="../{{dictID}}/">{{dictTitle}}</a>
-%if user["dictAccess"]:
+%if user.get("dictAccess") or user.get("isAdmin"):
 <a href="../{{dictID}}/edit/" class="editLink">Edit</a>
 %end
 </span></div>
