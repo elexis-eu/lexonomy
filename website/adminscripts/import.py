@@ -103,14 +103,14 @@ for entry in re.findall(re_entry, xmldata):
             entryID = re.match(pat, entry).group(2)
             c = db.execute("select id from entries where id=?", (entryID,))
             if not c.fetchone():
-                sql = "insert into entries(id, xml, needs_refac, needs_resave, needs_refresh, doctype) values(?, ?, 1, 1, 1, ?)"
+                sql = "insert into entries(id, xml, needs_refac, needs_resave, needs_refresh, doctype) values(?, ?, 0, 1, 0, ?)"
                 params = (entryID, entry, entryTag)
             else:
-                sql = "update entries set doctype=?, xml=?, needs_refac=1, needs_resave=1, needs_refresh=1 where id=?"
+                sql = "update entries set doctype=?, xml=?, needs_refac=0, needs_resave=1, needs_refresh=0 where id=?"
                 params = (entryTag, entry, entryID)
                 action = "update"
         else:
-            sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype) values(?, 1, 1, 1, ?)"
+            sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype) values(?, 0, 1, 0, ?)"
             params = (entry, entryTag)
         c = db.execute(sql, params)
         if entryID == None:
