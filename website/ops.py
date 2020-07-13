@@ -902,6 +902,11 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
         params1 = (doctype, "% " + searchtext + "%", howmany)
         sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ?"
         params2 = (doctype, "% " + searchtext + "%")
+    elif modifier == "exact":
+        sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=? group by e.id order by e.sortkey" + sortpar + ", s.level limit ?"
+        params1 = (doctype, searchtext, howmany)
+        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=?"
+        params2 = (doctype, searchtext)
     c1 = dictDB.execute(sql1, params1)
     entries = []
     for r1 in c1.fetchall():
