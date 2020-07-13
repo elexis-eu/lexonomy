@@ -29,6 +29,7 @@
 		Screenful.Navigator.editorUrl="../../../{{dictID}}/{{doctype}}/entryeditor/";
 		Screenful.Navigator.modifiers=[
 			{value: "start", caption: "starts like this"},
+			{value: "exact", caption: "is exactly"},
 			{value: "wordstart", caption: "contains a word that starts like this"},
 			{value: "substring", caption: "contains this sequence of characters"},
 		];
@@ -48,6 +49,9 @@
 						$this.html($this.html().replace(regexp, function(match, $1, $2){ return $1+"<span class='searchtext'>"+$2+"</span>"; }));
 					} else if(modifier=="substring") {
 						var regexp=new RegExp(searchtext, "gi");
+						$this.html($this.html().replace(regexp, function(match){ return "<span class='searchtext'>"+match+"</span>"; }));
+					} else if(modifier=="exact") {
+						var regexp=new RegExp("^"+searchtext+"$", "gi");
 						$this.html($this.html().replace(regexp, function(match){ return "<span class='searchtext'>"+match+"</span>"; }));
 					}
 
