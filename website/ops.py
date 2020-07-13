@@ -1013,8 +1013,15 @@ def makeQuery(lemma):
     ret = re.sub(" ","+", lemma) + ";q=aword," + "".join(words) + ";q=p+0+0>0+1+[ws(\".*\",+\"definitions\",+\".*\")];exceptmethod=PREV-CONC"
     return ret
 
+def clearRefac(dictDB):
+    dictDB.execute("update entries set needs_refac=0, needs_refresh=0")
+    dictDB.commit()
+
+
 def refac(dictDB, dictID, configs):
     from xml.dom import minidom, Node
+    if len(configs['subbing']) == 0:
+        return False
     c = dictDB.execute("select e.id, e.xml, h.email from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 order by h.[when] asc limit 1")
     r = c.fetchone()
     if not r:
@@ -1066,6 +1073,8 @@ def refac(dictDB, dictID, configs):
 
 def refresh(dictDB, dictID, configs):
     from xml.dom import minidom, Node
+    if len(configs['subbing']) == 0:
+        return False
     # takes one entry that needs refreshing and sucks into it the latest versions of its subentries
     # get one entry that needs refreshing where none of its children needs refreshing
     c = dictDB.execute("select pe.id, pe.xml from entries as pe left outer join sub as s on s.parent_id=pe.id left join entries as ce on ce.id=s.child_id where pe.needs_refresh=1 and (ce.needs_refresh is null or ce.needs_refresh=0) limit 1")

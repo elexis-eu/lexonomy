@@ -788,6 +788,8 @@ def dictsearch(dictID):
 @get(siteconfig["rootPath"]+"<dictID>/resave")
 @authDict(["canEdit","canConfig","canUpload"])
 def resave(dictID, user, dictDB, configs):
+    if len(configs['subbing']) == 0:
+        ops.clearRefac(dictDB)
     stats = ops.getDictStats(dictDB)
     return template("resave.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "awayUrl": "../../"+dictID+"/edit", "todo": stats["entryCount"]})
 
@@ -797,8 +799,9 @@ def resavejson(dictID, user, dictDB, configs):
     count = 0
     stats = ops.getDictStats(dictDB)
     while stats["needResave"] and count <= 127:
-        ops.refac(dictDB, dictID, configs)
-        ops.refresh(dictDB, dictID, configs)
+        if len(configs['subbing']) > 0:
+            ops.refac(dictDB, dictID, configs)
+            ops.refresh(dictDB, dictID, configs)
         ops.resave(dictDB, dictID, configs)
         stats = ops.getDictStats(dictDB)
         count += 1
