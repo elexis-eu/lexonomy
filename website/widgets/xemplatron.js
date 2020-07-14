@@ -126,6 +126,11 @@ Xemplatron.styles={ //the dimensions are ordered from innermost to outermost
     "semicolon": {toHtml: function(ly, html, n, isF, isL){return html+(isL?"":"; ")}, title: "Semicolon"},
     "colon": {toHtml: function(ly, html, n, isF, isL){return html+(isL?"":": ")}, title: "Colon"},
   },
+  textsize: {
+    "title": "Text size",
+    "smaller": {toHtml: function(ly, html, n, isF, isL){return "<span class='smaller'>"+html+"</span>"}, title: "Smaller"},
+    "bigger": {toHtml: function(ly, html, n, isF, isL){return "<span class='bigger'>"+html+"</span>"}, title: "Bigger"},
+  },
   weight: {
     "title": "Text weight",
     "bold": {toHtml: function(ly, html, n, isF, isL){return "<span class='bold'>"+html+"</span>"}, title: "Bold"},

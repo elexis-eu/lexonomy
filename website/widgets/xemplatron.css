@@ -13,6 +13,8 @@
 .viewer span.blue {color: #29549e;}
 .viewer span.green {color: #0c804c;}
 .viewer span.grey {color: #777777;}
+.viewer span.smaller {font-size: 75%;}
+.viewer span.bigger {font-size: 120%;}
 
 .viewer .border {border-radius: 4px;}
 .viewer div.border {padding: 5px 10px; margin: 15px -10px; }
