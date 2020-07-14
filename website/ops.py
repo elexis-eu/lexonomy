@@ -1356,3 +1356,43 @@ def getDictLinkables(dictDB):
     for r in c.fetchall():
         ret.append({"element": r["element"], "link": r["txt"], "entry": r["entry_id"]})
     return ret
+
+def addAutoNumbers(dictDB, dictID, countElem, storeElem):
+    from xml.dom import minidom, Node
+    isAttr = False
+    if storeElem[0] == '@':
+        isAttr = True
+        storeElem = storeElem[1:]
+    c = dictDB.execute("select id, xml from entries")
+    process = 0
+    for r in c.fetchall():
+        entryID = r["id"]
+        xml = r["xml"]
+        doc = minidom.parseString(xml)
+        allEmpty = True
+        for el in doc.getElementsByTagName(countElem):
+            if isAttr:
+                if el.getAttribute(storeElem) != "":
+                    allEmpty = False
+            else:
+                for sel in el.getElementsByTagName(storeElem):
+                    if sel.firstChild != None and sel.firstChild.nodeValue != "":
+                        allEmpty = False
+        if allEmpty:
+            count = 0
+            for el in doc.getElementsByTagName(countElem):
+                count += 1
+                if isAttr:
+                    el.setAttribute(storeElem, str(count))
+                else:
+                    for sel in el.getElementsByTagName(storeElem):
+                        el.removeChild(sel)
+                    n_elem = doc.createElement(storeElem)
+                    el.appendChild(n_elem)
+                    n_elem.appendChild(doc.createTextNode(str(count)))
+            process += 1
+            xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
+            dictDB.execute("update entries set xml=?, needs_refac=0 where id=?", (xml, entryID))
+    dictDB.commit()
+    return process
+

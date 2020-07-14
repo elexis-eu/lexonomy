@@ -766,9 +766,9 @@ def configupdate(dictID, user, dictDB, configs):
 
 @post(siteconfig["rootPath"]+"<dictID>/autonumber.json")
 @authDict(["canConfig"])
-def configupdate(dictID, user, dictDB, configs):
-    ops.addAutoNumbers(dictDB, dictID, request.forms.countElem, request.forms.storeElem)
-    return {"success": True}
+def autonumber(dictID, user, dictDB, configs):
+    process = ops.addAutoNumbers(dictDB, dictID, request.forms.countElem, request.forms.storeElem)
+    return {"success": True, "processed": process}
 
 @get(siteconfig["rootPath"]+"<dictID>/search")
 def dictsearch(dictID):
