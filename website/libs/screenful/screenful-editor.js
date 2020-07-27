@@ -281,8 +281,24 @@ Screenful.Editor={
         Screenful.Editor.updateToolbar();
         if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.setEntryAsCurrent(null);
       } else {
-        if($("#editor").length>0 && Screenful.Editor.entryID) Screenful.Editor.edit(event, id);
-        else Screenful.Editor.view(event, id);
+        if($("#editor").length>0 && Screenful.Editor.entryID) {
+          Screenful.Editor.edit(event, id);
+        } else {
+          Screenful.Editor.view(event, id);
+        }
+        if (event != null && (event.target.id == 'butOpen' || event.target.id == 'idbox')) {
+          var link = Screenful.Editor.getDirectLink();
+          if($("#editor").length>0 && Screenful.Editor.entryID) {
+            link += id;
+          } else {
+            link += "view"+id
+          }
+          if (history.pushState) {
+            parent.window.history.pushState({path:link},'',link);
+          } else {
+            parent.window.location = link;
+          }
+        }
       }
     }
   },
@@ -443,16 +459,26 @@ Screenful.Editor={
     if($("#container").hasClass("withHistory")) $("#container").removeClass("withHistory").html("<div id='viewer'></div>");
     Screenful.Editor.updateToolbar();
   },
-  showLink: function() {
+  getDirectLink: function(fullLink) {
     var link = window.location.protocol + '//' + window.location.host + '/';
     var paths = window.location.pathname.split('/');
     link += paths[1] + '/edit/' + paths[2] + '/';
+    if (fullLink) {
+      if (Screenful.Editor.entryID && $("#viewer").length>0) {
+        link += 'view' + Screenful.Editor.entryID;
+      }
+      if (Screenful.Editor.entryID && $("#editor").length>0) {
+        link += Screenful.Editor.entryID;
+      }
+    }
+    return link;
+  },
+  showLink: function() {
+    var link = Screenful.Editor.getDirectLink(true);
     if (Screenful.Editor.entryID && $("#viewer").length>0) {
-      link += 'view' + Screenful.Editor.entryID;
       prompt("Direct link to view this entry", link);
     }
     if (Screenful.Editor.entryID && $("#editor").length>0) {
-      link += Screenful.Editor.entryID;
       prompt("Direct link to edit this entry", link);
     }
   },
