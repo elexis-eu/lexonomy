@@ -12,6 +12,7 @@ import string
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
 path = os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite')
+pathXref = os.path.join(siteconfig["dataDir"], 'crossref.sqlite')
 
 conn = sqlite3.connect(path)
 print("Connected to database: %s" % path)
@@ -24,9 +25,22 @@ if siteconfig.get("dbSchemaFile") != "":
         print("Initialized %s with: %s" % (path, siteconfig.get("dbSchemaFile")))
     except sqlite3.Error as e:
         print("Problem importing database schema. Likely the DB has already been created. Database error: %s" % e)
-    
 else:
     print("Unknown database schema, please add dbSchemaFile to siteconfig.json")
+
+connXref = sqlite3.connect(pathXref)
+print("Connected to database: %s" % pathXref)
+
+if siteconfig.get("dbXrefSchemaFile") != "":
+    schema = open(siteconfig.get("dbXrefSchemaFile"), 'r').read()
+    try:
+        connXref.executescript(schema)
+        connXref.commit()
+        print("Initialized %s with: %s" % (pathXref, siteconfig.get("dbXrefSchemaFile")))
+    except sqlite3.Error as e:
+        print("Problem importing database schema. Likely the DB has already been created. Database error: %s" % e)
+else:
+    print("Unknown database schema, please add dbXrefSchemaFile to siteconfig.json")
 
 for user in siteconfig["admins"]:
     password = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))

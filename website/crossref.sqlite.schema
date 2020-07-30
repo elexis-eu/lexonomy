@@ -1,0 +1,1 @@
+CREATE TABLE links (link_id INTEGER PRIMARY KEY, source_dict TEXT, source_element TEXT, source_id TEXT, target_dict TEXT, target_element TEXT, target_id TEXT);
