@@ -16,6 +16,23 @@ Xemplatron.el2html=function(el, isFirst, isLast){
   var xema=Xemplatron.xema.elements[el.nodeName]; if(xema && xema.filling=="lst") {
     html=el.textContent;
     if(xema.values) for(var i=0; i<xema.values.length; i++) if(xema.values[i].value==el.textContent) {caption=xema.values[i].caption; break;}
+  } else if (xema.filling=="med") {
+    var fileType = Xemplatron.detectFileType(el.textContent);
+    console.log(fileType)
+    switch(fileType) {
+      case 'image':
+        html = '<img src="'+el.textContent+'" class="media_image"/>';
+        break;
+      case 'video':
+        html = '<video controls class="media_video"><source src="'+el.textContent+'"/></video>';
+        break;
+      case 'audio':
+        html = '<audio controls class="media_audio" src="'+el.textContent+'"/>';
+        break;
+      default:
+        html = el.textContent;
+        break;
+    }
   } else {
     //obtain the child nodes we want to process, in the other we want to proceess them in:
     var nodes=[];
@@ -235,6 +252,14 @@ Xemplatron._bullet=function(ly, name, html){
   else symbol=name;
   if(ly=="block") return "<div class='bulleted "+className+"'><div class='bullet'>"+symbol+"</div> <div class='inside'>"+html+"</div><div class='clear'></div></div>";
   if(ly=="inline") return "<span class='bulleted "+className+"'>"+symbol+"</span>&nbsp;"+html;
+}
+Xemplatron.detectFileType=function(url) {
+  var fileExtension = url.split('.').pop().split(/\#|\?/)[0].toLowerCase();
+  console.log('FE'+fileExtension)
+  if (['jpg','jpeg','png','gif'].includes(fileExtension)) return 'image';
+  if (['avi','mp4','webm'].includes(fileExtension)) return 'video';
+  if (['wav','ogg','weba'].includes(fileExtension)) return 'audio';
+  return '';
 }
 
 if(!module) var module={};

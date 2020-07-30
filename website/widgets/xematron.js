@@ -121,6 +121,13 @@ Xematron.xema2docspec=function(xema, stringAsker){
 			});
 		}
 
+		//med elements are like txt:
+		if(xel.filling=="med"){
+			del.hasText=true;
+			del.oneliner=true;
+			del.asker=Xonomy[stringAsker] || Xonomy.askLongString;
+		}
+
 		del.attributes={};
 		var submenu=[];
 		var attnames=[]; for(var attname in xel.attributes) attnames.push(attname); attnames.forEach(function(attname){

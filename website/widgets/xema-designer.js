@@ -433,6 +433,7 @@ XemaDesigner.renderElementFilling=function(elName){
 	$block.append("<label class='radio'><input type='radio' name='filling' value='inl' "+(el.filling=="inl"?"checked":"")+"/>Text with markup</label>");
 	$block.append("<label class='radio'><input type='radio' name='filling' value='lst' "+(el.filling=="lst"?"checked":"")+"/>Value from list</label>");
 	$block.append("<label class='radio'><input type='radio' name='filling' value='emp' "+(el.filling=="emp"?"checked":"")+"/>Empty</label>");
+	$block.append("<label class='radio'><input type='radio' name='filling' value='med' "+(el.filling=="med"?"checked":"")+"/>Media</label>");
 	$block.find("input").on("click change", function(event){
 		XemaDesigner.changeElementFilling(elName, $(event.target).val());
 	});
