@@ -5,7 +5,7 @@
   "port": 8080,
   "dataDir": "../data/",
   "dbSchemaFile": "lexonomy.sqlite.schema",
-  "dbFile": "lexonomy.sqlite",
+  "dbXrefSchemaFile": "crossref.sqlite.schema",
   "verbose": true,
   "admins": ["root@localhost"],
   "trackingCode": "",
