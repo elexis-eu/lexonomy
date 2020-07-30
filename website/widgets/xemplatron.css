@@ -47,3 +47,6 @@
 .viewer div.space {margin: 0.5em 0;}
 
 .viewer span.label {font-style: normal; font-weight: normal; color: #333333; font-size: 0.85em; white-space: nowrap; background-color: #eeeeee; padding: 2px 4px; border-radius: 4px; text-shadow: 1px 1px 0px #ffffff;}
+
+.viewer .media_image {max-width: 50%}
+.viewer .media_video {max-width: 50%}

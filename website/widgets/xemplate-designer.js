@@ -204,7 +204,7 @@ XemplateDesigner.renderElementStyles=function(elName){
     var dim=dims[iDim];
 		var qualifies=true;
 		if((dim=="separation" || dim=="gutter") && XemaDesigner.xema.root==elName) qualifies=false;
-		if((dim=="innerPunc" || dim=="weight" || dim=="slant" || dim=="colour" || dim=="textsize") && XemaDesigner.xema.elements[elName].filling=="chd") qualifies=false;
+		if((dim=="innerPunc" || dim=="weight" || dim=="slant" || dim=="colour" || dim=="textsize") && (XemaDesigner.xema.elements[elName].filling=="chd" || XemaDesigner.xema.elements[elName].filling=="med")) qualifies=false;
 		if((dim=="captioning") && XemaDesigner.xema.elements[elName].filling!="lst") qualifies=false;
 		if(qualifies) {
 	    var $row=$("<tr><td class='cell1'></td><td class='cell9'></td></tr>").appendTo($table);
