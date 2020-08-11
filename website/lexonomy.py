@@ -611,7 +611,9 @@ def publicentry(dictID, entryID):
     elif "_css" in configs["xemplate"]:
         html = xml
     else:
-        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", xml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+        entrydata = re.sub(r"'", "\\'", xml)
+        entrydata = re.sub(r"\n", " ", entrydata)
+        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
         #rewrite xemplatron to python, too?
     css = ""
     if "_css" in configs["xemplate"]:
