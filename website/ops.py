@@ -194,7 +194,8 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
     newxml = re.sub(r" lxnm:linkable='[^']+'", "", newxml)
     if not row:
         adjustedEntryID, adjustedXml, feedback = createEntry(dictDB, configs, entryID, xml, email, historiography)
-        adjustedXml = updateEntryLinkables(dictDB, adjustedEntryID, adjustedXml, configs, True, True)
+        if configs["links"]:
+            adjustedXml = updateEntryLinkables(dictDB, adjustedEntryID, adjustedXml, configs, True, True)
         return adjustedEntryID, adjustedXml, True, feedback
     else:
         oldxml = row["xml"]
@@ -219,7 +220,8 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
             dictDB.execute("update searchables set txt=? where entry_id=? and level=1", (getEntryTitle(xml, configs["titling"], True), entryID))
             dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
             dictDB.commit()
-            adjustedXml = updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
+            if configs["links"]:
+                xml = updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
             return entryID, xml, True, feedback
 
 def getEntryTitle(xml, titling, plaintext=False):
@@ -1144,7 +1146,8 @@ def resave(dictDB, dictID, configs):
         for searchable in getEntrySearchables(xml, configs):
             if searchable != headword:
                 dictDB.execute("insert into searchables(entry_id, txt, level) values(?,?,?)", (entryID, searchable, 2))
-        updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
+        if configs["links"]:
+            updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
     dictDB.commit()
     return True
 
