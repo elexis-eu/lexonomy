@@ -883,6 +883,7 @@ def listEntriesById(dictDB, entryID, configs):
     return entries
 
 def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
+    searchtext = searchtext.lower()
     if type(sortdesc) == str:
         if sortdesc == "true":
             sortdesc = True
@@ -1142,6 +1143,7 @@ def resave(dictDB, dictID, configs):
         dictDB.execute("update entries set needs_resave=0, title=?, sortkey=? where id=?", (getEntryTitle(xml, configs["titling"]), toSortKey(getSortTitle(xml, configs["titling"]), abc), entryID))
         dictDB.execute("delete from searchables where entry_id=?", (entryID,))
         dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
+        dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True).lower(), 1))
         headword = getEntryHeadword(xml, configs["titling"].get("headword"))
         for searchable in getEntrySearchables(xml, configs):
             if searchable != headword:
