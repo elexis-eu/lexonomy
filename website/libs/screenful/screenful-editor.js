@@ -105,7 +105,7 @@ Screenful.Editor={
       $("#butSave").hide(); $("#butSave .star").hide();
       $("#labAutosave").hide();
       $("#butDelete").hide();
-      $("#butSourceCode").hide();
+      $("#butSourceCode").show();
       $("#butClone").hide();
       $("#butHistory").addClass("pressed").show();
     } else if($("#container").hasClass("withSourceCode")) { //the source code editor is open
