@@ -16,7 +16,7 @@ Xemplatron.el2html=function(el, isFirst, isLast){
   var xema=Xemplatron.xema.elements[el.nodeName]; if(xema && xema.filling=="lst") {
     html=el.textContent;
     if(xema.values) for(var i=0; i<xema.values.length; i++) if(xema.values[i].value==el.textContent) {caption=xema.values[i].caption; break;}
-  } else if (xema.filling=="med") {
+  } else if (xema && xema.filling=="med") {
     var fileType = Xemplatron.detectFileType(el.textContent);
     console.log(fileType)
     switch(fileType) {
