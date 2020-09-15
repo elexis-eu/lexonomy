@@ -152,12 +152,12 @@ def entryread(dictID, user, dictDB, configs):
     xml = xml.replace(">\n<", "><")
     html = ""
     if xml:
-        if configs["xemplate"].get("_xsl"):
+        if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
             import lxml.etree as ET
             dom = ET.XML(xml.encode("utf-8"))
             xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
             html = str(ET.XSLT(xslt)(dom))
-        elif configs["xemplate"].get("_css"):
+        elif configs["xemplate"].get("_css") and configs["xemplate"]["_css"] != "":
             html = xml
         else:
             html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('" + xml.replace("'","\\'").replace("\n","") + "', " + json.dumps(configs["xemplate"]) + ", " + json.dumps(configs["xema"]) + "));</script>"
@@ -168,12 +168,12 @@ def entryread(dictID, user, dictDB, configs):
 def entryupdate(dictID, user, dictDB, configs):
     adjustedEntryID, adjustedXml, changed, feedback = ops.updateEntry(dictDB, configs, request.forms.id, request.forms.content, user["email"], {})
     html = ""
-    if configs["xemplate"].get("_xsl"):
+    if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
         import lxml.etree as ET
         dom = ET.XML(adjustedXml.encode("utf-8"))
         xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
         html = str(ET.XSLT(xslt)(dom))
-    elif configs["xemplate"].get("_css"):
+    elif configs["xemplate"].get("_css") and configs["xemplate"]["_xsl"] != "":
         html = adjustedXml
     else:
         html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", adjustedXml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
@@ -187,12 +187,12 @@ def entryupdate(dictID, user, dictDB, configs):
 def entrycreate(dictID, user, dictDB, configs):
     adjustedEntryID, adjustedXml, feedback = ops.createEntry(dictDB, configs, None, request.forms.content, user["email"], {})
     html = ""
-    if configs["xemplate"].get("_xsl"):
+    if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
         import lxml.etree as ET
         dom = ET.XML(adjustedXml.encode("utf-8"))
         xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
         html = str(ET.XSLT(xslt)(dom))
-    elif configs["xemplate"].get("_css"):
+    elif configs["xemplate"].get("_css") and configs["xemplate"]["_css"] != "":
         html = adjustedXml
     else:
         html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", adjustedXml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
@@ -224,12 +224,12 @@ def history(dictID):
         xml = item["content"]
         html = ""
         if xml:
-            if configs["xemplate"].get("_xsl"):
+            if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
                 import lxml.etree as ET
                 dom = ET.XML(xml.encode("utf-8"))
                 xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
                 html = str(ET.XSLT(xslt)(dom))
-            elif configs["xemplate"].get("_css"):
+            elif configs["xemplate"].get("_css") and configs["xemplate"]["_css"] != "":
                 html = xml
             else:
                 html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", xml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
@@ -602,13 +602,13 @@ def publicentry(dictID, entryID):
     if adjustedEntryID == 0:
         return redirect("/"+dictID)
     nabes = ops.readNabesByEntryID(dictDB, dictID, entryID, configs)
-    if "_xsl" in configs["xemplate"]:
+    if "_xsl" in configs["xemplate"] and configs["xemplate"]["_xsl"] != "":
         from lxml import etree
         xslt_root = etree.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
         transform = etree.XSLT(xslt_root)
         doc_root = etree.XML(xml.encode("utf-8"))
         html = transform(doc_root)
-    elif "_css" in configs["xemplate"]:
+    elif "_css" in configs["xemplate"] and configs["xemplate"]["_css"] != "":
         html = xml
     else:
         entrydata = re.sub(r"'", "\\'", xml)
@@ -721,7 +721,7 @@ def dicteditdoc(dictID, doctype, user, dictDB, configs, selectedID=""):
 @get(siteconfig["rootPath"]+"<dictID>/<doctype>/entryeditor")
 @authDict(["canEdit"], True)
 def entryeditor(dictID, doctype, user, dictDB, configs):
-    if "_xsl" in configs["xemplate"]:
+    if "_xsl" in configs["xemplate"] and configs["xemplate"]["_xsl"] != "":
         configs["xemplate"]["_xsl"] = "dummy"
     configs["xema"]["_root"] = configs["xema"]["root"]
     userdicts = ops.getDictsByUser(user["email"])
@@ -747,7 +747,7 @@ def entrylist(dictID, doctype, user, dictDB, configs):
 @authDict(["canConfig"], True)
 def config(dictID, user, dictDB, configs):
     stats = ops.getDictStats(dictDB)
-    return template("config.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "needResave": stats["needResave"], "hasXemaOverride": ("_xonomyDocSpec" in configs["xema"] or "_dtd" in configs["xema"]), "hasXemplateOverride": ("_xsl" in configs["xemplate"] or "_css" in configs["xemplate"]), "hasEditingOverride": ("_js" in configs["editing"])})
+    return template("config.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "needResave": stats["needResave"], "hasXemaOverride": ("_xonomyDocSpec" in configs["xema"] or "_dtd" in configs["xema"]), "hasXemplateOverride": (("_xsl" in configs["xemplate"] and configs["xemplate"]["_xsl"] != "") or ("_css" in configs["xemplate"] and configs["xemplate"]["_css"] != "")), "hasEditingOverride": ("_js" in configs["editing"])})
 
 @get(siteconfig["rootPath"]+"<dictID>/config/<page>")
 @authDict(["canConfig"], True)
