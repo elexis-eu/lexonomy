@@ -67,6 +67,31 @@ Titling.render=function(div, json){
 
   var $block=$("<div class='block abc'></div>").appendTo($div);
 	$block.append("<div class='title'>Alphabetical order</div>");
+  $block.append("<input class='textbox' id='sort_locale'/>");
+  var lang_input = $("#sort_locale");
+  var lang_found = langs.find(element => element.code == json.locale);
+  if (lang_found) {
+    lang_input.val(lang_found.lang);
+  }
+  lang_input.data("origval", lang_input.val);
+
+  lang_input.easyAutocomplete({
+    theme: "blue-light",
+    data: langs,
+    placeholder: "Type to search for locale",
+    getValue: "lang",
+    list: {
+      match: {
+        enabled: true,
+      },
+      onSelectItemEvent: function() {
+        if (json.locale != lang_input.val()) {
+          Titling.change();
+        }
+      }
+    },
+  });
+  
 	$block.append("<textarea class='textbox abc' spellcheck='false'></textarea>");
 	$block.find("textarea.abc").val(Titling.abc2txt(json.abc));
   $block.find("textarea.abc").on("keyup change", function(e){
@@ -99,6 +124,10 @@ Titling.harvest=function(div){
     if($input.prop("checked")) ret.headwordAnnotations.push($input.attr("data-name"));
   });
   ret.abc=Titling.txt2abc($(".pillarform .block.abc textarea").val());
+  var lang_found = langs.find(element => element.lang == $.trim($("#sort_locale").val()));
+  if (lang_found) {
+    ret.locale = lang_found.code;
+  }
   return ret;
 };
 

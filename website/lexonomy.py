@@ -754,7 +754,9 @@ def config(dictID, user, dictDB, configs):
 def configpage(dictID, page, user, dictDB, configs):
     lang_codes = []
     if page == "ident":
-        lang_codes = ops.get_iso639_1() 
+        lang_codes = ops.get_iso639_1()
+    if page == "titling":
+        lang_codes = ops.get_locales()
     return template("config-"+page+".tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "xema": configs["xema"], "titling": configs["titling"], "flagging": configs["flagging"], "langs": lang_codes})
 
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
