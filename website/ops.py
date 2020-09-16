@@ -1401,3 +1401,10 @@ def addAutoNumbers(dictDB, dictID, countElem, storeElem):
     dictDB.commit()
     return process
 
+def get_iso639_1():
+    codes = []
+    for line in open("libs/iso-639-3.tab").readlines():
+        la = line.split("\t")
+        if la[3] != "" and la[3] != "Part1":
+            codes.append({'code':la[3], 'lang':la[6]})
+    return codes

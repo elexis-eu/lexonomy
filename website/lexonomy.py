@@ -752,7 +752,10 @@ def config(dictID, user, dictDB, configs):
 @get(siteconfig["rootPath"]+"<dictID>/config/<page>")
 @authDict(["canConfig"], True)
 def configpage(dictID, page, user, dictDB, configs):
-    return template("config-"+page+".tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "xema": configs["xema"], "titling": configs["titling"], "flagging": configs["flagging"]})
+    lang_codes = []
+    if page == "ident":
+        lang_codes = ops.get_iso639_1() 
+    return template("config-"+page+".tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "xema": configs["xema"], "titling": configs["titling"], "flagging": configs["flagging"], "langs": lang_codes})
 
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
 @authDict(["canConfig"])
