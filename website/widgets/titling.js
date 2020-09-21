@@ -78,9 +78,10 @@ Titling.render=function(div, json){
   lang_input.easyAutocomplete({
     theme: "blue-light",
     data: langs,
-    placeholder: "Type to search for locale",
+    placeholder: "Type to search for language",
     getValue: "lang",
     list: {
+      maxNumberOfElements: 20,
       match: {
         enabled: true,
       },
@@ -92,12 +93,7 @@ Titling.render=function(div, json){
     },
   });
   
-	$block.append("<textarea class='textbox abc' spellcheck='false'></textarea>");
-	$block.find("textarea.abc").val(Titling.abc2txt(json.abc));
-  $block.find("textarea.abc").on("keyup change", function(e){
-    if($block.find("textarea.abc").val()!=Titling.abc2txt(json.abc)) Titling.change();
-  });
-  $block.append("<div class='instro'>This order is used to sort entries alphabetically in the entry list.</div>");
+  $block.append("<div class='instro'>Select language to sort entries alphabetically in the entry list.</div>");
 
   var $numberEntries=$("<div class='block abc'></div>").appendTo($div);
 	$numberEntries.append("<div class='title'>Number of entries to be shown in the entry list at once</div>");
@@ -123,37 +119,11 @@ Titling.harvest=function(div){
     var $input=$(this);
     if($input.prop("checked")) ret.headwordAnnotations.push($input.attr("data-name"));
   });
-  ret.abc=Titling.txt2abc($(".pillarform .block.abc textarea").val());
   var lang_found = langs.find(element => element.lang == $.trim($("#sort_locale").val()));
   if (lang_found) {
     ret.locale = lang_found.code;
   }
   return ret;
-};
-
-Titling.abc2txt=function(abc){
-	abc=abc || [];
-	var ret="";
-	for(var x=0; x<abc.length; x++){
-		var line="";
-		for(var y=0; y<abc[x].length; y++){ if(line!="") line+=" "; line+=abc[x][y]; }
-		if(line!="") ret+=line+"\n";
-	}
-	return ret;
-};
-Titling.txt2abc=function(txt){
-	var abc=[];
-	var rows=txt.split('\n');
-	for(var x=0; x<rows.length; x++){
-		var line=[];
-		var columns=rows[x].split(' ');
-		for(var y=0; y<columns.length; y++){
-			var char=$.trim(columns[y]);
-			if(char!="") line.push(char);
-		}
-		if(line.length>0) abc.push(line);
-	}
-	return abc;
 };
 
 Titling.headwordChanged=function(){

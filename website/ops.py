@@ -24,7 +24,7 @@ siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
 defaultDictConfig = {"editing": {"xonomyMode": "nerd", "xonomyTextEditor": "askString" },
                      "searchability": {"searchableElements": []},
                      "xema": {"elements": {}},
-                     "titling": {"headwordAnnotations": [], "abc": siteconfig["defaultAbc"]},
+                     "titling": {"headwordAnnotations": []},
                      "flagging": {"flag_element": "", "flags": []}}
 
 prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent", "userprofile"];
@@ -152,14 +152,10 @@ def readEntry(db, configs, entryID):
     return entryID, xml, row["title"]
 
 def createEntry(dictDB, configs, entryID, xml, email, historiography):
-    if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
-        abc = configs["titling"].get("abc")
-    else:
-        abc = configs["siteconfig"]["defaultAbc"]
     xml = setHousekeepingAttributes(entryID, xml, configs["subbing"])
     xml = removeSubentryParentTags(xml)
     title = getEntryTitle(xml, configs["titling"])
-    sortkey = toSortKey(getSortTitle(xml, configs["titling"]), abc)
+    sortkey = getSortTitle(xml, configs["titling"])
     doctype = getDoctype(xml)
     needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
     needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
@@ -183,10 +179,6 @@ def createEntry(dictDB, configs, entryID, xml, email, historiography):
 def updateEntry(dictDB, configs, entryID, xml, email, historiography):
     c = dictDB.execute("select id, xml from entries where id=?", (entryID, ))
     row = c.fetchone()
-    if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
-        abc = configs["titling"].get("abc")
-    else:
-        abc = configs["siteconfig"]["defaultAbc"]
     xml = setHousekeepingAttributes(entryID, xml, configs["subbing"])
     xml = removeSubentryParentTags(xml)
     newxml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
@@ -209,7 +201,7 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
         else:
             dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (entryID,))
             title = getEntryTitle(xml, configs["titling"])
-            sortkey = toSortKey(getSortTitle(xml, configs["titling"]), abc)
+            sortkey = getSortTitle(xml, configs["titling"])
             doctype = getDoctype(xml)
             needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
             needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
@@ -253,30 +245,6 @@ def getEntryHeadword(xml, headword_elem):
         ret = extractFirstText(xml)
     if len(ret) > 255:
         ret = ret[0:255]
-    return ret
-
-def toSortKey_num(match):
-    return str(match.group(0)).zfill(15)
-
-def toSortKey(s, abc):
-    keylength = 15
-    ret = re.sub(r"<[<>]+>", "", s).lower()
-    pat = r"[0-9]{1," + str(keylength) + "}"
-    ret = re.sub(pat, toSortKey_num, ret)
-    chars = []
-    count = 0
-    for pos in abc:
-        count += 1
-        key = "_"+str(count).zfill(keylength-1)
-        for i, pos2 in enumerate(pos):
-            if i > 0:
-                count += 1
-            chars.append({"char":pos2, "key": key})
-    chars.sort(key=lambda x:len(x["char"]), reverse=True)
-    for item in chars:
-        if not re.match(r"^[0-9]$", item["char"]):
-            ret = re.sub(item["char"], item["key"], ret)
-    ret = re.sub(r"[^0-9_]", "", ret)
     return ret
 
 def getDoctype(xml):
@@ -718,16 +686,13 @@ def readNabesByEntryID(dictDB, dictID, entryID, configs):
     nabes_before = []
     nabes_after = []
     nabes = []
-    c = dictDB.execute("select e1.id, e1.title from entries as e1 where e1.doctype=? ", (configs["xema"]["root"],))
+    c = dictDB.execute("select e1.id, e1.title, e1.sortkey from entries as e1 where e1.doctype=? ", (configs["xema"]["root"],))
     for r in c.fetchall():
-        nabes.append({"id": str(r["id"]), "title": r["title"]})
+        nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
 
     # sort by selected locale
-    locale = 'en'
-    if "locale" in configs["titling"] and configs["titling"]["locale"] != "":
-        locale = configs["titling"]["locale"]
-    collator = Collator.createInstance(Locale(locale))
-    nabes.sort(key=lambda x: collator.getSortKey(x['title']))
+    collator = Collator.createInstance(Locale(getLocale(configs)))
+    nabes.sort(key=lambda x: collator.getSortKey(x['sortkey']))
    
     #select before/after entries 
     entryID_seen = False
@@ -744,20 +709,17 @@ def readNabesByText(dictDB, dictID, configs, text):
     nabes_before = []
     nabes_after = []
     nabes = []
-    c = dictDB.execute("select e1.id, e1.title from entries as e1 where e1.doctype=? ", (configs["xema"]["root"],))
+    c = dictDB.execute("select e1.id, e1.title, e1.sortkey from entries as e1 where e1.doctype=? ", (configs["xema"]["root"],))
     for r in c.fetchall():
-        nabes.append({"id": str(r["id"]), "title": r["title"], "sort_title": r["title"].replace("<span class='headword'>","").replace("</span>","")})
+        nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
 
     # sort by selected locale
-    locale = 'en'
-    if "locale" in configs["titling"] and configs["titling"]["locale"] != "":
-        locale = configs["titling"]["locale"]
-    collator = Collator.createInstance(Locale(locale))
-    nabes.sort(key=lambda x: collator.getSortKey(x['sort_title']))
+    collator = Collator.createInstance(Locale(getLocale(configs)))
+    nabes.sort(key=lambda x: collator.getSortKey(x['sortkey']))
    
     #select before/after entries 
     for n in nabes:
-        if collator.getSortKey(n["sort_title"]) <= collator.getSortKey(text):
+        if collator.getSortKey(n["sortkey"]) <= collator.getSortKey(text):
             nabes_before.append(n)
         else:
             nabes_after.append(n)
@@ -768,9 +730,14 @@ def readRandoms(dictDB):
     limit = 75
     more = False
     randoms = []
-    c = dictDB.execute("select id, title from entries where doctype=? and id in (select id from entries order by random() limit ?) order by sortkey", (configs["xema"]["root"], limit))
+    c = dictDB.execute("select id, title, sortkey from entries where doctype=? and id in (select id from entries order by random() limit ?)", (configs["xema"]["root"], limit))
     for r in c.fetchall():
-        randoms.append({"id": r["id"], "title": r["title"]})
+        randoms.append({"id": r["id"], "title": r["title"], "sortkey": r["sortkey"]})
+
+    # sort by selected locale
+    collator = Collator.createInstance(Locale(getLocale(configs)))
+    randoms.sort(key=lambda x: collator.getSortKey(x['sortkey']))
+
     c = dictDB.execute("select count(*) as total from entries")
     r = c.fetchone()
     if r["total"] > limit:
@@ -920,29 +887,29 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
         sortdesc = not sortdesc
 
     if modifier == "start":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by s.level"
+        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by s.level"
         params1 = (doctype, searchtext+"%")
         sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ?"
         params2 = (doctype, searchtext+"%")
     elif modifier == "wordstart":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (s.txt like ? or s.txt like ?) group by e.id order by s.level"
+        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (s.txt like ? or s.txt like ?) group by e.id order by s.level"
         params1 = (doctype, searchtext + "%", "% " + searchtext + "%")
         sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (s.txt like ? or s.txt like ?)"
         params2 = (doctype, searchtext + "%", "% " + searchtext + "%")
     elif modifier == "substring":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by s.level"
+        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by s.level"
         params1 = (doctype, "% " + searchtext + "%")
         sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ?"
         params2 = (doctype, "% " + searchtext + "%")
     elif modifier == "exact":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=? group by e.id order by s.level"
+        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=? group by e.id order by s.level"
         params1 = (doctype, searchtext)
         sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=?"
         params2 = (doctype, searchtext)
     c1 = dictDB.execute(sql1, params1)
     entries = []
     for r1 in c1.fetchall():
-        item = {"id": r1["id"], "title": r1["title"]}
+        item = {"id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"]}
         if "flag_element" in configs["flagging"]:
             item["flag"] = extractText(r1["xml"], configs["flagging"]["flag_element"])
         if fullXML:
@@ -952,11 +919,8 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
         entries.append(item)
 
     # sort by selected locale
-    locale = 'en'
-    if "locale" in configs["titling"] and configs["titling"]["locale"] != "":
-        locale = configs["titling"]["locale"]
-    collator = Collator.createInstance(Locale(locale))
-    entries.sort(key=lambda x: collator.getSortKey(x['title']), reverse=sortdesc)
+    collator = Collator.createInstance(Locale(getLocale(configs)))
+    entries.sort(key=lambda x: collator.getSortKey(x['sortkey']), reverse=sortdesc)
     # and limit
     entries = entries[0:int(howmany)]
 
@@ -967,21 +931,18 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
 
 def listEntriesPublic(dictDB, dictID, configs, searchtext):
     howmany = 100
-    sql_list = "select s.txt, min(s.level) as level, e.id, e.title, case when s.txt=? then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like ? and e.doctype=? group by e.id order by priority, level, s.level"
+    sql_list = "select s.txt, min(s.level) as level, e.id, e.title, e.sortkey case when s.txt=? then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like ? and e.doctype=? group by e.id order by priority, level, s.level"
     c1 = dictDB.execute(sql_list, ("%"+searchtext+"%", "%"+searchtext+"%", configs["xema"].get("root")))
     entries = []
     for r1 in c1.fetchall():
-        item = {"id": r1["id"], "title": r1["title"], "exactMatch": (r1["level"] == 1 and r1["priority"] == 1)}
+        item = {"id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"], "exactMatch": (r1["level"] == 1 and r1["priority"] == 1)}
         if r1["level"] > 1:
             item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
         entries.append(item)
 
     # sort by selected locale
-    locale = 'en'
-    if "locale" in configs["titling"] and configs["titling"]["locale"] != "":
-        locale = configs["titling"]["locale"]
-    collator = Collator.createInstance(Locale(locale))
-    entries.sort(key=lambda x: collator.getSortKey(x['title']))
+    collator = Collator.createInstance(Locale(getLocale(configs)))
+    entries.sort(key=lambda x: collator.getSortKey(x['sortkey']))
     # and limit
     entries = entries[0:int(howmany)]
 
@@ -1167,17 +1128,13 @@ def refresh(dictDB, dictID, configs):
 
 def resave(dictDB, dictID, configs):
     from xml.dom import minidom, Node
-    if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
-        abc = configs["titling"].get("abc")
-    else:
-        abc = configs["siteconfig"]["defaultAbc"]
     c = dictDB.execute("select id, xml from entries where needs_resave=1 limit 12")
     for r in c.fetchall():
         entryID = r["id"]
         xml = r["xml"]
         xml = re.sub(r"\s+xmlns:lxnm=['\"]http:\/\/www\.lexonomy\.eu\/[\"']", "", xml)
         xml = re.sub(r"^<([^>^ ]*) ", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", xml)
-        dictDB.execute("update entries set needs_resave=0, title=?, sortkey=? where id=?", (getEntryTitle(xml, configs["titling"]), toSortKey(getSortTitle(xml, configs["titling"]), abc), entryID))
+        dictDB.execute("update entries set needs_resave=0, title=?, sortkey=? where id=?", (getEntryTitle(xml, configs["titling"]), getSortTitle(xml, configs["titling"]), entryID))
         dictDB.execute("delete from searchables where entry_id=?", (entryID,))
         dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
         dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True).lower(), 1))
@@ -1239,10 +1196,6 @@ def getEntrySearchables(xml, configs):
     return ret
 
 def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
-    if configs["titling"].get("abc") and configs["titling"].get("abc") != "":
-        abc = configs["titling"].get("abc")
-    else:
-        abc = configs["siteconfig"]["defaultAbc"]
     c = dictDB.execute("select id, xml from entries where id=?", (entryID,))
     row = c.fetchone()
     xml = row["xml"] if row else ""
@@ -1256,7 +1209,7 @@ def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
     # update me
     needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
     needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
-    dictDB.execute("update entries set doctype=?, xml=?, title=?, sortkey=$sortkey, needs_refac=?, needs_resave=? where id=?", (getDoctype(xml), xml, getEntryTitle(xml, configs["titling"]), toSortKey(getSortTitle(xml, configs["titling"]), abc), needs_refac, needs_resave, entryID))
+    dictDB.execute("update entries set doctype=?, xml=?, title=?, sortkey=$sortkey, needs_refac=?, needs_resave=? where id=?", (getDoctype(xml), xml, getEntryTitle(xml, configs["titling"]), getSortTitle(xml, configs["titling"]), needs_refac, needs_resave, entryID))
     dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
     dictDB.commit()
     return entryID
@@ -1451,4 +1404,10 @@ def get_locales():
     for code in Locale().getAvailableLocales():
         codes.append({'code': code, 'lang': Locale(code).getDisplayName()})
     return codes
+
+def getLocale(configs):
+    locale = 'en'
+    if "locale" in configs["titling"] and configs["titling"]["locale"] != "":
+        locale = configs["titling"]["locale"]
+    return locale
 
