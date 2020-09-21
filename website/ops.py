@@ -1128,7 +1128,7 @@ def refresh(dictDB, dictID, configs):
 
 def resave(dictDB, dictID, configs):
     from xml.dom import minidom, Node
-    c = dictDB.execute("select id, xml from entries where needs_resave=1 limit 12")
+    c = dictDB.execute("select id, xml from entries where needs_resave=1")
     for r in c.fetchall():
         entryID = r["id"]
         xml = r["xml"]

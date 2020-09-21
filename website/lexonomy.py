@@ -768,8 +768,10 @@ def configread(dictID, user, dictDB, configs):
 @authDict(["canConfig"])
 def configupdate(dictID, user, dictDB, configs):
     adjustedJson, resaveNeeded = ops.updateDictConfig(dictDB, dictID, request.forms.id, json.loads(request.forms.content))
-    redirUrl = "../../resave" if resaveNeeded else None
-    return {"success": True, "id": request.forms.id, "content": adjustedJson, redirUrl: redirUrl}
+    if resaveNeeded:
+        configs = ops.readDictConfigs(dictDB)
+        ops.resave(dictDB, dictID, configs)
+    return {"success": True, "id": request.forms.id, "content": adjustedJson}
 
 @post(siteconfig["rootPath"]+"<dictID>/autonumber.json")
 @authDict(["canConfig"])
