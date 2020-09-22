@@ -1161,6 +1161,12 @@ def updateEntryLinkables(dictDB, entryID, xml, configs, save=True, save_xml=True
     from xml.dom import minidom, Node
     doc = minidom.parseString(xml)
     ret = []
+    # table may not exists for older dictionaries
+    c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='linkables'")
+    if not c.fetchone():
+        dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT)")
+        dictDB.execute("CREATE INDEX link ON linkables (txt)")
+
     for linkref in configs["links"].values():
         for el in doc.getElementsByTagName(linkref["linkElement"]):
             identifier = linkref["identifier"]
