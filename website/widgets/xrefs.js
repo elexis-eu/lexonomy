@@ -4,7 +4,6 @@ Xrefs.extendDocspec=function(docspec, xema) {
   if (Object.keys(linking).length) {
     for(var parName in xema.elements) {
       if (linking[parName] != undefined) {
-        console.log(parName)
         docspec.elements[parName].caption = function(jsMe){
           var cap="";
           cap="<span class='lexonomyXrefsCaption' onclick='Xonomy.notclick=true; Xrefs.linkBox(\""+jsMe.htmlID+"\")'>▼</span>";
@@ -23,7 +22,7 @@ Xrefs.linkBox=function(htmlID) {
   html += "Link this element to<br/>dictionary: ";
   html += "<select name='xrefdict' onchange='Xrefs.refreshLinks()'>";
   for (var dict in userdicts) {
-    if (userdicts[dict]["id"] != dictID) {
+    if (userdicts[dict]["id"] != dictID && userdicts[dict]["hasLinks"]) {
       html += "<option value='"+userdicts[dict]["id"]+"'>"+userdicts[dict]["title"]+"</option>";
     }
   }

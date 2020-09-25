@@ -550,11 +550,13 @@ def getDictsByUser(email):
     conn = getMainDB()
     c = conn.execute("select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email=? order by d.title", (email,))
     for r in c.fetchall():
-        info = {"id": r["id"], "title": r["title"]}
+        info = {"id": r["id"], "title": r["title"], "hasLinks": False}
         try:
             configs = readDictConfigs(getDB(r["id"]))
             if configs["users"][email] and configs["users"][email]["canConfig"]:
                 info["currentUserCanDelete"] = True
+            if configs["links"] and len(configs["links"])>0:
+                info["hasLinks"] = True
         except:
             info["broken"] = True
         dicts.append(info)
