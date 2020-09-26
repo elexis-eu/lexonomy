@@ -51,7 +51,7 @@ Xrefs.refreshLinks=function() {
       template: {
         type: "custom",
         method: function(value, item) {
-          return item.element + ": " + item.link;
+          return "<i>" + item.element + ":</i> <b>" + item.link + "</b>" + ((item.preview != "")? " (" + item.preview + ")":"");
         }
       },
       list: {

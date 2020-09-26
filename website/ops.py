@@ -989,7 +989,7 @@ def updateDictConfig(dictDB, dictID, configID, content):
         resaveNeeded = flagForResave(dictDB)
         c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='linkables'")
         if not c.fetchone():
-            dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT)")
+            dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT)")
             dictDB.execute("CREATE INDEX link ON linkables (txt)")
         return content, resaveNeeded
     elif configID == "subbing":
@@ -1166,7 +1166,7 @@ def updateEntryLinkables(dictDB, entryID, xml, configs, save=True, save_xml=True
     # table may not exists for older dictionaries
     c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='linkables'")
     if not c.fetchone():
-        dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT)")
+        dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT)")
         dictDB.execute("CREATE INDEX link ON linkables (txt)")
 
     for linkref in configs["links"].values():
@@ -1182,12 +1182,22 @@ def updateEntryLinkables(dictDB, entryID, xml, configs, save=True, save_xml=True
                     text = extractfull[0]
                 identifier = identifier.replace(pattern, text)
             el.setAttribute('lxnm:linkable', identifier)
-            ret.append({'element': linkref["linkElement"], "identifier": identifier})
+            preview = linkref["preview"]
+            for pattern in re.findall(r"%\([^)]+\)", linkref["preview"]):
+                text = ""
+                extract = extractText(el.toxml(), pattern[2:-1])
+                extractfull = extractText(xml, pattern[2:-1])
+                if len(extract) > 0:
+                    text = extract[0]
+                elif len(extractfull) > 0:
+                    text = extractfull[0]
+                preview = preview.replace(pattern, text)
+            ret.append({'element': linkref["linkElement"], "identifier": identifier, "preview": preview})
     xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
     if save:
         dictDB.execute("delete from linkables where entry_id=?", (entryID,))
         for linkable in ret:
-            dictDB.execute("insert into linkables(entry_id, txt, element) values(?,?,?)", (entryID, linkable["identifier"], linkable["element"]))
+            dictDB.execute("insert into linkables(entry_id, txt, element, preview) values(?,?,?,?)", (entryID, linkable["identifier"], linkable["element"], linkable["preview"]))
     if save_xml and len(ret)>0:
         dictDB.execute("update entries set xml=? where id=?", (xml, entryID))
     dictDB.commit()
@@ -1357,7 +1367,7 @@ def getDictLinkables(dictDB):
     ret = []
     c = dictDB.execute("SELECT * FROM linkables ORDER BY entry_id, element, txt")
     for r in c.fetchall():
-        ret.append({"element": r["element"], "link": r["txt"], "entry": r["entry_id"]})
+        ret.append({"element": r["element"], "link": r["txt"], "entry": r["entry_id"], "preview": r["preview"]})
     return ret
 
 def addAutoNumbers(dictDB, dictID, countElem, storeElem):

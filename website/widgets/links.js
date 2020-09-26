@@ -4,7 +4,7 @@ Links.change=function(){};
 Links.render=function(div, json){
   $(div).append("<div id='pagebody' class='notop'><div class='pillarform'></div></div>"); var $div=$(div).find("div.pillarform");
   $div.append("<div class='title'>Manual linking between entries</div>");
-  $div.append("<div class='instro borderBelow'>Elements listed here can be used as target of cross-reference link. For each element, specify unique identifier in the form of placeholders '%(element)'. Eg. element <tt>entry</tt> can have identifier <tt>%(lemma)-%(pos)</tt>, element <tt>sense</tt> can have identifier <tt>%(number)</tt>.</div>");
+  $div.append("<div class='instro borderBelow'>Elements listed here can be used as target of cross-reference link. For each element, specify unique identifier in the form of placeholders '%(element)'. Eg. element <tt>entry</tt> can have identifier <tt>%(lemma)-%(pos)</tt>, element <tt>sense</tt> can have identifier <tt>%(number)</tt>. Optionally, specify element you want to show as preview when selecting links.</div>");
   $div.append("<div id='elements_list'></div>");
   for(var elName in json) Links.addElement(elName, json[elName]);
   $div.append("<select class='halfwidth' id='elements_new'></select> <button class='iconAdd' onclick='Links.newElement()'>Add</button>");
@@ -16,7 +16,7 @@ Links.harvest=function(div){
   var ret={};
   var $div=$("#elements_list .linkelement").each(function(index, item){
     var elName=$(item).attr("data-elname");
-    ret[elName]={'linkElement': elName, 'identifier': $(item).find('input[name=ident]').val()}
+    ret[elName]={'linkElement': elName, 'identifier': $(item).find('input[name=ident]').val(), 'preview': $(item).find('input[name=preview]').val()}
   });
 
   return ret;
@@ -28,7 +28,10 @@ console.log(details)
   var html="<div class='linkelement' data-elname='"+elName+"'>";
   html+="<button class='iconOnly iconCross floatRight' onclick='Links.removeElement(\""+elName+"\")'>&nbsp;</button>";
   html+="<div class='elName'><span class='tech'><span class='brak'>&lt;</span><span class='elm'>"+elName+"</span><span class='brak'>&gt;</span></span>";
+  html+="<span class='label'>Identifier</span>";
   html+="<span class='ident'><input type='text' name='ident' value='"+details.identifier+"'/></span>";
+  html+="<span class='label'>Preview</span>";
+  html+="<span class='ident'><input type='text' name='preview' value='"+((details.preview != undefined)?details.preview:'')+"'/></span>";
   html+="</div>";
   html+="</div>";
   $("#elements_list").append(html);
