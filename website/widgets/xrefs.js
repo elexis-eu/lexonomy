@@ -33,6 +33,10 @@ Xrefs.linkBox=function(htmlID) {
   html += "</div>";
   document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
+  // read dictionary preference from cookie
+  if (document.cookie.split('; ').find(row => row.startsWith('linkPref='))) {
+    $('[name=xrefdict]').val(document.cookie.split('; ').find(row => row.startsWith('linkPref=')).split('=')[1]);
+  }
   Xrefs.refreshLinks();
 }
 
@@ -73,6 +77,7 @@ Xrefs.makeLink=function(htmlID) {
   var srcel = $("#"+htmlID).data('name');
   if (xrefel != undefined && xrefid != undefined && xrefel != "" && xrefid != "" && xrefdict != "" && srcid != undefined && srcel != undefined) {
     var srcdict = dictID;
+    document.cookie = "linkPref=" + xrefdict + "; path=/" + srcdict;
     $("#"+htmlID+" > .tag.opening > .attributes")
     $.get(rootPath+dictID+"/links/add", {source_el: srcel, source_id: srcid, target_dict: xrefdict, target_el: xrefel, target_id: xrefid}, function(json){
       console.log(json);
