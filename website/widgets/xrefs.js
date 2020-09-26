@@ -80,7 +80,11 @@ Xrefs.makeLink=function(htmlID) {
     document.cookie = "linkPref=" + xrefdict + "; path=/" + srcdict;
     $("#"+htmlID+" > .tag.opening > .attributes")
     $.get(rootPath+dictID+"/links/add", {source_el: srcel, source_id: srcid, target_dict: xrefdict, target_el: xrefel, target_id: xrefid}, function(json){
-      console.log(json);
+      if (json.success) {
+        Screenful.status('Link created successfully.');
+      } else {
+        Screenful.status('Error while creating link: ' + json.error);
+      }
     });
   }
   Xonomy.destroyBubble();
