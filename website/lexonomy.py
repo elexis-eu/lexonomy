@@ -913,7 +913,7 @@ def linksto(dictID, user, dictDB, configs):
 @authDict([])
 def linkablelist(dictID, user, dictDB, configs):
     res = ops.getDictLinkables(dictDB)
-    return {"linkables": res}
+    return json.dumps(res)
 
 @get(siteconfig["rootPath"]+"<dictID>/entrylinks.json")
 @authDict([])

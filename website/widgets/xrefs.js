@@ -28,8 +28,7 @@ Xrefs.linkBox=function(htmlID) {
   }
   html += "</select>";
   html += " target: ";
-  html += "<select name='xreftarget'>";
-  html += "</select>";
+  html += "<input name='xreftarget'/>";
   html += "<button onclick='Xrefs.makeLink(\""+htmlID+"\")'>Link</button>";
   html += "</div>";
   document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
@@ -41,9 +40,26 @@ Xrefs.refreshLinks=function() {
   var xrefdict = $("[name=xrefdict]").val();
   $("[name=xreftarget]").empty();
   if (xrefdict != "") {
-    $.get(rootPath+xrefdict+"/linkablelist.json", function(json){
-      for (var link in json.linkables) {
-        $("[name=xreftarget]").append(new Option(json.linkables[link]["element"]+": "+json.linkables[link]["link"], json.linkables[link]["element"]+":/:"+json.linkables[link]["link"]));
+    var xrefTarget = $("[name=xreftarget]");
+    xrefTarget.easyAutocomplete({
+      url: rootPath+xrefdict+"/linkablelist.json",
+      getValue: "link",
+      template: {
+        type: "custom",
+        method: function(value, item) {
+          return item.element + ": " + item.link;
+        }
+      },
+      list: {
+        match: {
+          enabled: true
+        },
+        maxNumberOfElements: 15,
+        onSelectItemEvent: function() {
+          var data = xrefTarget.getSelectedItemData();
+          xrefTarget.data('element', data.element);
+          xrefTarget.data('link', data.link);
+        }
       }
     });
   }
@@ -51,13 +67,11 @@ Xrefs.refreshLinks=function() {
 
 Xrefs.makeLink=function(htmlID) {
   var xrefdict = $("[name=xrefdict]").val();
-  var xrefval = $("[name=xreftarget]").val();
+  var xrefel = $("[name=xreftarget]").data('element');
+  var xrefid = $("[name=xreftarget]").data('link');
   var srcid = $("#"+htmlID+" > .tag.opening > .attributes").children("[data-name='lxnm:linkable']").data('value');
   var srcel = $("#"+htmlID).data('name');
-  if (xrefval != "" && xrefdict != "" && srcid != undefined && srcel != undefined) {
-    var xrefar = xrefval.split(":/:")
-    var xrefel = xrefar[0];
-    var xrefid = xrefar[1];
+  if (xrefel != undefined && xrefid != undefined && xrefel != "" && xrefid != "" && xrefdict != "" && srcid != undefined && srcel != undefined) {
     var srcdict = dictID;
     $("#"+htmlID+" > .tag.opening > .attributes")
     $.get(rootPath+dictID+"/links/add", {source_el: srcel, source_id: srcid, target_dict: xrefdict, target_el: xrefel, target_id: xrefid}, function(json){
