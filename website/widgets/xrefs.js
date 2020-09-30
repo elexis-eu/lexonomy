@@ -88,4 +88,5 @@ Xrefs.makeLink=function(htmlID) {
     });
   }
   Xonomy.destroyBubble();
+  Screenful.Editor.addLinks(Screenful.Editor.readUrl.replace("entryread", "entrylinks"), $('#editor'), Screenful.Editor.entryID);
 }
