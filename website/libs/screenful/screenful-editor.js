@@ -259,16 +259,33 @@ Screenful.Editor={
         linkElement.append('<span id="outlinks"><h4>Outgoing links</h4></span>');
         for (var link in links.out) {
           var linkdata = links.out[link];
-          $('#outlinks').append('<ul>'+linkdata["source_id"]+' → '+linkdata['target_dict']+' : '+linkdata['target_el']+' : '+linkdata['target_id']+'</ul>');
+          var linkhtml = '<ul>'+linkdata["source_id"]+' → '+linkdata['target_dict']+' : '+linkdata['target_el']+' : '+linkdata['target_id'];
+          if ($("#editor").length>0) {
+            linkhtml += ' <span class="linkdelete" data-href="/'+linkdata['source_dict']+'/links/delete/'+linkdata['link_id']+'">×delete</span>';
+          }
+          linkhtml += '</ul>';
+          $('#outlinks').append(linkhtml);
         }
       }
       if (links.in.length > 0) {
         linkElement.append('<span id="inlinks"><h4>Incoming links</h4></span>');
         for (var link in links.in) {
           var linkdata = links.in[link];
-          $('#inlinks').append('<ul>'+linkdata["target_id"]+' ← '+linkdata['source_dict']+' : '+linkdata['source_el']+' : '+linkdata['source_id']+'</ul>');
+          var linkhtml = '<ul>'+linkdata["target_id"]+' ← '+linkdata['source_dict']+' : '+linkdata['source_el']+' : '+linkdata['source_id'];
+          if ($("#editor").length>0) {
+            linkhtml += ' <span class="linkdelete" data-href="/'+linkdata['target_dict']+'/links/delete/'+linkdata['link_id']+'">×delete</span>';
+          }
+          linkhtml += '</ul>';
+          $('#inlinks').append(linkhtml);
         }
       }
+      $('.linkdelete').on("click", function() {
+        if (confirm('Really delete link?')) {
+          $.ajax({url: $(this).data('href'), method: "GET"}).done(function(data){
+            Screenful.Editor.addLinks(linkUrl, linkElement, entryID);
+          });
+        }
+      });
     });
   },
   nonew: function(event){
