@@ -35,6 +35,10 @@
 				delete entry.content._newXml;
 				window.setTimeout(Screenful.Editor.changed, 100);
 			}
+			if(entry.content._dtd) { //the user is switching back from DTD
+				delete entry.content._dtd;
+				window.setTimeout(Screenful.Editor.changed, 100);
+			}
 		};
 		Screenful.Editor.harvester=function(div){
 			for(var el in XemaDesigner.xema.elements){
