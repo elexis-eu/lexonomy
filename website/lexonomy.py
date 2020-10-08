@@ -747,7 +747,7 @@ def entrylist(dictID, doctype, user, dictDB, configs):
 @authDict(["canConfig"], True)
 def config(dictID, user, dictDB, configs):
     stats = ops.getDictStats(dictDB)
-    return template("config.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "needResave": stats["needResave"], "hasXemaOverride": ("_xonomyDocSpec" in configs["xema"] or "_dtd" in configs["xema"]), "hasXemplateOverride": ("_xsl" in configs["xemplate"] or "_css" in configs["xemplate"]), "hasEditingOverride": ("_js" in configs["editing"])})
+    return template("config.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "needResave": stats["needResave"], "hasXemaOverride": (("_xonomyDocSpec" in configs["xema"] and configs["xema"]["_xonomyDocSpec"] != "") or ("_dtd" in configs["xema"] and configs["xema"]["_dtd"] != "")), "hasXemplateOverride": (("_xsl" in configs["xemplate"] and configs["xemplate"]["_xsl"] != "") or ("_css" in configs["xemplate"] and configs["xemplate"]["_css"] != "")), "hasEditingOverride": ("_js" in configs["editing"] and configs["editing"]["_js"] != "")})
 
 @get(siteconfig["rootPath"]+"<dictID>/config/<page>")
 @authDict(["canConfig"], True)
