@@ -752,7 +752,12 @@ def config(dictID, user, dictDB, configs):
 @get(siteconfig["rootPath"]+"<dictID>/config/<page>")
 @authDict(["canConfig"], True)
 def configpage(dictID, page, user, dictDB, configs):
-    return template("config-"+page+".tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "xema": configs["xema"], "titling": configs["titling"], "flagging": configs["flagging"]})
+    lang_codes = []
+    if page == "ident":
+        lang_codes = ops.get_iso639_1()
+    if page == "titling":
+        lang_codes = ops.get_locales()
+    return template("config-"+page+".tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "xema": configs["xema"], "titling": configs["titling"], "flagging": configs["flagging"], "langs": lang_codes})
 
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
 @authDict(["canConfig"])
@@ -763,8 +768,10 @@ def configread(dictID, user, dictDB, configs):
 @authDict(["canConfig"])
 def configupdate(dictID, user, dictDB, configs):
     adjustedJson, resaveNeeded = ops.updateDictConfig(dictDB, dictID, request.forms.id, json.loads(request.forms.content))
-    redirUrl = "../../resave" if resaveNeeded else None
-    return {"success": True, "id": request.forms.id, "content": adjustedJson, redirUrl: redirUrl}
+    if resaveNeeded:
+        configs = ops.readDictConfigs(dictDB)
+        ops.resave(dictDB, dictID, configs)
+    return {"success": True, "id": request.forms.id, "content": adjustedJson}
 
 @post(siteconfig["rootPath"]+"<dictID>/autonumber.json")
 @authDict(["canConfig"])
@@ -906,7 +913,7 @@ def linksto(dictID, user, dictDB, configs):
 @authDict([])
 def linkablelist(dictID, user, dictDB, configs):
     res = ops.getDictLinkables(dictDB)
-    return {"linkables": res}
+    return json.dumps(res)
 
 @get(siteconfig["rootPath"]+"<dictID>/entrylinks.json")
 @authDict([])

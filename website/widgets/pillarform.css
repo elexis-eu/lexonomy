@@ -61,10 +61,12 @@
 
 #envelope div.pillarform div.linkelement {padding: 5px 5px 15px 5px; border-bottom: 1px solid #eeeeee; margin-bottom: 10px;}
 #envelope div.pillarform div.linkelement div.elName {font-size: 1.1em;}
-#envelope div.pillarform div.linkelement div.elName span.ident {margin-left: 1.1em;}
 #envelope div.pillarform div.linkelement .floatRight {float: right; margin: -7px 0px 0px 0px !important;}
 
 #envelope div.pillarform div.apikey {font-size: 1.2em; font-family: monospace; margin: 20px 5px 25px 5px; }
 
 #envelope div.pillarform div.error { background-image: url(../furniture/exclamation.png); background-repeat: no-repeat; background-position: left center; padding-left: 25px; color: #333333; margin-bottom: 10px; text-shadow: 1px 1px 0px #ffffff; margin-top: -5px; color: #c64040; font-size: 0.9em; line-height: 1.5em;}
 #envelope div.pillarform div.error code {background-color: #fff8df; padding: 3px 4px; border-radius: 2px; text-shadow: 1px 1px 0px #ffffff;}
+
+#elements_list .label {padding: 0px 5px; color: #999999; font-size: 0.9em; margin-left: 1.1em;}
+

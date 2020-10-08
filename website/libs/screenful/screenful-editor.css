@@ -44,3 +44,5 @@
 
 #sourceCode {position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; padding: 20px 40px 40px 20px; background-color: #eeeeee;}
 #sourceCode textarea {width: 100%; height: 100%; border: 1px solid #cccccc; box-shadow: inset 0px 0px 2px #666666; padding: 9px; resize: none; font-family: monospace; font-size: 0.85rem; border-radius: 4px; line-height: 1.5em; color: #666666; white-space: pre;}
+
+.linkdelete {color: red; text-decoration: underline; cursor: pointer;}
