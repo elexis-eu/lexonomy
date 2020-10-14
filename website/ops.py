@@ -933,7 +933,7 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
 
 def listEntriesPublic(dictDB, dictID, configs, searchtext):
     howmany = 100
-    sql_list = "select s.txt, min(s.level) as level, e.id, e.title, e.sortkey case when s.txt=? then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like ? and e.doctype=? group by e.id order by priority, level, s.level"
+    sql_list = "select s.txt, min(s.level) as level, e.id, e.title, e.sortkey, case when s.txt=? then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like ? and e.doctype=? group by e.id order by priority, level, s.level"
     c1 = dictDB.execute(sql_list, ("%"+searchtext+"%", "%"+searchtext+"%", configs["xema"].get("root")))
     entries = []
     for r1 in c1.fetchall():
