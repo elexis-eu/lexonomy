@@ -37,8 +37,6 @@ Make sure that your docker-compose points to the right volume locations on the h
 - <path to data directory>:/opt/service/data
 ```
 
-For siteconfig.json you can use the default template, just make sure, that the server will listen on 0.0.0.0 instead of localhost.
-
 Initialize database and admin user:
 ```
 docker-compose exec python3 adminscripts/init.js
