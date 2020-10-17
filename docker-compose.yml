@@ -9,5 +9,4 @@ services:
             - <path to data directory>:/opt/service/data
         ports:
             - "8000:8000"
-            - "8080:8080"
 
