@@ -220,13 +220,16 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
 def getEntryTitle(xml, titling, plaintext=False):
     if titling.get("headwordAnnotationsType") == "advanced" and not plaintext:
         ret = titling["headwordAnnotationsAdvanced"]
+        advancedUsed = False
         for el in re.findall(r"%\([^)]+\)", titling["headwordAnnotationsAdvanced"]):
             text = ""
             extract = extractText(xml, el[2:-1])
             if len(extract) > 0:
                 text = extract[0]
+                advancedUsed = True
             ret = ret.replace(el, text)
-        return ret
+        if advancedUsed:
+            return ret
     ret = getEntryHeadword(xml, titling.get("headword"))
     if not plaintext:
         ret = "<span class='headword'>" + ret + "</span>"
