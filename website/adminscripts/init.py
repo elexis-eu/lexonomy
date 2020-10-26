@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # Script to initialize database and users, from the siteconfig.json file
 

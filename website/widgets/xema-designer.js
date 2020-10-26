@@ -2,7 +2,7 @@ var XemaDesigner={};
 XemaDesigner.onchange=function(){};
 XemaDesigner.isValidXmlName=function(str){
 	if(str=="") return false;
-	if(/[:=\s\"\']/.test(str)) return false;
+	if(/[=\s\"\']/.test(str)) return false;
 	try{ $.parseXML("<"+str+"/>"); } catch(err){ return false; }
 	return true;
 };
