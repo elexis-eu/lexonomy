@@ -1124,12 +1124,12 @@ def refresh(dictDB, dictID, configs):
         else: #if no such element exists: we are done
             els = parentDoc.documentElement.getElementsByTagName("*")
             for el in els:
-                if el.getAttributeNS("http://www.lexonomy.eu/", "done"):
+                if el.hasAttributeNS("http://www.lexonomy.eu/", "done"):
                     el.removeAttributeNS("http://www.lexonomy.eu/", "done")
-                parentXml = parentDoc.toxml().replace('<?xml version="1.0" ?>', '').strip()
-                # save the parent's xml (into which all subentries have been injected by now) and tell it that it needs a resave:
-                dictDB.execute("update entries set xml=?, needs_refresh=0, needs_resave=1 where id=?", (parentXml, parentID))
-                return True
+            parentXml = parentDoc.toxml().replace('<?xml version="1.0" ?>', '').strip()
+            # save the parent's xml (into which all subentries have been injected by now) and tell it that it needs a resave:
+            dictDB.execute("update entries set xml=?, needs_refresh=0, needs_resave=1 where id=?", (parentXml, parentID))
+            return True
 
 def resave(dictDB, dictID, configs):
     from xml.dom import minidom, Node

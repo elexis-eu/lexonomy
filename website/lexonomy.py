@@ -178,6 +178,8 @@ def entryupdate(dictID, user, dictDB, configs):
     else:
         html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", adjustedXml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
     result = {"success": True, "id": adjustedEntryID, "content": adjustedXml, "contentHtml": html}
+    if len(configs['subbing']) > 0:
+        ops.refresh(dictDB, dictID, configs)
     if feedback:
         result["feedback"] = feedback
     return result
