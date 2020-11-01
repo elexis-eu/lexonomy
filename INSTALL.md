@@ -84,6 +84,23 @@ In your terminal and in the `website` directory, start Lexonomy with this:
 python3 lexonomy.py
 ```
 
+## Install on MacOS
+
+**NOTE:** Lexonomy does not run on the ["native"](https://docs.python.org/3/using/mac.html) Python3 (issue [#231](https://github.com/elexis-eu/lexonomy/issues/231)). Use [Homebrew](https://brew.sh/) Python3 instead, which you can install by running: _$ brew install python3_
+
+1. [RECOMMENDED] Create and use a virtual environment.
+
+   ```
+   $ python -m venv env && source ./env/bin/activate
+   $ python -m pip install -U pip wheel setuptools
+   ```
+
+2. Install the required Python packages.
+
+   ```
+   $ cd <YOUR_LEXONOMY_DIR>/lexonomy/website
+   $ pip install -r requirements.txt --user
+
 # Configuring your Lexonomy (for a server installation)
 
 By default, configuration is located in the file `website/siteconfig.json`, however this can be changed by setting the `$LEXONOMY_SITECONFIG` environmental variable. This file contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
