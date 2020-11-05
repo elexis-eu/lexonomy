@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/riot@4.14/riot+compiler.min.js"></script>
+  	<script src="https://cdn.jsdelivr.net/npm/riot-route@3.1.4/dist/route.min.js"></script>
+    <script src="/widgets/xemplatron.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+		<link type="text/css" rel="stylesheet" href="/widgets/xemplatron.css" />
+    <title>Lexonomy</title>
+  </head>
+  <body>
+    <main></main>
+    <script type="riot" data-src="riot/main.tag"></script>
+    <script type="riot" data-src="riot/header.tag"></script>
+    <script type="riot" data-src="riot/login.tag"></script>
+    <script type="riot" data-src="riot/footer.tag"></script>
+    <script type="riot" data-src="riot/welcome.tag"></script>
+    <script type="riot" data-src="riot/main-page.tag"></script>
+    <script type="riot" data-src="riot/dict-list.tag"></script>
+    <script type="riot" data-src="riot/dict-public.tag"></script>
+    <script type="riot" data-src="riot/dict-public-entry.tag"></script>
+    <script type="riot" data-src="riot/entry-view.tag"></script>
+    <script>
+      riot.compile().then(()=>{
+        riot.mount('main');
+      });
+    </script>
+  </body>
+</html>
+

@@ -553,13 +553,15 @@ def getDictsByUser(email):
     conn = getMainDB()
     c = conn.execute("select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email=? order by d.title", (email,))
     for r in c.fetchall():
-        info = {"id": r["id"], "title": r["title"], "hasLinks": False}
+        info = {"id": r["id"], "title": r["title"], "hasLinks": False, "lang": ""}
         try:
             configs = readDictConfigs(getDB(r["id"]))
             if configs["users"][email] and configs["users"][email]["canConfig"]:
                 info["currentUserCanDelete"] = True
             if configs["links"] and len(configs["links"])>0:
                 info["hasLinks"] = True
+            if configs["ident"] and configs["ident"]["lang"]:
+                info["lang"] = configs["ident"]["lang"]
         except:
             info["broken"] = True
         dicts.append(info)
@@ -691,9 +693,9 @@ def readNabesByEntryID(dictDB, dictID, entryID, configs):
     nabes_before = []
     nabes_after = []
     nabes = []
-    c = dictDB.execute("select e1.id, e1.title, e1.sortkey from entries as e1 where e1.doctype=? ", (configs["xema"]["root"],))
+    c = dictDB.execute("select e1.id, e1.title, e1.sortkey, e1.xml from entries as e1 where e1.doctype=? ", (configs["xema"]["root"],))
     for r in c.fetchall():
-        nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
+        nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"], "titlePlain": getEntryTitle(r['xml'], configs["titling"], True)})
 
     # sort by selected locale
     collator = Collator.createInstance(Locale(getLocale(configs)))
@@ -735,9 +737,9 @@ def readRandoms(dictDB):
     limit = 75
     more = False
     randoms = []
-    c = dictDB.execute("select id, title, sortkey from entries where doctype=? and id in (select id from entries order by random() limit ?)", (configs["xema"]["root"], limit))
+    c = dictDB.execute("select id, title, sortkey, xml from entries where doctype=? and id in (select id from entries order by random() limit ?)", (configs["xema"]["root"], limit))
     for r in c.fetchall():
-        randoms.append({"id": r["id"], "title": r["title"], "sortkey": r["sortkey"]})
+        randoms.append({"id": r["id"], "title": r["title"], "sortkey": r["sortkey"], "titlePlain": getEntryTitle(r["xml"], configs["titling"], True)})
 
     # sort by selected locale
     collator = Collator.createInstance(Locale(getLocale(configs)))

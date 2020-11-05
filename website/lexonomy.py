@@ -35,7 +35,7 @@ if not cgi and len(sys.argv) > 1:
     my_url = sys.argv[1]
 
 # serve static files
-@route('/<path:re:(widgets|furniture|libs).*>')
+@route('/<path:re:(widgets|furniture|libs|index.html|riot).*>')
 def server_static(path):
     return static_file(path, root="./")
 
@@ -137,6 +137,12 @@ def home():
         error = request.cookies.jwt_error
         response.delete_cookie("jwt_error", path="/")
     return template("home.tpl", **{"user": res, "siteconfig": siteconfig, "dicts": dicts, "error": error, "version": version})
+
+@get(siteconfig["rootPath"] + "userdicts.json")
+@auth
+def listuserdicts(user):
+    dicts = ops.getDictsByUser(user["email"])
+    return {"dicts": dicts}
 
 @post(siteconfig["rootPath"] + "<dictID>/entrydelete.json")
 @authDict(["canEdit"])
@@ -357,7 +363,15 @@ def check_login():
         return {"success": True, "sessionkey": res["key"]}
     else:
         return {"success": False}
-    
+
+@post(siteconfig["rootPath"] + "logout.json")
+@auth
+def do_logout(user):
+    ops.logout(user)
+    response.delete_cookie("email", path="/")
+    response.delete_cookie("sessionkey", path="/")
+    return {"success": False}
+
 @get(siteconfig["rootPath"] + "logout")
 @auth
 def logout(user):
@@ -452,13 +466,14 @@ def makedictjson(user):
 @authDict(["canConfig"])
 def clonedict(dictID, user, dictDB, configs):
     res = ops.cloneDict(dictID, user["email"])
+    res["dicts"] = ops.getDictsByUser(user["email"])
     return res
 
 @post(siteconfig["rootPath"]+"<dictID>/destroy.json")
 @authDict(["canConfig"])
 def destroydict(dictID, user, dictDB, configs):
     res = ops.destroyDict(dictID)
-    return {"success": res}
+    return {"success": res, "dicts": ops.getDictsByUser(user["email"])}
 
 @post(siteconfig["rootPath"]+"<dictID>/move.json")
 @authDict(["canConfig"])
@@ -584,6 +599,16 @@ def dictread(user):
     else:
         return {"success": True, "id": res["id"], "content": res["xml"]}
 
+@get(siteconfig["rootPath"]+"<dictID>/config.json")
+def dictconfig(dictID):
+    if not ops.dictExists(dictID):
+        return {"success": False}
+    else:
+        user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
+        res = {"success": True, "publicInfo": {**configs["ident"], **configs["publico"]}, "userAccess": user["dictAccess"]}
+        res["publicInfo"]["blurb"] = ops.markdown_text(configs["ident"]["blurb"])
+        return res
+
 @get(siteconfig["rootPath"]+"<dictID>")
 def publicdict(dictID):
     if not ops.dictExists(dictID):
@@ -591,6 +616,13 @@ def publicdict(dictID):
     user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
     blurb = ops.markdown_text(configs["ident"]["blurb"])
     return template("dict.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": blurb, "publico": configs["publico"]})
+
+@get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>/nabes.json")
+def publicentrynabes(dictID, entryID):
+    dictDB = ops.getDB(dictID)
+    user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
+    nabes = ops.readNabesByEntryID(dictDB, dictID, entryID, configs)
+    return {"nabes": nabes}
 
 @get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>")
 def publicentry(dictID, entryID):
