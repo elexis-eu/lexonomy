@@ -1,7 +1,7 @@
 <main>
   <div class="container">
 		<header is="header" ref="header" authorized={ this.state.authorized } username={ this.state.username } log-out={ logOut } show-dict-menu={ this.state.showDictMenu } dict-id={ this.dictId } user-access={ this.state.userAccess }></header>
-		<div class="content row" is={ this.content } dict-id={ this.dictId} authorized={ this.state.authorized } check-auth={ checkAuth } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } dict-details={ this.state.dictDetails }></div>
+		<div class="content row" is={ this.content } dict-id={ this.dictId} authorized={ this.state.authorized } check-auth={ checkAuth } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } dict-details={ this.state.dictDetails } config-id={ this.configId }></div>
 		<footer is="footer"></footer>
   </div>
 
@@ -57,6 +57,9 @@
 						this.state.dictDetails.blurb = response.publicInfo.blurb;
 						this.state.dictDetails.public = response.publicInfo.public;
 						this.state.dictDetails.licence = response.publicInfo.licence;
+						this.state.dictDetails.xemaOverride = false;
+						this.state.dictDetails.xemplateOverride = false;
+						this.state.dictDetails.editingOverride = false;
 						this.state.userAccess = response.userAccess;
 						if (response.userAccess != false && (response.userAccess.canEdit || response.userAccess.canConfig || response.userAccess.canDownload || response.userAccess.canUpload)) {
 							this.state.showDictMenu = true;
@@ -87,6 +90,19 @@
 					this.dictId = dictId;
 					this.entryId = entryId;
 					this.content = 'dict-public-entry';
+					this.update();
+				});
+				route('/*/config/*', (dictId, configId) => {
+					console.log('config ' + dictId)
+					this.dictId = dictId;
+					this.configId = configId;
+					this.content = 'dict-config-'+configId;
+					this.update();
+				});
+				route('/*/config', (dictId) => {
+					console.log('config ' + dictId)
+					this.dictId = dictId;
+					this.content = 'dict-config';
 					this.update();
 				});
 				route('/*', (dictId) => {
