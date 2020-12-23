@@ -80,7 +80,12 @@
 				});
 			},
 
-			saveConfigData(configId) {
+			saveConfigData(configId, data) {
+				$.post("/" + this.dictId + "/configupdate.json", {id: configId, content: JSON.stringify(data)}, (response) => {
+					console.log(response)
+					$('#submit_button').html('Saved...');
+					setTimeout(() => {$('#submit_button').html('Save <i class="material-icons right">save</i>');}, 2000);
+				});
 			},
 
 			onUpdated() {

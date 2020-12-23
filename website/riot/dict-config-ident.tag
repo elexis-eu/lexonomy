@@ -25,8 +25,11 @@
 					<label for="ident_lang">Main language</label>
 					<span class="helper-text">Language of dictionary entries, used to sort dictionaries on your home page. You can select language from the list, or write down your own.</span>
 				</div>
-			</div>			
-		</form>		
+			</div>
+			<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
+			</button>
+
+		</form>
 	</div>
 	<script>
 		export default {
@@ -39,7 +42,7 @@
 				console.log('config dict '+ this.dictId + '-' + this.configId)
 				this.props.loadDictDetail();
 				this.fillConfigForm();
-				console.log(this.props)
+				console.log(this.props);
 			},
 
 			async fillConfigForm() {
@@ -48,9 +51,22 @@
 					this.update();
 					M.updateTextFields();
 					M.textareaAutoResize($('#ident_blurb'));
-				})
+				});
 			},
+
 			getConfigData() {
+				var newData = {
+					'title': $('#ident_title').val(),
+					'blurb': $('#ident_blurb').val(),
+					'lang': $('#ident_lang').val()
+				};
+				return newData;
+			},
+
+			saveData() {
+				console.log(this.getConfigData())
+				$('#submit_button').html('Saving...');
+				this.props.saveConfigData(this.configId, this.getConfigData());
 			}
 		}
 	</script>
