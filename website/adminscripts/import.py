@@ -80,7 +80,7 @@ except xml.sax._exceptions.SAXParseException as e:
 # second pass, we know what the entry is and can import that
 import re
 
-entryCount = xmldata.count('<'+entryTag)
+entryCount = len(re.findall('<'+entryTag+'[ >]', xmldata))
 entryInserted = 0
 print("Detected %d entries in '%s' element" % (entryCount, entryTag))
 
