@@ -8,6 +8,8 @@ import datetime
 import json
 import xml.sax
 import re
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ops
 
 if len(sys.argv) < 3:
     print("Usage: ./import.py [-p] PATH_TO_DICTIONARY.sqlite FILE_TO_IMPORT.xml [AUTHOR_EMAIL]")
@@ -28,6 +30,7 @@ filename = args[1]
 email = args[2] if len(args)>2 else "IMPORT@LEXONOMY"
 dictID = os.path.basename(dbname).replace(".sqlite", "")
 db = sqlite3.connect(dbname)
+db.row_factory = sqlite3.Row
 historiography={"importStart": str(datetime.datetime.utcnow()), "filename": os.path.basename(filename)}
 
 if purge:
@@ -84,6 +87,10 @@ entryCount = len(re.findall('<'+entryTag+'[ >]', xmldata))
 entryInserted = 0
 print("Detected %d entries in '%s' element" % (entryCount, entryTag))
 
+configs = ops.readDictConfigs(db)
+needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
+needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
+
 re_entry = re.compile(r'<'+entryTag+'[^>]*>.*?</'+entryTag+'>', re.MULTILINE|re.DOTALL|re.UNICODE)
 for entry in re.findall(re_entry, xmldata):
     skip = False
@@ -99,24 +106,30 @@ for entry in re.findall(re_entry, xmldata):
         pat = r'^<[^>]*\s+lxnm:(sub)?entryID=[\'"]([0-9]+)["\']'
         entryID = None
         action = "create"
+        title = ops.getEntryTitle(entry, configs["titling"])
+        sortkey = ops.getSortTitle(entry, configs["titling"])
         if re.match(pat, entry):
             entryID = re.match(pat, entry).group(2)
             c = db.execute("select id from entries where id=?", (entryID,))
             if not c.fetchone():
-                sql = "insert into entries(id, xml, needs_refac, needs_resave, needs_refresh, doctype) values(?, ?, 1, 1, 1, ?)"
-                params = (entryID, entry, entryTag)
+                sql = "insert into entries(id, xml, needs_refac, needs_resave, needs_refresh, doctype, title, sortkey) values(?, ?, ?, ?, ?, ?, ?, ?)"
+                params = (entryID, entry, needs_refac, needs_resave, 0, entryTag, title, sortkey)
             else:
-                sql = "update entries set doctype=?, xml=?, needs_refac=1, needs_resave=1, needs_refresh=1 where id=?"
-                params = (entryTag, entry, entryID)
+                sql = "update entries set doctype=?, xml=?, needs_refac=?, needs_resave=?, needs_refresh=? , title=?, sortkey=? where id=?"
+                params = (entryTag, entry, needs_refac, needs_resave, 0, title, sortkey, entryID)
                 action = "update"
         else:
-            sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype) values(?, 1, 1, 1, ?)"
-            params = (entry, entryTag)
+            sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype, title, sortkey) values(?, ?, ?, ?, ?, ?, ?)"
+            params = (entry, needs_refac, needs_resave, 0, entryTag, title, sortkey)
         c = db.execute(sql, params)
         if entryID == None:
             entryID = c.lastrowid
         db.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, action, str(datetime.datetime.utcnow()), email, entry, json.dumps(historiography)))
-
+        db.execute("delete from searchables where entry_id=? and level=?", (entryID, 1))
+        searchTitle = ops.getEntryTitle(entry, configs["titling"], True)
+        db.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, searchTitle, 1))
+        db.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, searchTitle.lower(), 1))
+        db.commit() 
         entryInserted += 1
         print("\r%.2d%% (%d/%d entries imported)" % ((entryInserted/entryCount*100), entryInserted, entryCount))
         
