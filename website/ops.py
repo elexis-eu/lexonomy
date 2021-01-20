@@ -841,8 +841,10 @@ def importfile(dictID, filename, email):
     return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
 
 def checkImportStatus(pidfile, errfile):
-    with open(pidfile, "r") as content_file:
-        content = content_file.read()
+    content = ''
+    while content == '':
+        with open(pidfile, "r") as content_file:
+            content = content_file.read()
     pid_data = re.split(r"[\n\r]", content)
     if pid_data[-1] == "":
         progress = pid_data[-2]
@@ -1436,3 +1438,17 @@ def getLocale(configs):
         locale = configs["titling"]["locale"]
     return locale
 
+def preprocessLex0(entryXml):
+    from xml.dom import minidom, Node
+    doc = minidom.parseString(entryXml)
+    headword = None
+    for el in doc.getElementsByTagName("form"):
+        if el.getAttribute("type") == "lemma":
+            for el2 in el.getElementsByTagName("orth"):
+                headword = el2.firstChild.nodeValue
+    if headword and headword != "":
+        he = doc.createElement("headword")
+        het = doc.createTextNode(headword)
+        doc.documentElement.appendChild(he)
+        he.appendChild(het)
+    return doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
