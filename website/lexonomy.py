@@ -835,24 +835,33 @@ def pushapi():
             if dictTitle == "":
                 dictTitle = dictID
             dictBlurb = data["dictBlurb"]
-            poses = data["poses"]
-            labels = data["labels"]
-            res = ops.makeDict(dictID, "push", dictTitle, dictBlurb, user["email"])
+            poses = []
+            labels = []
+            if "poses" in data:
+                poses = data["poses"]
+            if "labels" in data:
+                labels = data["labels"]
+            if data.get("format") == "teilex0":
+                dictFormat = "teilex0"
+            else:
+                dictFormat = "push"
+            res = ops.makeDict(dictID, dictFormat, dictTitle, dictBlurb, user["email"])
             if not res:
                 return {"success": False}
             else:
-                dictDB = ops.getDB(dictID)
-                configs = ops.readDictConfigs(dictDB)
-                if configs["xema"]["elements"].get("partOfSpeech"):
-                    for pos in poses:
-                        configs["xema"]["elements"]["partOfSpeech"]["values"].append({"value": pos, "caption": ""})
-                if configs["xema"]["elements"].get("collocatePartOfSpeech"):
-                    for pos in poses:
-                        configs["xema"]["elements"]["collocatePartOfSpeech"]["values"].append({"value": pos, "caption":""})
-                if configs["xema"]["elements"].get("label"):
-                    for label in labels:
-                        configs["xema"]["elements"]["label"]["values"].append({"value":label, "caption": ""})
-                ops.updateDictConfig(dictDB, dictID, "xema", configs["xema"])
+                if dictFormat == "push":
+                    dictDB = ops.getDB(dictID)
+                    configs = ops.readDictConfigs(dictDB)
+                    if configs["xema"]["elements"].get("partOfSpeech"):
+                        for pos in poses:
+                            configs["xema"]["elements"]["partOfSpeech"]["values"].append({"value": pos, "caption": ""})
+                    if configs["xema"]["elements"].get("collocatePartOfSpeech"):
+                        for pos in poses:
+                            configs["xema"]["elements"]["collocatePartOfSpeech"]["values"].append({"value": pos, "caption":""})
+                    if configs["xema"]["elements"].get("label"):
+                        for label in labels:
+                            configs["xema"]["elements"]["label"]["values"].append({"value":label, "caption": ""})
+                    ops.updateDictConfig(dictDB, dictID, "xema", configs["xema"])
                 return {"success": True, "dictID": dictID}
         elif data["command"] == "listDicts":
             dicts = ops.getDictsByUser(user["email"])
@@ -863,6 +872,8 @@ def pushapi():
             dictDB = ops.getDB(dictID)
             configs = ops.readDictConfigs(dictDB)
             for entry in entryXmls:
+                if data.get("format") == "teilex0":
+                    entry = ops.preprocessLex0(entry)
                 ops.createEntry(dictDB, configs, None, entry, user["email"], {"apikey": data["apikey"]})
             return {"success": True}
         else:

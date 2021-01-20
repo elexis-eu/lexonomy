@@ -15,6 +15,46 @@
 			<p>{{siteconfig["baseUrl"]}}push.api</p>
 
 			<hr/>
+			<h2>Make a dictionary, TEI Lex0 format</h2>
+			<textarea id="input_makeDictTei" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">{
+  "email": "valselob@gmail.com",
+  "apikey": "4HNA6VI6C9MROAENNYJQJPLL53HCAJMA",
+  "command": "makeDict",
+  "format": "teilex0",
+  "dictTitle": "My TEI Lex0 Dictionary",
+  "dictBlurb": "Yet another dictionary draft.",
+}</textarea>
+			<button onclick="makeDictTei()">Post</button> and watch your console.
+			<script type="text/javascript">
+			function makeDictTei(){
+				//var json=JSON.parse($("#input_makeDict").val());
+				var json=$("#input_makeDictTei").val();
+				$.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+					console.log(data);
+				});
+			}
+			</script>
+<hr/>
+		<h2>Create entries, TEI Lex0 format</h2>
+		<textarea id="input_createEntriesTei" style="font-size: 1rem; width: 100%; height: 9em; resize: vertical" spellcheck="false">{
+  "email": "valselob@gmail.com",
+  "apikey": "4HNA6VI6C9MROAENNYJQJPLL53HCAJMA",
+  "command": "createEntries",
+  "format": "teilex0",
+  "dictID": "jakobrno",
+  "entryXmls": ["<entry><form type='lemma'><orth>Earth</orth></form></entry>", "<entry><form type='lemma'><orth>Mars</orth></form></entry>"]
+}</textarea>
+			<button onclick="createEntriesTei()">Post</button> and watch your console.
+			<script type="text/javascript">
+			function createEntriesTei(){
+				var json=$("#input_createEntriesTei").val();
+				console.log(json);
+				$.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+					console.log(data);
+				});
+			}
+			</script>
+
 			<h2>Make a dictionary</h2>
 			<textarea id="input_makeDict" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">{
   "email": "valselob@gmail.com",
