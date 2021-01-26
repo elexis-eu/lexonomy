@@ -1480,8 +1480,25 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
             num += 1
             senseDef = sense.find("def")
             if senseDef != None and senseDef.text:
-                print('a')
                 defText = senseDef.text
+            elif sense.text:
+                defText = sense.text
+            else:
+                defText = ""
+            if defText != "":
+                senseId = str(r["id"]) + "_" + str(num)
+                line = "<" + siteconfig["baseUrl"] + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + "#" + senseId + "> ."
+                entries.append(line)
+                line = "<" + siteconfig["baseUrl"] + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
+                entries.append(line)
+        for sense in root.findall("meaning"):
+            num += 1
+            senseDef = sense.find("def")
+            senseDesc = sense.find("semDescription")
+            if senseDef != None and senseDef.text:
+                defText = senseDef.text
+            elif senseDesc != None and senseDesc.text:
+                defText = senseDesc.text
             elif sense.text:
                 defText = sense.text
             else:
