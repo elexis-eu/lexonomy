@@ -1452,3 +1452,57 @@ def preprocessLex0(entryXml):
         doc.documentElement.appendChild(he)
         he.appendChild(het)
     return doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
+
+def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
+    from lxml import etree as ET
+    if searchtext == "":
+        sql = "select id, title, sortkey, xml from entries where doctype=? order by id"
+        params = (doctype, )
+    else:
+        sql = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title, e.xml from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by e.id"
+        params = (doctype, searchtext+"%")
+    print(sql)
+    c = dictDB.execute(sql, params)
+    entries = []
+    for r in c.fetchall():
+        headword = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
+        item = {"id": r["id"], "title": headword}
+        if configs["ident"].get("lang"):
+            lang = configs["ident"].get("lang")
+        else:
+            lang = "en"
+        entryId = re.sub("[\W_]", "",  headword) + "_" + str(r["id"])
+        line = "<" + siteconfig["baseUrl"] + "#" + entryId + "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/lemon/ontolex#LexicalEntry> ."
+        entries.append(line)
+        line = "<" + siteconfig["baseUrl"] + "#" + entryId + "> <http://www.w3.org/2000/01/rdf-schema#label> \"" + headword + "\"@" + lang + " ."
+        entries.append(line)
+
+        #just guessing and hoping
+        root = ET.fromstring(r["xml"])
+        num = 0
+        for sense in root.findall("sense"):
+            num += 1
+            senseDef = sense.find("def")
+            if senseDef != None and senseDef.text:
+                print('a')
+                defText = senseDef.text
+            elif sense.text:
+                defText = sense.text
+            else:
+                defText = ""
+            if defText != "":
+                senseId = str(r["id"]) + "_" + str(num)
+                line = "<" + siteconfig["baseUrl"] + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + "#" + senseId + "> ."
+                entries.append(line)
+                line = "<" + siteconfig["baseUrl"] + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
+                entries.append(line)
+        for sense in root.findall("def"):
+            num += 1
+            if sense.text:
+                senseId = str(r["id"]) + "_" + str(num)
+                line = "<" + siteconfig["baseUrl"] + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + "#" + senseId + "> ."
+                entries.append(line)
+                line = "<" + siteconfig["baseUrl"] + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + sense.text + "\"@" + lang + " ."
+                entries.append(line)
+
+    return "\n".join(entries)
