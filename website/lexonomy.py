@@ -817,7 +817,26 @@ def resavejson(dictID, user, dictDB, configs):
         stats = ops.getDictStats(dictDB)
         count += 1
     return {"todo": stats["needResave"]}
-    
+
+@post(siteconfig["rootPath"] + "<dictID>/<doctype>/ontolex.api")
+def ontolex(dictID, doctype):
+    data = json.loads(request.body.getvalue().decode('utf-8'))
+    if not data.get("email") or not data.get("apikey"):
+        return {"success": False, "message": "missing email or api key"}
+    user = ops.verifyUserApiKey(data["email"], data["apikey"])
+    if not user["valid"]:
+        return {"success": False}
+    else:
+        if data.get("search"):
+            search = data["search"]
+        else:
+            search = ""
+        dictDB = ops.getDB(dictID)
+        configs = ops.readDictConfigs(dictDB)
+        entries = ops.listOntolexEntries(dictDB, dictID, configs, doctype, search)
+        response.headers['Content-Type'] = "text/plain; charset=utf-8"
+        return entries
+
 @get(siteconfig["rootPath"] + "push.api")
 def pushtest():
     return template("pushapi.tpl", **{"siteconfig": siteconfig})
