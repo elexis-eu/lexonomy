@@ -1457,7 +1457,6 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
     else:
         sql = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title, e.xml from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by e.id"
         params = (doctype, searchtext+"%")
-    print(sql)
     c = dictDB.execute(sql, params)
     entries = []
     for r in c.fetchall():
