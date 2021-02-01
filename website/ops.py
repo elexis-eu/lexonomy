@@ -1492,7 +1492,7 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
                 senseId = str(r["id"]) + "_" + str(num)
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + "#" + senseId + "> ."
                 entries.append(line)
-                line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
+                line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + re.sub(r'[\r\n]', ' ', defText) + "\"@" + lang + " ."
                 entries.append(line)
         for sense in root.findall("meaning"):
             num += 1
