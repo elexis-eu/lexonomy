@@ -1156,11 +1156,14 @@ def resave(dictDB, dictID, configs):
 
 def getEntryLinks(dictDB, dictID, entryID):
     ret = {"out": [], "in": []}
-    c = dictDB.execute("SELECT * FROM linkables WHERE entry_id=?", (entryID,))
-    conn = getLinkDB()
-    for r in c.fetchall():
-        ret["out"] = ret["out"] + links_get(dictID, r["element"], r["txt"], "", "", "")
-        ret["in"] = ret["in"] + links_get("", "", "", dictID, r["element"], r["txt"])
+    cl = dictDB.execute("SELECT count(*) as count FROM sqlite_master WHERE type='table' and name='linkables'")
+    rl = cl.fetchone()
+    if rl['count'] > 0:
+        c = dictDB.execute("SELECT * FROM linkables WHERE entry_id=?", (entryID,))
+        conn = getLinkDB()
+        for r in c.fetchall():
+            ret["out"] = ret["out"] + links_get(dictID, r["element"], r["txt"], "", "", "")
+            ret["in"] = ret["in"] + links_get("", "", "", dictID, r["element"], r["txt"])
     return ret
         
 
@@ -1370,9 +1373,12 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
 
 def getDictLinkables(dictDB):
     ret = []
-    c = dictDB.execute("SELECT * FROM linkables ORDER BY entry_id, element, txt")
-    for r in c.fetchall():
-        ret.append({"element": r["element"], "link": r["txt"], "entry": r["entry_id"], "preview": r["preview"]})
+    cl = dictDB.execute("SELECT count(*) as count FROM sqlite_master WHERE type='table' and name='linkables'")
+    rl = cl.fetchone()
+    if rl['count'] > 0:
+        c = dictDB.execute("SELECT * FROM linkables ORDER BY entry_id, element, txt")
+        for r in c.fetchall():
+            ret.append({"element": r["element"], "link": r["txt"], "entry": r["entry_id"], "preview": r["preview"]})
     return ret
 
 def addAutoNumbers(dictDB, dictID, countElem, storeElem):
