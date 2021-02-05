@@ -831,11 +831,8 @@ def importfile(dictID, filename, email):
     errfile = filename + ".err";
     if os.path.isfile(pidfile):
         return checkImportStatus(pidfile, errfile)
-    try:
-        pidfile_f = open(pidfile, "w")
-        errfile_f = open(errfile, "w")
-    except:
-        return checkImportStatus(pidfile, errfile)
+    pidfile_f = open(pidfile, "w")
+    errfile_f = open(errfile, "w")
     dbpath = os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")
     p = subprocess.Popen(["adminscripts/import.py", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
     return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
@@ -846,13 +843,16 @@ def checkImportStatus(pidfile, errfile):
         with open(pidfile, "r") as content_file:
             content = content_file.read()
     pid_data = re.split(r"[\n\r]", content)
-    if pid_data[-1] == "":
-        progress = pid_data[-2]
-    else:
-        progress = pid_data[-1]
     finished = False
-    if "100%" in progress:
-        finished = True
+    if len(pid_data) > 1:
+        if pid_data[-1] == "":
+            progress = pid_data[-2]
+        else:
+            progress = pid_data[-1]
+        if "100%" in progress:
+            finished = True
+    else:
+        progress = "Import started. Please wait..."
     errors = False
     if os.path.isfile(errfile) and os.stat(errfile).st_size:
         errors = True
