@@ -894,11 +894,15 @@ def pushapi():
             entryXmls = data["entryXmls"]
             dictDB = ops.getDB(dictID)
             configs = ops.readDictConfigs(dictDB)
-            for entry in entryXmls:
-                if data.get("format") == "teilex0":
-                    entry = ops.preprocessLex0(entry)
-                ops.createEntry(dictDB, configs, None, entry, user["email"], {"apikey": data["apikey"]})
-            return {"success": True}
+            dictAccess = configs["users"].get(user["email"])
+            if dictAccess and (dictAccess["canEdit"] or dictAccess["canUpload"]):
+                for entry in entryXmls:
+                    if data.get("format") == "teilex0":
+                        entry = ops.preprocessLex0(entry)
+                    ops.createEntry(dictDB, configs, None, entry, user["email"], {"apikey": data["apikey"]})
+                return {"success": True}
+            else:
+                return {"success": False}
         else:
             return {"success": False}
 
