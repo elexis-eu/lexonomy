@@ -1483,7 +1483,6 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
         root = ET.fromstring(r["xml"])
         num = 0
         for sense in root.findall("sense"):
-            num += 1
             senseDef = sense.find("def")
             if senseDef != None and senseDef.text:
                 defText = re.sub(r'[\r\n]', ' ', senseDef.text)
@@ -1492,6 +1491,7 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
             else:
                 defText = ""
             if defText != "":
+                num += 1
                 defText = defText.replace('"', "'")
                 senseId = str(r["id"]) + "_" + str(num)
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> ."
@@ -1499,7 +1499,6 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
                 entries.append(line)
         for sense in root.findall("meaning"):
-            num += 1
             senseDef = sense.find("def")
             senseDesc = sense.find("semDescription")
             if senseDef != None and senseDef.text:
@@ -1511,6 +1510,7 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
             else:
                 defText = ""
             if defText != "":
+                num += 1
                 defText = defText.replace('"', "'")
                 senseId = str(r["id"]) + "_" + str(num)
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> ."
@@ -1518,8 +1518,8 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
                 entries.append(line)
         for sense in root.findall("def"):
-            num += 1
             if sense.text:
+                num += 1
                 defText = re.sub(r'[\r\n]', ' ', sense.text)
                 defText = defText.replace('"', "'")
                 senseId = str(r["id"]) + "_" + str(num)
@@ -1527,5 +1527,15 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
                 entries.append(line)
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
                 entries.append(line)
+        # no sense detected, copy headword
+        if num == 0:
+            defText = re.sub(r'[\r\n]', ' ', headword)
+            defText = defText.replace('"', "'")
+            senseId = str(r["id"]) + "_1"
+            line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> ."
+            entries.append(line)
+            line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
+            entries.append(line)
+
     entries.append("")
     return "\n".join(entries)
