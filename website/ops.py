@@ -1372,7 +1372,33 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
     c = conn.execute(query, tuple(params))
     res = []
     for row in c.fetchall():
-        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_el": row["target_element"], "target_id": row["target_id"]})
+        sourceDB = getDB(row["source_dict"])
+        targetDB = getDB(row["target_dict"])
+        source_entry = ""
+        try:
+            # test if source DB has linkables tables
+            ress = sourceDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["source_id"],))
+            rows = ress.fetchone()
+            if rows:
+                source_entry = rows["entry_id"]
+        except:
+            source_entry = ""
+        # fallback for ontolex ids
+        if source_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["source_id"]):
+            source_entry = row["source_id"].split("_")[0]
+        try:
+            # test if target DB has linkables tables
+            rest = targetDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["target_id"],))
+            rowt = ress.fetchone()
+            if rowt:
+                target_entry= rowt["entry_id"]
+        except:
+            target_entry = ""
+        # fallback for ontolex ids
+        if target_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["target_id"]):
+            target_entry = row["target_id"].split("_")[0]
+
+        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_entry": str(source_entry), "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_entry": str(target_entry), "target_el": row["target_element"], "target_id": row["target_id"]})
     return res
 
 def getDictLinkables(dictDB):
