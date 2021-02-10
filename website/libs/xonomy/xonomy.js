@@ -490,7 +490,16 @@ Xonomy.render=function(data, editor, docSpec) { //renders the contents of an edi
 	Xonomy.namespaces={};
 
 	//Convert doc to a JavaScript object, if it isn't a JavaScript object already:
-	if(typeof(data)=="string") data=$.parseXML(data);
+	if(typeof(data)=="string") {
+    [...data.matchAll(/ ([a-zA-Z]+):[^=]+=/g)].forEach(function(nsel) {
+      var nsname = nsel[1];
+      var re = new RegExp('xmlns:'+nsname+'=');
+      if (nsname != 'xmlns' && nsname != 'lxnm' && data.match(re) == null) {
+        data = data.replace(' xmlns:lxnm', ' xmlns:'+nsname+'="'+nsname+'" xmlns:lxnm');
+      }
+    })
+    data=$.parseXML(data);
+  }
 	if(data.documentElement) data=Xonomy.xml2js(data);
 
 	//Make sure editor refers to an HTML element, if it doesn't already:
