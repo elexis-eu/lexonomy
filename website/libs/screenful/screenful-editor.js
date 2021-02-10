@@ -264,6 +264,9 @@ Screenful.Editor={
           } else {
             var linkhtml = '<ul>'+linkdata["source_id"]+' → <a target="_top" href="/'+linkdata['target_dict']+'">'+linkdata['target_dict']+'</a> : '+linkdata['target_el']+' : '+linkdata['target_id'];
           }
+          if (linkdata['confidence'] && linkdata['confidence'] != '') {
+            linkhtml += ' ('+linkdata['confidence']+')';
+          }
           if ($("#editor").length>0) {
             linkhtml += ' <span class="linkdelete" data-href="/'+linkdata['source_dict']+'/links/delete/'+linkdata['link_id']+'">×delete</span>';
           }
@@ -275,7 +278,14 @@ Screenful.Editor={
         linkElement.append('<span id="inlinks"><h4>Incoming links</h4></span>');
         for (var link in links.in) {
           var linkdata = links.in[link];
-          var linkhtml = '<ul>'+linkdata["target_id"]+' ← '+linkdata['source_dict']+' : '+linkdata['source_el']+' : '+linkdata['source_id'];
+          if (linkdata['source_entry'] != '') {
+            var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="/'+linkdata['source_dict']+'/edit/entry/view'+linkdata['source_entry']+'">'+linkdata['source_dict']+' : '+linkdata['source_el']+' : '+linkdata['source_id']+'</a>';
+          } else {
+            var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="/'+linkdata['source_dict']+'">'+linkdata['source_dict']+'</a> : '+linkdata['source_el']+' : '+linkdata['source_id'];
+          }
+          if (linkdata['confidence'] && linkdata['confidence'] != '') {
+            linkhtml += ' ('+linkdata['confidence']+')';
+          }
           if ($("#editor").length>0) {
             linkhtml += ' <span class="linkdelete" data-href="/'+linkdata['target_dict']+'/links/delete/'+linkdata['link_id']+'">×delete</span>';
           }
