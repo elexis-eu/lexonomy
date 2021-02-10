@@ -1165,7 +1165,6 @@ def getEntryLinks(dictDB, dictID, entryID):
             ret["out"] = ret["out"] + links_get(dictID, r["element"], r["txt"], "", "", "")
             ret["in"] = ret["in"] + links_get("", "", "", dictID, r["element"], r["txt"])
     return ret
-        
 
 def updateEntryLinkables(dictDB, entryID, xml, configs, save=True, save_xml=True):
     from xml.dom import minidom, Node
@@ -1319,20 +1318,20 @@ def verifyUserApiKey(email, apikey):
     else:
         return {"valid": True, "email": email or ""}
 
-def links_add(source_dict, source_el, source_id, target_dict, target_el, target_id):
+def links_add(source_dict, source_el, source_id, target_dict, target_el, target_id, confidence=0):
     conn = getLinkDB()
-    c = conn.execute("select * from links where source_dict=? and source_element=? and source_id=? and target_dict=? and target_element=? and target_id=?", (source_dict, source_el, source_id, target_dict, target_el, target_id))
+    c = conn.execute("SELECT * FROM links WHERE source_dict=? AND source_element=? AND source_id=? AND target_dict=? AND target_element=? AND target_id=?", (source_dict, source_el, source_id, target_dict, target_el, target_id))
     row = c.fetchone()
     if not row:
-        conn.execute("insert into links (source_dict, source_element, source_id, target_dict, target_element, target_id) values (?,?,?,?,?,?)", (source_dict, source_el, source_id, target_dict, target_el, target_id))
+        conn.execute("INSERT INTO links (source_dict, source_element, source_id, target_dict, target_element, target_id, confidence) VALUES (?,?,?,?,?,?,?)", (source_dict, source_el, source_id, target_dict, target_el, target_id, confidence))
         conn.commit()
-    c = conn.execute("select * from links where source_dict=? and source_element=? and source_id=? and target_dict=? and target_element=? and target_id=?", (source_dict, source_el, source_id, target_dict, target_el, target_id))
+    c = conn.execute("SELECT * FROM links WHERE source_dict=? AND source_element=? AND source_id=? AND target_dict=? AND target_element=? AND target_id=?", (source_dict, source_el, source_id, target_dict, target_el, target_id))
     row = c.fetchone()
-    return {"link_id": row["link_id"], "source_dict": row["source_dict"], "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_el": row["target_element"], "target_id": row["target_id"]}
+    return {"link_id": row["link_id"], "source_dict": row["source_dict"], "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_el": row["target_element"], "target_id": row["target_id"], "confidence": row["confidence"]}
 
 def links_delete(dictID, linkID):
     conn = getLinkDB()
-    conn.execute("delete from links where source_dict=? and link_id=?", (dictID, linkID))
+    conn.execute("DELETE FROM links WHERE source_dict=? AND link_id=?", (dictID, linkID))
     conn.commit()
     c = conn.execute("select * from links where link_id=?", (linkID, ))
     if len(c.fetchall()) > 0:
@@ -1361,9 +1360,9 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
     if target_id != "":
         where.append("target_id=?")
         params.append(target_id)
-    query = "select * from links"
+    query = "SELECT * FROM links"
     if len(where) > 0:
-        query += " where " + " and ".join(where)
+        query += " WHERE " + " AND ".join(where)
     conn = getLinkDB()
     c = conn.execute(query, tuple(params))
     res = []
@@ -1382,19 +1381,20 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
         # fallback for ontolex ids
         if source_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["source_id"]):
             source_entry = row["source_id"].split("_")[0]
+        target_entry = ""
         try:
             # test if target DB has linkables tables
             rest = targetDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["target_id"],))
             rowt = ress.fetchone()
             if rowt:
-                target_entry= rowt["entry_id"]
+                target_entry = rowt["entry_id"]
         except:
             target_entry = ""
         # fallback for ontolex ids
         if target_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["target_id"]):
             target_entry = row["target_id"].split("_")[0]
 
-        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_entry": str(source_entry), "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_entry": str(target_entry), "target_el": row["target_element"], "target_id": row["target_id"]})
+        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_entry": str(source_entry), "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_entry": str(target_entry), "target_el": row["target_element"], "target_id": row["target_id"], "confidence": row["confidence"]})
     return res
 
 def getDictLinkables(dictDB):

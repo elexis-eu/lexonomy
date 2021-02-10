@@ -915,10 +915,11 @@ def linksadd(dictID, user, dictDB, configs):
     target_dict = request.query.target_dict
     target_el = request.query.target_el
     target_id = request.query.target_id
+    confidence = request.query.confidence
     if source_dict == "" or source_id == "" or target_dict == "" or target_id == "" or source_el == "" or target_el == "":
         return {"success": False, "error": "missing parameters"}
     else:
-        res = ops.links_add(source_dict, source_el, source_id, target_dict, target_el, target_id)
+        res = ops.links_add(source_dict, source_el, source_id, target_dict, target_el, target_id, confidence)
         return {"success": True, "links": res}
 
 @get(siteconfig["rootPath"] + "<dictID>/links/delete/<linkID>")
