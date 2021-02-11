@@ -494,11 +494,17 @@ Xonomy.render=function(data, editor, docSpec) { //renders the contents of an edi
     [...data.matchAll(/ ([a-zA-Z]+):[^=]+=/g)].forEach(function(nsel) {
       var nsname = nsel[1];
       var re = new RegExp('xmlns:'+nsname+'=');
-      if (nsname != 'xmlns' && nsname != 'lxnm' && data.match(re) == null) {
+      if (nsname != 'xmlns' && nsname != 'lxnm' && nsname != 'xml' && data.match(re) == null) {
         data = data.replace(' xmlns:lxnm', ' xmlns:'+nsname+'="'+nsname+'" xmlns:lxnm');
       }
-    })
-    data=$.parseXML(data);
+    });
+    try {
+      data=$.parseXML(data);
+    } catch(e) {
+      $('.alertmessage .text', parent.document).html('Error parsing entry XML.')
+      $('.alertmessage', parent.document).show();
+      data = $.parseXML('<entry/>');
+    }
   }
 	if(data.documentElement) data=Xonomy.xml2js(data);
 
