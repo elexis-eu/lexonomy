@@ -15,6 +15,8 @@ from bottle import (hook, route, get, post, run, template, error, request,
                     response, static_file, abort, redirect, install)
 
 # configuration
+app = bottle.default_app()
+app.config['autojson'] = True
 bottle.BaseRequest.MEMFILE_MAX = 10 * 1024 * 1024 #10MB upload
 my_url = siteconfig["baseUrl"].split("://")[1].rstrip("/")
 cgi = False
