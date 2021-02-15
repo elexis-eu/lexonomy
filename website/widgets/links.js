@@ -11,6 +11,16 @@ Links.render=function(div, json){
   for(var elName in xema.elements){
     $("#elements_new").append("<option value='"+elName+"'>"+elName+"</option>");
   }
+  $div.append("<div class='title'>Automatic linking using NAISC</div>");
+  $div.append("Other dictionary: <input type='text' id='otherdict' oninput='Links.checkOtherDict()'> <button id='naisc_link' onclick='Links.startLinking()' disabled>Checking status, wait...</button>");
+
+  $.get("../../linking.json").done(function(data) {
+    if (data["bgjob"] != -1) {
+      $("#naisc_link").html("Linking to '" + data["otherdictID"] + "' already in progress, please wait...");
+      Links.waitForLinking(data["otherdictID"], data["bgjob"]);
+    } else
+      $("#naisc_link").html("Start linking");
+  });
 };
 Links.harvest=function(div){
   var ret={};
@@ -36,6 +46,37 @@ console.log(details)
   html+="</div>";
   $("#elements_list").append(html);
 };
+
+Links.checkOtherDict=function() {
+  var otherdict = $("#otherdict").val();
+  $("#naisc_link").prop("disabled", otherdict.length == 0);
+};
+
+Links.waitForLinking=function(otherdict, jobid) {
+  var naiscTimer = setInterval(checkNaisc, 1000);
+  function checkNaisc() {
+    $.get("../../naiscprogress.json", {"otherdictID": otherdict, "jobid": jobid}).done(function(data) {
+      if (data["status"] == "finished") {
+        clearInterval(naiscTimer);
+        $("#naisc_link").html("Linking done. <a href='../../links'>See results.</a>");
+      } else if (data["status"] == "failed") {
+        clearInterval(naiscTimer);
+        $("#naisc_link").html("Linking failed :(");
+      }
+    });
+  }
+};
+
+Links.startLinking=function() {
+  var otherdict = $("#otherdict").val();
+  $("#naisc_link").html("Initiating linking ...");
+  $("#naisc_link").prop("disabled", true);
+  $.get("../../linknaisc.json", {"otherdictID": otherdict}).done(function(data) {
+    $("#naisc_link").html("Linking in progress, please wait...");
+    Links.waitForLinking(otherdict, data["bgjob"]);
+  });
+};
+
 Links.removeElement=function(elName){
   $("#elements_list .linkelement[data-elname='"+elName+"']").remove();
   Links.change();

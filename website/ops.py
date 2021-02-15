@@ -1318,8 +1318,9 @@ def verifyUserApiKey(email, apikey):
     else:
         return {"valid": True, "email": email or ""}
 
-def links_add(source_dict, source_el, source_id, target_dict, target_el, target_id, confidence=0):
-    conn = getLinkDB()
+def links_add(source_dict, source_el, source_id, target_dict, target_el, target_id, confidence=0, conn=None):
+    if not conn:
+        conn = getLinkDB()
     c = conn.execute("SELECT * FROM links WHERE source_dict=? AND source_element=? AND source_id=? AND target_dict=? AND target_element=? AND target_id=?", (source_dict, source_el, source_id, target_dict, target_el, target_id))
     row = c.fetchone()
     if not row:
@@ -1406,6 +1407,73 @@ def getDictLinkables(dictDB):
         for r in c.fetchall():
             ret.append({"element": r["element"], "link": r["txt"], "entry": r["entry_id"], "preview": r["preview"]})
     return ret
+
+def isrunning(dictDB, bgjob, pid=None):
+    if not pid:
+        c = dictDB.execute("SELECT pid FROM bgjobs WHERE id=?", (bgjob,))
+        job = c.fetchone()
+        if not job:
+            return False
+        pid = job["pid"]
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True
+
+def linkNAISC(dictDB, dictID, configs, otherdictDB, otherdictID, otherconfigs):
+    import subprocess
+    res = isLinking(dictDB)
+    if "otherdictID" in res:
+        return res
+    c = dictDB.execute("INSERT INTO bgjobs (type, data) VALUES ('naisc-local', ?)", (otherdictID,))
+    dictDB.commit()
+    jobid = c.lastrowid
+    entries = listOntolexEntries(dictDB, dictID, configs, configs["xema"]["root"], "")
+    otherentries = listOntolexEntries(otherdictDB, otherdictID, otherconfigs, otherconfigs["xema"]["root"], "")
+    left = open("/tmp/linkNAISC-%s.nt" % dictID, "w")
+    right = open("/tmp/linkNAISC-%s.nt" % otherdictID, "w")
+    left.write(entries)
+    right.write(otherentries)
+    left.close()
+    right.close()
+    linkfilename = "/tmp/linkNAISC-%s-%s" % (dictID, otherdictID)
+    bgjob = subprocess.Popen('%s %s %s -c %s -o %s; adminscripts/importNAISClinks.py %s < %s; sqlite3 %s/dicts/%s.sqlite "UPDATE bgjobs SET finished=$? WHERE id=%s"' %
+                  (siteconfig["naiscCmd"], left.name, right.name, "configs/auto.json", linkfilename, os.path.join(siteconfig["dataDir"], 'crossref.sqlite'), linkfilename,
+                   siteconfig["dataDir"], dictID, jobid), shell=True,
+                  stderr=open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID), "w"),
+                  stdout=open("/tmp/linkNAISC-%s-%s.out" % (dictID, otherdictID), "w"))
+    dictDB.execute("UPDATE bgjobs SET pid=? WHERE id=?", (bgjob.pid, jobid))
+    dictDB.commit()
+    return {"bgjob": jobid}
+
+def isLinking(dictDB):
+    c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='bgjobs'")
+    if not c.fetchone():
+        dictDB.execute("CREATE TABLE bgjobs (id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT, data TEXT, finished INTEGER DEFAULT -1, pid DEFAULT -1)")
+        dictDB.commit()
+    c = dictDB.execute("SELECT * FROM bgjobs WHERE finished=-1")
+    job = c.fetchone()
+    if job:
+        pid = job["pid"]
+        if isrunning(dictDB, job["id"], pid):
+            return {"bgjob": job["id"], "otherdictID": job["data"]}
+        else: # mark as dead
+            c = dictDB.execute("UPDATE bgjobs SET finished=-2 WHERE pid=?", (pid,))
+    return {"bgjob": -1}
+
+def getNAISCstatus(dictDB, dictID, otherdictID, bgjob):
+    try:
+        err = open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID))
+    except:
+        return None
+    if "[COMPLETED] Done\n" in err.readlines():
+        return {"status": "finished"}
+    if isrunning(dictDB, bgjob):
+        return {"status": "linking"}
+    else:
+        return {"status": "failed"}
 
 def addAutoNumbers(dictDB, dictID, countElem, storeElem):
     from xml.dom import minidom, Node

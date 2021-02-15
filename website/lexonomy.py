@@ -973,6 +973,33 @@ def linkablelist(dictID, user, dictDB, configs):
     res = ops.getDictLinkables(dictDB)
     return json.dumps(res)
 
+@get(siteconfig["rootPath"]+"<dictID>/linknaisc.json")
+@authDict([])
+def linkNaisc(dictID, user, dictDB, configs):
+    otherdictID = request.query.otherdictID
+    if dictID == otherdictID:
+        abort(400, "Linking dictionary to the same dictionary does not make any sense")
+    try:
+        otherconn = ops.getDB(otherdictID)
+    except IOError:
+        abort(404, "No such dictionary")
+    _res, otherconfigs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, otherconn)
+    res = ops.linkNAISC(dictDB, dictID, configs, otherconn, otherdictID, otherconfigs)
+    return res
+
+@get(siteconfig["rootPath"]+"<dictID>/naiscprogress.json")
+@authDict([])
+def checkNaisc(dictID, user, dictDB, configs):
+    res = ops.getNAISCstatus(dictDB, dictID, request.query.otherdictID, request.query.jobid)
+    if not res:
+        abort(400, "Invalid job")
+    return res
+
+@get(siteconfig["rootPath"]+"<dictID>/linking.json")
+@authDict([])
+def linking(dictID, user, dictDB, configs):
+    return ops.isLinking(dictDB)
+
 @get(siteconfig["rootPath"]+"<dictID>/entrylinks.json")
 @authDict([])
 def entrylinks(dictID, user, dictDB, configs):

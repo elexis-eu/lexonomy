@@ -4,6 +4,7 @@
   "rootPath": "/",
   "port": 8080,
   "dataDir": "../data/",
+  "naiscCmd": "/opt/naisc/naisc-1.0.1/naisc.sh",
   "dbSchemaFile": "lexonomy.sqlite.schema",
   "dbXrefSchemaFile": "crossref.sqlite.schema",
   "verbose": true,
