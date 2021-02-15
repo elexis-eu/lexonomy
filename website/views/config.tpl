@@ -77,7 +77,7 @@
 					%end
 					<div class="signpost"><a href="../../{{dictID}}/config/flagging/">Flags</a></div>
 					<div class="signpost"><a href="../../{{dictID}}/config/autonumber/">Auto-numbering</a></div>
-					<div class="signpost"><a href="../../{{dictID}}/config/links/">Manual linking</a></div>
+					<div class="signpost"><a href="../../{{dictID}}/config/links/">Linking</a></div>
 					<div class="signpost"><a href="../../{{dictID}}/config/download/">Download settings</a></div>
 					<div class="signpost"><a href="../../{{dictID}}/config/subbing/">Subentries</a></div>
 				</div>
