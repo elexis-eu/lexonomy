@@ -892,9 +892,8 @@ def ontolex(dictID, doctype):
         if not dictAccess:
             return {"success": False}
         else:
-            entries = ops.listOntolexEntries(dictDB, dictID, configs, doctype, search)
             response.headers['Content-Type'] = "text/plain; charset=utf-8"
-            return entries
+            return ops.listOntolexEntries(dictDB, dictID, configs, doctype, search)
 
 @get(siteconfig["rootPath"] + "push.api")
 def pushtest():

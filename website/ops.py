@@ -1562,7 +1562,6 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
         sql = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title, e.xml from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by e.id"
         params = (doctype, searchtext+"%")
     c = dictDB.execute(sql, params)
-    entries = []
     for r in c.fetchall():
         headword = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
         headword = headword.replace('"', "'")
@@ -1573,9 +1572,9 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
             lang = "en"
         entryId = re.sub("[\W_]", "",  headword) + "_" + str(r["id"])
         line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/lemon/ontolex#LexicalEntry> ."
-        entries.append(line)
+        yield line; yield "\n"
         line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/2000/01/rdf-schema#label> \"" + headword + "\"@" + lang + " ."
-        entries.append(line)
+        yield line; yield "\n"
 
         #just guessing and hoping
         root = ET.fromstring(r["xml"])
@@ -1593,9 +1592,9 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
                 defText = defText.replace('"', "'")
                 senseId = 'sense:' + str(r["id"]) + "_" + str(num)
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> ."
-                entries.append(line)
+                yield line; yield "\n"
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
-                entries.append(line)
+                yield line; yield "\n"
         for sense in root.findall("meaning"):
             senseDef = sense.find("def")
             senseDesc = sense.find("semDescription")
@@ -1612,9 +1611,9 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
                 defText = defText.replace('"', "'")
                 senseId = 'meaning:' + str(r["id"]) + "_" + str(num)
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> ."
-                entries.append(line)
+                yield line; yield "\n"
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
-                entries.append(line)
+                yield line; yield "\n"
         for sense in root.findall("def"):
             if sense.text:
                 num += 1
@@ -1622,18 +1621,15 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
                 defText = defText.replace('"', "'")
                 senseId = 'def:' + str(r["id"]) + "_" + str(num)
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> ."
-                entries.append(line)
+                yield line; yield "\n"
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
-                entries.append(line)
+                yield line; yield "\n"
         # no sense detected, copy headword
         if num == 0:
             defText = re.sub(r'[\r\n]', ' ', headword)
             defText = defText.replace('"', "'")
             senseId = 'entry:' + str(r["id"]) + "_1"
             line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> ."
-            entries.append(line)
+            yield line; yield "\n"
             line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
-            entries.append(line)
-
-    entries.append("")
-    return "\n".join(entries)
+            yield line; yield "\n"
