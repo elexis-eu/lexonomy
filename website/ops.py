@@ -122,7 +122,7 @@ def verifyLoginAndDictAccess(email, sessionkey, dictDB):
     ret = verifyLogin(email, sessionkey)
     configs = readDictConfigs(dictDB)
     dictAccess = configs["users"].get(email)
-    if ret["loggedin"] == False or (not dictAccess and (not "isAdmin" in ret or not ret["isAdmin"])):
+    if ret["loggedin"] == False or (not dictAccess and not ret["isAdmin"]):
         return {"loggedin": ret["loggedin"], "email": email, "dictAccess": False, "isAdmin": False}, configs
     ret["dictAccess"] = dictAccess
     for r in ["canEdit", "canConfig", "canDownload", "canUpload"]:

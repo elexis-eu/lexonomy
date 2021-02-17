@@ -117,7 +117,7 @@ def authAdmin(func):
     @functools.wraps(func)
     def wrapper_verifyLoginAdmin(*args, **kwargs):
         res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
-        if not res["loggedin"] or not "isAdmin" in res or not res["isAdmin"]:
+        if not res["loggedin"] or not res["isAdmin"]:
             redirect("/")
         kwargs["user"] = res
         return func(*args, **kwargs)
