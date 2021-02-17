@@ -835,7 +835,7 @@ def ontolex(dictID, doctype):
             search = ""
         dictDB = ops.getDB(dictID)
         configs = ops.readDictConfigs(dictDB)
-        dictAccess = configs["users"].get(user["email"])
+        dictAccess = configs["users"].get(user["email"]) or user["email"] in siteconfig["admins"]
         if not dictAccess:
             return {"success": False}
         else:
