@@ -1430,20 +1430,9 @@ def linkNAISC(dictDB, dictID, configs, otherdictDB, otherdictID, otherconfigs):
     c = dictDB.execute("INSERT INTO bgjobs (type, data) VALUES ('naisc-local', ?)", (otherdictID,))
     dictDB.commit()
     jobid = c.lastrowid
-    entries = listOntolexEntries(dictDB, dictID, configs, configs["xema"]["root"], "")
-    otherentries = listOntolexEntries(otherdictDB, otherdictID, otherconfigs, otherconfigs["xema"]["root"], "")
-    left = open("/tmp/linkNAISC-%s.nt" % dictID, "w")
-    right = open("/tmp/linkNAISC-%s.nt" % otherdictID, "w")
-    left.write(entries)
-    right.write(otherentries)
-    left.close()
-    right.close()
-    linkfilename = "/tmp/linkNAISC-%s-%s" % (dictID, otherdictID)
-    bgjob = subprocess.Popen('%s %s %s -c %s -o %s; adminscripts/importNAISClinks.py %s < %s; sqlite3 %s/dicts/%s.sqlite "UPDATE bgjobs SET finished=$? WHERE id=%s"' %
-                  (siteconfig["naiscCmd"], left.name, right.name, "configs/auto.json", linkfilename, os.path.join(siteconfig["dataDir"], 'crossref.sqlite'), linkfilename,
-                   siteconfig["dataDir"], dictID, jobid), shell=True,
-                  stderr=open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID), "w"),
-                  stdout=open("/tmp/linkNAISC-%s-%s.out" % (dictID, otherdictID), "w"))
+    bgjob = subprocess.Popen('adminscripts/linkNAISC.sh %s %s %s %s %s' % (siteconfig["dataDir"], dictID, otherdictID, siteconfig["naiscCmd"], jobid),
+        shell=True, stderr=open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID), "w"),
+                    stdout=open("/tmp/linkNAISC-%s-%s.out" % (dictID, otherdictID), "w"))
     dictDB.execute("UPDATE bgjobs SET pid=? WHERE id=?", (bgjob.pid, jobid))
     dictDB.commit()
     return {"bgjob": jobid}
