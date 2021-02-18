@@ -1435,8 +1435,9 @@ def linkNAISC(dictDB, dictID, configs, otherdictDB, otherdictID, otherconfigs):
     dictDB.commit()
     jobid = c.lastrowid
     bgjob = subprocess.Popen('adminscripts/linkNAISC.sh %s %s %s %s %s' % (siteconfig["dataDir"], dictID, otherdictID, siteconfig["naiscCmd"], jobid),
-        shell=True, stderr=open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID), "w"),
-                    stdout=open("/tmp/linkNAISC-%s-%s.out" % (dictID, otherdictID), "w"))
+        shell=True, start_new_session=True, close_fds=True,
+        stderr=open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID), "w"),
+        stdout=open("/tmp/linkNAISC-%s-%s.out" % (dictID, otherdictID), "w"))
     dictDB.execute("UPDATE bgjobs SET pid=? WHERE id=?", (bgjob.pid, jobid))
     dictDB.commit()
     return {"bgjob": jobid}
