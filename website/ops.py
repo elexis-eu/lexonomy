@@ -1419,6 +1419,8 @@ def isrunning(dictDB, bgjob, pid=None):
         if not job:
             return False
         pid = job["pid"]
+    if pid < 0:
+        return False
     try:
         os.kill(pid, 0)
     except OSError:
