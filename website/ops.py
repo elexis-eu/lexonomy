@@ -1434,10 +1434,10 @@ def linkNAISC(dictDB, dictID, configs, otherdictDB, otherdictID, otherconfigs):
     c = dictDB.execute("INSERT INTO bgjobs (type, data) VALUES ('naisc-local', ?)", (otherdictID,))
     dictDB.commit()
     jobid = c.lastrowid
-    bgjob = subprocess.Popen('adminscripts/linkNAISC.sh %s %s %s %s %s' % (siteconfig["dataDir"], dictID, otherdictID, siteconfig["naiscCmd"], jobid),
-        shell=True, start_new_session=True, close_fds=True,
-        stderr=open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID), "w"),
-        stdout=open("/tmp/linkNAISC-%s-%s.out" % (dictID, otherdictID), "w"))
+    errfile = open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID), "w")
+    outfile = open("/tmp/linkNAISC-%s-%s.out" % (dictID, otherdictID), "w")
+    bgjob = subprocess.Popen(['adminscripts/linkNAISC.sh', siteconfig["dataDir"], dictID, otherdictID, siteconfig["naiscCmd"], str(jobid)],
+        start_new_session=True, close_fds=True, stderr=errfile, stdout=outfile, stdin=subprocess.DEVNULL)
     dictDB.execute("UPDATE bgjobs SET pid=? WHERE id=?", (bgjob.pid, jobid))
     dictDB.commit()
     return {"bgjob": jobid}
