@@ -168,7 +168,7 @@ def entryread(dictID, user, dictDB, configs):
         elif configs["xemplate"].get("_css") and configs["xemplate"]["_css"] != "":
             html = xml
         else:
-            html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('" + xml.replace("'","\\'").replace("\n","") + "', " + json.dumps(configs["xemplate"]) + ", " + json.dumps(configs["xema"]) + "));</script>"
+            html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('" + xml.replace("'","\\'").replace("\n","").replace("\r","") + "', " + json.dumps(configs["xemplate"]) + ", " + json.dumps(configs["xema"]) + "));</script>"
     return {"success": (adjustedEntryID > 0), "id": adjustedEntryID, "content": xml, "contentHtml": html}
 
 @post(siteconfig["rootPath"]+"<dictID>/entryupdate.json")
@@ -207,7 +207,9 @@ def entrycreate(dictID, user, dictDB, configs):
     elif configs["xemplate"].get("_css") and configs["xemplate"]["_css"] != "":
         html = adjustedXml
     else:
-        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", adjustedXml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+        entrydata = re.sub(r"'", "\\'", adjustedXml)
+        entrydata = re.sub(r"[\n\r]", "", entrydata)
+        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
     result = {"success": True, "id": adjustedEntryID, "content": adjustedXml, "contentHtml": html}
     if feedback:
         result["feedback"] = feedback
@@ -244,7 +246,9 @@ def history(dictID):
             elif configs["xemplate"].get("_css") and configs["xemplate"]["_css"] != "":
                 html = xml
             else:
-                html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", xml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+                entrydata = re.sub(r"'", "\\'", xml)
+                entrydata = re.sub(r"[\n\r]", "", entrydata)
+                html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
         item["contentHtml"] = html
         res_history.append(item)
     return {"history":res_history}
