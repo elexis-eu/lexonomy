@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ $# -ne 5 ]; then
   echo "Usage: $0 DATADIR DB1 DB2 NAISCCMD JOBID"
