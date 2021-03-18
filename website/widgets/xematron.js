@@ -335,21 +335,23 @@ Xematron.listFollowingSiblings=function(xema, elname){
 };
 Xematron.initialAttributes=function(xema, elname){
 	var ret="";
-	for(var attname in xema.elements[elname].attributes){
-		var att=xema.elements[elname].attributes[attname];
-		if(att.optionality=="obligatory") {
-			var attvalue="";
-			ret+=" "+attname+"='"+Xonomy.xmlEscape(attvalue)+"'";
-		}
-	}
+  if (xema.elements[elname] != undefined) {
+    for(var attname in xema.elements[elname].attributes){
+      var att=xema.elements[elname].attributes[attname];
+      if(att.optionality=="obligatory") {
+        var attvalue="";
+        ret+=" "+attname+"='"+Xonomy.xmlEscape(attvalue)+"'";
+      }
+    }
+  }
 	return ret;
 };
 Xematron.initialElement=function(xema, elname, depth){
 	if(!depth) depth=0;
 	var el=xema.elements[elname];
 	var ret="<"+elname+Xematron.initialAttributes(xema, elname)+">";
-	if(el.filling=="chd" && el.children && depth<10){
-		el.children.forEach(function(child){
+	if (el != undefined && el.filling=="chd" && el.children && depth < 10) {
+		el.children.forEach(function(child) {
 			for(var i=0; i<child.min; i++) ret+=Xematron.initialElement(xema, child.name, depth+1);
 		});
 	}
