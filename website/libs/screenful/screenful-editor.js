@@ -259,7 +259,9 @@ Screenful.Editor={
         linkElement.append('<span id="outlinks"><h4>Outgoing links</h4></span>');
         for (var link in links.out) {
           var linkdata = links.out[link];
-          if (linkdata['target_entry'] != '') {
+          if (linkdata['target_hw'] != '') {
+            var linkhtml = '<ul>'+linkdata["source_id"]+' → <a target="_top" href="/'+linkdata['target_dict']+'/edit/entry/view'+linkdata['target_entry']+'">'+linkdata['target_dict']+' : '+linkdata['target_hw']+' : '+linkdata['target_el']+' : '+linkdata['target_id']+'</a>';
+          } else if (linkdata['target_entry'] != '') {
             var linkhtml = '<ul>'+linkdata["source_id"]+' → <a target="_top" href="/'+linkdata['target_dict']+'/edit/entry/view'+linkdata['target_entry']+'">'+linkdata['target_dict']+' : '+linkdata['target_el']+' : '+linkdata['target_id']+'</a>';
           } else {
             var linkhtml = '<ul>'+linkdata["source_id"]+' → <a target="_top" href="/'+linkdata['target_dict']+'">'+linkdata['target_dict']+'</a> : '+linkdata['target_el']+' : '+linkdata['target_id'];
@@ -278,7 +280,9 @@ Screenful.Editor={
         linkElement.append('<span id="inlinks"><h4>Incoming links</h4></span>');
         for (var link in links.in) {
           var linkdata = links.in[link];
-          if (linkdata['source_entry'] != '') {
+          if (linkdata['source_hw'] != '') {
+            var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="/'+linkdata['source_dict']+'/edit/entry/view'+linkdata['source_entry']+'">'+linkdata['source_dict']+' : '+linkdata['source_hw']+' : '+linkdata['source_el']+' : '+linkdata['source_id']+'</a>';
+          } else if (linkdata['source_entry'] != '') {
             var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="/'+linkdata['source_dict']+'/edit/entry/view'+linkdata['source_entry']+'">'+linkdata['source_dict']+' : '+linkdata['source_el']+' : '+linkdata['source_id']+'</a>';
           } else {
             var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="/'+linkdata['source_dict']+'">'+linkdata['source_dict']+'</a> : '+linkdata['source_el']+' : '+linkdata['source_id'];
