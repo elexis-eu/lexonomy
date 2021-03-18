@@ -239,6 +239,10 @@ def getEntryTitle(xml, titling, plaintext=False):
             ret += " ".join(extractText(xml, hw))
     return ret
 
+def getEntryTitleID(dictDB, configs, entry_id, plaintext=False):
+    eid, xml, title = readEntry(dictDB, configs, entry_id)
+    return getEntryTitle(xml, configs["titling"], plaintext)
+
 def getEntryHeadword(xml, headword_elem):
     ret = "?"
     arr = extractText(xml, headword_elem)
@@ -1367,10 +1371,25 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
     conn = getLinkDB()
     c = conn.execute(query, tuple(params))
     res = []
+    #first, get all dictionaries in results
+    dbs = {}
+    dbconfigs = {}
     for row in c.fetchall():
-        sourceDB = getDB(row["source_dict"])
-        targetDB = getDB(row["target_dict"])
+        if not row["source_dict"] in dbs:
+            dbs[row["source_dict"]] = getDB(row["source_dict"])
+            dbconfigs[row["source_dict"]] = readDictConfigs(dbs[row["source_dict"]])
+        if not row["target_dict"] in dbs:
+            dbs[row["target_dict"]] = getDB(row["target_dict"])
+            dbconfigs[row["target_dict"]] = readDictConfigs(dbs[row["target_dict"]])
+    #now the actual results
+    c = conn.execute(query, tuple(params))
+    for row in c.fetchall():
+        sourceDB = dbs[row["source_dict"]]
+        sourceConfig = dbconfigs[row["source_dict"]]
+        targetDB = dbs[row["target_dict"]]
+        targetConfig = dbconfigs[row["target_dict"]]
         source_entry = ""
+        source_hw = ""
         try:
             # test if source DB has linkables tables
             ress = sourceDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["source_id"],))
@@ -1382,7 +1401,10 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
         # fallback for ontolex ids
         if source_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["source_id"]):
             source_entry = row["source_id"].split("_")[0]
+        if source_entry != "":
+            source_hw = getEntryTitleID(sourceDB, sourceConfig, source_entry, True)
         target_entry = ""
+        target_hw = ""
         try:
             # test if target DB has linkables tables
             rest = targetDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["target_id"],))
@@ -1394,8 +1416,10 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
         # fallback for ontolex ids
         if target_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["target_id"]):
             target_entry = row["target_id"].split("_")[0]
+        if target_entry != "":
+            target_hw = getEntryTitleID(targetDB, targetConfig, target_entry, True)
 
-        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_entry": str(source_entry), "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_entry": str(target_entry), "target_el": row["target_element"], "target_id": row["target_id"], "confidence": row["confidence"]})
+        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_entry": str(source_entry), "source_hw": source_hw, "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_entry": str(target_entry), "target_hw": target_hw, "target_el": row["target_element"], "target_id": row["target_id"], "confidence": row["confidence"]})
     return res
 
 def getDictLinkables(dictDB):
