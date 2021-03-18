@@ -21,23 +21,6 @@
 		<style>
 		.title {cursor: pointer;}
 		</style>
-		<script type="text/javascript">
-		$(function() {
-			$(".expert .signpost").hide();
-			$(".sketch").hide();
-			$(".expert .title").on("click", function() {
-				if ($(".sketch").is(":hidden")) {
-					$(".expert .signpost").show();
-					$(".sketch").show();
-					$(".expert .title span").html("▸");
-				} else {
-					$(".expert .signpost").hide();
-					$(".sketch").hide();
-					$(".expert .title span").html("▾");
-				}
-			});
-		});
-		</script>
 	</head>
 	<body>
                 %include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="", configUrl="", rootPath="../../")
@@ -69,7 +52,7 @@
 					<div class="signpost"><a href="../../{{dictID}}/config/searchability/">Searching</a></div>
 				</div>
 				<div class="signposts expert">
-					<div class="title">Expert settings <span>▾</span></div>
+					<div class="title">Expert settings</div>
 					%if hasEditingOverride:
 					<div class="signpost"><a href="../../{{dictID}}/config/editing-override/">Entry editor</a></div>
 					%else:
