@@ -100,6 +100,7 @@
 				route('/*/edit', (dictId) => {
 					console.log('edit ' + dictId)
 					this.dictId = dictId;
+					this.content = 'dict-edit';
 					this.update();
 				});
 				route('/*/([0-9]*)', (dictId, entryId) => {

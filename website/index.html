@@ -6,6 +6,11 @@
     <script src="https://cdn.jsdelivr.net/npm/riot@4.14/riot+compiler.min.js"></script>
   	<script src="https://cdn.jsdelivr.net/npm/riot-route@3.1.4/dist/route.min.js"></script>
     <script src="/widgets/xemplatron.js"></script>
+    <script src="/widgets/xematron.js"></script>
+    <script type="text/javascript" src="/libs/screenful/screenful.js"></script>
+    <script type="text/javascript" src="/libs/screenful/screenful-editor.js"></script>
+    <script type="text/javascript" src="/libs/screenful/screenful-loc-en.js"></script>
+    <script type="text/javascript" src="/libs/xonomy/xonomy.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 	  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
@@ -23,9 +28,12 @@
     <script type="riot" data-src="riot/dict-config.tag"></script>
     <script type="riot" data-src="riot/dict-config-ident.tag"></script>
     <script type="riot" data-src="riot/dict-list.tag"></script>
+    <script type="riot" data-src="riot/dict-edit.tag"></script>
+    <script type="riot" data-src="riot/dict-edit-entry.tag"></script>
     <script type="riot" data-src="riot/dict-public.tag"></script>
     <script type="riot" data-src="riot/dict-public-entry.tag"></script>
     <script type="riot" data-src="riot/entry-view.tag"></script>
+    <script type="riot" data-src="riot/list-headword.tag"></script>
     <script>
       riot.compile().then(()=>{
         riot.mount('main');
