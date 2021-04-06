@@ -1,7 +1,7 @@
 <main>
   <div class="container">
 		<header is="header" ref="header" authorized={ this.state.authorized } username={ this.state.username } log-out={ logOut } show-dict-menu={ this.state.showDictMenu } dict-id={ this.dictId } user-access={ this.state.userAccess }></header>
-		<div class="content row" is={ this.content } dict-id={ this.dictId} authorized={ this.state.authorized } check-auth={ checkAuth } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId }></div>
+		<div class="content row" is={ this.content } dict-id={ this.dictId} authorized={ this.state.authorized } check-auth={ checkAuth } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs }></div>
 		<footer is="footer"></footer>
   </div>
 
@@ -17,6 +17,7 @@
 				dictDetails: {},
 				showDictMenu: false,
 				publicMoreEntries: [],
+				dictConfigs: {},
 			},
 
 			getCookie(val) {
@@ -61,6 +62,7 @@
 						this.state.dictDetails.xemplateOverride = false;
 						this.state.dictDetails.editingOverride = false;
 						this.state.userAccess = response.userAccess;
+						this.state.dictConfigs = response.configs;
 						if (response.userAccess != false && (response.userAccess.canEdit || response.userAccess.canConfig || response.userAccess.canDownload || response.userAccess.canUpload)) {
 							this.state.showDictMenu = true;
 						}

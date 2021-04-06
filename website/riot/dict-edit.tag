@@ -12,7 +12,7 @@
 			</div>
 		</div>
 		<div class="col s9">
-			<dict-edit-entry if={ this.selectedEntry != "" } entryId={ this.selectedEntry } dictId={ this.dictId } dictConfig={ this.dictConfig }></dict-entry-edit>
+			<dict-edit-entry if={ this.selectedEntry != "" } entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs }></dict-entry-edit>
 		</div>
 
 	</div>
@@ -20,7 +20,7 @@
 	<script>
 		export default {
 			dictId: '',
-			dictConfig: {},
+			dictConfigs: {},
 			doctype: 'entry',
 			entryList: [],
 			entryCount: 0,
@@ -47,7 +47,6 @@
 				this.dictId = this.props.dictId;
 				console.log('list edit dict '+ this.dictId)
 				this.props.loadDictDetail();
-				console.log(this.props)
 				this.loadList();
 			},
 

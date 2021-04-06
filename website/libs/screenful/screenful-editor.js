@@ -1,7 +1,7 @@
 Screenful.Editor={
   start: function(){
     Screenful.createEnvelope();
-    $("#envelope").html("<div id='toolbar'></div><div id='container' class='empty'></div><div id='waiter' style='display: none'></div><div id='history' style='display: none'></div>");
+    //$("#envelope").html("<div id='toolbar'></div><div id='container' class='empty'></div><div id='waiter' style='display: none'></div><div id='history' style='display: none'></div>");
     if(Screenful.Editor.historyUrl) $("#history").html("<iframe name='historyframe' frameborder='0' scrolling='auto' src='"+Screenful.Editor.historyUrl+"'/>");
     Screenful.Editor.populateToolbar();
     Screenful.status(Screenful.Loc.ready);
@@ -52,6 +52,7 @@ Screenful.Editor={
   },
   populateToolbar: function(){
     var $toolbar=$("#toolbar");
+    $toolbar.empty();
     if(Screenful.History) $("<button id='butHistory' class='iconOnly' title='"+Screenful.Loc.history+"'>&nbsp;</button>").appendTo($toolbar).on("click", Screenful.Editor.history);
     $("<button id='butLink' class='iconOnly' title='"+Screenful.Loc.link+"'>&nbsp;</button>").appendTo($toolbar).on("click", Screenful.Editor.showLink);
     if(Screenful.Editor.allowSourceCode) $("<button id='butSourceCode' class='iconOnly' title='"+Screenful.Loc.sourceCode+"'>&nbsp;</button>").appendTo($toolbar).on("click", Screenful.Editor.sourceCode);
@@ -557,4 +558,4 @@ Screenful.Editor={
     Screenful.Editor.open();
   },
 };
-$(window).ready(Screenful.Editor.start);
+$(document).ready(Screenful.Editor.start);

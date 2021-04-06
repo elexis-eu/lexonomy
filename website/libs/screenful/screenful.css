@@ -1,21 +1,21 @@
-body {font-family: 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans HK', 'Noto Naskh Arabic', sans-serif; background-color: #ffffff; margin: 0; padding: 0; overflow: hidden; line-height: 1.3em; font-size: 1rem;}
+body {font-family: 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans HK', 'Noto Naskh Arabic', sans-serif; background-color: #ffffff; margin: 0; padding: 0; /*overflow: hidden;*/ line-height: 1.3em; font-size: 1rem;}
 #header { position: absolute; top: 0px; left: 0px; right: 0px; z-index: 2; }
 #envelope { position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px;}
 #envelope.scrollable {overflow-y: auto;}
-#statusbar { position: absolute; bottom: 0px; left: 0px; right: 0px; padding: 5px 15px; background-color: #dddddd; color: #666666; font-size: 0.9em; box-sizing: border-box; height: 1.8rem; overflow: hidden; box-shadow: 0px -2px 2px #999999; z-index: 5;}
+#statusbar { /*position: absolute;*/ bottom: 0px; left: 0px; right: 0px; padding: 5px 15px; background-color: #dddddd; color: #666666; font-size: 0.9em; box-sizing: border-box; height: 1.8rem; overflow: hidden; box-shadow: 0px -2px 2px #999999; z-index: 5;}
 #footer { position: absolute; bottom: 0px; left: 0px; right: 0px; }
 #curtain { position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: #333333; opacity: 0.5; z-index: 5;}
 
 .xonomy {background-color: transparent !important;}
 
-#envelope button {font: inherit; border-width: 0px; cursor: pointer; border-radius: 4px; background-color: #ffffff; box-shadow: 0px 0px 2px #666666; color: var(--link); padding: 5px 10px; margin: 10px 5px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
-#envelope button:hover { background-color: #f7f9ea;}
-#envelope button.pressed { box-shadow: inset 0px 0px 2px #666666; background-color: #e9e9e9;}
-#envelope button.iconYes {padding-left: 35px; background-position: left+10px center; background-repeat: no-repeat;}
-#envelope button.iconOnly {background-position: left+10px center; background-repeat: no-repeat; width: 35px;}
-#envelope button.noborder { box-shadow: 0px 0px 0px transparent; }
-#envelope button.mergeLeft { margin-left: -42px; }
-#envelope button.disabled { color: #999999; cursor: not-allowed; }
+.xonomy-envelope button {font: inherit; border-width: 0px; cursor: pointer; border-radius: 4px; background-color: #ffffff; box-shadow: 0px 0px 2px #666666; color: var(--link); padding: 5px 10px; margin: 10px 5px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
+.xonomy-envelope button:hover { background-color: #f7f9ea;}
+.xonomy-envelope button.pressed { box-shadow: inset 0px 0px 2px #666666; background-color: #e9e9e9;}
+.xonomy-envelope button.iconYes {padding-left: 35px; background-position: left+10px center; background-repeat: no-repeat;}
+.xonomy-envelope button.iconOnly {background-position: left+10px center; background-repeat: no-repeat; width: 35px;}
+.xonomy-envelope button.noborder { box-shadow: 0px 0px 0px transparent; }
+.xonomy-envelope button.mergeLeft { margin-left: -42px; }
+.xonomy-envelope button.disabled { color: #999999; cursor: not-allowed; }
 
 #statusbar span.wait { background-image: url(loader.gif); display: inline-block; width: 30px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 1em;}
 #statusbar span.warn { background-image: url(exclamation.png); display: inline-block; width: 16px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 0.75em;}
