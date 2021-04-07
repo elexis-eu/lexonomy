@@ -1,5 +1,5 @@
 astroid==2.2.5
-bottle==0.12.16
+bottle==0.12.19
 isort==4.3.18
 lazy-object-proxy==1.4.0
 lxml==4.6.3
