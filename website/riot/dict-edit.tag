@@ -12,7 +12,7 @@
 			</div>
 		</div>
 		<div class="col s9">
-			<dict-edit-entry if={ this.selectedEntry != "" } entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs }></dict-entry-edit>
+			<dict-edit-entry if={ this.selectedEntry != "" } entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess }></dict-entry-edit>
 		</div>
 
 	</div>

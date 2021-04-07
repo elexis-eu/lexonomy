@@ -432,7 +432,7 @@
 .xonomy .inlinecaption a { color: inherit; text-decoration: none; }
 .xonomy .inlinecaption a:hover {color: #2d4ea1;}
 
-.xonomy div.modeSwitcher { position: fixed; bottom: 0px; left: 0px; width: 70px; height: 28px; background-color: #ffffff; cursor: pointer; border: 1px solid #cccccc; z-index: 12;}
+.xonomy div.modeSwitcher { /*position: fixed;*/ bottom: 0px; left: 0px; width: 73px; height: 30px; background-color: #ffffff; cursor: pointer; border: 1px solid #cccccc; z-index: 12;}
 .xonomy.nerd div.modeSwitcher {}
 .xonomy.laic div.modeSwitcher {}
 .xonomy div.modeSwitcher span.nerd {display: inline-block; width: 35px; height: 28px; background-image: url(tag.png); background-position: center center; background-repeat: no-repeat; }

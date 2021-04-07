@@ -1,14 +1,10 @@
 <dict-edit-entry>
 	<div>
-		<!--<div class="row">
-			<div class="col s10 offset-s1">
-				<h3 class="header">{ this.props.entryId }</a></h3>
-			</div>
-		</div>-->
 		<div class="row">
-			<div id="container" class="xonomy-envelope">
+			<div class="xonomy-envelope">
 				<div id="toolbar"></div>
-				<div class="xonomy" id="editor"></div>
+				<div id="container" class="empty"></div>
+				<div id="waiter" style="display: none"></div>
 				<div id="statusbar"></div>
 			</div>
 		</div>
@@ -32,27 +28,122 @@
 					Screenful.Editor.readUrl="/"+this.dictId+"/entryread.json";
 					Screenful.Editor.updateUrl="/"+this.dictId+"/entryupdate.json";
 					Screenful.Editor.deleteUrl="/"+this.dictId+"/entrydelete.json";
-					xema = this.dictConfigs.xema;
-					Screenful.Editor.editor=function(div, entry, uneditable){
-						Xonomy.lang="en";
-						newXml="<entry/>";
-						var docSpec=Xematron.xema2docspec(xema, "entry");
-						Xonomy.render((entry ? entry : newXml), div, docSpec);
+					var xema = this.dictConfigs.xema;
+					var xemplate = this.dictConfigs.xemplate;
+					kex = this.dictConfigs.kex;
+					subbing = this.dictConfigs.subbing;
+					xampl = this.dictConfigs.xampl;
+					thes = this.dictConfigs.thes;
+					collx = this.dictConfigs.collx;
+					defo = this.dictConfigs.defo;
+					var titling = this.dictConfigs.titling;
+					var flagging = this.dictConfigs.flagging;
+					linking = this.dictConfigs.linking;
+					var editing = this.dictConfigs.editing;
+					var userAccess = this.props.userAccess;
+					var dictId = this.dictId;
+
+					if (editing["_js"]) {
+						var customizeEditor = editing["_js"];
+						var usingOwnEditor = customizeEditor.editor && customizeEditor.harvester;
+					} else {
+						var customizeEditor = null;
+						var usingOwnEditor = false;
+					}
+
+					if (!xemplate[xema.root]) xemplate[xema.root] = {shown: false};
+					if (xemplate[xema.root].shown == "false") xemplate[xema.root].shown = false;
+					Screenful.Editor.viewer=null;
+					if(xemplate._xsl || xemplate._css || xemplate[xema.root].shown) {
+						Screenful.Editor.viewer = function (div, entry) {
+							if (entry.contentHtml.length == 0) {
+								var doc = (new DOMParser()).parseFromString(entry.content, 'text/xml');
+								entry.contentHtml = Xemplatron.xml2html(doc, xemplate, xema);
+							}
+							$(div).addClass("viewer").html(entry.contentHtml);
+							$(div).find("a.xref").on("click", function(e){
+								var text = $(e.delegateTarget).attr("data-text");
+								window.parent.$("#searchbox").val(text);
+								window.parent.Screenful.Navigator.list();
+							});
+						};
+					}
+
+					Screenful.Editor.editor = function (div, entry, uneditable) {
+						if (!userAccess.canEdit) {
+							uneditable = true;
+						}
+						Xonomy.lang = "en";
+
+						newXml = "";
+						if (xema["_xonomyDocSpec"]) {
+							var docSpec = xema["_xonomyDocSpec"];
+							if (xema["_newXml"]) {
+								newXml = xema["_newXml"];
+							}
+						} else if (xema["_dtd"]) {
+							var xmlStructure = parseDTD(xema["_dtd"]);
+							var docSpec = struct2Xonomy(xmlStructure);
+							newXml = initialDocument(xmlStructure);
+						} else {
+							var docSpec = Xematron.xema2docspec(xema, editing["xonomyTextEditor"]);
+						}
+						if (!newXml) {
+							newXml = Xematron.xema2xml(xema); 
+						}
+
+						docSpec.allowModeSwitching = true;
+						docSpec.onModeSwitch = function (mode) {
+							Cookies.set("xonomyMode_" + dictId, mode);
+							window.parent.$(".doctypes").removeClass("laic");
+							window.parent.$(".doctypes").removeClass("nerd");
+							window.parent.$(".doctypes").addClass(mode);
+						};
+						if (!uneditable) {
+							docSpec.allowLayby=true;
+							docSpec.laybyMessage="This is your temporary lay-by for entry fragments. You can drag and drop XML elements here.";
+						}
+						Xonomy.setMode(Cookies.get("xonomyMode_" + dictId) || editing["xonomyMode"]);
+						Ske.extendDocspec(docSpec, xema);
+						Sub.extendDocspec(docSpec, xema);
+						Xrefs.extendDocspec(docSpec, xema);
+						docSpec.onchange = Screenful.Editor.changed;
+						if (uneditable) {
+							for (elName in docSpec.elements) docSpec.elements[elName].isReadOnly = true;
+							if (docSpec.unknownElement && typeof(docSpec.unknownElement) == "object") docSpec.unknownElement.isReadOnly = true;
+							if (docSpec.unknownElement && typeof(docSpec.unknownElement) == "function") {
+								var func = docSpec.unknownElement;
+								docSpec.unknownElement = function(elName){
+									var ret = func(elName);
+									ret.isReadOnly = true;
+									return ret;
+								}
+							}
+						}
+
+						if (!usingOwnEditor) {
+							if (customizeEditor && customizeEditor.adjustDocSpec) customizeEditor.adjustDocSpec(docSpec);
+							Xonomy.render((entry ? entry.content : newXml), div, docSpec);
+							if(!Xonomy.keyNav) Xonomy.startKeyNav(document, document.getElementById("container"));
+						} else {
+							customizeEditor.editor(div, entry ? entry : {content: newXml, id: 0}, uneditable);
+						}
 					};
-					Screenful.Editor.allowSourceCode=true;
-					Screenful.Editor.formatSourceCode=function(str){
+					Screenful.Editor.allowSourceCode = true;
+					Screenful.Editor.formatSourceCode = function(str) {
 						return Screenful.formatXml(str);
 					};
-					Screenful.Editor.validateSourceCode=function(str){
+					Screenful.Editor.validateSourceCode = function(str) {
 						return Screenful.isWellFormedXml(str);
 					};
-					Screenful.Editor.cleanupSourceCode=function(str){
+					Screenful.Editor.cleanupSourceCode = function(str) {
 						return Screenful.cleanupXml(str);
 					};
 					if (response.content != undefined) {
-						Screenful.Editor.editor(document.getElementById("editor"), response.content);
 						Screenful.Editor.populateToolbar();
+						Screenful.status(Screenful.Loc.ready);
 						Screenful.Editor.updateToolbar();
+						Screenful.Editor.open(null,this.entryId);
 					}
 				});
 			},
