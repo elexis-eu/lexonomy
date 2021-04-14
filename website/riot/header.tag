@@ -1,5 +1,6 @@
 <header>
 	<ul if={ props.showDictMenu } id="dropdown-menu-dict" class="dropdown-content">
+		<li if={ props.userAccess && props.userAccess.canEdit }><a href="#/{ props.dictId }">View</a></li>
 		<li if={ props.userAccess && props.userAccess.canEdit }><a href="#/{ props.dictId }/edit">Edit</a></li>
 		<li if={ props.userAccess && props.userAccess.canConfig }><a href="#/{ props.dictId }/config">Configure</a></li>
 		<li if={ props.userAccess && props.userAccess.canDownload }><a href="#/{ props.dictId }/download">Download</a></li>
