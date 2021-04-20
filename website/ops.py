@@ -71,6 +71,11 @@ def readDictConfigs(dictDB):
         if not conf in configs:
             configs[conf] = defaultDictConfig.get(conf, {})
 
+    users = {}
+    for email in configs["users"]:
+        users[email.lower()] = configs["users"][email]
+    configs["users"] = users
+
     for key in configs.keys():
         if type(configs[key]) is dict:
             configs[key] = defaultdict(lambda: None, configs[key])
@@ -554,6 +559,7 @@ def getDoc(docID):
 
 def getDictsByUser(email):
     dicts = []
+    email = str(email).lower()
     conn = getMainDB()
     c = conn.execute("select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email=? order by d.title", (email,))
     for r in c.fetchall():
