@@ -558,4 +558,4 @@ Screenful.Editor={
     Screenful.Editor.open();
   },
 };
-$(document).ready(Screenful.Editor.start);
+//$(document).ready(Screenful.Editor.start);
