@@ -7,12 +7,26 @@
 	<div class="divider"></div>
 	<div class="row">
 		<div class="col s3">
+			<div class="row">
+				<input type="text" placeholder="search" class="col s6"/>
+				<div class="col s3">
+				<div class="input-field">
+					<select>
+						<option value="" disabled selected>?</option>
+						<option value="start">starts like this</option>
+						<option value="exact">is exactly</option>
+						<option value="wordstart">contains a word that starts like this</option>
+						<option value="substring">contains this sequence of characters</option>
+					</select>
+				</div>
+			</div>
+			</div>
 			<div class="entry-list collection">
 				<list-headword each={ entry in this.entryList } entryData={ entry } active={entry.id == this.props.entryId} change-entry-edit={ changeEntryEdit }/>
 			</div>
 		</div>
 		<div class="col s9">
-			<dict-edit-entry if={ this.selectedEntry != "" } entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess }></dict-entry-edit>
+			<dict-edit-entry  entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess }></dict-entry-edit>
 		</div>
 
 	</div>
@@ -24,7 +38,7 @@
 			doctype: 'entry',
 			entryList: [],
 			entryCount: 0,
-			selectedEntry: "628",
+			selectedEntry: '',
 
 			loadList() {
 				$.post("/" + this.dictId + "/" + this.doctype + "/entrylist.json", {searchtext: '', modifier: 'start', howmany: 10}, (response) => {
@@ -52,11 +66,21 @@
 
 			onUpdated() {
 				console.log('list edit dict update'+ this.dictId)
+				$('select').formSelect();
+				$('select').siblings('input').attr("data-constrainwidth", false);
 			}
 		}
 	</script>
 
 	<style>
+	ul.select-dropdown,
+ul.dropdown-content {
+  width: 200% !important;
+
+  li > span {
+    white-space: nowrap;
+  }
+}
 	</style>
 </dict-edit>
 
