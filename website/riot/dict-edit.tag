@@ -8,10 +8,10 @@
 	<div class="row">
 		<div class="col s3">
 			<div class="row">
-				<input type="text" placeholder="search" class="col s6"/>
+				<input type="text" id="searchBox" placeholder="search" class="col s6" onkeypress={ runSearch }/>
 				<div class="col s3">
 				<div class="input-field">
-					<select>
+					<select id="searchType">
 						<option value="" disabled selected>?</option>
 						<option value="start">starts like this</option>
 						<option value="exact">is exactly</option>
@@ -41,7 +41,15 @@
 			selectedEntry: '',
 
 			loadList() {
-				$.post("/" + this.dictId + "/" + this.doctype + "/entrylist.json", {searchtext: '', modifier: 'start', howmany: 10}, (response) => {
+				var searchtext = '';
+				var modifier = 'start';
+				if ($('#searchType').val() != null) {
+					modifier = $('#searchType').val();
+				}
+				if ($('#searchBox').val() != '') {
+					searchtext = $('#searchBox').val();
+				}
+				$.post("/" + this.dictId + "/" + this.doctype + "/entrylist.json", {searchtext: searchtext, modifier: modifier, howmany: 100}, (response) => {
 					console.log(response)
 					this.entryList = response.entries;
 					this.entryCount = response.total;
@@ -55,6 +63,12 @@
 				//$('#editor').html(i)
 				this.selectedEntry = i;
 				this.update();
+			},
+
+			runSearch(e) {
+				if (e.keyCode == 13) {
+					this.loadList();
+				}
 			},
 
 			onMounted() {
@@ -73,14 +87,16 @@
 	</script>
 
 	<style>
-	ul.select-dropdown,
-ul.dropdown-content {
-  width: 200% !important;
-
-  li > span {
-    white-space: nowrap;
-  }
-}
+	ul.select-dropdown, ul.dropdown-content {
+		width: 200% !important;
+	  li > span {
+		  white-space: nowrap;
+	  }
+	}
+	.entry-list {
+		max-height: 80%;
+		overflow-y: auto;
+	}
 	</style>
 </dict-edit>
 
