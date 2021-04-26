@@ -149,6 +149,37 @@
 						Screenful.Editor.cleanupSourceCode = function(str) {
 							return Screenful.cleanupXml(str);
 						};
+
+						// history
+						Screenful.History.historyUrl = "/"+this.dictId+"/history.json";
+						Screenful.History.isDeletion = function(revision) {
+							return revision.action=="delete" || revision.action=="purge";
+						};
+						Screenful.History.getRevisionID = function(revision) {
+							return revision.revision_id;
+						};
+						Screenful.History.printAction = function(revision) {
+							var content = "";
+							//actions: delete | create | update | purge
+							//historiography: {apikey: apikey} | {uploadStart: uploadStart, filename: filename}
+							content += "<div style='white-space: nowrap'>";
+							if (revision.action=="create") content += "<b>Created</b>";
+							else if (revision.action=="update") content += "<b>Changed</b>";
+							else if (revision.action=="delete") content += "<b>Deleted</b>";
+							else if (revision.action=="purge") content += "<b>Bulk-deleted</b>";
+							if (revision.historiography.uploadStart) content += " while uploading";
+							if (revision.historiography.apikey) content += " through API";
+							if (revision.historiography.refactoredFrom) content += " as a subentry of <a href='javascript:void(null)' onclick='parent.Screenful.Editor.open(null, "+revision.historiography.refactoredFrom+")'>"+revision.historiography.refactoredFrom+"</a>";
+							content += "</div>";
+							if (revision.email) content += "<div style='white-space: nowrap'><b>By:</b> "+revision.email+"</div>";
+							content += "<div style='white-space: nowrap'><b>When:</b> "+revision.when+"</div>";
+							return content;
+						};
+						Screenful.History.fakeEntry = function(revision) {
+							return {id: revision.entry_id, content: revision.content, contentHtml: revision.contentHtml};
+						};
+
+
 						console.log(response)
 						if (response.content != undefined) {
 							Screenful.Editor.populateToolbar();
