@@ -132,6 +132,13 @@
 								customizeEditor.editor(div, entry ? entry : {content: newXml, id: 0}, uneditable);
 							}
 						};
+						Screenful.Editor.harvester=function(div){
+							if(!usingOwnEditor){
+								return Xonomy.harvest();
+							} else {
+								return customizeEditor.harvester(div);
+							}
+						};
 						Screenful.Editor.allowSourceCode = true;
 						Screenful.Editor.formatSourceCode = function(str) {
 							return Screenful.formatXml(str);
