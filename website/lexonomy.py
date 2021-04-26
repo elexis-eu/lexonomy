@@ -182,7 +182,9 @@ def entryupdate(dictID, user, dictDB, configs):
     elif configs["xemplate"].get("_css") and configs["xemplate"]["_xsl"] != "":
         html = adjustedXml
     else:
-        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+re.sub(r"'","\\'", adjustedXml)+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+        entrydata = re.sub(r"'", "\\'", adjustedXml)
+        entrydata = re.sub(r"[\n\r]", "", entrydata)
+        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
     result = {"success": True, "id": adjustedEntryID, "content": adjustedXml, "contentHtml": html}
     if len(configs['subbing']) > 0:
         ops.refresh(dictDB, dictID, configs)
@@ -646,7 +648,7 @@ def publicentry(dictID, entryID):
         html = xml
     else:
         entrydata = re.sub(r"'", "\\'", xml)
-        entrydata = re.sub(r"\n", " ", entrydata)
+        entrydata = re.sub(r"[\n\r]", "", entrydata)
         html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
         #rewrite xemplatron to python, too?
     css = ""
