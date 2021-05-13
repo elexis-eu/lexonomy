@@ -556,6 +556,8 @@ def getDictsByUser(email):
         info = {"id": r["id"], "title": r["title"], "hasLinks": False, "lang": ""}
         try:
             configs = readDictConfigs(getDB(r["id"]))
+            if configs["users"][email] and configs["users"][email]["canEdit"]:
+                info["currentUserCanEdit"] = True
             if configs["users"][email] and configs["users"][email]["canConfig"]:
                 info["currentUserCanDelete"] = True
             if configs["links"] and len(configs["links"])>0:
