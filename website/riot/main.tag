@@ -1,7 +1,7 @@
 <main>
   <div class="container">
 		<header is="header" ref="header" authorized={ this.state.authorized } username={ this.state.username } log-out={ logOut } show-dict-menu={ this.state.showDictMenu } dict-id={ this.dictId } user-access={ this.state.userAccess }></header>
-		<div class="content row" is={ this.content } dict-id={ this.dictId} authorized={ this.state.authorized } check-auth={ checkAuth } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess }></div>
+		<div class="content row" is={ this.content } dict-id={ this.dictId } authorized={ this.state.authorized } check-auth={ checkAuth } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess } doctype={ this.doctype } doctypes={ this.doctypes }></div>
 		<footer is="footer"></footer>
   </div>
 
@@ -10,6 +10,8 @@
 			content: '',
 			checkingAuth: false,
 			dictId: '',
+			doctype: 'entry',
+			doctypes: ['entry'],
 			state: {
 				authorized: false,
 				username: '',
@@ -102,6 +104,31 @@
 				route('/*/edit', (dictId) => {
 					console.log('edit ' + dictId)
 					this.dictId = dictId;
+					this.doctype = 'entry';
+					$.get("/" + this.dictId + "/doctype.json", (response) => {
+						console.log(response);
+						if (response.success && response.userAccess.canEdit) {
+							if (response.doctype != "") {
+								this.doctype = response.doctype;
+								this.doctypes = response.doctypes;
+							}
+							route(this.dictId + "/edit/" + this.doctype);
+						} else {
+							route("/");
+						}
+					});
+				});
+				route('/*/edit/*', (dictId, doctype) => {
+					console.log('edit ' + dictId + doctype)
+					this.dictId = dictId;
+					this.doctype = doctype;
+					$.get("/" + this.dictId + "/doctype.json", (response) => {
+						console.log(response);
+						if (response.success && response.doctypes) {
+							this.doctypes = response.doctypes;
+							this.update();
+						}
+					});
 					this.content = 'dict-edit';
 					this.update();
 				});

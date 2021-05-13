@@ -611,6 +611,18 @@ def dictconfig(dictID):
         res["publicInfo"]["blurb"] = ops.markdown_text(configs["ident"]["blurb"])
         return res
 
+@get(siteconfig["rootPath"]+"<dictID>/doctype.json")
+def dictconfig(dictID):
+    if not ops.dictExists(dictID):
+        return {"success": False}
+    else:
+        user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
+        doctypesUsed = ops.readDoctypesUsed(ops.getDB(dictID))
+        doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys()) + doctypesUsed
+        doctypes = list(set(doctypes))
+        res = {"success": True, "doctype": configs["xema"]["root"], "doctypes": doctypes, "userAccess": user["dictAccess"]}
+        return res
+
 @get(siteconfig["rootPath"]+"<dictID>")
 def publicdict(dictID):
     if not ops.dictExists(dictID):

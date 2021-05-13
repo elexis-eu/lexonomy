@@ -4,6 +4,13 @@
 			<h3 class="header">{ this.props.dictDetails.title }</h3>
 		</div>
 	</div>
+	<div if={ this.doctypes.length > 1 } class="row doctypes">
+		<div class="col s12">
+			<ul class="tabs">
+				<li each={ type in this.doctypes } active={ type == this.doctype } class="tab col s2"><a onclick={ doChangeDoctype } doctype={ type }>{ type }</a></li>
+			</ul>
+		</div>
+	</div>
 	<div class="divider"></div>
 	<div class="row">
 		<div class="col s3">
@@ -36,6 +43,7 @@
 			dictId: '',
 			dictConfigs: {},
 			doctype: 'entry',
+			doctypes: ['entry'],
 			entryList: [],
 			entryCount: 0,
 			selectedEntry: '',
@@ -71,17 +79,31 @@
 				}
 			},
 
+			doChangeDoctype(e) {
+				var newdoctype = e.target.getAttribute('doctype');
+				if (newdoctype != this.doctype) {
+					this.doctype = newdoctype;
+					route("/"+this.dictId+"/edit/"+newdoctype);
+					this.loadList();
+					this.update();
+				}
+			},
+
 			onMounted() {
 				this.dictId = this.props.dictId;
-				console.log('list edit dict '+ this.dictId)
+				this.doctype = this.props.doctype;
+				this.doctypes = this.props.doctypes;
+				console.log('list edit dict '+ this.dictId + this.doctype)
 				this.props.loadDictDetail();
 				this.loadList();
 			},
 
 			onUpdated() {
-				console.log('list edit dict update'+ this.dictId)
+				this.doctypes = this.props.doctypes;
+				console.log('list edit dict update'+ this.dictId+this.doctype)
 				$('select').formSelect();
 				$('select').siblings('input').attr("data-constrainwidth", false);
+				console.log(this.doctypes)
 			}
 		}
 	</script>
@@ -96,6 +118,17 @@
 	.entry-list {
 		max-height: 80%;
 		overflow-y: auto;
+	}
+	.doctypes {
+		margin-bottom: 0px;
+	}
+	li.tab[active] {
+		background-color: transparent;
+		color: #ee6e73;
+		border-bottom: 2px solid;
+	}
+	li.tab a {
+		cursor: pointer;
 	}
 	</style>
 </dict-edit>
