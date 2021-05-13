@@ -21,7 +21,7 @@
 					<span class="helper-text">This will appear on your dictionary's home page. You can leave it blank if you prefer.<br/>You can use <a href='https://daringfireball.net/projects/markdown/' target='_blank'>Markdown</a> here.</span>
 				</div>
 				<div class="input-field col s10">
-					<input type="text" id="ident_lang" class="autocomplete" placeholder="Type to search for language, or write your custom info">
+					<input value={ this.configData.lang } type="text" id="ident_lang" class="autocomplete" placeholder="Type to search for language, or write your custom info">
 					<label for="ident_lang">Main language</label>
 					<span class="helper-text">Language of dictionary entries, used to sort dictionaries on your home page. You can select language from the list, or write down your own.</span>
 				</div>
@@ -51,6 +51,11 @@
 					this.update();
 					M.updateTextFields();
 					M.textareaAutoResize($('#ident_blurb'));
+					var langs_data = {};
+					this.configData.langs.forEach(lang => {
+						langs_data[lang['lang']] = null;
+					});
+					$('#ident_lang').autocomplete({data: langs_data});
 				});
 			},
 

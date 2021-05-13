@@ -810,7 +810,10 @@ def configpage(dictID, page, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
 @authDict(["canConfig"])
 def configread(dictID, user, dictDB, configs):
-    return {"success": True, "id": request.forms.id, "content": configs[request.forms.id]}
+    config_data = configs[request.forms.id]
+    if request.forms.id == 'ident':
+        config_data['langs'] = ops.get_iso639_1()
+    return {"success": True, "id": request.forms.id, "content": config_data}
 
 @post(siteconfig["rootPath"]+"<dictID>/configupdate.json")
 @authDict(["canConfig"])
