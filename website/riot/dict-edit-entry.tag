@@ -4,11 +4,10 @@
 			<div class="xonomy-envelope">
 				<div id="toolbar"></div>
 				<div id="container" class="empty"></div>
+				<div id='history' style='display: none'></div>
 				<div id="waiter" style="display: none"></div>
 				<div id="statusbar"></div>
 			</div>
-		</div>
-		<div class="row">
 		</div>
 	</div>
 	<script>
@@ -178,7 +177,6 @@
 						Screenful.History.fakeEntry = function(revision) {
 							return {id: revision.entry_id, content: revision.content, contentHtml: revision.contentHtml};
 						};
-
 
 						console.log(response)
 						if (response.content != undefined) {
