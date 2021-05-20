@@ -1,7 +1,7 @@
 <main>
   <div class="container">
-		<header is="header" ref="header" authorized={ this.state.authorized } username={ this.state.username } log-out={ logOut } show-dict-menu={ this.state.showDictMenu } dict-id={ this.dictId } user-access={ this.state.userAccess }></header>
-		<div class="content row" is={ this.content } dict-id={ this.dictId } authorized={ this.state.authorized } check-auth={ checkAuth } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess } doctype={ this.doctype } doctypes={ this.doctypes }></div>
+		<header is="header" ref="header" authorized={ this.state.authorized } user-info={ this.state.userInfo } log-out={ logOut } show-dict-menu={ this.state.showDictMenu } dict-id={ this.dictId } user-access={ this.state.userAccess }></header>
+		<div class="content row" is={ this.content } dict-id={ this.dictId } authorized={ this.state.authorized } check-auth={ checkAuth } user-info={ this.state.userInfo } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess } doctype={ this.doctype } doctypes={ this.doctypes }></div>
 		<footer is="footer"></footer>
   </div>
 
@@ -14,7 +14,7 @@
 			doctypes: ['entry'],
 			state: {
 				authorized: false,
-				username: '',
+				userInfo: {username: ''},
 				userAccess: false,
 				dictDetails: {},
 				showDictMenu: false,
@@ -31,7 +31,9 @@
 				var password = $('#password').val();
 				$.post("/login.json", {email: email, password: password}, (response) => {
 					if (response.success) {
-						this.state.username = this.getCookie('email');
+						this.state.userInfo.username = this.getCookie('email');
+						this.state.userInfo.ske_username = response.ske_username;
+						this.state.userInfo.ske_apiKey = response.ske_apiKey;
 						this.state.authorized = true;
 					}
 				}).always(() => {
@@ -42,7 +44,7 @@
 
 			logOut() {
 				this.state.authorized = false;
-				this.state.username = '';
+				this.state.userInfo = {username: ''};
 				this.state.showDictMenu = false;
 				this.state.userAccess = false;
 				$.post("/logout.json", {}, (response) => {
@@ -98,7 +100,7 @@
 
 			onMounted() {
 				this.state.authorized = true;
-				this.state.username = 'rambousek@gmail.com';
+				this.state.userInfo = {username: 'rambousek@gmail.com', ske_username: 'sso_458', ske_apiKey: '0a632cda5add424b97432ffb28806ffd'};
 
 				console.log('mount')
 				route('/*/edit', (dictId) => {

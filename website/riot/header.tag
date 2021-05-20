@@ -22,7 +22,7 @@
 	    <ul id="nav-mobile" class="right hide-on-med-and-down">
 				<li if={ props.showDictMenu }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-dict">Dictionary<i class="material-icons right">arrow_drop_down</i></a></li>
 	      <li if={ !props.authorized }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-anon">anonymous user<i class="material-icons right">arrow_drop_down</i></a></li>
-	      <li if={ props.authorized }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-user">{props.username}<i class="material-icons right">arrow_drop_down</i></a></li>
+	      <li if={ props.authorized }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-user">{props.userInfo.username}<i class="material-icons right">arrow_drop_down</i></a></li>
 	    </ul>
 	  </div>
 	</nav>

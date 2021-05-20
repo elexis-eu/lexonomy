@@ -33,7 +33,7 @@
 			</div>
 		</div>
 		<div class="col s9">
-			<dict-edit-entry  entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess }></dict-entry-edit>
+			<dict-edit-entry  entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess } userInfo={ this.props.userInfo }></dict-entry-edit>
 		</div>
 
 	</div>

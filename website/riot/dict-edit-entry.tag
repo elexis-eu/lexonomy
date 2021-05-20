@@ -44,6 +44,8 @@
 						var editing = this.dictConfigs.editing;
 						var userAccess = this.props.userAccess;
 						var dictId = this.dictId;
+						ske_username = this.props.userInfo.ske_username;
+						ske_apiKey = this.props.userInfo.ske_apiKey;
 
 						if (editing["_js"]) {
 							var customizeEditor = editing["_js"];

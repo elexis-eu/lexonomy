@@ -362,7 +362,7 @@ def check_login():
     if res["success"]:
         response.set_cookie("email", res["email"], path="/")
         response.set_cookie("sessionkey", res["key"], path="/")
-        return {"success": True, "sessionkey": res["key"]}
+        return {"success": True, "sessionkey": res["key"], "ske_username": res["ske_username"], "ske_apiKey": res["ske_apiKey"]}
     else:
         return {"success": False}
 
