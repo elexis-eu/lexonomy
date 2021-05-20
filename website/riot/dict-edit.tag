@@ -93,14 +93,21 @@
 				this.dictId = this.props.dictId;
 				this.doctype = this.props.doctype;
 				this.doctypes = this.props.doctypes;
-				console.log('list edit dict '+ this.dictId + this.doctype)
+				console.log('list edit dict '+ this.dictId + this.doctype + this.props.entryId)
 				this.props.loadDictDetail();
 				this.loadList();
 			},
 
 			onUpdated() {
 				this.doctypes = this.props.doctypes;
-				console.log('list edit dict update'+ this.dictId+this.doctype)
+				if (this.props.entryId && this.props.entryId != "") {
+					if (this.props.entryId.match(/^view[0-9]*$/)) {
+						this.selectedEntry = this.props.entryId.substring(4);
+					} else {
+						this.selectedEntry = this.props.entryId;
+					}
+				}
+				console.log('list edit dict update'+ this.dictId+this.doctype+this.props.entryId)
 				$('select').formSelect();
 				$('select').siblings('input').attr("data-constrainwidth", false);
 				console.log(this.doctypes)

@@ -120,6 +120,21 @@
 						}
 					});
 				});
+				route('/*/edit/*/([view0-9]*)', (dictId, doctype, entryId) => {
+					console.log('edit ' + dictId + doctype + entryId)
+					this.dictId = dictId;
+					this.entryId = entryId;
+					this.doctype = doctype;
+					$.get("/" + this.dictId + "/doctype.json", (response) => {
+						console.log(response);
+						if (response.success && response.doctypes) {
+							this.doctypes = response.doctypes;
+							this.update();
+						}
+					});
+					this.content = 'dict-edit';
+					this.update();
+				});
 				route('/*/edit/*', (dictId, doctype) => {
 					console.log('edit ' + dictId + doctype)
 					this.dictId = dictId;

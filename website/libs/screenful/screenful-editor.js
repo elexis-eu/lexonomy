@@ -484,9 +484,9 @@ Screenful.Editor={
     Screenful.Editor.updateToolbar();
   },
   getDirectLink: function(fullLink) {
-    var link = window.location.protocol + '//' + window.location.host + '/';
-    var paths = window.location.pathname.split('/');
-    link += paths[1] + '/edit/' + paths[2] + '/';
+    var link = window.location.protocol + '//' + window.location.host + '/index.html';
+    var paths = window.location.hash.split('/');
+    link += paths[0] + '/edit/' + paths[2] + '/';
     if (fullLink) {
       if (Screenful.Editor.entryID && $("#viewer").length>0) {
         link += 'view' + Screenful.Editor.entryID;
