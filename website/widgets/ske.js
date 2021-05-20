@@ -14,9 +14,9 @@ Ske.makeSettings=function(){
   }
 }
 Ske.getHeadword=function(){
-  var $xml=$($.parseXML(Xonomy.harvest()));
-  var hwd=$xml.find(titling.headword).html();
-  if(!hwd) hwd="";
+  var $xml = $($.parseXML(Xonomy.harvest()));
+  var hwd = $xml.find(titling.headword).html().replace(/(<([^>]+)>)/gi, "");
+  if(!hwd) hwd = "";
   return hwd;
 };
 Ske.getSearchword=function(elementID){
@@ -83,7 +83,7 @@ Ske.extendDocspec=function(docspec, xema){
           if(docspec.elements[parName]){
             if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
             docspec.elements[parName].menu.push({
-              icon: rootPath+"furniture/ske.png",
+              icon: "/furniture/ske.png",
               caption: "Find examples <"+xampl.container+">",
               action: Ske.menuExamples,
             });
@@ -100,7 +100,7 @@ Ske.extendDocspec=function(docspec, xema){
           if(docspec.elements[parName]){
             if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
             docspec.elements[parName].menu.push({
-              icon: rootPath+"furniture/ske.png",
+              icon: "/furniture/ske.png",
               caption: "Find collocations <"+collx.container+">",
               action: Ske.menuCollx,
             });
@@ -117,7 +117,7 @@ Ske.extendDocspec=function(docspec, xema){
           if(docspec.elements[parName]){
             if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
             docspec.elements[parName].menu.push({
-              icon: rootPath+"furniture/ske.png",
+              icon: "/furniture/ske.png",
               caption: "Find thesaurus items <"+thes.container+">",
               action: Ske.menuThes,
             });
@@ -134,7 +134,7 @@ Ske.extendDocspec=function(docspec, xema){
           if(docspec.elements[parName]){
             if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
             docspec.elements[parName].menu.push({
-              icon: rootPath+"furniture/ske.png",
+              icon: "/furniture/ske.png",
               caption: "Find definitions <"+defo.container+">",
               action: Ske.menuDefo,
             });
@@ -268,7 +268,7 @@ Ske.searchExamples=function(fromp){
   var query=$.trim($(".skebox input.textbox:enabled").val());
   var querytype=$("input[name=skesearchtype]:checked").val();
   if(query!="") {
-    $.get(rootPath+dictID+"/skeget/xampl/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, querytype: querytype, query: query, fromp: fromp}, function(json){
+    $.get("/"+dictId+"/skeget/xampl/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, querytype: querytype, query: query, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");
@@ -356,7 +356,7 @@ Ske.searchThes=function(fromp){
   $(".skebox .waiter").show();
   var lemma=$.trim($(".skebox .textbox").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/skeget/thes/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
+    $.get("/"+dictId+"/skeget/thes/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");
@@ -437,7 +437,7 @@ Ske.searchCollx=function(fromp){
   $(".skebox .waiter").show();
   var lemma=$.trim($(".skebox .textbox").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/skeget/collx/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
+    $.get("/"+dictId+"/skeget/collx/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");
@@ -518,7 +518,7 @@ Ske.searchDefo=function(fromp){
   $(".skebox .waiter").show();
   var lemma=$.trim($(".skebox .textbox").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/skeget/defo/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
+    $.get("/"+dictId+"/skeget/defo/", {url: kex.apiurl, corpus: kex.corpus, username: ske_username, apikey: ske_apiKey, lemma: lemma, fromp: fromp}, function(json){
         $(".skebox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".skebox .choices").html("<div class='error'>No results found.</div>");

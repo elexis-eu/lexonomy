@@ -38,12 +38,12 @@
 						thes = this.dictConfigs.thes;
 						collx = this.dictConfigs.collx;
 						defo = this.dictConfigs.defo;
-						var titling = this.dictConfigs.titling;
-						var flagging = this.dictConfigs.flagging;
+						titling = this.dictConfigs.titling;
+						flagging = this.dictConfigs.flagging;
 						linking = this.dictConfigs.linking;
-						var editing = this.dictConfigs.editing;
+						editing = this.dictConfigs.editing;
 						var userAccess = this.props.userAccess;
-						var dictId = this.dictId;
+						dictId = this.dictId;
 						ske_username = this.props.userInfo.ske_username;
 						ske_apiKey = this.props.userInfo.ske_apiKey;
 

@@ -42,7 +42,7 @@ Sub.extendDocspec=function(docspec, xema){
           if(docspec.elements[parName]){
             if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
             docspec.elements[parName].menu.push({
-              icon: rootPath+"furniture/favicon.png",
+              icon: "/furniture/favicon.png",
               caption: "Find subentries <"+elName+">",
               action: Sub.menuSubentries,
               actionParameter: {elName: elName},
@@ -137,7 +137,7 @@ Sub.searchSubentries=function(){
   var lemma=$.trim($(".subbox .textbox").val());
   var doctype=$.trim($("input[name=\"doctype\"]").val());
   if(lemma!="") {
-    $.get(rootPath+dictID+"/subget/", {lemma: lemma, doctype: doctype}, function(json){
+    $.get("/"+dictID+"/subget/", {lemma: lemma, doctype: doctype}, function(json){
         $(".subbox .choices").html("");
         if(!json.success){
           $(".subbox .choices").html("<div class='error'>There has been an error getting data from Lexonomy.</div>");
