@@ -1414,7 +1414,7 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
         try:
             # test if target DB has linkables tables
             rest = targetDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["target_id"],))
-            rowt = ress.fetchone()
+            rowt = rest.fetchone()
             if rowt:
                 target_entry = rowt["entry_id"]
         except:
