@@ -20,15 +20,15 @@ Xrefs.linkBox=function(htmlID) {
   var html = "";
   html = "<div class='xrefsbox'>";
   html += "Link this element to<br/>dictionary: ";
-  html += "<select name='xrefdict' onchange='Xrefs.refreshLinks()'>";
+  html += "<select name='xrefdict' class='browser-default' style='display: inline-block; width: auto;' onchange='Xrefs.refreshLinks()'>";
   for (var dict in userDicts) {
     if (userDicts[dict]["id"] != dictId && userDicts[dict]["hasLinks"]) {
       html += "<option value='"+userDicts[dict]["id"]+"'>"+userDicts[dict]["title"]+"</option>";
     }
   }
-  html += "</select>";
+  html += "</select><br/>";
   html += " target: ";
-  html += "<input name='xreftarget'/>";
+  html += "<div class='input-field'><input id='xreftarget' name='xreftarget' class='autocomplete'/></div>";
   html += "<button onclick='Xrefs.makeLink(\""+htmlID+"\")'>Link</button>";
   html += "</div>";
   document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
@@ -44,42 +44,42 @@ Xrefs.refreshLinks=function() {
   var xrefdict = $("[name=xrefdict]").val();
   $("[name=xreftarget]").empty();
   if (xrefdict != "") {
-    var xrefTarget = $("[name=xreftarget]");
-    xrefTarget.easyAutocomplete({
-      url: "/"+xrefdict+"/linkablelist.json",
-      getValue: "link",
-      template: {
-        type: "custom",
-        method: function(value, item) {
-          return "<i>" + item.element + ":</i> <b>" + item.link + "</b>" + ((item.preview != "")? " (" + item.preview + ")":"");
+    var xrefTarget = $("#xreftarget");
+    var listData = {};
+    var autocompleteData = {};
+    console.log("/"+xrefdict+"/linkablelist.json")
+    $.get("/"+xrefdict+"/linkablelist.json", (response) => {
+      response.links.forEach(item => {
+        var text = item.element + ": " + item.link + ((item.preview != "")? " (" + item.preview + ")":"");
+        listData[text] = item;
+        autocompleteData[text] = null
+      });
+      xrefTarget.autocomplete({
+        data: autocompleteData, 
+        limit: 10, 
+        onAutocomplete: function(txt) {
+          var item = listData[txt];
+          if (item) {
+            $("#xreftarget").data('element', item.element);
+            $("#xreftarget").data('link', item.link);
+          }
         }
-      },
-      list: {
-        match: {
-          enabled: true
-        },
-        maxNumberOfElements: 15,
-        onSelectItemEvent: function() {
-          var data = xrefTarget.getSelectedItemData();
-          xrefTarget.data('element', data.element);
-          xrefTarget.data('link', data.link);
-        }
-      }
+      })
     });
   }
 }
 
 Xrefs.makeLink=function(htmlID) {
   var xrefdict = $("[name=xrefdict]").val();
-  var xrefel = $("[name=xreftarget]").data('element');
-  var xrefid = $("[name=xreftarget]").data('link');
+  var xrefel = $("#xreftarget").data('element');
+  var xrefid = $("#xreftarget").data('link');
   var srcid = $("#"+htmlID+" > .tag.opening > .attributes").children("[data-name='lxnm:linkable']").data('value');
   var srcel = $("#"+htmlID).data('name');
   if (xrefel != undefined && xrefid != undefined && xrefel != "" && xrefid != "" && xrefdict != "" && srcid != undefined && srcel != undefined) {
-    var srcdict = dictID;
+    var srcdict = dictId;
     document.cookie = "linkPref=" + xrefdict + "; path=/" + srcdict;
     $("#"+htmlID+" > .tag.opening > .attributes")
-    $.get("/"+dictID+"/links/add", {source_el: srcel, source_id: srcid, target_dict: xrefdict, target_el: xrefel, target_id: xrefid}, function(json){
+    $.get("/"+dictId+"/links/add", {source_el: srcel, source_id: srcid, target_dict: xrefdict, target_el: xrefel, target_id: xrefid}, function(json){
       if (json.success) {
         Screenful.status('Link created successfully.');
       } else {

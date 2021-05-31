@@ -964,7 +964,7 @@ def linksto(dictID, user, dictDB, configs):
 @authDict([])
 def linkablelist(dictID, user, dictDB, configs):
     res = ops.getDictLinkables(dictDB)
-    return json.dumps(res)
+    return {"links": res}
 
 @get(siteconfig["rootPath"]+"<dictID>/entrylinks.json")
 @authDict([])
