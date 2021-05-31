@@ -43,6 +43,7 @@
 						linking = this.dictConfigs.linking;
 						editing = this.dictConfigs.editing;
 						var userAccess = this.props.userAccess;
+						userDicts = this.props.userDicts;
 						dictId = this.dictId;
 						ske_username = this.props.userInfo.ske_username;
 						ske_apiKey = this.props.userInfo.ske_apiKey;

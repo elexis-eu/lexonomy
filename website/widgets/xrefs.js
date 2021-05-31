@@ -21,9 +21,9 @@ Xrefs.linkBox=function(htmlID) {
   html = "<div class='xrefsbox'>";
   html += "Link this element to<br/>dictionary: ";
   html += "<select name='xrefdict' onchange='Xrefs.refreshLinks()'>";
-  for (var dict in userdicts) {
-    if (userdicts[dict]["id"] != dictID && userdicts[dict]["hasLinks"]) {
-      html += "<option value='"+userdicts[dict]["id"]+"'>"+userdicts[dict]["title"]+"</option>";
+  for (var dict in userDicts) {
+    if (userDicts[dict]["id"] != dictId && userDicts[dict]["hasLinks"]) {
+      html += "<option value='"+userDicts[dict]["id"]+"'>"+userDicts[dict]["title"]+"</option>";
     }
   }
   html += "</select>";
@@ -46,7 +46,7 @@ Xrefs.refreshLinks=function() {
   if (xrefdict != "") {
     var xrefTarget = $("[name=xreftarget]");
     xrefTarget.easyAutocomplete({
-      url: rootPath+xrefdict+"/linkablelist.json",
+      url: "/"+xrefdict+"/linkablelist.json",
       getValue: "link",
       template: {
         type: "custom",
@@ -79,7 +79,7 @@ Xrefs.makeLink=function(htmlID) {
     var srcdict = dictID;
     document.cookie = "linkPref=" + xrefdict + "; path=/" + srcdict;
     $("#"+htmlID+" > .tag.opening > .attributes")
-    $.get(rootPath+dictID+"/links/add", {source_el: srcel, source_id: srcid, target_dict: xrefdict, target_el: xrefel, target_id: xrefid}, function(json){
+    $.get("/"+dictID+"/links/add", {source_el: srcel, source_id: srcid, target_dict: xrefdict, target_el: xrefel, target_id: xrefid}, function(json){
       if (json.success) {
         Screenful.status('Link created successfully.');
       } else {

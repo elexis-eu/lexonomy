@@ -33,7 +33,7 @@
 			</div>
 		</div>
 		<div class="col s9">
-			<dict-edit-entry  entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess } userInfo={ this.props.userInfo }></dict-entry-edit>
+			<dict-edit-entry  entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess } userInfo={ this.props.userInfo } userDicts={ this.userDicts }></dict-entry-edit>
 		</div>
 
 	</div>
@@ -47,6 +47,7 @@
 			entryList: [],
 			entryCount: 0,
 			selectedEntry: '',
+			userDicts: [],
 
 			loadList() {
 				var searchtext = '';
@@ -96,6 +97,9 @@
 				console.log('list edit dict '+ this.dictId + this.doctype + this.props.entryId)
 				this.props.loadDictDetail();
 				this.loadList();
+				$.get("/userdicts.json", (response) => {
+					this.userDicts = response.dicts;
+				});
 			},
 
 			onUpdated() {
