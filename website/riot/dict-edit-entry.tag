@@ -16,10 +16,21 @@
 			entryId: '',
 			dictId: '',
 			dictConfigs: {},
+			selectedMode: 'view',
+			selectedId: '',
 
 			onUpdated() {
-				console.log('list dict edit entry '+ this.props.dictId+'-'+this.props.entryId)
+				console.log('list dict edit entry '+ this.props.dictId+'-'+this.props.entryId+'-'+this.props.selectedId)
 				this.entryId = this.props.entryId;
+				if (this.props.selectedId != '') {
+					if (this.props.selectedId.toString().match(/^view[0-9]*$/)) {
+						this.entryId = this.props.selectedId.substring(4);
+						this.selectedMode = 'view';
+					} else {
+						this.entryId = this.props.selectedId;
+						this.selectedMode = 'edit';
+					}
+				}
 				this.dictId = this.props.dictId;
 				this.dictConfigs = this.props.dictConfigs;
 				if (this.entryId != '') {
@@ -187,6 +198,11 @@
 							Screenful.status(Screenful.Loc.ready);
 							Screenful.Editor.updateToolbar();
 							Screenful.Editor.open(null,this.entryId);
+							if (this.selectedMode == 'edit') {
+								Screenful.Editor.edit(null, this.entryId);
+							} else {
+								Screenful.Editor.view(null, this.entryId);
+							}
 						}
 					});
 				}

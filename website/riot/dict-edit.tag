@@ -33,7 +33,7 @@
 			</div>
 		</div>
 		<div class="col s9">
-			<dict-edit-entry  entryId={ this.selectedEntry } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess } userInfo={ this.props.userInfo } userDicts={ this.userDicts }></dict-entry-edit>
+			<dict-edit-entry  entryId={ this.selectedEntry } selectedId={ this.selectedId } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess } userInfo={ this.props.userInfo } userDicts={ this.userDicts }></dict-entry-edit>
 		</div>
 
 	</div>
@@ -47,6 +47,7 @@
 			entryList: [],
 			entryCount: 0,
 			selectedEntry: '',
+			selectedId: '',
 			userDicts: [],
 
 			loadList() {
@@ -105,11 +106,7 @@
 			onUpdated() {
 				this.doctypes = this.props.doctypes;
 				if (this.props.entryId && this.props.entryId != "") {
-					if (this.props.entryId.match(/^view[0-9]*$/)) {
-						this.selectedEntry = this.props.entryId.substring(4);
-					} else {
-						this.selectedEntry = this.props.entryId;
-					}
+					this.selectedId = this.props.entryId;
 				}
 				console.log('list edit dict update'+ this.dictId+this.doctype+this.props.entryId)
 				$('select').formSelect();
