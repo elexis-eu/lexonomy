@@ -1,7 +1,7 @@
 .viewer {font-size: 1.1rem; padding: 20px; line-height: 1.75em;}
 .viewer .clearFont {font-style: normal; font-weight: normal; color: #333333;}
 
-.viewer a.xref {color: inherit; text-decoration: inherit; border-bottom: 2px solid #cccccc;}
+.viewer a.xref {color: inherit; text-decoration: inherit; border-bottom: 2px solid #cccccc; cursor: pointer;}
 .viewer a.xref:hover {border-bottom: 2px solid #437de2; }
 
 .viewer span.caption {border-bottom: 1px dotted #cccccc; cursor: default;}
