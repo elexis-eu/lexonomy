@@ -83,9 +83,9 @@ Sub.menuSubentry=function(htmlID){
 };
 
 Sub.getHeadword=function(){
-  var $xml=$($.parseXML(Xonomy.harvest()));
-  var hwd=$xml.find(titling.headword).html();
-  if(!hwd) hwd="";
+  var $xml = $($.parseXML(Xonomy.harvest()));
+  var hwd = $xml.find(titling.headword).html().replace(/(<([^>]+)>)/gi, "");
+  if(!hwd) hwd = "";
   return hwd;
 };
 
@@ -137,7 +137,7 @@ Sub.searchSubentries=function(){
   var lemma=$.trim($(".subbox .textbox").val());
   var doctype=$.trim($("input[name=\"doctype\"]").val());
   if(lemma!="") {
-    $.get("/"+dictID+"/subget/", {lemma: lemma, doctype: doctype}, function(json){
+    $.get("/"+dictId+"/subget/", {lemma: lemma, doctype: doctype}, function(json){
         $(".subbox .choices").html("");
         if(!json.success){
           $(".subbox .choices").html("<div class='error'>There has been an error getting data from Lexonomy.</div>");
