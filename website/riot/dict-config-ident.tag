@@ -1,12 +1,5 @@
 <dict-config-ident>
-	<div class="row">
-		<div class="col s10 offset-s1">
-			<h3 class="header">
-				<i class="material-icons">settings</i>
-				{ this.props.dictDetails.title } - Ident
-			</h3>
-		</div>
-	</div>
+	<dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title } configId={ this.configId } configTitle={ this.configTitle }/>
 	<div class="row">
 		<form class="col s12">
 			<div class="row">
@@ -35,6 +28,7 @@
 		export default {
 			dictId: '',
 			configId: '',
+			configTitle: 'Description', 
 			configData: {},
 			onMounted() {
 				this.dictId = this.props.dictId;

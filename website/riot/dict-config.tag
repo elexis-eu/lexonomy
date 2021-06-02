@@ -1,12 +1,5 @@
 <dict-config>
-	<div class="row">
-		<div class="col s10 offset-s1">
-			<h3 class="header">
-				<i class="material-icons">settings</i>
-				{ this.props.dictDetails.title }
-			</h3>
-		</div>
-	</div>
+	<dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title }/>
 	<div class="row">
 		<div class="col s10 offset-s1">
 			<div class="row">
