@@ -6,6 +6,7 @@
 				<span if={ dict.lang }>{ dict.lang }</span>
 				<a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="delete dictionary" onclick={ doDeleteDict }><i class="material-icons">delete</i></a>
 				<a style="cursor: pointer" class="secondary-content" data-dict-id={ dict.id } title="clone dictionary" onclick={ doCloneDict }><i class="material-icons">content_copy</i></a>
+				<a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="config dictionary" onclick={ doConfigDict }><i class="material-icons">settings</i></a>
 				<a style="cursor: pointer" if={ dict.currentUserCanEdit } class="secondary-content" data-dict-id={ dict.id } title="edit dictionary" onclick={ doEditDict }><i class="material-icons">edit</i></a>
 			</div>
 		</li>
@@ -26,6 +27,11 @@
 			doEditDict(event) {
 				var dictId = event.target.parentNode.getAttribute('data-dict-id');
 				route(dictId + "/edit");
+			},
+
+			doConfigDict(event) {
+				var dictId = event.target.parentNode.getAttribute('data-dict-id');
+				route(dictId + "/config");
 			},
 
 			doCloneDict(event) {
