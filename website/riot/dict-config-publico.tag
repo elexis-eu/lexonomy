@@ -18,7 +18,7 @@
 				</div>
 				<div class="input-field col s10" id="publico_licence_info">
 					<select id="publico_licence">
-						<option each={ licence in licences } value={ licence.id } selected={ this.configData.licence == licence.id }>{ licence.title }</option>
+						<option each={ licence in licences } value={ licence.id } data-url={ licence.url } selected={ this.configData.licence == licence.id }>{ licence.title }</option>
 					</select>
 					<label>Licence</label>
 					<span class="helper-text"></span>
@@ -60,6 +60,7 @@
 				this.props.loadDictDetail();
 				this.fillConfigForm();
 				console.log(this.props);
+
 				$('#publico_public_private').on('change', function() {
 					if($(this).is(":checked")) {
 						$('#publico_licence_info').hide();
@@ -69,6 +70,10 @@
 					if($(this).is(":checked")) {
 						$('#publico_licence_info').show();
 					}					
+				});
+				$('#publico_licence').on('change', function() {
+					var url = $('#publico_licence option:selected').data('url')
+					$('#publico_licence_info .helper-text').html('More information about this licence: <a target="_blank" href="' + url + '">' + url + "</a>.");
 				});
 			},
 
@@ -80,6 +85,9 @@
 					$('#publico_licence').formSelect();
 					if (!(this.configData.public)) {
 						$('#publico_licence_info').hide();
+					} else {
+						var url = $('#publico_licence option:selected').data('url')
+						$('#publico_licence_info .helper-text').html('More information about this licence: <a target="_blank" href="' + url + '">' + url + "</a>.");
 					}
 				});
 			},
