@@ -24,7 +24,9 @@
 
 			getCookie(val) {
 				if (document.cookie != undefined) {
-					return document.cookie.split('; ').find(row => row.startsWith(val+'=')).split('=')[1].slice(1,-1);
+					if (document.cookie.split('; ').find(row => row.startsWith(val+'=')) != undefined) {
+						return document.cookie.split('; ').find(row => row.startsWith(val+'=')).split('=')[1].slice(1,-1);
+					}
 				} else {
 					return "";
 				}
