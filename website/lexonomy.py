@@ -358,13 +358,17 @@ def login():
 
 @post(siteconfig["rootPath"] + "login.json")
 def check_login():
-    res = ops.login(request.forms.email, request.forms.password)
-    if res["success"]:
-        response.set_cookie("email", res["email"], path="/")
-        response.set_cookie("sessionkey", res["key"], path="/")
-        return {"success": True, "sessionkey": res["key"], "ske_username": res["ske_username"], "ske_apiKey": res["ske_apiKey"]}
-    else:
-        return {"success": False}
+    if request.forms.email != "" and request.forms.password != "":
+        res = ops.login(request.forms.email, request.forms.password)
+        if res["success"]:
+            response.set_cookie("email", res["email"], path="/")
+            response.set_cookie("sessionkey", res["key"], path="/")
+            return {"success": True, "email": res["email"], "sessionkey": res["key"], "ske_username": res["ske_username"], "ske_apiKey": res["ske_apiKey"]}
+    if request.cookies.email != "" and request.cookies.sessionkey != "":
+        res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+        if res["loggedin"]:
+            return {"success": True, "email": res["email"], "sessionkey": request.cookies.sessionkey, "ske_username": res["ske_username"], "ske_apiKey": res["ske_apiKey"]}
+    return {"success": False}
 
 @post(siteconfig["rootPath"] + "logout.json")
 @auth

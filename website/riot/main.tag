@@ -23,7 +23,28 @@
 			},
 
 			getCookie(val) {
-				return document.cookie.split('; ').find(row => row.startsWith(val+'=')).split('=')[1].slice(1,-1);
+				if (document.cookie) {
+					return document.cookie.split('; ').find(row => row.startsWith(val+'=')).split('=')[1].slice(1,-1);
+				} else {
+					return null;
+				}
+			},
+
+			checkAuthCookie() {
+				if (this.getCookie('email') != '' && this.getCookie('sessionkey') != '' && this.state.userInfo.username == '') {
+					console.log('cookie auth')
+					$.post("/login.json", (response) => {
+						if (response.success) {
+							this.state.userInfo.username = response.email;
+							this.state.userInfo.ske_username = response.ske_username;
+							this.state.userInfo.ske_apiKey = response.ske_apiKey;
+							this.state.authorized = true;
+						}
+					}).always(() => {
+						this.checkingAuth = false;
+						this.update();
+					})
+				}
 			},
 
 			checkAuth() {
@@ -99,8 +120,7 @@
 			},
 
 			onMounted() {
-				this.state.authorized = true;
-				this.state.userInfo = {username: 'rambousek@gmail.com', ske_username: 'sso_458', ske_apiKey: '0a632cda5add424b97432ffb28806ffd'};
+				this.checkAuthCookie();
 
 				console.log('mount')
 				route('/*/edit', (dictId) => {
