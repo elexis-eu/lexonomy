@@ -23,10 +23,10 @@
 			},
 
 			getCookie(val) {
-				if (document.cookie) {
+				if (document.cookie != undefined) {
 					return document.cookie.split('; ').find(row => row.startsWith(val+'=')).split('=')[1].slice(1,-1);
 				} else {
-					return null;
+					return "";
 				}
 			},
 
