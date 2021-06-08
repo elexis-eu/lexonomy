@@ -1,7 +1,7 @@
 <main>
   <div class="container">
 		<header is="header" ref="header" authorized={ this.state.authorized } user-info={ this.state.userInfo } log-out={ logOut } show-dict-menu={ this.state.showDictMenu } dict-id={ this.dictId } user-access={ this.state.userAccess }></header>
-		<div class="content row" is={ this.content } dict-id={ this.dictId } authorized={ this.state.authorized } check-auth={ checkAuth } user-info={ this.state.userInfo } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess } doctype={ this.doctype } doctypes={ this.doctypes }></div>
+		<div class="content row" is={ this.content } dict-id={ this.dictId } authorized={ this.state.authorized } account-ops={ accountOps } user-info={ this.state.userInfo } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess } doctype={ this.doctype } doctypes={ this.doctypes } main-sub-page={ this.state.subPage }></div>
 		<footer is="footer"></footer>
   </div>
 
@@ -20,6 +20,7 @@
 				showDictMenu: false,
 				publicMoreEntries: [],
 				dictConfigs: {},
+				subPage: 'login',
 			},
 
 			getCookie(val) {
@@ -49,20 +50,48 @@
 				}
 			},
 
-			checkAuth() {
-				var email = $('#username').val();
-				var password = $('#password').val();
-				$.post("/login.json", {email: email, password: password}, (response) => {
-					if (response.success) {
-						this.state.userInfo.username = this.getCookie('email');
-						this.state.userInfo.ske_username = response.ske_username;
-						this.state.userInfo.ske_apiKey = response.ske_apiKey;
-						this.state.authorized = true;
+			accountOps(type) {
+				return new Promise((resolve) => {
+					if (type == 'login') {
+						var email = $('#username').val();
+						var password = $('#password').val();
+						$.post("/login.json", {email: email, password: password}, (response) => {
+							if (response.success) {
+								this.state.userInfo.username = this.getCookie('email');
+								this.state.userInfo.ske_username = response.ske_username;
+								this.state.userInfo.ske_apiKey = response.ske_apiKey;
+								this.state.authorized = true;
+							}
+						}).always(() => {
+							this.checkingAuth = false;
+							this.update();
+						});
 					}
-				}).always(() => {
-					this.checkingAuth = false;
-					this.update();
-				})
+
+					if (type == 'register') {
+						$.post("/signup.json", {email: $('#email').val()}, (response) => {
+							if (response.success) {
+								resolve({success: true});
+							} else {
+								resolve({success: false, errorMessage: 'Incorrect e-mail.'});
+							}
+						}).fail(() => {
+								resolve({success: false, errorMessage: 'Incorrect e-mail.'});
+						});
+					}
+
+					if (type == 'forgot') {
+						$.post("/forgotpwd.json", {email: $('#email').val()}, (response) => {
+							if (response.success) {
+								resolve({success: true});
+							} else {
+								resolve({success: false, errorMessage: 'Incorrect e-mail.'});
+							}
+						}).fail(() => {
+								resolve({success: false, errorMessage: 'Incorrect e-mail.'});
+						});
+					}
+				});
 			},
 
 			logOut() {
@@ -191,6 +220,22 @@
 					this.content = 'dict-config';
 					this.update();
 				});
+				route('/register', () => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = 'register';
+					this.content = 'main-page';
+					this.update();
+				});
+				route('/forgot', () => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = 'forgot';
+					this.content = 'main-page';
+					this.update();
+				});
 				route('/*', (dictId) => {
 					console.log('testd ' + dictId)
 					this.dictId = dictId;
@@ -202,6 +247,7 @@
 					this.dictId = '';
 					this.state.showDictMenu = false;
 					this.state.userAccess = false;
+					this.state.subPage = 'login';
 					this.content = 'main-page';
 					this.update();
 				});

@@ -7,9 +7,9 @@
 		<li if={ props.userAccess && props.userAccess.canUpload }><a href="#/{ props.dictId }/upload">Upload</a></li>
 	</ul>
 	<ul if={ !props.authorized } id="dropdown-menu-anon" class="dropdown-content">
-	  <li><a href="#!">Log in</a></li>
-	  <li><a href="#!">Get an account</a></li>
-	  <li><a href="#!">Forgot your password?</a></li>
+	  <li><a href="#/">Log in</a></li>
+	  <li><a href="#/register">Get an account</a></li>
+	  <li><a href="#/forgot">Forgot your password?</a></li>
 	</ul>
 	<ul if={ props.authorized } id="dropdown-menu-user" class="dropdown-content">
 	  <li><a href="#/" onclick={ doLogout }>Log out</a></li>

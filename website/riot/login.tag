@@ -1,7 +1,7 @@
 <login>
 	<div class="section">
 	<div class="input-field col s6">
-		<input type="text" id="username" type="text"/>
+		<input id="username" type="email" class="validate"/>
 		<label for="username">Username</label>
 	</div>
 	<div class="input-field col s6">
@@ -17,7 +17,7 @@
 		export default {
 			doLogin(event) {
 				if ((event.target.id == "username" || event.target.id == "password") && event.keyCode != 13) return false;
-				this.props.checkAuth();
+				this.props.accountOps('login');
 			}
 		}
 	</script>
