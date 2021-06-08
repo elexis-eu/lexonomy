@@ -126,19 +126,22 @@ def authAdmin(func):
 #homepage
 @get(siteconfig["rootPath"])
 def home():
-    res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
-    if res["loggedin"] and siteconfig["consent"] and siteconfig["consent"]["terms"] and not res["consent"]:
-        return redirect("/consent/")
-    dicts = ops.getDictsByUser(res["email"])
-    error = ""
-    version = ""
-    if os.path.isfile("version.txt"):
-        with open("version.txt", "r") as version_file:
-            version = version_file.read()
-    if request.cookies.jwt_error:
-        error = request.cookies.jwt_error
-        response.delete_cookie("jwt_error", path="/")
-    return template("home.tpl", **{"user": res, "siteconfig": siteconfig, "dicts": dicts, "error": error, "version": version})
+    return static_file("/index.html", root="./")
+#@get(siteconfig["rootPath"])
+#def home():
+#    res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+#    if res["loggedin"] and siteconfig["consent"] and siteconfig["consent"]["terms"] and not res["consent"]:
+#        return redirect("/consent/")
+#    dicts = ops.getDictsByUser(res["email"])
+#    error = ""
+#    version = ""
+#    if os.path.isfile("version.txt"):
+#        with open("version.txt", "r") as version_file:
+#            version = version_file.read()
+#    if request.cookies.jwt_error:
+#        error = request.cookies.jwt_error
+#        response.delete_cookie("jwt_error", path="/")
+#    return template("home.tpl", **{"user": res, "siteconfig": siteconfig, "dicts": dicts, "error": error, "version": version})
 
 @get(siteconfig["rootPath"] + "userdicts.json")
 @auth
