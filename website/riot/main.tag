@@ -1,7 +1,7 @@
 <main>
   <div class="container">
 		<header is="header" ref="header" authorized={ this.state.authorized } user-info={ this.state.userInfo } log-out={ logOut } show-dict-menu={ this.state.showDictMenu } dict-id={ this.dictId } user-access={ this.state.userAccess }></header>
-		<div class="content row" is={ this.content } dict-id={ this.dictId } authorized={ this.state.authorized } account-ops={ accountOps } user-info={ this.state.userInfo } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess } doctype={ this.doctype } doctypes={ this.doctypes } main-sub-page={ this.state.subPage }></div>
+		<div class="content row" is={ this.content } dict-id={ this.dictId } authorized={ this.state.authorized } account-ops={ accountOps } user-info={ this.state.userInfo } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess } doctype={ this.doctype } doctypes={ this.doctypes } main-sub-page={ this.state.subPage } token={ this.state.token }></div>
 		<footer is="footer"></footer>
   </div>
 
@@ -21,6 +21,7 @@
 				publicMoreEntries: [],
 				dictConfigs: {},
 				subPage: 'login',
+				token: '',
 			},
 
 			getCookie(val) {
@@ -91,6 +92,30 @@
 								resolve({success: false, errorMessage: 'Incorrect e-mail.'});
 						});
 					}
+
+					if (type == 'registerPassword') {
+						$.post("/createaccount.json", {token: $('#token').val(), password: $('#password').val()}, (response) => {
+							if (response.success) {
+								resolve({success: true});
+							} else {
+								resolve({success: false, errorMessage: 'Error while creating account.'});
+							}
+						}).fail(() => {
+								resolve({success: false, errorMessage: 'Error while creating account.'});
+						});
+					}
+
+					if (type == 'forgotPassword') {
+						$.post("/recoverpwd.json", {token: $('#token').val(), password: $('#password').val()}, (response) => {
+							if (response.success) {
+								resolve({success: true});
+							} else {
+								resolve({success: false, errorMessage: 'Error while accessing account.'});
+							}
+						}).fail(() => {
+								resolve({success: false, errorMessage: 'Error while accessing account.'});
+						});
+					}
 				});
 			},
 
@@ -154,6 +179,40 @@
 				this.checkAuthCookie();
 
 				console.log('mount')
+				route('/createaccount/*', (token) => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = 'registerPassword';
+					this.state.token = token;
+					this.content = 'main-page';
+					this.update();
+				});
+				route('/recoverpwd/*', (token) => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = 'forgotPassword';
+					this.state.token = token;
+					this.content = 'main-page';
+					this.update();
+				});
+				route('/register', () => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = 'register';
+					this.content = 'main-page';
+					this.update();
+				});
+				route('/forgot', () => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = 'forgot';
+					this.content = 'main-page';
+					this.update();
+				});
 				route('/*/edit', (dictId) => {
 					console.log('edit ' + dictId)
 					this.dictId = dictId;
@@ -200,7 +259,7 @@
 					this.content = 'dict-edit';
 					this.update();
 				});
-				route('/*/([0-9]*)', (dictId, entryId) => {
+				route('/*/([0-9]*)$', (dictId, entryId) => {
 					console.log('public entry ' + dictId + '-' + entryId)
 					this.dictId = dictId;
 					this.entryId = entryId;
@@ -218,22 +277,6 @@
 					console.log('config ' + dictId)
 					this.dictId = dictId;
 					this.content = 'dict-config';
-					this.update();
-				});
-				route('/register', () => {
-					this.dictId = '';
-					this.state.showDictMenu = false;
-					this.state.userAccess = false;
-					this.state.subPage = 'register';
-					this.content = 'main-page';
-					this.update();
-				});
-				route('/forgot', () => {
-					this.dictId = '';
-					this.state.showDictMenu = false;
-					this.state.userAccess = false;
-					this.state.subPage = 'forgot';
-					this.content = 'main-page';
 					this.update();
 				});
 				route('/*', (dictId) => {

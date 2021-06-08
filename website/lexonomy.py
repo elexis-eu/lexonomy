@@ -408,6 +408,11 @@ def signup():
         return redirect("/")
     return template("signup.tpl", **{"siteconfig": siteconfig, "redirectUrl": "/"})
 
+@post(siteconfig["rootPath"] + "verifytoken.json")
+def verify_token():
+    valid = ops.verifyToken(request.forms.token, request.forms.type)
+    return {"success": valid}
+
 @post(siteconfig["rootPath"] + "signup.json")
 def send_signup():
     client_ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
