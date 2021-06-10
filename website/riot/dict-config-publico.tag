@@ -1,33 +1,30 @@
 <dict-config-publico>
 	<dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title } configId={ this.configId } configTitle={ this.configTitle }/>
 	<div class="row">
-		<form class="col s12">
-			<div class="row">
-				<div class="input-field col s10">
-					<p>
-						<label>
-							<input name="publico_public" id="publico_public_private" type="radio" class="with-gap" checked={ !(this.configData.public) } />
-							<span>Private</span>
-						</label>
-						<label>
-							<input name="publico_public" id="publico_public_public" type="radio" class="with-gap" checked={ this.configData.public } />
-							<span>Public</span>
-						</label>
-					</p>
-					<span class="helper-text"><i>Private</i> means that the dictionary is not publicly viewable.  <i>Public</i> means that the dictionary is publicly viewable.</span>
-				</div>
-				<div class="input-field col s10" id="publico_licence_info">
-					<select id="publico_licence">
-						<option each={ licence in licences } value={ licence.id } data-url={ licence.url } selected={ this.configData.licence == licence.id }>{ licence.title }</option>
-					</select>
-					<label>Licence</label>
-					<span class="helper-text"></span>
-				</div>
+		<div class="row">
+			<div class="input-field col s10">
+				<p>
+					<label>
+						<input name="publico_public" id="publico_public_private" type="radio" class="with-gap" checked={ !(this.configData.public) } />
+						<span>Private</span>
+					</label>
+					<label>
+						<input name="publico_public" id="publico_public_public" type="radio" class="with-gap" checked={ this.configData.public } />
+						<span>Public</span>
+					</label>
+				</p>
+				<span class="helper-text"><i>Private</i> means that the dictionary is not publicly viewable.  <i>Public</i> means that the dictionary is publicly viewable.</span>
 			</div>
-			<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
-			</button>
-
-		</form>
+			<div class="input-field col s10" id="publico_licence_info">
+				<select id="publico_licence">
+					<option each={ licence in licences } value={ licence.id } data-url={ licence.url } selected={ this.configData.licence == licence.id }>{ licence.title }</option>
+				</select>
+				<label>Licence</label>
+				<span class="helper-text"></span>
+			</div>
+		</div>
+		<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
+		</button>
 	</div>
 	<script>
 		export default {
