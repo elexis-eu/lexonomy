@@ -305,7 +305,7 @@ def sendSignupToken(email, remoteip):
     user = c.fetchone()
     if not user:
         token = secrets.token_hex()
-        tokenurl = siteconfig["baseUrl"] + "createaccount/" + token
+        tokenurl = siteconfig["baseUrl"] + "#/createaccount/" + token
         expireDate = datetime.datetime.now() + datetime.timedelta(days=2)
         mailSubject = "Lexonomy signup"
         mailText = "Dear Lexonomy user,\n\n"
@@ -328,7 +328,7 @@ def sendToken(email, remoteip):
     user = c.fetchone()
     if user:
         token = secrets.token_hex()
-        tokenurl = siteconfig["baseUrl"] + "recoverpwd/" + token
+        tokenurl = siteconfig["baseUrl"] + "#/recoverpwd/" + token
         expireDate = datetime.datetime.now() + datetime.timedelta(days=2)
         mailSubject = "Lexonomy password reset"
         mailText = "Dear Lexonomy user,\n\n"
