@@ -120,9 +120,9 @@
 								docSpec.laybyMessage="This is your temporary lay-by for entry fragments. You can drag and drop XML elements here.";
 							}
 							Xonomy.setMode(Cookies.get("xonomyMode_" + dictId) || editing["xonomyMode"]);
+							Xrefs.extendDocspec(docSpec, xema);
 							Ske.extendDocspec(docSpec, xema);
 							Sub.extendDocspec(docSpec, xema);
-							Xrefs.extendDocspec(docSpec, xema);
 							docSpec.onchange = Screenful.Editor.changed;
 							if (uneditable) {
 								for (elName in docSpec.elements) docSpec.elements[elName].isReadOnly = true;
