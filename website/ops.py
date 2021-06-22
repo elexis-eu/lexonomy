@@ -67,7 +67,7 @@ def readDictConfigs(dictDB):
         configs[r["id"]] = json.loads(r["json"])
     for conf in ["ident", "publico", "users", "kex", "titling", "flagging",
                  "searchability", "xampl", "thes", "collx", "defo", "xema",
-                 "xemplate", "editing", "subbing", "download", "links", "autonumber"]:
+                 "xemplate", "editing", "subbing", "download", "links", "autonumber", "gapi"]:
         if not conf in configs:
             configs[conf] = defaultDictConfig.get(conf, {})
 

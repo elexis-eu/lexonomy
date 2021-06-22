@@ -63,6 +63,7 @@
 					<div class="signpost"><a href="../../{{dictID}}/config/links/">Linking</a></div>
 					<div class="signpost"><a href="../../{{dictID}}/config/download/">Download settings</a></div>
 					<div class="signpost"><a href="../../{{dictID}}/config/subbing/">Subentries</a></div>
+					<div class="signpost"><a href="../../{{dictID}}/config/gapi/">Google API</a></div>
 				</div>
 				<div class="signposts sketch">
 					<div class="title">Sketch Engine</div>
