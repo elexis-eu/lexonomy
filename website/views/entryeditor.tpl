@@ -20,6 +20,8 @@
     <link type="text/css" rel="stylesheet" href="../../../widgets/xemplatron.css" />
     <script type="text/javascript" src="../../../widgets/xrefs.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../widgets/xrefs.css" />
+    <script type="text/javascript" src="../../../widgets/gmedia.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../../widgets/gmedia.css" />
     <script type="text/javascript" src="../../../widgets/ske.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../widgets/ske.css" />
     <script type="text/javascript" src="../../../widgets/sub.js"></script>
@@ -71,6 +73,7 @@
     var flagging={{!JSON(flagging)}};
     var linking={{!JSON(linking)}};
     var userdicts={{!JSON(userdicts)}};
+    var gapi={{!JSON(gapi)}};
     var ske_username = {{!JSON(user.get("ske_username"))}};
     var ske_apiKey = {{!JSON(user.get("ske_apiKey"))}};
     if(!xemplate[xema.root]) xemplate[xema.root]={shown: false};
@@ -125,6 +128,7 @@
       }
       Xonomy.setMode(Cookies.get("xonomyMode_{{dictID}}") || "{{editing["xonomyMode"]}}");
       Xrefs.extendDocspec(docSpec, xema);
+      Gmedia.extendDocspec(docSpec, xema);
       Ske.extendDocspec(docSpec, xema);
       Sub.extendDocspec(docSpec, xema);
       docSpec.onchange=Screenful.Editor.changed;
