@@ -1032,14 +1032,15 @@ def showImportErrors(filename, truncate):
 
 def importfile(dictID, filename, email):
     import subprocess
+    import sys
     pidfile = filename + ".pid";
     errfile = filename + ".err";
     if os.path.isfile(pidfile):
         return checkImportStatus(pidfile, errfile)
     pidfile_f = open(pidfile, "w")
     errfile_f = open(errfile, "w")
-    dbpath = os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")
-    p = subprocess.Popen(["adminscripts/import.py", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
+    dbpath = os.path.join(siteconfig["dataDir"], "dicts", dictID+".sqlite")
+    p = subprocess.Popen([sys.executable, "adminscripts/import.py", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
     return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
 
 def checkImportStatus(pidfile, errfile):

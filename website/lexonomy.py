@@ -698,17 +698,19 @@ def upload(dictID, user, dictDB, configs):
 @authDict(["canUpload"])
 def uploadhtml(dictID, user, dictDB, configs):
     import tempfile
+    import urllib.parse
     if not request.files.get("myfile"):
         return "<html><body>false</body></html>"
     else:
         upload = request.files.get("myfile")
         uploadStart = str(datetime.datetime.utcnow())
-        temppath = tempfile.mkdtemp()
+        uploadStartqs = urllib.parse.urlencode({'uploadStart': uploadStart})
+        temppath = tempfile.mkdtemp()+os.pathsep+upload.filename
+        temppathqs = urllib.parse.urlencode({'file': temppath})
         upload.save(temppath)
-        filepath = temppath+"/"+upload.filename
         if request.forms.purge == "on":
-            ops.purge(dictDB, user["email"], { "uploadStart": uploadStart, "filename": filepath })
-        return "<html><body>../import/?file=" + filepath + "&amp;uploadStart=" + uploadStart + "</body></html>"
+            ops.purge(dictDB, user["email"], { "uploadStart": uploadStart, "filename": temppath })
+        return "<html><body>../import/?" + temppathqs + "&amp;" + uploadStartqs + "</body></html>"
 
 @get(siteconfig["rootPath"]+"<dictID>/import")
 @authDict(["canUpload"], True)

@@ -22,7 +22,7 @@
 		<script type="text/javascript">
 		Screenful.Job.message="Lexonomy is importing your entries.";
 		Screenful.Job.actionUrl="../import.json";
-		Screenful.Job.state={filename: "{{filename}}", uploadStart: "{{uploadStart}}"};
+		Screenful.Job.state={filename: {{!JSON(filename)}}, uploadStart: {{!JSON(uploadStart)}}};
 		Screenful.Job.awayUrl="../resave/";
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../furniture/ui.css" />
