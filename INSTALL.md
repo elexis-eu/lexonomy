@@ -39,7 +39,7 @@ Make sure that your docker-compose points to the right volume locations on the h
 
 Initialize database and admin user:
 ```
-docker-compose exec python3 adminscripts/init.js
+docker-compose exec python3 adminscripts/init.py
 ```
 This will create a database file inside your data volume.
 
