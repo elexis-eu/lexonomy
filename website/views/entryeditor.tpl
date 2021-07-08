@@ -91,6 +91,7 @@
           window.parent.$("#searchbox").val(text);
           window.parent.Screenful.Navigator.list();
         });
+        Gmedia.addVoice(entry);
       };
     }
 
@@ -153,6 +154,7 @@
       } else {
         customizeEditor.editor(div, entry ? entry : {content: newXml, id: 0}, uneditable);
       }
+      Gmedia.addVoice();
     };
     Screenful.Editor.harvester=function(div){
       if(!usingOwnEditor){

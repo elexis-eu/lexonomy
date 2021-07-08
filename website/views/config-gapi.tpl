@@ -50,6 +50,6 @@
         <link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
     </head>
     <body>
-                %include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Google API", configUrl="gapi", rootPath="../../../")
+                %include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Multimedia API", configUrl="gapi", rootPath="../../../")
     </body>
 </html>
