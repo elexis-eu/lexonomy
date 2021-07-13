@@ -213,6 +213,14 @@
 					this.content = 'main-page';
 					this.update();
 				});
+				route('/make', () => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = 'new';
+					this.content = 'main-page';
+					this.update();
+				});
 				route('/*/edit', (dictId) => {
 					console.log('edit ' + dictId)
 					this.dictId = dictId;

@@ -476,11 +476,16 @@ def userprofile(user):
 def makedict(user):
     return template("make.tpl", **{"siteconfig": siteconfig, "suggested": ops.suggestDictId(), "user": user})
 
+@get(siteconfig["rootPath"] + "makesuggest.json")
+@auth
+def makedict(user):
+    return {"baseUrl": siteconfig['baseUrl'], "suggested": ops.suggestDictId()}
+
 @post(siteconfig["rootPath"] + "make.json")
 @auth
 def makedictjson(user):
     res = ops.makeDict(request.forms.url, request.forms.template, request.forms.title, "", user["email"])
-    return {"success": res}
+    return {"success": res, "url": request.forms.url}
 
 @post(siteconfig["rootPath"]+"<dictID>/clone.json")
 @authDict(["canConfig"])

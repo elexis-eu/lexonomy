@@ -11,6 +11,7 @@
 			</div>
 		</li>
 	</ul>
+	<a href="#/make" class="waves-effect waves-light btn-small"><i class="material-icons left">add</i>create new dictionary</a>
 
 	<script>
 		export default {
