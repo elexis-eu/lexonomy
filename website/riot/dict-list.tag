@@ -3,7 +3,7 @@
 		<li each={ dict in userdicts } class="collection-item ">
 			<div>
 				<a href="#/{ dict.id }" style="cursor: pointer">{ dict.title }</a>
-				<span if={ dict.lang }>{ dict.lang }</span>
+				<span if={ dict.lang } class="dict-lang">{ dict.lang }</span>
 				<a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="delete dictionary" onclick={ doDeleteDict }><i class="material-icons">delete</i></a>
 				<a style="cursor: pointer" class="secondary-content" data-dict-id={ dict.id } title="clone dictionary" onclick={ doCloneDict }><i class="material-icons">content_copy</i></a>
 				<a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="config dictionary" onclick={ doConfigDict }><i class="material-icons">settings</i></a>
@@ -58,4 +58,10 @@
 			}
 		}
 	</script>
+
+	<style>
+		.dict-lang {
+			padding-left: 0.5em;
+		}
+	</style>
 </dict-list>
