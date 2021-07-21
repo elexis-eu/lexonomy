@@ -27,8 +27,9 @@ Gmedia.getHeadword=function() {
 Gmedia.addLink=function(htmlID, target) {
   $('#'+htmlID+' .children div').attr('data-value', target.getAttribute('data-url'));
   $('#'+htmlID+' .children div').removeClass('empty');
+  $('#'+htmlID+' .children div').removeClass('whitespace');
   $('#'+htmlID+' .children div .value .word').html(target.getAttribute('data-url'));
-  Xonomy.refresh()
+  Xonomy.changed()
 };
 
 Gmedia.menuRoot=function(htmlID) {
