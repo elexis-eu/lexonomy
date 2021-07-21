@@ -20,6 +20,11 @@ Gapi.render=function(div, json){
   $div.find("#Gapi_cx").val(json.cx);
   $div.append("<div class='instro'>Insert ID of your Custom Search - see <a href='https://developers.google.com/custom-search/v1/introduction'>documentation</a>.</div>");
   $div.append("<hr>");
+  $div.append("<div class='title'>Pixabay API key</div>");
+  $div.append("<input class='textbox' id='Pixabay_key'/>");
+  $div.find("#Pixabay_key").val(json.pixabaykey);
+  $div.append("<div class='instro'>Insert your <a href='https://pixabay.com/api/docs/'>Pixabay API key</a>.</div>");
+  $div.append("<hr>");
   $div.append("<div class='title'>VoiceRSS API key</div>");
   $div.append("<input class='textbox' id='Voice_key'/>");
   $div.find("#Voice_key").val(json.voicekey);
@@ -35,6 +40,7 @@ Gapi.harvest=function(div){
   ret.image_licence = $.trim( $div.find("#Img_licence").val() ) || "code";
   ret.apikey = $.trim( $div.find("#Gapi_key").val() ) || "";
   ret.cx = $.trim( $div.find("#Gapi_cx").val() ) || "";
+  ret.pixabaykey = $.trim( $div.find("#Pixabay_key").val() ) || "";
   ret.voicekey = $.trim( $div.find("#Voice_key").val() ) || "";
   ret.voicelang = $.trim( $div.find("#Voice_lang").val() ) || "";
   return ret;
