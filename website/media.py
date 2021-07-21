@@ -3,14 +3,23 @@ import requests
 
 def get_images(configs, query):
     images = []
+    if not configs["gapi"]["image_licence"] or configs["gapi"]["image_licence"] == "":
+        configs["gapi"]["image_licence"] = "code"
     if configs["gapi"] and configs["gapi"]["apikey"] != "" and configs["gapi"]["cx"] != "":
-        images.extend(get_image_google(query, configs["gapi"]["apikey"], configs["gapi"]["cx"]))
+        images.extend(get_image_google(query, configs["gapi"]["apikey"], configs["gapi"]["cx"], configs["gapi"]["image_licence"]))
     return images
 
 
-def get_image_google(query, apikey, cx):
+def get_image_google(query, apikey, cx, licence):
     images = []
     endpoint = 'https://www.googleapis.com/customsearch/v1'
+    rights = {
+        'any': '(cc_publicdomain|cc_attribute|cc_sharealike|cc_noncommercial|cc_nonderived)',
+        'public': 'cc_publicdomain',
+        'comm': '(cc_publicdomain|cc_attribute|cc_sharealike|cc_nonderived).-(cc_noncommercial)',
+        'der': '(cc_publicdomain|cc_attribute|cc_sharealike|cc_noncommercial).-(cc_nonderived)',
+        'code': '(cc_publicdomain|cc_attribute|cc_sharealike).-(cc_noncommercial|cc_nonderived)',
+    }
     params = {
         'key': apikey,
         'cx': cx,
@@ -19,7 +28,7 @@ def get_image_google(query, apikey, cx):
         'imgSize': 'medium',
         'searchType': 'image',
         'format': 'json',
-        'rights': '(cc_publicdomain|cc_attribute|cc_sharealike|cc_nonderived).-(cc_noncommercial)'
+        'rights': rights[licence]
     }
     results = requests.get(endpoint, params=params)
     for item in results.json()['items']:

@@ -7,6 +7,10 @@ Gapi.ifchange=function(event){};
 Gapi.render=function(div, json){
   $(div).append("<div id='pagebody' class='notop'><div class='pillarform'></div></div>"); var $div=$(div).find("div.pillarform");
 
+  $div.append("<div class='title'>Image licence</div>");
+  $div.append("<select id='Img_licence'><option value='any'>any licence</option><option value='comm'>permits commercial use</option><option value='der'>permits derivative works</option><option value='code'>permits commercial and derivative use</option><option value='public'>public domain</option></select>");
+  $div.append("<div class='instro'>Select licence type when searching for images.</div>");
+  $div.find("#Img_licence").val(json.image_licence);
   $div.append("<div class='title'>Google Custom Search API key</div>");
   $div.append("<input class='textbox' id='Gapi_key'/>");
   $div.find("#Gapi_key").val(json.apikey);
@@ -28,6 +32,7 @@ Gapi.render=function(div, json){
 Gapi.harvest=function(div){
   var $div = $(div);
   var ret = {};
+  ret.image_licence = $.trim( $div.find("#Img_licence").val() ) || "code";
   ret.apikey = $.trim( $div.find("#Gapi_key").val() ) || "";
   ret.cx = $.trim( $div.find("#Gapi_cx").val() ) || "";
   ret.voicekey = $.trim( $div.find("#Voice_key").val() ) || "";
