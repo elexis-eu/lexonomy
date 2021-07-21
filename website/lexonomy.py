@@ -10,6 +10,7 @@ import json
 import datetime
 import urllib.request
 from ops import siteconfig
+import media
 import bottle
 from bottle import (hook, route, get, post, run, template, error, request,
                     response, static_file, abort, redirect, install)
@@ -257,6 +258,12 @@ def consent(user):
 def save_consent(user):
     res = ops.setConsent(user["email"], request.forms.consent)
     return {"success": res}
+
+@get(siteconfig["rootPath"] + "<dictID>/getmedia/<query>")
+@authDict(["canEdit"])
+def getmedia(dictID, query, user, dictDB, configs):
+    res = media.get_images(configs, query)
+    return {"images": res}
 
 @get(siteconfig["rootPath"] + "skeget/corpora")
 @auth

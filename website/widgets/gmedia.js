@@ -37,13 +37,13 @@ Gmedia.menuRoot=function(htmlID) {
   var headword = Gmedia.getHeadword();
   if (headword != '') {
     html += headword;
-    var url = 'https://customsearch.googleapis.com/customsearch/v1';
-    $.get(url, {cx: gapi.cx, key: gapi.apikey, searchType: 'image', imgSize: 'LARGE', rights: 'cc_sharealike', q: headword}, function(json) {
-      if (json.items && json.items.length > 0) {
+    var url = '/'+dictID+'/getmedia/'+headword;
+    $.get(url, function(json) {
+      if (json.images && json.images.length > 0) {
         $('#xonomyBubbleContent .menu').html('');
-        json.items.forEach((image) => {
+        json.images.forEach((image) => {
           var imhtml = '<i>' + image.title + '</i><br/>';
-          imhtml += '<img onclick="Gmedia.addLink(\'' + htmlID + '\', this)" data-url="' + image.link + '" src="' + image.image.thumbnailLink + '" width="' + image.image.thumbnailWidth + '" height="' + image.image.thumbnailHeight + '">';
+          imhtml += '<img onclick="Gmedia.addLink(\'' + htmlID + '\', this)" data-url="' + image.url + '" src="' + image.thumb + '" class="Gmediathumb">';
           imhtml += '</br>';
           $('#xonomyBubbleContent .menu').append(imhtml)
         });
