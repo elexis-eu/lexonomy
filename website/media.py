@@ -25,7 +25,8 @@ def get_image_pixabay(query, apikey):
         images.append({
             'title': 'Pixabay: ' + item['user'] + ': ' + item['tags'],
             'thumb': item['previewURL'],
-            'url': item['webformatURL']
+            'url': item['webformatURL'],
+            'licence': 'pixabay'
         })
     return images
 
@@ -38,6 +39,13 @@ def get_image_google(query, apikey, cx, licence):
         'comm': '(cc_publicdomain|cc_attribute|cc_sharealike|cc_nonderived).-(cc_noncommercial)',
         'der': '(cc_publicdomain|cc_attribute|cc_sharealike|cc_noncommercial).-(cc_nonderived)',
         'code': '(cc_publicdomain|cc_attribute|cc_sharealike).-(cc_noncommercial|cc_nonderived)',
+    }
+    rightsVal = {
+        'any': 'any licence',
+        'public': 'public domain',
+        'comm': 'permits commercial use',
+        'der': 'permits derivative works',
+        'code': 'permits commercial and derivative use'
     }
     params = {
         'key': apikey,
@@ -54,7 +62,8 @@ def get_image_google(query, apikey, cx, licence):
         images.append({
             'title': 'Wikimedia: ' + item['title'],
             'thumb': item['image']['thumbnailLink'],
-            'url': item['link']
+            'url': item['link'],
+            'licence': rightsVal[licence]
         })
     return images
 
@@ -79,7 +88,8 @@ def get_image_wikidata(query, licence):
                 images.append({
                     'title': info['title'],
                     'thumb': info['imageinfo'][0]['url'],
-                    'url': info['imageinfo'][0]['url']
+                    'url': info['imageinfo'][0]['url'],
+                    'licence': info['imageinfo'][0]['extmetadata']['LicenseShortName']['value']
                 })
     return images
 
