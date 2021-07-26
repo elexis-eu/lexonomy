@@ -60,7 +60,7 @@ def get_image_google(query, apikey, cx, licence):
     results = requests.get(endpoint, params=params)
     for item in results.json()['items']:
         images.append({
-            'title': 'Wikimedia: ' + item['title'],
+            'title': 'Wikimedia: ' + item.get('title'),
             'thumb': item['image']['thumbnailLink'],
             'url': item['link'],
             'licence': rightsVal[licence]

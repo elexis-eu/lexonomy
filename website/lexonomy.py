@@ -796,6 +796,21 @@ def autonumber(dictID, user, dictDB, configs):
     process = ops.addAutoNumbers(dictDB, dictID, request.forms.countElem, request.forms.storeElem)
     return {"success": True, "processed": process}
 
+@post(siteconfig["rootPath"]+"<dictID>/autoimage.json")
+@authDict(["canEdit"])
+def autoimage(dictID, user, dictDB, configs):
+    res = ops.autoImage(dictDB, dictID, configs, request.forms.addElem, request.forms.addNumber)
+    return res
+
+@get(siteconfig["rootPath"]+"<dictID>/autoimageprogress.json")
+@authDict([])
+def autoimagestatus(dictID, user, dictDB, configs):
+    res = ops.autoImageStatus(dictDB, dictID, request.query.jobid)
+    if not res:
+        abort(400, "Invalid job")
+    return res
+
+
 @get(siteconfig["rootPath"]+"<dictID>/search")
 def dictsearch(dictID):
     if not ops.dictExists(dictID):

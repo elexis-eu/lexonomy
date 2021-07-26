@@ -29,6 +29,7 @@
         Screenful.Editor.leaveUrl="../../../{{dictID}}/config/";
         Screenful.Editor.readUrl="../../../{{dictID}}/configread.json";
         Screenful.Editor.updateUrl="../../../{{dictID}}/configupdate.json";
+        Screenful.Editor.addUrl="../../../{{dictID}}/autoimage.json";
         Screenful.Editor.editor=function(div, entry){
             Gapi.change=Screenful.Editor.changed;
             Gapi.render(div, entry.content);
