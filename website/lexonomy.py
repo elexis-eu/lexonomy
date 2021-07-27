@@ -509,7 +509,7 @@ def changeoneclickapi(user):
 def skelogin(token):
     secret = siteconfig["sketchengineKey"]
     try:
-        jwtdata = jwt.decode(token, secret, audience="lexonomy.eu")
+        jwtdata = jwt.decode(token, secret, audience="lexonomy.eu", algorithms="HS256")
         user = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
         res = ops.processJWT(user, jwtdata)
         if res["success"]:
