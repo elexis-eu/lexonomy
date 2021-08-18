@@ -132,7 +132,7 @@ Xemplatron.styles={ //the dimensions are ordered from innermost to outermost
   },
   interactivity: {
     "title": "Interactivity",
-    "xref": {toHtml: function(ly, html, n, isF, isL){return "<a class='xref' href='#' data-text='"+n.textContent.replace("'", "&apos;")+"'>"+html+"</a>"}, title: "Clickable cross-reference"},
+    "xref": {toHtml: function(ly, html, n, isF, isL){return "<a class='xref' data-text='"+n.textContent.replace("'", "&apos;")+"'>"+html+"</a>"}, title: "Clickable cross-reference"},
   },
   innerPunc: {
     "title": "Inner punctuation",
