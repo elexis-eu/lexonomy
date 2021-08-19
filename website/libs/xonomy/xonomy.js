@@ -699,68 +699,76 @@ Xonomy.renderDisplayText=function(text, displayText) {
 }
 
 Xonomy.chewText=function(txt) {
-	return "<span class='word focusable' onclick='if((event.ctrlKey||event.metaKey) && $(this).closest(\".element\").hasClass(\"hasInlineMenu\")) Xonomy.wordClick(this)'>" + txt + "</span>"
+  var words = txt.split(" ");
+  var index = 0;
+  var rets = [];
+  words.forEach((word) => {
+    rets.push("<span data-index='" + index + "' data-word='" + word + "' class='word focusable' onclick='if((event.ctrlKey||event.metaKey) && $(this).closest(\".element\").hasClass(\"hasInlineMenu\")) Xonomy.wordClick(this)'>" + word + "</span>");
+    index += 1;
+  });
+  return rets.join(" ");
 };
 Xonomy.wordClick=function(c) {
 	Xonomy.clickoff();
-	var isReadOnly=( $(c).closest(".readonly").toArray().length>0 );
+	var isReadOnly = ( $(c).closest(".readonly").toArray().length>0 );
 	if(!isReadOnly) {
-		var htmlID=$element.attr("id");
-		var content=Xonomy.inlineMenu(htmlID); //compose bubble content
-		if(content!="" && content!="<div class='menu'></div>") {
-			document.body.appendChild(Xonomy.makeBubble(content)); //create bubble
-			Xonomy.showBubble($(c).last()); //anchor bubble to the word
-		}
+    Xonomy.notclick = true;
+    var $element = $(c).closest(".element");
+    var htmlID = $element.attr("id");
+    var content = Xonomy.inlineMenu(htmlID); //compose bubble content
+    Xonomy.wrapIndex = $(c).data('index');
+    Xonomy.wrapWord = $(c).data('word');
+    if(content != "" && content != "<div class='menu'></div>") {
+      document.body.appendChild(Xonomy.makeBubble(content)); //create bubble
+      Xonomy.showBubble($(c).last()); //anchor bubble to the word
+    }
   }
 };
 Xonomy.wrap=function(htmlID, param) {
-	Xonomy.clickoff();
-	Xonomy.destroyBubble();
-	var xml=param.template;
-	var ph=param.placeholder;
-	var jsElement=Xonomy.harvestElement(document.getElementById(htmlID));
-	if(Xonomy.textFromID==Xonomy.textTillID) { //abc --> a<XYZ>b</XYZ>c
-		var jsOld=Xonomy.harvestText(document.getElementById(Xonomy.textFromID));
-		var txtOpen=jsOld.value.substring(0, Xonomy.textFromIndex);
-		var txtMiddle=jsOld.value.substring(Xonomy.textFromIndex, Xonomy.textTillIndex+1);
-		var txtClose=jsOld.value.substring(Xonomy.textTillIndex+1);
-		xml=xml.replace(ph, Xonomy.xmlEscape(txtMiddle));
-		var html="";
-		html+=Xonomy.renderText({type: "text", value: txtOpen});
-		var js=Xonomy.xml2js(xml, jsElement); html+=Xonomy.renderElement(js); var newID=js.htmlID;
-		html+=Xonomy.renderText({type: "text", value: txtClose});
-		$("#"+Xonomy.textFromID).replaceWith(html);
-		window.setTimeout(function(){ Xonomy.setFocus(newID, "openingTagName"); }, 100);
-	} else { //ab<...>cd --> a<XYZ>b<...>c</XYZ>d
-		var jsOldOpen=Xonomy.harvestText(document.getElementById(Xonomy.textFromID));
-		var jsOldClose=Xonomy.harvestText(document.getElementById(Xonomy.textTillID));
-		var txtOpen=jsOldOpen.value.substring(0, Xonomy.textFromIndex);
-		var txtMiddleOpen=jsOldOpen.value.substring(Xonomy.textFromIndex);
-		var txtMiddleClose=jsOldClose.value.substring(0, Xonomy.textTillIndex+1);
-		var txtClose=jsOldClose.value.substring(Xonomy.textTillIndex+1);
-		xml=xml.replace(ph, Xonomy.xmlEscape(txtMiddleOpen)+ph);
-		$("#"+Xonomy.textFromID).nextUntil("#"+Xonomy.textTillID).each(function(){
-			if($(this).hasClass("element")) xml=xml.replace(ph, Xonomy.js2xml(Xonomy.harvestElement(this))+ph);
-			else if($(this).hasClass("textnode")) xml=xml.replace(ph, Xonomy.js2xml(Xonomy.harvestText(this))+ph);
-		});
-		xml=xml.replace(ph, Xonomy.xmlEscape(txtMiddleClose));
-		$("#"+Xonomy.textFromID).nextUntil("#"+Xonomy.textTillID).remove();
-		$("#"+Xonomy.textTillID).remove();
-		var html="";
-		html+=Xonomy.renderText({type: "text", value: txtOpen});
-		var js=Xonomy.xml2js(xml, jsElement); html+=Xonomy.renderElement(js); var newID=js.htmlID;
-		html+=Xonomy.renderText({type: "text", value: txtClose});
-		$("#"+Xonomy.textFromID).replaceWith(html);
-		window.setTimeout(function(){ Xonomy.setFocus(newID, "openingTagName"); }, 100);
-	}
-	Xonomy.changed();
+  Xonomy.clickoff();
+  Xonomy.destroyBubble();
+  if ($('#'+htmlID+' .children .element').length > 0) {
+    $('#'+htmlID+' .children .element').each(function() {
+      Xonomy.unwrap(this.id);
+    });
+    var jsElement = Xonomy.harvestElement(document.getElementById(htmlID));
+    var oldText = jsElement.getText();
+    var words = oldText.split(' ');
+    Xonomy.wrapIndex = words.indexOf(Xonomy.wrapWord);
+  }
+  var xml = param.template;
+  var ph = param.placeholder;
+  var jsElement = Xonomy.harvestElement(document.getElementById(htmlID));
+  var oldText = jsElement.getText();
+  if (Xonomy.wrapIndex > 0) {
+    var html = "";
+    var words = oldText.split(" ");
+    html += Xonomy.renderText({type: "text", value: words.slice(0, Xonomy.wrapIndex).join(" ")});
+    xml = xml.replace(ph, words[Xonomy.wrapIndex])
+    var js = Xonomy.xml2js(xml, jsElement);
+    html += " ";
+    html += Xonomy.renderElement(js);
+    var newID=js.htmlID;
+    html += " ";
+    html += Xonomy.renderText({type: "text", value: words.slice(Xonomy.wrapIndex+1).join(" ")});
+    window.setTimeout(function(){ Xonomy.setFocus(newID, "openingTagName"); }, 100);
+  } else {
+    xml = xml.replace(ph, oldText)
+    var js = Xonomy.xml2js(xml, jsElement);
+    html = Xonomy.renderElement(js);
+  }
+  $('#'+htmlID+' .children div').replaceWith(html);
+  Xonomy.wrapIndex = null;
+  Xonomy.wrapWord = null;
+  Xonomy.changed();
 };
 Xonomy.unwrap=function(htmlID, param) {
-	var parentID=$("#"+htmlID)[0].parentNode.parentNode.id;
-	Xonomy.clickoff();
-	$("#"+htmlID).replaceWith($("#"+htmlID+" > .children > *"));
-	Xonomy.changed();
-	window.setTimeout(function(){ Xonomy.setFocus(parentID, "openingTagName");  }, 100);
+  var parentID=$("#"+htmlID)[0].parentNode.parentNode.id;
+  Xonomy.clickoff();
+  var jsElement=Xonomy.harvestElement(document.getElementById(htmlID));
+  $("#"+htmlID).replaceWith(Xonomy.renderText({type: "text", value: " " + jsElement.getText() + " "}))
+  Xonomy.changed();
+  window.setTimeout(function(){ Xonomy.setFocus(parentID, "openingTagName");  }, 100);
 };
 
 Xonomy.plusminus=function(htmlID, forceExpand) {
