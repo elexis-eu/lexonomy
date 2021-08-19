@@ -62,14 +62,16 @@ Gmedia.menuRoot=function(htmlID) {
 };
 
 Gmedia.addVoice=function(entry) {
-  if (entry) {
-    var $xml = $($.parseXML(entry.content));
-  } else {
-    var $xml = $($.parseXML(Xonomy.harvest()));
-  }
-  var headword = $xml.find(titling.headword).html();
-  if (headword != '' && gapi.voicekey && gapi.voicekey != '' && gapi.voicelang != '') {
-    $('#viewer').append('<div id="voicetts"><audio controls src="https://api.voicerss.org/?key='+gapi.voicekey+'&hl='+gapi.voicelang+'&src='+headword+'"/></div>');
-    $('#editor').append('<div id="voicetts"><audio controls src="https://api.voicerss.org/?key='+gapi.voicekey+'&hl='+gapi.voicelang+'&src='+headword+'"/></div>');
+  if (usingOwnEditor === false && gapi.voicekey && gapi.voicekey != '' && gapi.voicelang != '') {
+    if (entry) {
+      var $xml = $($.parseXML(entry.content));
+    } else {
+      var $xml = $($.parseXML(Xonomy.harvest()));
+    }
+    var headword = $xml.find(titling.headword).html();
+    if (headword != '') {
+      $('#viewer').append('<div id="voicetts"><audio controls src="https://api.voicerss.org/?key='+gapi.voicekey+'&hl='+gapi.voicelang+'&src='+headword+'"/></div>');
+      $('#editor').append('<div id="voicetts"><audio controls src="https://api.voicerss.org/?key='+gapi.voicekey+'&hl='+gapi.voicelang+'&src='+headword+'"/></div>');
+    }
   }
 }
