@@ -994,7 +994,15 @@ def updateDictConfig(dictDB, dictID, configID, content):
     dictDB.execute("insert into configs(id, json) values(?, ?)", (configID, json.dumps(content)))
     dictDB.commit()
     
-    if configID == "ident" or configID == "users":
+    if configID == "ident":
+        attachDict(dictDB, dictID)
+        if content.get('lang'):
+            lang = content.get('lang')
+            conn = getMainDB()
+            conn.execute("UPDATE dicts SET language=? WHERE id=?", (lang, dictID))
+            conn.commit()
+        return content, False
+    elif configID == 'users':
         attachDict(dictDB, dictID)
         return content, False
     elif configID == "titling" or configID == "searchability":
