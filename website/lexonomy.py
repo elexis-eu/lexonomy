@@ -870,6 +870,21 @@ def ontolex(dictID, doctype):
             response.headers['Content-Type'] = "text/plain; charset=utf-8"
             return ops.listOntolexEntries(dictDB, dictID, configs, doctype, search)
 
+@get(siteconfig["rootPath"] + "api")
+def apitest():
+    return template("api.tpl", **{"siteconfig": siteconfig})
+
+@post(siteconfig["rootPath"] + "api/listDict")
+def apilist():
+    data = json.loads(request.body.getvalue().decode('utf-8'))
+    print(data)
+    user = ops.verifyUserApiKey(data["email"], data["apikey"])
+    if not user["valid"]:
+        return {"success": False}
+    else:
+        dicts = ops.getDictList(data.get('lang'), data.get('withLinks'))
+        return {"dictionaries": dicts, "success": True}
+
 @get(siteconfig["rootPath"] + "push.api")
 def pushtest():
     return template("pushapi.tpl", **{"siteconfig": siteconfig})

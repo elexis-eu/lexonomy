@@ -575,6 +575,26 @@ def getDictsByUser(email):
         dicts.append(info)
     return dicts
 
+def getDictList(lang, withLinks):
+    print(withLinks)
+    dicts = []
+    conn = getMainDB()
+    if lang:
+        c = conn.execute("SELECT * FROM dicts WHERE language=? ORDER BY title", (lang, ))
+    else:
+        c = conn.execute("SELECT * FROM dicts ORDER BY title")
+    for r in c.fetchall():
+        info = {"id": r["id"], "title": r["title"], "language": r["language"], "hasLinks": False}
+        try:
+            configs = readDictConfigs(getDB(r["id"]))
+            if configs["links"] and len(configs["links"])>0:
+                info["hasLinks"] = True
+        except:
+            info["broken"] = True
+        if not withLinks or (withLinks == True and info["hasLinks"] == True):
+            dicts.append(info)
+    return dicts
+
 def listUsers(searchtext, howmany):
     conn = getMainDB()
     c = conn.execute("select * from users where email like ? order by email limit ?", ("%"+searchtext+"%", howmany))
