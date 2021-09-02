@@ -576,7 +576,6 @@ def getDictsByUser(email):
     return dicts
 
 def getDictList(lang, withLinks):
-    print(withLinks)
     dicts = []
     conn = getMainDB()
     if lang:
@@ -594,6 +593,69 @@ def getDictList(lang, withLinks):
         if not withLinks or (withLinks == True and info["hasLinks"] == True):
             dicts.append(info)
     return dicts
+
+def getLinkList(headword, sourceLang, sourceDict, targetLang):
+    links = []
+    linkDB = getLinkDB()
+    if sourceDict and sourceDict != "":
+        dicts = [{"id": sourceDict}]
+    else:
+        dicts = getDictList(sourceLang, True)
+
+    for d in dicts:
+        dictDB = getDB(d["id"])
+        if dictDB:
+            query = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND s.txt LIKE ? AND s.level=1"
+            c = dictDB.execute(query, (headword+"%", ))
+            for entry in c.fetchall():
+                info0 = {"sourceDict": d["id"], "sourceHeadword": entry["hw"]}
+                if entry["link_el"] == "sense" and "_" in entry["link_id"]:
+                    lia = entry["link_id"].split("_")
+                    info0["sourceSense"] = lia[1]
+                # first, find links with searched dict as source
+                if targetLang:
+                    targetDicts = []
+                    for td in getDictList(targetLang, True):
+                        targetDicts.append(td["id"])
+                    query2 = "SELECT * FROM links WHERE source_dict=? AND source_id=? AND target_dict IN "+"('"+"','".join(targetDicts)+"')"
+                else:
+                    query2 = "SELECT * FROM links WHERE source_dict=? AND source_id=?"
+                data2 = (d["id"], entry["link_id"])
+                c2 = linkDB.execute(query2, data2)
+                for r2 in c2.fetchall():
+                    info = info0
+                    info["targetDict"] = r2["target_dict"]
+                    info["confidence"] = r2["confidence"]
+                    info["targetLang"] = readDictConfigs(getDB(r2["target_dict"]))['ident']['lang']
+                    if r2["target_element"] == "sense" and "_" in r2["target_id"]:
+                        lia = r2["target_id"].split("_")
+                        info["targetSense"] = lia[1]
+                    query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=1"
+                    c3 = getDB(r2["target_dict"]).execute(query3, (r2["target_id"],))
+                    for r3 in c3.fetchall():
+                        info["targetHeadword"] = r3["hw"]
+                        links.append(info)
+                # second, find links with search dict as target
+                if targetLang:
+                    query2 = "SELECT * FROM links WHERE target_dict=? AND target_id=? AND source_dict IN "+"('"+"','".join(targetDicts)+"')"
+                else:
+                    query2 = "SELECT * FROM links WHERE target_dict=? AND target_id=?"
+                data2 = (d["id"], entry["link_id"])
+                c2 = linkDB.execute(query2, data2)
+                for r2 in c2.fetchall():
+                    info = info0
+                    info["targetDict"] = r2["source_dict"]
+                    info["confidence"] = r2["confidence"]
+                    info["targetLang"] = readDictConfigs(getDB(r2["source_dict"]))['ident']['lang']
+                    if r2["source_element"] == "sense" and "_" in r2["source_id"]:
+                        lia = r2["source_id"].split("_")
+                        info["targetSense"] = lia[1]
+                    query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=1"
+                    c3 = getDB(r2["source_dict"]).execute(query3, (r2["source_id"],))
+                    for r3 in c3.fetchall():
+                        info["targetHeadword"] = r3["hw"]
+                        links.append(info)
+    return links
 
 def listUsers(searchtext, howmany):
     conn = getMainDB()

@@ -69,5 +69,64 @@
 			}
 			</script>
 			<hr/>
+			<h2>Find links, from headword in language</h2>
+			<p>POST {{siteconfig["baseUrl"]}}api/listLinks</p>
+			<textarea id="input_listLinks1" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{
+  "email": "rambousek@gmail.com",
+  "apikey": "8VBOZ1COTZT5YPGL05GKTZKV006RXJ54",
+  "headword": "zopet",
+  "sourceLanguage": "sl"
+}</textarea>
+			<button onclick="listLinks1()">Post</button> and watch your console.
+			<script type="text/javascript">
+			function listLinks1(){
+				//var json=JSON.parse($("#input_makeDict").val());
+				var json=$("#input_listLinks1").val();
+				$.ajax("/api/listLinks", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+					console.log(data);
+				});
+			}
+			</script>
+			<hr/>
+			<h2>Find links, headword with specific dictionary</h2>
+			<p>POST {{siteconfig["baseUrl"]}}api/listLinks</p>
+			<textarea id="input_listLinks2" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{
+  "email": "rambousek@gmail.com",
+  "apikey": "8VBOZ1COTZT5YPGL05GKTZKV006RXJ54",
+  "headword": "zopet",
+  "sourceLanguage": "sl",
+  "sourceDict": "elexis-zrcsazu-pletersnik"
+}</textarea>
+			<button onclick="listLinks2()">Post</button> and watch your console.
+			<script type="text/javascript">
+			function listLinks2(){
+				//var json=JSON.parse($("#input_makeDict").val());
+				var json=$("#input_listLinks2").val();
+				$.ajax("/api/listLinks", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+					console.log(data);
+				});
+			}
+			</script>
+			<hr/>
+			<h2>Find links, headword to target language</h2>
+			<p>POST {{siteconfig["baseUrl"]}}api/listLinks</p>
+			<textarea id="input_listLinks3" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{
+  "email": "rambousek@gmail.com",
+  "apikey": "8VBOZ1COTZT5YPGL05GKTZKV006RXJ54",
+  "headword": "zopet",
+  "sourceLanguage": "sl",
+  "targetLanguage": "en"
+}</textarea>
+			<button onclick="listLinks3()">Post</button> and watch your console.
+			<script type="text/javascript">
+			function listLinks3(){
+				//var json=JSON.parse($("#input_makeDict").val());
+				var json=$("#input_listLinks3").val();
+				$.ajax("/api/listLinks", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+					console.log(data);
+				});
+			}
+			</script>
+			<hr/>
 	</body>
 </html>

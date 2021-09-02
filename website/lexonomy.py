@@ -875,7 +875,7 @@ def apitest():
     return template("api.tpl", **{"siteconfig": siteconfig})
 
 @post(siteconfig["rootPath"] + "api/listDict")
-def apilist():
+def apilistdict():
     data = json.loads(request.body.getvalue().decode('utf-8'))
     print(data)
     user = ops.verifyUserApiKey(data["email"], data["apikey"])
@@ -884,6 +884,17 @@ def apilist():
     else:
         dicts = ops.getDictList(data.get('lang'), data.get('withLinks'))
         return {"dictionaries": dicts, "success": True}
+
+@post(siteconfig["rootPath"] + "api/listLinks")
+def apilistlink():
+    data = json.loads(request.body.getvalue().decode('utf-8'))
+    print(data)
+    user = ops.verifyUserApiKey(data["email"], data["apikey"])
+    if not user["valid"]:
+        return {"success": False}
+    else:
+        dicts = ops.getLinkList(data.get('headword'), data.get('sourceLanguage'), data.get('sourceDict'), data.get('targetLanguage'))
+        return {"links": dicts, "success": True}
 
 @get(siteconfig["rootPath"] + "push.api")
 def pushtest():
