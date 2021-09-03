@@ -37,7 +37,7 @@ Gmedia.menuRoot=function(htmlID) {
 
   var headword = Gmedia.getHeadword();
   if (headword != '') {
-    html += headword;
+    html += "searching for: " + headword;
     var url = '/'+dictID+'/getmedia/'+headword;
     $.get(url, function(json) {
       if (json.images && json.images.length > 0) {

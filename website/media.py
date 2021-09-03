@@ -5,10 +5,10 @@ def get_images(configs, query):
     images = []
     if not configs["gapi"]["image_licence"] or configs["gapi"]["image_licence"] == "":
         configs["gapi"]["image_licence"] = "code"
-    if configs["gapi"] and configs["gapi"]["pixabaykey"] != "":
+    if configs["gapi"] and configs["gapi"]["pixabaykey"] and configs["gapi"]["pixabaykey"] != "":
         images.extend(get_image_pixabay(query, configs["gapi"]["pixabaykey"]))
     images.extend(get_image_wikidata(query, configs["gapi"]["image_licence"]))
-    if configs["gapi"] and configs["gapi"]["apikey"] != "" and configs["gapi"]["cx"] != "":
+    if configs["gapi"] and configs["gapi"]["apikey"] and configs["gapi"]["cx"] and configs["gapi"]["apikey"] != "" and configs["gapi"]["cx"] != "":
         images.extend(get_image_google(query, configs["gapi"]["apikey"], configs["gapi"]["cx"], configs["gapi"]["image_licence"]))
     return images
 
