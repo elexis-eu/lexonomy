@@ -879,7 +879,6 @@ def apitest():
 @post(siteconfig["rootPath"] + "api/listDict")
 def apilistdict():
     data = json.loads(request.body.getvalue().decode('utf-8'))
-    print(data)
     user = ops.verifyUserApiKey(data["email"], data["apikey"])
     if not user["valid"]:
         return {"success": False}
@@ -890,7 +889,6 @@ def apilistdict():
 @post(siteconfig["rootPath"] + "api/listLinks")
 def apilistlink():
     data = json.loads(request.body.getvalue().decode('utf-8'))
-    print(data)
     user = ops.verifyUserApiKey(data["email"], data["apikey"])
     if not user["valid"]:
         return {"success": False}
