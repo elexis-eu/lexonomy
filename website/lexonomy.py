@@ -631,6 +631,8 @@ def publicentry(dictID, entryID):
         entrydata = re.sub(r"'", "\\'", xml)
         entrydata = re.sub(r"[\n\r]", "", entrydata)
         html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+        if configs["gapi"] and configs["gapi"]["voicekey"] and configs["gapi"]["voicekey"] != "" and configs["gapi"]["voicelang"]:
+            html += "<script type='text/javascript'>Gmedia.addVoicePublic('" + re.sub(r"\<[^\<\>]+\>", "", _title) + "', '" + configs["gapi"]["voicekey"] + "', '" + configs["gapi"]["voicelang"] + "');</script>"
         #rewrite xemplatron to python, too?
     css = ""
     if "_css" in configs["xemplate"]:

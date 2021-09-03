@@ -27,6 +27,8 @@
 		<link type="text/css" rel="stylesheet" href="../../furniture/public.css" />
 		<script type="text/javascript" src="../../widgets/xemplatron.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../widgets/xemplatron.css" />
+		<script type="text/javascript" src="../../widgets/gmedia.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../widgets/gmedia.css" />
 		<style>
 		{{!css}}
 		</style>

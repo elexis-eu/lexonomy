@@ -4,3 +4,12 @@
 .xonomy .lexonomyGmediaCaption:hover {color: #004f9b; }
 #xonomyBubble .menuItem > a {display: block; color: inherit; text-decoration: inherit;}
 .Gmediathumb {max-width: 100px; max-height: 80px}
+#viewer .voicetts {
+  display: inline-block;
+  vertical-align: top;
+}
+#viewer .voicetts-icon img {
+  width: 30px;
+  cursor: pointer;
+  margin-left: 1em;
+}
