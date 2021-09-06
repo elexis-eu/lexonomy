@@ -15,6 +15,23 @@
 			<p>{{siteconfig["baseUrl"]}}api</p>
 
 			<hr/>
+			<h2>List languages used in dictionaries</h2>
+			<p>POST {{siteconfig["baseUrl"]}}api/listLang</p>
+			<textarea id="input_listLang" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">{
+  "email": "rambousek@gmail.com",
+  "apikey": "8VBOZ1COTZT5YPGL05GKTZKV006RXJ54"
+}</textarea>
+			<button onclick="listLang()">Post</button> and watch your console.
+			<script type="text/javascript">
+			function listLang(){
+				//var json=JSON.parse($("#input_makeDict").val());
+				var json=$("#input_listLang").val();
+				$.ajax("/api/listLang", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+					console.log(data);
+				});
+			}
+			</script>
+			<hr/>
 			<h2>List all dictionaries metadata</h2>
 			<p>POST {{siteconfig["baseUrl"]}}api/listDict</p>
 			<textarea id="input_listDict" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">{

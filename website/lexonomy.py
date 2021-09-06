@@ -876,6 +876,16 @@ def ontolex(dictID, doctype):
 def apitest():
     return template("api.tpl", **{"siteconfig": siteconfig})
 
+@post(siteconfig["rootPath"] + "api/listLang")
+def apilistlang():
+    data = json.loads(request.body.getvalue().decode('utf-8'))
+    user = ops.verifyUserApiKey(data["email"], data["apikey"])
+    if not user["valid"]:
+        return {"success": False}
+    else:
+        langs = ops.getLangList()
+        return {"languages": langs, "success": True}
+
 @post(siteconfig["rootPath"] + "api/listDict")
 def apilistdict():
     data = json.loads(request.body.getvalue().decode('utf-8'))

@@ -575,6 +575,16 @@ def getDictsByUser(email):
         dicts.append(info)
     return dicts
 
+def getLangList():
+    langs = []
+    codes = get_iso639_1()
+    conn = getMainDB()
+    c = conn.execute("SELECT DISTINCT language FROM dicts WHERE language!='' ORDER BY language")
+    for r in c.fetchall():
+        lang = next((item for item in codes if item["code"] == r["language"]), {})
+        langs.append({"code": r["language"], "language": lang.get("lang")})
+    return langs
+
 def getDictList(lang, withLinks):
     dicts = []
     conn = getMainDB()
