@@ -619,9 +619,14 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
             c = dictDB.execute(query, (headword+"%", ))
             for entry in c.fetchall():
                 info0 = {"sourceDict": d["id"], "sourceHeadword": entry["hw"]}
+                if entry["entry_id"] and entry["entry_id"] != "":
+                    info0["sourceID"] = entry["entry_id"]
                 if entry["link_el"] == "sense" and "_" in entry["link_id"]:
                     lia = entry["link_id"].split("_")
                     info0["sourceSense"] = lia[1]
+                    if not info0["sourceID"]:
+                        info0["sourceID"] = lia[0]
+                info0["sourceURL"] = siteconfig["baseUrl"] + info0["sourceDict"] + "/" + str(info0["sourceID"])
                 # first, find links with searched dict as source
                 if targetLang:
                     targetDicts = []
@@ -644,6 +649,8 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
                     c3 = getDB(r2["target_dict"]).execute(query3, (r2["target_id"],))
                     for r3 in c3.fetchall():
                         info["targetHeadword"] = r3["hw"]
+                        info["targetID"] = r3["entry_id"]
+                        info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
                         links.append(info)
                 # second, find links with search dict as target
                 if targetLang:
@@ -664,6 +671,8 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
                     c3 = getDB(r2["source_dict"]).execute(query3, (r2["source_id"],))
                     for r3 in c3.fetchall():
                         info["targetHeadword"] = r3["hw"]
+                        info["targetID"] = r3["entry_id"]
+                        info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
                         links.append(info)
     return links
 
