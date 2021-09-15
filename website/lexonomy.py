@@ -833,7 +833,10 @@ def configpage(dictID, page, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
 @authDict(["canConfig"])
 def configread(dictID, user, dictDB, configs):
-    config_data = configs[request.forms.id]
+    if request.forms.id == 'ske':
+        config_data = {'kex': configs['kex'], 'collx': configs['collx'], 'xampl': configs['xampl'], 'thes': configs['thes'], 'defo': configs['defo']}
+    else:
+        config_data = configs[request.forms.id]
     if request.forms.id == 'ident':
         config_data['langs'] = ops.get_iso639_1()
     return {"success": True, "id": request.forms.id, "content": config_data}

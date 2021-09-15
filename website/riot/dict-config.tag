@@ -33,6 +33,7 @@
 						<a href="#/{ this.dictId }/config/links" class="collection-item">Manual linking</a>
 						<a href="#/{ this.dictId }/config/download" class="collection-item">Download settings</a>
 						<a href="#/{ this.dictId }/config/subbing" class="collection-item">Subentries</a>
+						<a href="#/{ this.dictId }/config/ske" class="collection-item">Sketch Engine</a>
 					</div>
 				</div>
 				<div class="col s3">
