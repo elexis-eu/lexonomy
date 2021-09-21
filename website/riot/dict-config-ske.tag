@@ -15,34 +15,43 @@
 					<span class="helper-text">The path to the <tt>run.cgi</tt> API script in Sketch Engine. Defaults to <tt>https://api.sketchengine.eu/bonito/run.cgi</tt>. Do not change this unless you are using a local installation of Sketch Engine.</span>
 				</div>
 			</div>
-			<div class="row">
-        <div class="input-field col s10">
-					<label for="kex_corpus">Corpus name</label>
-					<span class="helper-text">Select a Sketch Engine corpus from the list of corpora available to you.</span>
+			<template if={ this.props.userInfo.ske_username && this.props.userInfo.ske_apiKey && this.props.userInfo.ske_username != "" && this.props.userInfo.ske_apiKey != "" }>
+				<div class="row">
+					<div class="input-field col s10">
+						<input data-selected-corpus={ this.configData.kex.corpus } type="text" id="kex_corpus" class="autocomplete" placeholder="Retrieving available corpora from Sketch Engine, please wait...">
+						<label for="kex_corpus">Corpus name</label>
+						<span class="helper-text">Select a Sketch Engine corpus from the list of corpora available to you.</span>
+						<span class="helper-text" id="corpusInfo" hide={ true }></span>
+					</div>
 				</div>
-			</div>
-			<div class="row">
-        <div class="input-field col s10">
-          <input value={ this.configData.kex.concquery} placeholder="" id="kex_concquery" type="text" class=""/>
-					<label for="kex_concquery">Concordance query</label>
-					<span class="helper-text">The CQL query that will be used to obtain concordance from Sketch Engine. You can use placeholders for elements in the form of '%(element)', e.g. '[lemma="%(headword)"]'. If left empty the 'simple' query type will be used as configured for the respective corpus. Please note that you cannot use CQL syntax with default attribute because it is not specified.</span>
+				<div class="row">
+					<div class="input-field col s10">
+						<input value={ this.configData.kex.concquery} placeholder="" id="kex_concquery" type="text" class=""/>
+						<label for="kex_concquery">Concordance query</label>
+						<span class="helper-text">The CQL query that will be used to obtain concordance from Sketch Engine. You can use placeholders for elements in the form of '%(element)', e.g. '[lemma="%(headword)"]'. If left empty the 'simple' query type will be used as configured for the respective corpus. Please note that you cannot use CQL syntax with default attribute because it is not specified.</span>
+					</div>
 				</div>
-			</div>
-			<div class="row">
-        <div class="input-field col s10">
-          <input value={ this.configData.kex.concsampling} placeholder="" id="kex_concsampling" type="number" class=""/>
-					<label for="kex_concsampling">Sample size</label>
-					<span class="helper-text">Whether to apply automatic sampling of the concordance. Any non-zero value means to automatically create a random sample of that size.</span>
+				<div class="row">
+					<div class="input-field col s10">
+						<input value={ this.configData.kex.concsampling} placeholder="" id="kex_concsampling" type="number" class=""/>
+						<label for="kex_concsampling">Sample size</label>
+						<span class="helper-text">Whether to apply automatic sampling of the concordance. Any non-zero value means to automatically create a random sample of that size.</span>
+					</div>
 				</div>
-			</div>
-			<div class="row">
-        <div class="input-field col s10">
-					<select id="kex_searchElements" multiple>
-					</select>
-					<label for="kex_searchElements">Additional search elements</label>
-					<span class="helper-text">You can select any textual elements here whose content you would like to search for in Sketch Engine. A menu will be displayed next to all these elements like for the root entry element.</span>
+				<div class="row">
+					<div class="input-field col s10">
+						<select id="kex_searchElements" multiple>
+						</select>
+						<label for="kex_searchElements">Additional search elements</label>
+						<span class="helper-text">You can select any textual elements here whose content you would like to search for in Sketch Engine. A menu will be displayed next to all these elements like for the root entry element.</span>
+					</div>
 				</div>
-			</div>
+			</template>
+			<template if={ !this.props.userInfo.ske_username || !this.props.userInfo.ske_apiKey || this.props.userInfo.ske_apiKey == "" || this.props.userInfo.ske_username == "" }>
+				<div class="card-panel amber lighten-2">
+					Please setup your Sketch Engine account in your <a href='#/userprofile'>profile</a> settings to be able to select a corpus.
+				</div>
+			</template>
 			<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
 			</button>
 	</div>
@@ -99,6 +108,42 @@
 						this.configData.kex.searchElements = [];
 					}
 					M.updateTextFields();
+					$('#kex_corpus').autocomplete({data: {}});
+					$('#kex_corpus').data('corpora', {});
+					$.get({
+						url: '/skeget/corpora'
+					}).done(function(res) {
+						console.log(res)
+						var corporaList = {};
+						var corporaData = {};
+						var selected = '';
+						res.data.forEach(e => {
+              var size = "";
+              if (e.sizes) {
+                size = ", " + (e.sizes.tokencount / 1000000).toFixed(2) + "M tokens";
+              }
+							var eInfo = e.name + " (" + e.language_name + size + ")";
+							corporaData[eInfo] = e.corpname;
+							corporaList[eInfo] = null;
+							if ($('#kex_corpus').data('selected-corpora') == e.corpname) {
+								selected = eInfo;
+								$('#corpusInfo').html('Currently selected corpus: ' + e.name + ", show <a href='" + $.trim($("#kex_url").val()) + "#dashboard?corp_info=1&corpname=" + encodeURIComponent(e.corpname) + "' target='ske'>detailed corpus info</a>.");
+								$('#corpusInfo').show();
+							}
+						});
+						$('#kex_corpus').autocomplete({data: corporaList});
+						$('#kex_corpus').data('corpora', corporaData);
+						$('#kex_corpus').attr('placeholder', 'Type to search in the list of corpora');
+						if (selected != '') {
+							$('#kex_corpus').val(selected);
+						}
+					});
+					$('#kex_corpus').on('change', function() {
+						var corporaData = $(this).data('corpora')
+						$(this).data('selected-corpus', corporaData[$(this).val()]);
+						$('#corpusInfo').html('Currently selected corpus: ' + $(this).val() + ", show <a href='" + $.trim($("#kex_url").val()) + "#dashboard?corp_info=1&corpname=" + encodeURIComponent(corporaData[$(this).val()]) + "' target='ske'>detailed corpus info</a>.");
+						$('#corpusInfo').show();
+					});
 					this.update();
 				});
 			},
