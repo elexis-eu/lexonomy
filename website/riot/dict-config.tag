@@ -36,16 +36,6 @@
 						<a href="#/{ this.dictId }/config/ske" class="collection-item">Sketch Engine</a>
 					</div>
 				</div>
-				<div class="col s3">
-					<h5 class="header">Sketch Engine</h5>
-					<div class="collection">
-						<a href="#/{ this.dictId }/config/kex" class="collection-item">Connection</a>
-						<a href="#/{ this.dictId }/config/xampl" class="collection-item">Examples</a>
-						<a href="#/{ this.dictId }/config/collx" class="collection-item">Collocations</a>
-						<a href="#/{ this.dictId }/config/thes" class="collection-item">Thesaurus items</a>
-						<a href="#/{ this.dictId }/config/defo" class="collection-item">Definitions</a>
-					</div>
-				</div>
 			</div>
 		</div>
 	</div>
