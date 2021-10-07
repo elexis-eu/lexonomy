@@ -844,7 +844,17 @@ def configread(dictID, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/configupdate.json")
 @authDict(["canConfig"])
 def configupdate(dictID, user, dictDB, configs):
-    adjustedJson, resaveNeeded = ops.updateDictConfig(dictDB, dictID, request.forms.id, json.loads(request.forms.content))
+    if request.forms.id == 'ske':
+        adjustedJson = {}
+        jsonData = json.loads(request.forms.content)
+        adjustedJson['kex'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'kex', jsonData['kex'])
+        adjustedJson['xampl'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'xampl', jsonData['xampl'])
+        adjustedJson['collx'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'collx', jsonData['collx'])
+        adjustedJson['defo'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'defo', jsonData['defo'])
+        adjustedJson['thes'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'thes', jsonData['thes'])
+        resaveNeeded = False
+    else:
+        adjustedJson, resaveNeeded = ops.updateDictConfig(dictDB, dictID, request.forms.id, json.loads(request.forms.content))
     if resaveNeeded:
         configs = ops.readDictConfigs(dictDB)
         ops.resave(dictDB, dictID, configs)
