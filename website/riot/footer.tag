@@ -7,6 +7,9 @@
 			</div>
 		</div>
 	</div>
+	<div class="row" if={ this.props.siteconfig.version }>
+		Version: { this.props.siteconfig.version }
+	</div>
 	<div class="footer-copyright">
 		<div class="container">
 			Lexonomy is developed as part of <a href="https://elex.is/">ELEXIS</a> project.
