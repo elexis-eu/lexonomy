@@ -143,6 +143,19 @@ def home():
 #        response.delete_cookie("jwt_error", path="/")
 #    return template("home.tpl", **{"user": res, "siteconfig": siteconfig, "dicts": dicts, "error": error, "version": version})
 
+@get(siteconfig["rootPath"] + "siteconfigread.json")
+def lexonomyconfig():
+    version = ""
+    if os.path.isfile("version.txt"):
+        with open("version.txt", "r") as version_file:
+            version = version_file.read()
+    configData = {
+        "version": version, 
+        "licences": siteconfig['licences'],
+        "sketchengineLoginPage": siteconfig['sketchengineLoginPage']
+    }
+    return configData
+
 @get(siteconfig["rootPath"] + "userdicts.json")
 @auth
 def listuserdicts(user):

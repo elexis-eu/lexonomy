@@ -8,7 +8,7 @@
 			<dict-new if={this.props.mainSubPage == 'new'}></dict-new>
 		</div>
 		<div if={ !props.authorized }>
-			<login if={this.props.mainSubPage == 'login'} account-ops={ props.accountOps }></login>
+			<login if={this.props.mainSubPage == 'login'} account-ops={ props.accountOps } siteconfig={ props.siteconfig }></login>
 			<register if={this.props.mainSubPage == 'register'} account-ops={ props.accountOps }></register>
 			<register-password if={this.props.mainSubPage == 'registerPassword'} account-ops={ props.accountOps } token={ props.token }></register-password>
 			<forgot if={this.props.mainSubPage == 'forgot'} account-ops={ props.accountOps }></forgot>

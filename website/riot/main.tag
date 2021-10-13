@@ -1,7 +1,7 @@
 <main>
   <div class="container">
 		<header is="header" ref="header" authorized={ this.state.authorized } user-info={ this.state.userInfo } log-out={ logOut } show-dict-menu={ this.state.showDictMenu } dict-id={ this.dictId } user-access={ this.state.userAccess }></header>
-		<div class="content row" is={ this.content } dict-id={ this.dictId } authorized={ this.state.authorized } account-ops={ accountOps } user-info={ this.state.userInfo } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess } doctype={ this.doctype } doctypes={ this.doctypes } main-sub-page={ this.state.subPage } token={ this.state.token }></div>
+		<div class="content row" is={ this.content } dict-id={ this.dictId } authorized={ this.state.authorized } account-ops={ accountOps } user-info={ this.state.userInfo } entry-id={ this.entryId } load-dict-detail={ loadDictDetail } load-config-data={ loadConfigData } save-config-data={ saveConfigData } dict-details={ this.state.dictDetails } config-id={ this.configId } dict-configs={ this.state.dictConfigs } user-access={ this.state.userAccess } doctype={ this.doctype } doctypes={ this.doctypes } main-sub-page={ this.state.subPage } token={ this.state.token } siteconfig={ this.siteconfig }></div>
 		<footer is="footer"></footer>
   </div>
 
@@ -12,6 +12,7 @@
 			dictId: '',
 			doctype: 'entry',
 			doctypes: ['entry'],
+			siteconfig: {},
 			state: {
 				authorized: false,
 				userInfo: {username: ''},
@@ -300,6 +301,10 @@
 					this.state.userAccess = false;
 					this.state.subPage = 'login';
 					this.content = 'main-page';
+					$.get("/siteconfigread.json", (response) => {
+						this.siteconfig = response;
+						this.update();
+					});
 					this.update();
 				});
 				route.start(true);
