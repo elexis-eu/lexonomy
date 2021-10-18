@@ -17,17 +17,18 @@ Xemplatron.el2html=function(el, isFirst, isLast){
     html=el.textContent;
     if(xema.values) for(var i=0; i<xema.values.length; i++) if(xema.values[i].value==el.textContent) {caption=xema.values[i].caption; break;}
   } else if (xema && xema.filling=="med") {
-    var fileType = Xemplatron.detectFileType(el.textContent);
+    var fileurl = el.textContent.trim();
+    var fileType = Xemplatron.detectFileType(fileurl);
     console.log(fileType)
     switch(fileType) {
       case 'image':
-        html = '<img src="'+el.textContent+'" class="media_image"/>';
+        html = '<img src="'+fileurl+'" class="media_image"/>';
         break;
       case 'video':
-        html = '<video controls class="media_video"><source src="'+el.textContent+'"/></video>';
+        html = '<video controls class="media_video"><source src="'+fileurl+'"/></video>';
         break;
       case 'audio':
-        html = '<audio controls class="media_audio" src="'+el.textContent+'"/>';
+        html = '<audio controls class="media_audio" src="'+fileurl+'"/>';
         break;
       default:
         html = el.textContent;
