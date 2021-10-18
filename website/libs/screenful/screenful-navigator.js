@@ -33,7 +33,7 @@ Screenful.Navigator={
                              <div id='editbox'></div>\
                              <div id='critbox' tabindex='0' style='display: none'></div>");
     $("#editbox").html("<div id='editoverlay'></div><iframe name='editframe' frameborder='0' scrolling='no' src='"+Screenful.Navigator.editorUrl+"'/>");
-    $("#navbox").html("<div class='line1'><button class='iconOnly' id='butCritOpen'>&nbsp;</button><div class='modifiers boxModifiers' style='display: none'><span class='clickable'><span class='current'></span> <span class='arrow'>▼</span></span><div class='menu' style='display: none'></div></div><input id='searchbox' title='Ctrl + Shift + T'/><button id='butSearch' class='iconOnly mergeLeft noborder'>&nbsp;</buttton><button class='iconOnly noborder' id='butCritRemove' style='display: none;'></button></div>");
+    $("#navbox").html("<div class='line1'><button class='iconOnly' id='butCritOpen'>&nbsp;</button><div class='modifiers boxModifiers' style='display: none'><span class='clickable'><span class='current'></span> <span class='arrow'>▼</span></span><div class='menu' style='display: none'></div></div><input id='searchbox' title='Ctrl + Shift + T'/><button id='butSearch' class='iconOnly mergeLeft noborder'>&nbsp;</buttton><button class='iconOnly noborder' id='butCritRemove' style='display: none;'></button></div><div id='firstrun' style='display:none'><span>first 200 entries, please use search</span></div>");
     var $navlistcontainer = $("#navlistcontainer");
     var $editbox = $("#editbox");
     var $editoverlay = $("#editoverlay"); // must be here to make resize working, otherwise iframe catches mouseup
@@ -232,6 +232,11 @@ Screenful.Navigator={
         Screenful.status(Screenful.Loc.listingFailed, "warn"); //"failed to get list of entries"
       } else {
         $("#countcaption").html(data.total);
+        if (data.firstRun) {
+          $('#firstrun').show();
+        } else {
+          $('#firstrun').hide();
+        }
         var $listbox=$("#listbox").html("");
         if(data.suggestions && data.suggestions.length>0){
           var $suggs=$("<div class='suggs'></div>").appendTo($listbox);

@@ -989,6 +989,20 @@ def listEntriesById(dictDB, entryID, configs):
     return entries
 
 def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
+    # fast initial loading, for large dictionaries without search
+    if searchtext == "":
+        sqlc = "select count(*) as total from entries"
+        cc = dictDB.execute(sqlc)
+        rc = cc.fetchone()
+        if int(rc["total"]) > 1000:
+            sqlf = "select * from entries order by sortkey limit 200"
+            cf = dictDB.execute(sqlf)
+            entries = []
+            for rf in cf.fetchall():
+                item = {"id": rf["id"], "title": rf["title"], "sortkey": rf["sortkey"]}
+                entries.append(item)
+            return rc["total"], entries, True
+
     lowertext = searchtext.lower()
     if type(sortdesc) == str:
         if sortdesc == "true":
@@ -1045,7 +1059,7 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
     c2 = dictDB.execute(sql2, params2)
     r2 = c2.fetchone()
     total = r2["total"]
-    return total, entries
+    return total, entries, False
 
 def listEntriesPublic(dictDB, dictID, configs, searchtext):
     howmany = 100

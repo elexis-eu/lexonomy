@@ -759,8 +759,8 @@ def entrylist(dictID, doctype, user, dictDB, configs):
             entries = ops.listEntriesById(dictDB, request.forms.id, configs)
             return {"success": True, "entries": entries}
     else:
-        total, entries = ops.listEntries(dictDB, dictID, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.howmany, request.forms.sortdesc, False)
-        return {"success": True, "entries": entries, "total": total}
+        total, entries, first = ops.listEntries(dictDB, dictID, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.howmany, request.forms.sortdesc, False)
+        return {"success": True, "entries": entries, "total": total, "firstRun": first}
 
 @get(siteconfig["rootPath"]+"<dictID>/config")
 @authDict(["canConfig"], True)

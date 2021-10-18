@@ -129,3 +129,5 @@ div.menu {z-index: 2;}
 #listMenu a {text-align: left; display: block; padding: 8px 20px 8px 10px; text-decoration: none; color: #333333; border-top: 1px solid #dddddd;}
 #listMenu a button {margin: 0}
 #listMenu a:hover {background-color: #f7f9ea; }
+
+#firstrun {color: green; font-size: 0.9em; padding-left: 1em; margin-top: -10px;}
