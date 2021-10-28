@@ -33,6 +33,7 @@
 						<a href="#/{ this.dictId }/config/download" class="collection-item">Download settings</a>
 						<a href="#/{ this.dictId }/config/subbing" class="collection-item">Subentries</a>
 						<a href="#/{ this.dictId }/config/ske" class="collection-item">Sketch Engine</a>
+						<a href="#/{ this.dictId }/config/gapi" class="collection-item">Multimedia API</a>
 					</div>
 				</div>
 			</div>

@@ -67,7 +67,7 @@ def readDictConfigs(dictDB):
         configs[r["id"]] = json.loads(r["json"])
     for conf in ["ident", "publico", "users", "kex", "titling", "flagging",
                  "searchability", "xampl", "thes", "collx", "defo", "xema",
-                 "xemplate", "editing", "subbing", "download", "links", "autonumber"]:
+                 "xemplate", "editing", "subbing", "download", "links", "autonumber", "gapi"]:
         if not conf in configs:
             configs[conf] = defaultDictConfig.get(conf, {})
 
@@ -1474,6 +1474,22 @@ def linkNAISC(dictDB, dictID, configs, otherdictDB, otherdictID, otherconfigs):
     dictDB.commit()
     return {"bgjob": jobid}
 
+def autoImage(dictDB, dictID, configs, addElem, addNumber):
+    import subprocess
+    res = isAutoImage(dictDB)
+    if res["bgjob"] and res["bgjob"] > 0:
+        return res
+    c = dictDB.execute("INSERT INTO bgjobs (type, data) VALUES ('autoimage', 'autoimage')")
+    dictDB.commit()
+    jobid = c.lastrowid
+    errfile = open("/tmp/autoImage-%s.err" % (dictID), "w")
+    outfile = open("/tmp/autoImage-%s.out" % (dictID), "w")
+    bgjob = subprocess.Popen(['adminscripts/autoImage.py', siteconfig["dataDir"], dictID, addElem, str(addNumber), str(jobid)],
+        start_new_session=True, close_fds=True, stderr=errfile, stdout=outfile, stdin=subprocess.DEVNULL)
+    dictDB.execute("UPDATE bgjobs SET pid=? WHERE id=?", (bgjob.pid, jobid))
+    dictDB.commit()
+    return {"bgjob": jobid}
+
 def isLinking(dictDB):
     c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='bgjobs'")
     if not c.fetchone():
@@ -1489,6 +1505,22 @@ def isLinking(dictDB):
             c = dictDB.execute("UPDATE bgjobs SET finished=-2 WHERE pid=?", (pid,))
     return {"bgjob": -1}
 
+def isAutoImage(dictDB):
+    c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='bgjobs'")
+    if not c.fetchone():
+        dictDB.execute("CREATE TABLE bgjobs (id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT, data TEXT, finished INTEGER DEFAULT -1, pid DEFAULT -1)")
+        dictDB.commit()
+    c = dictDB.execute("SELECT * FROM bgjobs WHERE finished=-1 AND data='autoimage'")
+    job = c.fetchone()
+    if job:
+        pid = job["pid"]
+        if isrunning(dictDB, job["id"], pid):
+            return {"bgjob": job["id"]}
+        else: # mark as dead
+            c = dictDB.execute("UPDATE bgjobs SET finished=-2 WHERE pid=?", (pid,))
+    return {"bgjob": -1}
+
+
 def getNAISCstatus(dictDB, dictID, otherdictID, bgjob):
     try:
         err = open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID))
@@ -1498,6 +1530,18 @@ def getNAISCstatus(dictDB, dictID, otherdictID, bgjob):
         return {"status": "finished"}
     if isrunning(dictDB, bgjob):
         return {"status": "linking"}
+    else:
+        return {"status": "failed"}
+
+def autoImageStatus(dictDB, dictID, bgjob):
+    try:
+        out = open("/tmp/autoImage-%s.out" % (dictID))
+    except:
+        return None
+    if "COMPLETED\n" in out.readlines():
+        return {"status": "finished"}
+    if isrunning(dictDB, bgjob):
+        return {"status": "working"}
     else:
         return {"status": "failed"}
 
