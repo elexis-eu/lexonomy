@@ -28,7 +28,7 @@
 				<label>Label</label>
 			</div>
 			<div class="col s2 input-field">
-				<input type="text" value={ flag.color } placeholder="color"  class="flag-color" style={ "background-color:"+flag.color}/>
+				<input type="text" value={ flag.color } placeholder="color"  class="flag-color" id={ "flag-color"+index } style={ "background-color:"+flag.color}/>
 				<label>Color</label>
 			</div>
 			<div class="col s1">
@@ -62,6 +62,15 @@
 				this.update();
 			},
 
+			addColor() {
+				$('.flag-color').each(function() {
+					var cid = $(this)[0].id;
+					$('#'+cid).colorpicker().on('changeColor', function(ev) {
+						$(this).css('background-color',ev.color.toHex());
+					});
+				});
+			},
+
 			onMounted() {
 				this.dictId = this.props.dictId;
 				this.configId = this.props.configId;
@@ -70,6 +79,7 @@
 				this.fillConfigForm();
 				M.updateTextFields();
 				console.log(this.props);
+				this.addColor();
 			},
 
 			onUpdated() {
@@ -82,6 +92,7 @@
 					$('select').formSelect();
 				}
 				M.updateTextFields();
+				this.addColor();
 			},
 
 			async fillConfigForm() {
