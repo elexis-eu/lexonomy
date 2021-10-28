@@ -26,8 +26,7 @@
 				<div class="col s3">
 					<h5 class="header">Expert settings</h5>
 					<div class="collection">
-						<a if={ !this.props.dictDetails.editingOverride } href="#/{ this.dictId }/config/editing" class="collection-item">Entry editor</a>
-						<a if={ this.props.dictDetails.editingOverride } href="#/{ this.dictId }/config/editing-override" class="collection-item">Entry editor</a>
+						<a href="#/{ this.dictId }/config/editing" class="collection-item">Entry editor</a>
 						<a href="#/{ this.dictId }/config/flagging" class="collection-item">Flags</a>
 						<a href="#/{ this.dictId }/config/autonumber" class="collection-item">Auto-numbering</a>
 						<a href="#/{ this.dictId }/config/links" class="collection-item">Linking</a>
