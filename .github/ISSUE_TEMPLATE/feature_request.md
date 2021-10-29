@@ -1,9 +1,9 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
+name: Feature request: Enable TBX import 
+about: Suggest an idea for this project: Provide a DTD file or other template that can be used under "Use your own schema" to correctly import TBX-basic files or provide a sample structure that I can recreate manually to correctly import TBX files.
+title: '':
+labels: '':
+assignees: '':
 
 ---
 
