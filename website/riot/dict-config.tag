@@ -15,8 +15,7 @@
 				<div class="col s3">
 					<h5 class="header">Entry settings</h5>
 					<div class="collection">
-						<a if={ !this.props.dictDetails.xemaOverride } href="#/{ this.dictId }/config/xema" class="collection-item">Structure</a>
-						<a if={ this.props.dictDetails.xemaOverride } href="#/{ this.dictId }/config/xema-override" class="collection-item">Structure</a>
+						<a href="#/{ this.dictId }/config/xema" class="collection-item">Structure</a>
 						<a if={ !this.props.dictDetails.xemplateOverride } href="#/{ this.dictId }/config/xemplate" class="collection-item">Formatting</a>
 						<a if={ this.props.dictDetails.xemplateOverride } href="#/{ this.dictId }/config/xemplate-override" class="collection-item">Formatting</a>
 						<a href="#/{ this.dictId }/config/titling" class="collection-item">Headword list</a>
