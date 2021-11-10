@@ -72,6 +72,9 @@
 		#editor.designer input.textbox.cap {
 			width: 15em !important;
 		}
+		#editor.designer input[type=radio] {
+			opacity: 1 !important;
+		}
 	</style>
 
 	<script>
