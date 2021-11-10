@@ -767,7 +767,8 @@ def readRandomOne(dictDB, dictID, configs):
     c = dictDB.execute("select id, title, xml from entries where id in (select id from entries where doctype=? order by random() limit 1)", (configs["xema"]["root"], ))
     r = c.fetchone()
     if r:
-        return {"id": r["id"], "title": r["title"], "xml": r["xml"]}
+        xml = setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
+        return {"id": r["id"], "title": r["title"], "xml": xml}
     else:
         return {"id": 0, "title": "", "xml": ""}
 

@@ -1,9 +1,12 @@
 var XemplateDesigner={};
 XemplateDesigner.xemplate=null;
+XemplateDesigner.dictID = null;
 
-XemplateDesigner.start=function(xema, xemplate){ //the editor can be an HTML element, or the string ID of one.
+XemplateDesigner.start=function(xema, xemplate, dictID){ //the editor can be an HTML element, or the string ID of one.
 	XemaDesigner.xema=xema;
+	XemplateDesigner.xema=xema;
   XemplateDesigner.xemplate=xemplate;
+  XemplateDesigner.dictID = dictID;
 	if(typeof(editor)=="string") editor=document.getElementById(editor);
 	var $editor=$("#editor").addClass("designer");
 	$editor.append("<div class='list'></div><div class='details narrow'></div><div class='preview'></div>");
@@ -15,7 +18,6 @@ XemplateDesigner.start=function(xema, xemplate){ //the editor can be an HTML ele
 };
 XemplateDesigner.onchange=function(){
 	XemplateDesigner.refreshPreview();
-	Screenful.Editor.changed();
 };
 
 XemplateDesigner.renderPreview=function(){
@@ -28,9 +30,10 @@ XemplateDesigner.renderPreview=function(){
 };
 XemplateDesigner.previewXml="";
 XemplateDesigner.reloadPreviewXml=function(){
-	$.ajax({url: "/"+dictID+"/randomone.json", dataType: "json", method: "POST"}).done(function(data){
+	$.ajax({url: "/"+this.dictID+"/randomone.json", dataType: "json", method: "POST"}).done(function(data){
 		if(data.id>0) {
-			XemplateDesigner.previewXml=data.xml;
+      var doc = (new DOMParser()).parseFromString(data.xml, 'text/xml');
+			XemplateDesigner.previewXml=doc;
 			XemplateDesigner.refreshPreview();
 			$(".designer .preview .area").hide().fadeIn();
 		} else {
@@ -40,7 +43,7 @@ XemplateDesigner.reloadPreviewXml=function(){
 	});
 };
 XemplateDesigner.refreshPreview=function(){
-	var html=Xemplatron.xml2html(XemplateDesigner.previewXml, XemplateDesigner.xemplate, xema);
+	var html=Xemplatron.xml2html(XemplateDesigner.previewXml, XemplateDesigner.xemplate, XemplateDesigner.xema);
 	var $details=$(".designer .preview .area").html(html);
 }
 
@@ -102,13 +105,13 @@ XemplateDesigner.changeElementLabel=function(elName, label){
   var x=XemplateDesigner.getElementXemplate(elName);
   x.label=label;
   XemaDesigner.selectElement(elName);
-  XemaDesigner.onchange();
+  XemplateDesigner.onchange();
 };
 XemplateDesigner.changeAttributeLabel=function(elName, atName, label){
   var x=XemplateDesigner.getAttributeXemplate(elName, atName);
   x.label=label;
   XemaDesigner.selectAttribute(elName, atName);
-  XemaDesigner.onchange();
+  XemplateDesigner.onchange();
 };
 
 XemplateDesigner.renderElementShown=function(elName){
@@ -135,13 +138,13 @@ XemplateDesigner.changeElementShown=function(elName, shown){
   var x=XemplateDesigner.getElementXemplate(elName);
   x.shown=(shown=="true" ? true : false);
   XemaDesigner.selectElement(elName);
-  XemaDesigner.onchange();
+  XemplateDesigner.onchange();
 };
 XemplateDesigner.changeAttributeShown=function(elName, atName, shown){
   var x=XemplateDesigner.getAttributeXemplate(elName, atName);
   x.shown=(shown=="true" ? true : false);
   XemaDesigner.selectAttribute(elName, atName);
-  XemaDesigner.onchange();
+  XemplateDesigner.onchange();
 };
 
 XemplateDesigner.renderAttributeOrder=function(elName, atName){
@@ -158,7 +161,7 @@ XemplateDesigner.changeAttributeOrder=function(elName, atName, val){
   var x=XemplateDesigner.getAttributeXemplate(elName, atName);
   x.order=val;
   XemaDesigner.selectAttribute(elName, atName);
-  XemaDesigner.onchange();
+  XemplateDesigner.onchange();
 };
 
 XemplateDesigner.renderElementLayout=function(elName){
@@ -185,13 +188,13 @@ XemplateDesigner.changeElementLayout=function(elName, val){
   var x=XemplateDesigner.getElementXemplate(elName);
   x.layout=val;
   XemaDesigner.selectElement(elName);
-  XemaDesigner.onchange();
+  XemplateDesigner.onchange();
 };
 XemplateDesigner.changeAttributeLayout=function(elName, atName, val){
   var x=XemplateDesigner.getAttributeXemplate(elName, atName);
   x.layout=val;
   XemaDesigner.selectAttribute(elName, atName);
-  XemaDesigner.onchange();
+  XemplateDesigner.onchange();
 };
 
 XemplateDesigner.renderElementStyles=function(elName){
@@ -246,11 +249,11 @@ XemplateDesigner.changeElementStyle=function(elName, dim, val){
   var x=XemplateDesigner.getElementXemplate(elName);
   x[dim]=val;
   XemaDesigner.selectElement(elName);
-  XemaDesigner.onchange();
+  XemplateDesigner.onchange();
 };
 XemplateDesigner.changeAttributeStyle=function(elName, atName, dim, val){
   var x=XemplateDesigner.getAttributeXemplate(elName, atName);
   x[dim]=val;
   XemaDesigner.selectAttribute(elName, atName);
-  XemaDesigner.onchange();
+  XemplateDesigner.onchange();
 };
