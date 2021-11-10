@@ -8,11 +8,15 @@
 					<label for="ident_title">Dictionary name</label>
 					<span class="helper-text">A human-readable title for your dictionary, such as <i>My Esperanto Dictionary</i>.</span>
 				</div>
+			</div>
+			<div class="row">
 				<div class="input-field col s10">
 					<textarea id="ident_blurb" class="materialize-textarea" placeholder="Yet another Lexonomy dictionary.">{ this.configData.blurb }</textarea>
 					<label for="ident_blurb">Dictionary description</label>
 					<span class="helper-text">This will appear on your dictionary's home page. You can leave it blank if you prefer.<br/>You can use <a href='https://daringfireball.net/projects/markdown/' target='_blank'>Markdown</a> here.</span>
 				</div>
+			</div>
+			<div class="row">
 				<div class="input-field col s10">
 					<input value={ this.configData.lang } type="text" id="ident_lang" class="autocomplete" placeholder="Type to search for language, or write your custom info">
 					<label for="ident_lang">Main language</label>
