@@ -853,6 +853,8 @@ def configread(dictID, user, dictDB, configs):
         config_data = configs[request.forms.id]
     if request.forms.id == 'ident':
         config_data['langs'] = ops.get_iso639_1()
+    if request.forms.id == 'titling':
+        config_data['locales'] = ops.get_locales()
     return {"success": True, "id": request.forms.id, "content": config_data}
 
 @post(siteconfig["rootPath"]+"<dictID>/configupdate.json")
