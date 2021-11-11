@@ -288,6 +288,24 @@
 					this.content = 'dict-config';
 					this.update();
 				});
+				route('/*/download', (dictId) => {
+					console.log('download ' + dictId)
+					this.dictId = dictId;
+					this.doctype = 'entry';
+					$.get("/" + this.dictId + "/doctype.json", (response) => {
+						console.log(response);
+						if (response.success && response.userAccess.canDownload) {
+							if (response.doctype != "") {
+								this.doctype = response.doctype;
+								this.doctypes = response.doctypes;
+							}
+							this.content = 'dict-download';
+							this.update();
+						} else {
+							route("/");
+						}
+					});
+				});
 				route('/*', (dictId) => {
 					console.log('testd ' + dictId)
 					this.dictId = dictId;
