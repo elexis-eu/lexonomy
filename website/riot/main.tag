@@ -306,6 +306,24 @@
 						}
 					});
 				});
+				route('/*/upload', (dictId) => {
+					console.log('upload ' + dictId)
+					this.dictId = dictId;
+					this.doctype = 'entry';
+					$.get("/" + this.dictId + "/doctype.json", (response) => {
+						console.log(response);
+						if (response.success && response.userAccess.canUpload) {
+							if (response.doctype != "") {
+								this.doctype = response.doctype;
+								this.doctypes = response.doctypes;
+							}
+							this.content = 'dict-upload';
+							this.update();
+						} else {
+							route("/");
+						}
+					});
+				});
 				route('/*', (dictId) => {
 					console.log('testd ' + dictId)
 					this.dictId = dictId;
