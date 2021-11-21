@@ -1508,8 +1508,11 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
             dbs[row["source_dict"]] = getDB(row["source_dict"])
             dbconfigs[row["source_dict"]] = readDictConfigs(dbs[row["source_dict"]])
         if not row["target_dict"] in dbs:
-            dbs[row["target_dict"]] = getDB(row["target_dict"])
-            dbconfigs[row["target_dict"]] = readDictConfigs(dbs[row["target_dict"]])
+            try:
+                dbs[row["target_dict"]] = getDB(row["target_dict"])
+                dbconfigs[row["target_dict"]] = readDictConfigs(dbs[row["target_dict"]])
+            except:
+                dbconfigs[row["target_dict"]] = None
     #now the actual results
     c = conn.execute(query, tuple(params))
     for row in c.fetchall():
@@ -1542,11 +1545,14 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
                 target_entry = rowt["entry_id"]
         except:
             target_entry = ""
-        # fallback for ontolex ids
+        # fallback for ontolex ids and CILI
         if target_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["target_id"]):
             target_entry = row["target_id"].split("_")[0]
         if target_entry != "":
             target_hw = getEntryTitleID(targetDB, targetConfig, target_entry, True)
+        if target_dict == "CILI":
+            target_entry = row["target_id"]
+            target_hw = row["target_id"]
 
         res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_entry": str(source_entry), "source_hw": source_hw, "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_entry": str(target_entry), "target_hw": target_hw, "target_el": row["target_element"], "target_id": row["target_id"], "confidence": row["confidence"]})
     return res
