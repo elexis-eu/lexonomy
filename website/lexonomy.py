@@ -901,10 +901,13 @@ def apilistlink():
     data = json.loads(request.body.getvalue().decode('utf-8'))
     user = ops.verifyUserApiKey(data["email"], data["apikey"])
     if not user["valid"]:
-        return {"success": False}
+        return {"success": False, "msg": "invalid user"}
     else:
-        dicts = ops.getLinkList(data.get('headword'), data.get('sourceLanguage'), data.get('sourceDict'), data.get('targetLanguage'))
-        return {"links": dicts, "success": True}
+        if data.get('headword') and (data.get('sourceLanguage') or data.get('sourceDict')):
+            dicts = ops.getLinkList(data.get('headword'), data.get('sourceLanguage'), data.get('sourceDict'), data.get('targetLanguage'))
+            return {"links": dicts, "success": True}
+        else:
+            return {"success": False, "msg": "missing parameters"}
 
 @get(siteconfig["rootPath"] + "push.api")
 def pushtest():
