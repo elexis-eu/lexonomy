@@ -31,10 +31,13 @@ prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepw
 
 # db management
 def getDB(dictID):
-    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite"))
-    conn.row_factory = sqlite3.Row
-    conn.executescript("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=on")
-    return conn
+    if os.path.isfile(os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")):
+        conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite"))
+        conn.row_factory = sqlite3.Row
+        conn.executescript("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=on")
+        return conn
+    else:
+        return None
 
 def getMainDB():
     conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite'))
