@@ -6,7 +6,10 @@
 		%include("head.tpl")
 		<title>404</title>
 		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}furniture/public.css" />
-	</head>
+		%if siteconfig["rtl"]:
+			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+		%end
+</head>
 	<body class="homepage">
 		<div id="header">
 			<a class="sitehome" href="{{siteconfig["baseUrl"]}}"></a>

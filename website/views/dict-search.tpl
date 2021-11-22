@@ -13,7 +13,7 @@
 		<meta name="twitter:url" content={{siteconfig["baseUrl"]}}{{dictID}}/?q={{q}}" />
 		<meta property="og:image" content={{siteconfig["baseUrl"]}}furniture/preview.gif" />
 		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
-		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
 		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
 		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-theme-blue.css" />
@@ -41,6 +41,9 @@
 				});
 			});
 		</script>
+		%if siteconfig["rtl"]:
+			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+		%end
 	</head>
 	<body class="entrypage">
 		<div id="header">
@@ -89,7 +92,7 @@
 				<div class="right"><a href="../../">Lexonomy</a></div>
 				<div><a href="../../{{dictID}}/">{{dictTitle}}</a></div>
                                 %if "licence" in publico and siteconfig["licences"][publico["licence"]]: 
-                                        <a href="{{siteconfig["licences"][publico["licence"]]["url"]}}" target="_blank"><img src="../{{siteconfig["licences"][publico["licence"]]["icon"]}}" alt="{{siteconfig["licences"][publico["licence"]]["title"]}}"/></a>
+                                        <a href="{{siteconfig["licences"][publico["licence"]]["url"]}}" target="_blank"><img src="{{siteconfig["baseUrl"]}}/{{siteconfig["licences"][publico["licence"]]["icon"]}}" alt="{{siteconfig["licences"][publico["licence"]]["title"]}}"/></a>
                                 %end
 
 			</div>

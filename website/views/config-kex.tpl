@@ -53,8 +53,11 @@
         var ske_apiKey = "{{user["ske_apiKey"]}}";
         </script>
         <link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
+        %if siteconfig["rtl"]:
+        <link type="text/css" rel="stylesheet" href="{{siteconfig[" baseUrl"]}}/furniture/rtl.css" />
+        %end
     </head>
     <body>
-                %include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Sketch Engine connection", configUrl="kex", rootPath="../../../")
+                %include("header.tpl", i18n=i18n,user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Sketch Engine connection", configUrl="kex", rootPath="../../../")
     </body>
 </html>

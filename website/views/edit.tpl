@@ -7,7 +7,7 @@
 		<title>{{dictTitle}}</title>
 		<script type="text/javascript" src="../../../libs/screenful/screenful.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
-		<script type="text/javascript" src="../../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
 		<script type="text/javascript" src="../../../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-user.css" />
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-theme-blue.css" />
@@ -28,10 +28,10 @@
 		Screenful.Navigator.sortDesc=false;
 		Screenful.Navigator.editorUrl="../../../{{dictID}}/{{doctype}}/entryeditor/";
 		Screenful.Navigator.modifiers=[
-			{value: "start", caption: "starts like this"},
-			{value: "exact", caption: "is exactly"},
-			{value: "wordstart", caption: "contains a word that starts like this"},
-			{value: "substring", caption: "contains this sequence of characters"},
+			{value: "start", caption: Screenful.Loc["starts like this"]},
+			{value: "exact", caption: Screenful.Loc["is exactly"]},
+			{value: "wordstart", caption: Screenful.Loc["contains a word that starts like this"]},
+			{value: "substring", caption: Screenful.Loc["contains this sequence of characters"]},
 		];
 		Screenful.Navigator.renderer=function(div, entry, searchtext, modifier){
 			var $xml=$($.parseXML(entry.content));
@@ -92,9 +92,12 @@
 		</script>
 
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
+		%if siteconfig["rtl"]:
+			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+		%end
 	</head>
-	<body>
-                %include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="edit", rootPath="../../../", doctype=doctype, doctypes=doctypes)
+	<body class="edit">
+                %include("header.tpl", i18n=i18n,user=user, dictID=dictID, dictTitle=dictTitle, current="edit", rootPath="../../../", doctype=doctype, doctypes=doctypes)
 		<script>
 	    var mode=Cookies.get("xonomyMode_{{dictID}}") || "{{xonomyMode}}";
 			$(".doctypes").addClass(mode);

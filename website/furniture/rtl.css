@@ -1,0 +1,206 @@
+
+/* public.css */
+
+body {background-position: left top; direction: rtl;}
+#header a.sitehome {margin-left: unset;margin-right: 4px;}
+#header a.sitehome span.readonly { left: unset; right: 120px; }
+#header div.email { right: unset; left: 20px; }
+#dictheader div.titleContainer span.dictTitle a.editLink {right: unset;left: -25px;}
+#dictheader form.searchContainer span.searchbox {text-align: right;}
+#dictheader form.searchContainer span.searchbox input.submit {right: unset;left: 4px; }
+#randoms.hasMore div.list {text-align: right; border-left:unset; padding-left: unset; margin-left: unset;border-right: 1px solid #dddddd; padding-right: 10px; margin-right: 105px;}
+@media (max-width: 800px){
+  #randoms.hasMore div.list {border-left: unset; padding-left: unset; margin-left: unset; border-right: 0px; padding-right: 0px; margin-right: 0px; }
+  #randoms.hasMore > div.randomizer {left: unset;right: 0px;}
+
+}
+#sitefooter > div.right {float: left;}
+#viewer {float: right;}
+#crossroads {float: right;}
+#crossroads > div > a {padding-right: unset;padding-left: 10px;}
+#nabes {float: left;}
+@media (max-width: 1240px){
+  #nabes {clear: right; }
+}
+div.welcome > div.point > div.blurb {padding-left: unset; padding-right: 50px; }
+div.usertop {background-position: right center;padding-left: unset; padding-right: 80px; }
+div.orline span {margin-left: unset; margin-right: 20px; }
+div.skelogin {text-align: left; margin: 20px 0px 0px 0px; }
+div.field.submit {text-align: left}
+div.createdict a {background-position: right center;  padding-left: unset;padding-right: 25px;}
+div.adminlink a {background-position: right center;  padding-left: unset; margin-right: unset;padding-right: 25px; margin-left: 0.75em;}
+div.dict a.dictTitle {margin-right: unset; margin-left: 0.5em;}
+
+div.leftie {float: right; border-right: unset; border-left: 1px solid #1e6bcf;}
+div.rightie {float: right; border-left: unset;border-right: 1px solid #1e6bcf; padding: 20px 40px 20px 0px; left: unset;right: -1px;}
+@media (max-width: 800px){
+  div.leftie {padding: 0px 0px 0px 0px; border-right: unset; border-left: 0px}
+  div.rightie {padding: 40px 0px 0px 0px; border-left: unset; left: unset;border-right: 0px; right: 0px;}
+}
+body.sitehome .invelope.top > div.clear {clear: right;}
+
+/* --- */
+
+/* xemplatron.css */
+.viewer div.indented {margin-left: unset;}
+.viewer div.hanging {margin-left: unset;}
+.viewer span.hanging {margin-right: unset;}
+.viewer div.bulleted > div.bullet {float: unset; margin-left: unset;}
+.viewer div.bulleted > div.inside {margin-left: unset;}
+.viewer div.bulleted > div.clear {clear: unset;}
+
+.viewer div.indented {margin-right: 40px;}
+.viewer div.hanging {margin-right: 40px;}
+.viewer span.hanging {margin-left: 0.5em;}
+.viewer div.bulleted > div.bullet {float: right; margin-right: 5px;}
+.viewer div.bulleted > div.inside {margin-right: 40px;}
+.viewer div.bulleted > div.clear {clear: right;}
+
+/* --- */
+
+/* screenful.css */
+#envelope button.iconYes {padding-left: unset; background-position: unset; }
+#envelope button.iconOnly {background-position: unset; }
+#envelope button.mergeLeft { margin-left: unset; }
+#statusbar span.wait { background-position: unset; margin-right: unset;}
+#statusbar span.warn { background-position: unset; margin-right: unset;}
+#statusbar .alertmessage { margin-right: unset; }
+
+#envelope button.iconYes {padding-right: 35px; background-position: right+10px center; }
+#envelope button.iconOnly {background-position: right+10px center; }
+#envelope button.mergeLeft { margin-right: -42px; }
+#statusbar span.wait { background-position: right center; margin-right: 1em;}
+#statusbar span.warn { background-position: right center; margin-right: 0.75em;}
+#statusbar .alertmessage { margin-left: 20px; }
+
+/* screenful-user.css */
+
+div.ScreenfulUser div.clickable span.arrow {margin-left: unset; }
+div.ScreenfulUser div.clickable span.arrow {margin-right: 5px; }
+
+div.ScreenfulUser div.menu {right: unset;}
+div.ScreenfulUser div.menu {left: -5px;}
+/* --- */
+
+/* ui.css */
+#header span.dicLinks {margin-left: unset;}
+#header a.dicLink.mergeleft {margin-left: unset;}
+body.edit #header div.email {right: unset; }
+#header div.doctypes a.doctype {margin-right: unset;}
+div.dangerzone a {background-position: unset; padding-left: unset; margin-right: unset;}
+div.signposts {margin-right: unset; }
+
+#header span.dicLinks {margin-right: 10px;}
+#header {background-position: left top;}
+#header a.dicLink.mergeleft {margin-right: -15px;}
+body.edit #header div.email {left: 20px; }
+#header div.doctypes a.doctype {float: right; margin-left: 10px;}
+div.dangerzone a {background-position: right center; padding-right: 25px; margin-left: 1em;}
+div.signposts {float: right; margin-left: 20px;}
+
+
+/* --- */
+/* scrrenful-navigator.css */
+
+#leftcontainer {left: unset; }
+#envelope.leftContainerCollapsed > #midcontainer {left: unset;}
+#envelope.leftContainerExpanded > #midcontainer {left: unset;}
+#envelope.leftContainerExpanded > #leftcontainer > .closer {right: unset; }
+#navlistcontainer { left: unset; }
+#editbox { left: unset; right: unset;}
+#critbox { left: unset; }
+input#searchbox.hasSearchModifiers {padding-left: unset;}
+button#butReload {margin-left: unset;}
+button#butReverse {margin-left: unset; }
+button#butShowNumbers {margin-left: unset; }
+button#butGoLast {margin-left: unset; }
+button#butGoLast {margin-left: unset; }
+#navbox .line1 { padding-left: unset;}
+#navbox .lineModifiers { padding-left: unset;}
+#navbox .lineModifiersLeft.hasCrits {padding-left: unset;}
+#navbox .line2 { padding-left: unset; }
+#navbox .modifiers span.clickable span.arrow {margin-left: unset; }
+#navbox .lineModifiersLeft div.menu {left: unset;}
+#navbox .lineModifiersLeft.hasCrits div.menu {left: unset;}
+#navbox .lineModifiersRight { float: unset; padding-right: unset;}
+#navbox .lineModifiersRight div.menu {right: unset;}
+#navbox .boxModifiers {margin-right: unset;}
+#navbox .boxModifiers span.clickable span.arrow {right: unset; }
+#navbox .boxModifiers div.menu {left: unset;}
+#critbox #editor {  left: unset; right: unset;}
+#critbox .buttons { left: unset; right: unset; text-align: unset; }
+#critbox .buttons *:last-child {margin-right: unset;}
+#listbox span.sugg {margin-right: unset.75em;}
+#listbox .entry a.entryMenuLink {float: unset; }
+#listbox .entry a.entryFlagLink {float: unset; margin-right: unset; }
+#listbox .entry span.entryLineNumber {float: unset; margin-right: unset;}
+#listbox .entry div.entrymenu {right: unset; }
+#listbox .entry div.entrymenu a span.keyCaption {float: unset; margin-left: unset; margin-right: unset;}
+#listbox .entry div.flagmenu {left: unset; }
+#listbox .entry div.flagmenu a span.spot {float: unset; margin-right: unset; }
+#listbox .entry div.flagmenu a span.keyCaption {float: unset; margin-left: unset; margin-right: unset; }
+#listMenuWrapper { right: unset; margin-right: unset;}
+#listMenu a {text-align: unset; padding: unset; }
+#firstrun {padding-left: unset; }
+
+#leftcontainer {right: 0px; }
+#envelope.leftContainerCollapsed > #midcontainer {right: 15px;}
+#envelope.leftContainerExpanded > #midcontainer {right: 17%;}
+#envelope.leftContainerExpanded > #leftcontainer > .closer {left: 12px; }
+#navlistcontainer { right: 0px; }
+#editbox { right: 30%; left: 0px;}
+#critbox { right: 15px; }
+input#searchbox.hasSearchModifiers {padding-right: 80px;}
+button#butReload {margin-right: -2px;}
+button#butReverse {margin-right: -2px; }
+button#butShowNumbers {margin-right: -2px; }
+button#butGoLast {margin-right: -2px; }
+button#butGoLast {margin-right: -2px; }
+#navbox .line1 { padding-right: 10px;}
+#navbox .lineModifiers { padding-right: 15px;}
+#navbox .lineModifiersLeft.hasCrits {padding-right: 62px;}
+#navbox .line2 { padding-right: 10px; }
+#navbox .modifiers span.clickable span.arrow {margin-right: 5px; }
+#navbox .lineModifiersLeft div.menu {right: 10px;}
+#navbox .lineModifiersLeft.hasCrits div.menu {right: 55px;}
+#navbox .lineModifiersRight { float: left; padding-left: 20px;}
+#navbox .lineModifiersRight div.menu {left: 10px;}
+#navbox .boxModifiers {margin-left: -76px;}
+#navbox .boxModifiers span.clickable span.arrow {left: 12px; }
+#navbox .boxModifiers div.menu {right: -5px;}
+#critbox #editor {  right: 15px; left: 10px;}
+#critbox .buttons { right: 15px; left: 10px; text-align: left; }
+#critbox .buttons *:last-child {margin-left: 0px;}
+#listbox span.sugg {margin-left: 0.75em;}
+#listbox .entry a.entryMenuLink {float: left; }
+#listbox .entry a.entryFlagLink {float: right; margin-left: 0.5em; }
+#listbox .entry span.entryLineNumber {float: right; margin-left: 0.5em;}
+#listbox .entry div.entrymenu {left: 0px; }
+#listbox .entry div.entrymenu a span.keyCaption {float: left; margin-right: 2em; margin-left: -0.5em;}
+#listbox .entry div.flagmenu {right: 10px; }
+#listbox .entry div.flagmenu a span.spot {float: right; margin-left: 0.5em; }
+#listbox .entry div.flagmenu a span.keyCaption {float: left; margin-right: 2em; margin-left: -0.5em; }
+#listMenuWrapper { left: 0; margin-left: 20px;}
+#listMenu a {text-align: right; padding: 8px 20px 8px 10px; }
+#firstrun {padding-right: 1em; }
+
+/* screenful-editor.css */
+#container { left: 0px; right: 15px; padding: 5px 0px 5px 20px; }
+#container.withHistory {right: unset;left: 350px; margin-right: unset;margin-left: 10px;}
+#container.withSourceCode {left: unset;right: 0px;}
+#toolbar span.divider {border-left: unset;border-right: 2px dotted #cccccc;}
+#toolbar input#idbox {margin-left: unset;margin-right: -46px;}
+#toolbar button.iconYes#butView {background-image: url(arrow_left.png);}
+#toolbar button.iconYes#butLeave {background-image: url(arrow_left.png);}
+#toolbar button.iconYes#butNonew {background-image: url(arrow_left.png);}
+#toolbar button.iconOnly#butSourceCode {float: right;}
+#toolbar button.iconOnly#butHistory {float: right;}
+#toolbar button.iconOnly#butLink {float: right;}
+#toolbar span#errorMessage {float: right;}
+#toolbar a {padding-left: unset;  background-position: unset; }
+#toolbar a {padding-right: 35px; background-position: right+10px center; }
+#toolbar label {background-position: right}
+#waiter { left: unset;}
+#waiter { right: 30%;}
+#history { right: unset; }
+#history { left: 0px; }

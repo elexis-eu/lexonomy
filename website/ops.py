@@ -20,6 +20,8 @@ from icu import Locale, Collator
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
+i18n = json.load(open(os.environ.get("LEXONOMY_LANG",
+                                           "lang/" + siteconfig["lang"] + ".json"), encoding="utf-8"))
 
 defaultDictConfig = {"editing": {"xonomyMode": "nerd", "xonomyTextEditor": "askString" },
                      "searchability": {"searchableElements": []},
@@ -54,7 +56,6 @@ def sendmail(mailTo, mailSubject, mailText):
             server = smtplib.SMTP_SSL(siteconfig["mailconfig"]["host"], siteconfig["mailconfig"]["port"], context=context)
         else:
             server = smtplib.SMTP(siteconfig["mailconfig"]["host"], siteconfig["mailconfig"]["port"])
-        message = "Subject: " + mailSubject + "\n\n" + mailText
         server.sendmail(siteconfig["mailconfig"]["from"], mailTo, message)
         server.quit()
         
@@ -485,7 +486,7 @@ def makeDict(dictID, template, title, blurb, email):
     if title == "":
         title = "?"
     if blurb == "":
-        blurb = "Yet another Lexonomy dictionary."
+        blurb = i18n["Yet another Lexonomy dictionary."]
     if dictID in prohibitedDictIDs or dictExists(dictID):
         return False
     if not template.startswith("/"):
@@ -520,7 +521,7 @@ def cloneDict(dictID, email):
     ident = {"title": "?", "blurb": "?"}
     if row:
         ident = json.loads(row["json"])
-        ident["title"] = "Clone of " + ident["title"]
+        ident["title"] = i18n["Clone of "] + ident["title"]
     newDB.execute("update configs set json=? where id='ident'", (json.dumps(ident),))
     newDB.commit()
     attachDict(newDB, newID)

@@ -41,8 +41,11 @@
 		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
+		%if siteconfig["rtl"]:
+		<link type="text/css" rel="stylesheet" href="{{siteconfig[" baseUrl"]}}/furniture/rtl.css" />
+		%end
 	</head>
 	<body>
-                %include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Entry structure", configUrl="xema-override", rootPath="../../../")
+                %include("header.tpl", i18n=i18n,user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Entry structure", configUrl="xema-override", rootPath="../../../")
 	</body>
 </html>

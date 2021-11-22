@@ -11,7 +11,7 @@
     <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-theme-blue.css" />
     <script type="text/javascript" src="../../../libs/screenful/screenful.js"></script>
     <script type="text/javascript" src="../../../libs/screenful/screenful-editor.js"></script>
-    <script type="text/javascript" src="../../../libs/screenful/screenful-loc-en.js"></script>
+    <script type="text/javascript" src="../../../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../libs/xonomy/xonomy.css" />
     <script type="text/javascript" src="../../../libs/xonomy/xonomy.js?2018-02-02"></script>
     <script type="text/javascript" src="../../../widgets/xematron.js"></script>
@@ -206,6 +206,9 @@
       return {id: revision.entry_id, content: revision.content, contentHtml: revision.contentHtml};
     };
     </script>
+    %if siteconfig["rtl"]:
+      <link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+    %end
   </head>
   <body>
   </body>

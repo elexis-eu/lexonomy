@@ -7,7 +7,7 @@
 		<title>{{dictTitle}}</title>
 		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
     <link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful.css" />
-		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
 		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
 		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-theme-blue.css" />
@@ -25,8 +25,11 @@
 		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../furniture/ui.css" />
+		%if siteconfig["rtl"]:
+			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+		%end
 	</head>
 	<body>
-		%include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="download", configTitle="", configUrl="", rootPath="../../")
+		%include("header.tpl", i18n=i18n,user=user, dictID=dictID, dictTitle=dictTitle, current="download", configTitle="", configUrl="", rootPath="../../")
 	</body>
 </html>

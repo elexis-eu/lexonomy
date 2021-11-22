@@ -10,7 +10,7 @@
 		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-theme-blue.css" />
 		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
 		<script type="text/javascript" src="../../libs/screenful/screenful-editor.js"></script>
-		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../libs/xonomy/xonomy.css" />
 		<script type="text/javascript" src="../../libs/xonomy/xonomy.js"></script>
 		<script type="text/javascript" src="../../widgets/user-docspec.js"></script>
@@ -75,6 +75,9 @@
 		div.userdata > div.body > div.dict a:hover {box-shadow: 0px 0px 2px #999999; color: #eeeeee;}
 		div.userdata > div.body > div.dict span.id {color: #999999; margin-left: 0.25em;}
 		</style>
+		%if siteconfig["rtl"]:
+			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+		%end
 	</head>
 	<body>
 	</body>
