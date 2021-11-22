@@ -49,17 +49,29 @@ def getLinkDB():
     return conn
 
 # SMTP
+# SMTP
 def sendmail(mailTo, mailSubject, mailText):
     if siteconfig["mailconfig"] and siteconfig["mailconfig"]["host"] and siteconfig["mailconfig"]["port"]:
-        if siteconfig["mailconfig"]["secure"]:
+        message = "Subject: " + mailSubject + "\n\n" + mailText
+        if siteconfig["mailconfig"]["ttl"]:
+            context = ssl.create_default_context()
+            with smtplib.SMTP(siteconfig["mailconfig"]["host"], siteconfig["mailconfig"]["port"]) as server:
+                server.ehlo()  # Can be omitted
+                server.starttls(context=context)
+                server.ehlo()  # Can be omitted
+                server.login(siteconfig["mailconfig"]["from"], siteconfig["mailconfig"]["password"])
+                server.sendmail(siteconfig["mailconfig"]["from"], mailTo, message)
+                server.quit()
+        elif siteconfig["mailconfig"]["secure"]:
             context = ssl.create_default_context()
             server = smtplib.SMTP_SSL(siteconfig["mailconfig"]["host"], siteconfig["mailconfig"]["port"], context=context)
+            server.sendmail(siteconfig["mailconfig"]["from"], mailTo, message)
+            server.quit()
         else:
             server = smtplib.SMTP(siteconfig["mailconfig"]["host"], siteconfig["mailconfig"]["port"])
-        server.sendmail(siteconfig["mailconfig"]["from"], mailTo, message)
-        server.quit()
+            server.sendmail(siteconfig["mailconfig"]["from"], mailTo, message)
+            server.quit()
         
-
 # config
 def readDictConfigs(dictDB):
     configs = {"siteconfig": siteconfig}
