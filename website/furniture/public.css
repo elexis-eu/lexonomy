@@ -1,7 +1,7 @@
 body {background-image: url(header-back.gif); background-position: right top; background-repeat: no-repeat; font-family: sans-serif; background-color: #ffffff; margin: 0; padding: 0; line-height: 1.3em; font-size: 1rem;}
 
 #header {padding: 10px 10px; height: 38px;}
-#header a.sitehome {display: inline-block; width: 119px; height: 34px; background-image: url(lexonomy_logo_blue_on_transparent_with_bleed.png); background-size: 119px auto; margin-top: 5px; margin-left: 4px; position: relative;}
+#header a.sitehome {display: inline-block; width: 119px; height: 34px; background-image: url(https://lexonomy.eu-central-1.linodeobjects.com/KSGAAL-logo-full-color-rgb-548px72ppi.png); background-size: 119px auto; margin-top: 5px; margin-left: 4px; position: relative;}
 #headepx .sitehome:hover {top: -1px;}
 #header a.sitehome span.readonly { display: inline-block; color: #bd6c73; font-size: 0.75rem; line-height: 1em; padding: 10px 5px; position: absolute; top: -15px; left: 120px; white-space: nowrap; text-shadow: 1px 1px 0px #ffffff;}
 #header div.email {display: inline-block; position: absolute; top: 18px; right: 20px; color: #666666;}
