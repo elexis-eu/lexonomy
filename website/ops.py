@@ -1542,8 +1542,12 @@ def readDictHistory(dictDB, dictID, configs, entryID):
 
 def verifyUserApiKey(email, apikey):
     conn = getMainDB()
-    c = conn.execute("select email from users where email=? and apiKey=?", (email, apikey))
-    row = c.fetchone()
+    if email == '':
+        c = conn.execute("select email from users where apiKey=?", (apikey,))
+        row = c.fetchone()
+    else:
+        c = conn.execute("select email from users where email=? and apiKey=?", (email, apikey))
+        row = c.fetchone()
     if not row or siteconfig["readonly"]:
         return {"valid": False}
     else:

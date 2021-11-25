@@ -1072,6 +1072,17 @@ def entrylinks(dictID, user, dictDB, configs):
     res = ops.getEntryLinks(dictDB, dictID, request.query.id)
     return {"links": res}
 
+# ELEXIS REST API https://elexis-eu.github.io/elexis-rest/
+@get(siteconfig["rootPath"] + "dictionaries")
+def apilistdict():
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    else:
+        dicts = list(map(lambda h: h['id'], ops.getDictList(None, None)))
+        return {"dictionaries": dicts}
+
 @error(404)
 def error404(error):
     return template("404.tpl", **{"siteconfig": siteconfig})
