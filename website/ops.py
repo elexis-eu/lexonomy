@@ -1926,3 +1926,23 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
             yield line; yield "\n"
             line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
             yield line; yield "\n"
+
+def elexisDictAbout(dictID):
+    dictDB = getDB(dictID)
+    if dictDB:
+        info = {"id": dictID}
+        configs = readDictConfigs(dictDB)
+        info["sourceLang"] = configs['ident']['lang']
+        if configs["publico"]["public"]:
+            info["release"] = "PUBLIC"
+            info["license"] = configs["publico"]["licence"]
+            if siteconfig["licences"][configs["publico"]["licence"]]:
+                info["license"] = siteconfig["licences"][configs["publico"]["licence"]]["url"]
+        else:
+            info["release"] = "PRIVATE"
+        info["creator"] = []
+        for user in configs["users"]:
+            info["creator"].append({"email": user})
+        return info
+    else:
+        return None
