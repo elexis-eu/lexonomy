@@ -203,6 +203,13 @@ Screenful.Editor={
             $("#idbox").val(data.id);
             $("#container").removeClass("empty").html("<div id='editor'></div>");
             Screenful.Editor.editor(document.getElementById("editor"), data);
+            // hook
+            if(Screenful.Editor.onEditor) {
+              Screenful.Editor.onEditor(
+                document.getElementById("editor"),
+                data
+              );
+            }
             $("#container").hide().fadeIn();
             if($("#container .xonomy .layby").length>0) {
               $("#container").css("right", "15px"); //make room for xonomy layby

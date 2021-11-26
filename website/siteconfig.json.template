@@ -2,6 +2,8 @@
   "readonly": false,
   "baseUrl": "http://localhost:8080/",
   "rootPath": "/",
+  "rtl": false,
+  "lang": "en",
   "port": 8080,
   "dataDir": "../data/",
   "naiscCmd": "/opt/naisc/naisc-1.0.1/naisc.sh",

@@ -1,4 +1,5 @@
 Screenful.Loc = {
+  ...loc,
   ready: "جاهز.",
   find: "ابحث",
   reload: "إعادة تحميل",
@@ -107,4 +108,16 @@ Screenful.Loc = {
   "is exactly": "تطابق تام",
   "contains a word that starts like this": "يحتوي على كلمة كهذه",
   "contains this sequence of characters": "تحتوي على النص",
+  "Headword": "الكلمة الرئيسية",
 };
+
+$(document).ready(function(params) {
+  if (Screenful.Editor)
+    Screenful.Editor.onEditor = (el, data) => {
+      $(".pillarform .title").each(function (x) {
+        const t = $(this).text();
+        if (Screenful.Loc[t]) 
+          $(this).text(Screenful.Loc[t]);
+      });
+    };
+})

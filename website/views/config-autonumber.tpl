@@ -48,11 +48,12 @@
 			return JSON.parse(str);
 		};
 		</script>
+		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
 		%if siteconfig["rtl"]:
 			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
 		%end
 	</head>
 	<body>
-                %include("header.tpl", i18n=i18n, user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Auto-numbering", configUrl="autonumber", rootPath="../../../")
+                %include("header.tpl", i18n=i18n, user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle=i18n["Auto-numbering"], configUrl="autonumber", rootPath="../../../")
 	</body>
 </html>

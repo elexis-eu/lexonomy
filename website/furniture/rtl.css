@@ -83,9 +83,11 @@ div.ScreenfulUser div.menu {left: -5px;}
 /* --- */
 
 /* ui.css */
+div.field > div.clear {clear: right;}
+div.signposts div.signpost { background-image: url(signpost-rtl.png); margin: 0px 0px 20px 30px; }
 #header span.dicLinks {margin-left: unset;}
 #header a.dicLink.mergeleft {margin-left: unset;}
-body.edit #header div.email {right: unset; }
+body #header div.email {right: unset; }
 #header div.doctypes a.doctype {margin-right: unset;}
 div.dangerzone a {background-position: unset; padding-left: unset; margin-right: unset;}
 div.signposts {margin-right: unset; }
@@ -93,7 +95,7 @@ div.signposts {margin-right: unset; }
 #header span.dicLinks {margin-right: 10px;}
 #header {background-position: left top;}
 #header a.dicLink.mergeleft {margin-right: -15px;}
-body.edit #header div.email {left: 20px; }
+body #header div.email {left: 20px; }
 #header div.doctypes a.doctype {float: right; margin-left: 10px;}
 div.dangerzone a {background-position: right center; padding-right: 25px; margin-left: 1em;}
 div.signposts {float: right; margin-left: 20px;}

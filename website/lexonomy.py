@@ -124,6 +124,11 @@ def authAdmin(func):
         return func(*args, **kwargs)
     return wrapper_verifyLoginAdmin
 
+#i18n
+@get(siteconfig["rootPath"] + 'i18n')
+def i18nFunc():
+    return i18n
+
 #homepage
 @get(siteconfig["rootPath"])
 def home():
