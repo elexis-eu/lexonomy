@@ -102,36 +102,40 @@ for entry in re.findall(re_entry, xmldata):
         print("Skipping entry, XML parsing error: " + str(e))
         print("Entry with error: " + entry, file=sys.stderr)
         entryInserted += 1
-    if not skip:
-        pat = r'^<[^>]*\s+lxnm:(sub)?entryID=[\'"]([0-9]+)["\']'
-        entryID = None
-        action = "create"
-        title = ops.getEntryTitle(entry, configs["titling"])
-        sortkey = ops.getSortTitle(entry, configs["titling"])
-        if re.match(pat, entry):
-            entryID = re.match(pat, entry).group(2)
-            c = db.execute("select id from entries where id=?", (entryID,))
-            if not c.fetchone():
-                sql = "insert into entries(id, xml, needs_refac, needs_resave, needs_refresh, doctype, title, sortkey) values(?, ?, ?, ?, ?, ?, ?, ?)"
-                params = (entryID, entry, needs_refac, needs_resave, 0, entryTag, title, sortkey)
-            else:
-                sql = "update entries set doctype=?, xml=?, needs_refac=?, needs_resave=?, needs_refresh=? , title=?, sortkey=? where id=?"
-                params = (entryTag, entry, needs_refac, needs_resave, 0, title, sortkey, entryID)
-                action = "update"
+        continue
+    
+    if not re.match(r"^<([\w]+)([^>]*)(xmlns\:lxnm\=[\"']http://www.lexonomy\.eu\/[\"'])(.*?)>", entry, re.DOTALL): 
+        entry = re.sub(r"<([^> ]*)", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", entry, 1) # add the lexonomy namespace declaration to the root
+    
+    pat = r'^<[^>]*\s+lxnm:(sub)?entryID=[\'"]([0-9]+)["\']'
+    entryID = None
+    action = "create"
+    title = ops.getEntryTitle(entry, configs["titling"])
+    sortkey = ops.getSortTitle(entry, configs["titling"])
+    if re.match(pat, entry): # has already got an entry/subentry id
+        entryID = re.match(pat, entry).group(2)
+        c = db.execute("select id from entries where id=?", (entryID,))
+        if not c.fetchone():
+            sql = "insert into entries(id, xml, needs_refac, needs_resave, needs_refresh, doctype, title, sortkey) values(?, ?, ?, ?, ?, ?, ?, ?)"
+            params = (entryID, entry, needs_refac, needs_resave, 0, entryTag, title, sortkey)
         else:
-            sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype, title, sortkey) values(?, ?, ?, ?, ?, ?, ?)"
-            params = (entry, needs_refac, needs_resave, 0, entryTag, title, sortkey)
-        c = db.execute(sql, params)
-        if entryID == None:
-            entryID = c.lastrowid
-        db.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, action, str(datetime.datetime.utcnow()), email, entry, json.dumps(historiography)))
-        db.execute("delete from searchables where entry_id=? and level=?", (entryID, 1))
-        searchTitle = ops.getEntryTitle(entry, configs["titling"], True)
-        db.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, searchTitle, 1))
-        db.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, searchTitle.lower(), 1))
-        db.commit() 
-        entryInserted += 1
-        print("\r%.2d%% (%d/%d entries imported)" % ((entryInserted/entryCount*100), entryInserted, entryCount))
-        
+            sql = "update entries set doctype=?, xml=?, needs_refac=?, needs_resave=?, needs_refresh=? , title=?, sortkey=? where id=?"
+            params = (entryTag, entry, needs_refac, needs_resave, 0, title, sortkey, entryID)
+            action = "update"
+    else:
+        sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype, title, sortkey) values(?, ?, ?, ?, ?, ?, ?)"
+        params = (entry, needs_refac, needs_resave, 0, entryTag, title, sortkey)
+    c = db.execute(sql, params)
+    if entryID == None:
+        entryID = c.lastrowid
+    db.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, action, str(datetime.datetime.utcnow()), email, entry, json.dumps(historiography)))
+    db.execute("delete from searchables where entry_id=? and level=?", (entryID, 1))
+    searchTitle = ops.getEntryTitle(entry, configs["titling"], True)
+    db.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, searchTitle, 1))
+    db.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, searchTitle.lower(), 1))
+    db.commit() 
+    entryInserted += 1
+    print("\r%.2d%% (%d/%d entries imported)" % ((entryInserted/entryCount*100), entryInserted, entryCount))
+    
 db.commit() 
 

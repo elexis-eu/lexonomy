@@ -862,10 +862,10 @@ def markdown_text(text):
 def setHousekeepingAttributes(entryID, xml, subbing):
     entryID = str(entryID)
     #delete any housekeeping attributes and elements that already exist in the XML
-    xml = re.sub(r"^(<[^>\/]*)\s+xmlns:lxnm=['\"]http:\/\/www\.lexonomy\.eu\/[\"']", r"\1", xml)
-    xml = re.sub(r"^(<[^>\/]*)\s+lxnm:entryID=['\"][^\"\']*[\"']", r"\1", xml)
-    xml = re.sub(r"^(<[^>\/]*)\s+lxnm:subentryID=['\"][^\"\']*[\"']", r"\1", xml)
-    xml = re.sub(r"^(<[^>\/]*)\s+lxnm:linkable=['\"][^\"\']*[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>]*)xmlns:lxnm=['\"]http:\/\/www\.lexonomy\.eu\/[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>]*)lxnm:entryID=['\"][^\"\']*[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>]*)lxnm:subentryID=['\"][^\"\']*[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>]*)lxnm:linkable=['\"][^\"\']*[\"']", r"\1", xml)
     #get name of the top-level element
     root = ""
     root = re.search(r"^<([^\s>\/]+)", xml, flags=re.M).group(1)
@@ -1262,7 +1262,7 @@ def refac(dictDB, dictID, configs):
     from xml.dom import minidom, Node
     if len(configs['subbing']) == 0:
         return False
-    c = dictDB.execute("select e.id, e.xml, h.email from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 order by h.[when] asc limit 1")
+    c = dictDB.execute("select e.id, e.xml, h.email from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 limit 1")
     r = c.fetchone()
     if not r:
         return False
@@ -1277,39 +1277,50 @@ def refac(dictDB, dictID, configs):
         el.parentNode.removeChild(el)
     # in the current entry, find elements which are subentries, and are not contained inside other subentries
     els = []
-    for doctype in configs["subbing"]:
+    
+    def matchesAttributes(el, attributes):
+        for name, requiredValue in attributes.items():
+            if not(el.hasAttribute(name)) or (requiredValue and requiredValue != el.getAttribute(name)):
+                return False
+        return True
+
+    for doctype, config in configs["subbing"].items():
+        attributes = config["attributes"]
+       # get all elements whose tag is in the subentries list
         _els = doc.getElementsByTagName(doctype)
-        for el in _els:
-            if el.parentNode and el.parentNode.nodeType == 1:
-                isSubSub = False
-                p = el.parentNode
-                while p.parentNode and p.parentNode.nodeType == 1:
-                    if p.tagName in configs["subbing"]:
-                        isSubSub = True
-                    p = p.parentNode
-                if not isSubSub:
-                    els.append(el)
+        for el in _els: 
+            if not(matchesAttributes(el, attributes)):
+                continue
+            
+            # climb up the parent tree to check it is not inside of another subentry
+            parent = el.parentNode
+            while parent and parent.nodeType == 1:
+                if parent.tagName in configs["subbing"] and matchesAttributes(parent, configs["subbing"][doctype]["attributes"]):
+                    continue
+                parent = parent.parentNode
+            els.append(el)
+
     dictDB.execute("delete from sub where parent_id=?", (entryID, ))
     # keep saving subentries of the current entry until there are no more subentries to save:
-    if len(els) > 0:
-        for el in els:
-            subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID")
-            xml = el.toxml()
-            if subentryID:
-                subentryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, xml, email.lower(), {"refactoredFrom":entryID})
-                el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", str(subentryID))
-                dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
-                if changed:
-                    dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?) and id<>?", (subentryID, entryID))
-            else:
-                subentryID, adjustedXml, feedback = createEntry(dictDB, configs, None, xml, email.lower(), {"refactoredFrom":entryID})
-                el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", str(subentryID))
-                subentryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, el.toxml(), email.lower(), {"refactoredFrom":entryID})
-                dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
-                dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (subentryID, ))
+    for el in els:
+        subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID")
+        xml = el.toxml()
+        if subentryID:
+            subentryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, xml, email.lower(), {"refactoredFrom":entryID})
+            el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", str(subentryID))
+            dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
+            if changed:
+                dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?) and id<>?", (subentryID, entryID))
+        else:
+            subentryID, adjustedXml, feedback = createEntry(dictDB, configs, None, xml, email.lower(), {"refactoredFrom":entryID})
+            el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", str(subentryID))
+            subentryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, el.toxml(), email.lower(), {"refactoredFrom":entryID})
+            dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
+            dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (subentryID, ))
     xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
     dictDB.execute("update entries set xml=?, needs_refac=0 where id=?", (xml, entryID))
     dictDB.commit()
+    print(f'processed {entryID}')
 
 def refresh(dictDB, dictID, configs):
     from xml.dom import minidom, Node
@@ -1323,9 +1334,15 @@ def refresh(dictDB, dictID, configs):
         return False
     parentID = r["id"]
     parentXml = r["xml"]
-    if not "xmlns:lxnm" in parentXml:
-        parentXml = re.sub(r"<([^>^ ]*) ", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", parentXml)
-    parentDoc = minidom.parseString(parentXml)
+
+    if not re.match(r"^<([\w]+)([^>]*)(xmlns\:lxnm\=[\"']http://www.lexonomy\.eu\/[\"'])(.*?)>", parentXml): 
+        parentXml = re.sub(r"<([^> ]*)", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", parentXml, 1) # add the lexonomy namespace declaration to the root
+
+    try:
+        parentDoc = minidom.parseString(parentXml)
+    except Exception as e: 
+        print("oops")
+   
     # this will be called repeatedly till exhaustion
     while True:
         # find an element which is a subentry and which we haven't sucked in yet:
@@ -1350,11 +1367,16 @@ def refresh(dictDB, dictID, configs):
                 el.parentNode.removeChild(el)
             else:
                 childXml = r["xml"]
+                # try:
                 childDoc = minidom.parseString(childXml)
                 elNew = childDoc.documentElement
                 el.parentNode.replaceChild(elNew, el)
                 elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", subentryID)
                 elNew.setAttributeNS("http://www.lexonomy.eu/", "lxnm:done", "1")
+                # except Exception as E:
+                #     print("failed to parse")
+                #     print(E)
+                #     pass
         else: #if no such element exists: we are done
             els = parentDoc.documentElement.getElementsByTagName("*")
             for el in els:
@@ -1456,9 +1478,9 @@ def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
     c = dictDB.execute("select id, xml from entries where id=?", (entryID,))
     row = c.fetchone()
     xml = row["xml"] if row else ""
-    xml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
-    xml = re.sub(r"\=\"([^\"]*)\"", r"='\1'", xml)
-    xml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", xml)
+    # xml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml) # remove all lexonomy namespace declarations if they're otherwise unused in the entry
+    # xml = re.sub(r"\=\"([^\"]*)\"", r"='\1'", xml) # normalize all attributes to use single quotes instead of double
+    # xml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", xml) # remove all lexonomy attributes (subentryID, entryID)
     xml = addFlag(xml, flag, configs["flagging"], configs["xema"])
 
     # tell my parents that they need a refresh:
