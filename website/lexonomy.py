@@ -219,7 +219,7 @@ def entryflag(dictID, user, dictDB, configs):
 @get(siteconfig["rootPath"]+"<dictID>/subget")
 @authDict(["canEdit"])
 def subget(dictID, user, dictDB, configs):
-    total, entries = ops.listEntries(dictDB, dictID, configs, request.query.doctype, request.query.lemma, "wordstart", 100, False, False, True)
+    total, entries, first = ops.listEntries(dictDB, dictID, configs, request.query.doctype, request.query.lemma, "wordstart", 100, False, False, True)
     return {"success": True, "total": total, "entries": entries}
 
 @post(siteconfig["rootPath"]+"<dictID>/history.json")
@@ -851,6 +851,7 @@ def resavejson(dictID, user, dictDB, configs):
     stats = ops.getDictStats(dictDB)
     while stats["needResave"] and count <= 127:
         if len(configs['subbing']) > 0:
+            ops.refresh(dictDB, dictID, configs)
             ops.refac(dictDB, dictID, configs)
             ops.refresh(dictDB, dictID, configs)
         ops.resave(dictDB, dictID, configs)
