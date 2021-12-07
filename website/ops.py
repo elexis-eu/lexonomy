@@ -27,7 +27,7 @@ defaultDictConfig = {"editing": {"xonomyMode": "nerd", "xonomyTextEditor": "askS
                      "titling": {"headwordAnnotations": []},
                      "flagging": {"flag_element": "", "flags": []}}
 
-prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent", "userprofile"];
+prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent", "userprofile", "dictionaries", "about", "list", "lemma", "json", "ontolex", "tei"];
 
 # db management
 def getDB(dictID):
