@@ -1097,7 +1097,10 @@ def elexaboutdict(dictID):
 
 @error(404)
 def error404(error):
-    return template("404.tpl", **{"siteconfig": siteconfig})
+    if request.path.startswith("/about/") or request.path.startswith("/list/"):
+        return error.body
+    else:
+        return template("404.tpl", **{"siteconfig": siteconfig})
 
 # deployment
 debug=False
