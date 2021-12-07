@@ -1089,55 +1089,54 @@ def listEntriesById(dictDB, entryID, configs):
 
 def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
     # fast initial loading, for large dictionaries without search
+    c1 = None
+    total = None
     if searchtext == "":
         sqlc = "select count(*) as total from entries where doctype=?"
-        cc = dictDB.execute(sqlc, (doctype,))
-        rc = cc.fetchone()
-        if int(rc["total"]) > 1000:
+        total = dictDB.execute(sqlc, (doctype,)).fetchone()["total"]
+        if total > 1000:
             sqlf = "select * from entries where doctype=? order by sortkey limit 200"
-            cf = dictDB.execute(sqlf, (doctype,))
-            entries = []
-            for rf in cf.fetchall():
-                item = {"id": rf["id"], "title": rf["title"], "sortkey": rf["sortkey"]}
-                entries.append(item)
-            return rc["total"], entries, True
-
-    lowertext = searchtext.lower()
-    if type(sortdesc) == str:
-        if sortdesc == "true":
-            sortdesc = True
+            c1 = dictDB.execute(sqlf, (doctype,))
+    
+    if not c1: 
+        lowertext = searchtext.lower()
+        if type(sortdesc) == str:
+            if sortdesc == "true":
+                sortdesc = True
+            else:
+                sortdesc = False
+        if "flag_element" in configs["flagging"] or fullXML:
+            entryXML = ", e.xml "
         else:
-            sortdesc = False
-    if "flag_element" in configs["flagging"] or fullXML:
-        entryXML = ", e.xml "
-    else:
-        entryXML = ""
-    if "headwordSortDesc" in configs["titling"]:
-        reverse = configs["titling"]["headwordSortDesc"]
-    if reverse:
-        sortdesc = not sortdesc
+            entryXML = ""
+        if "headwordSortDesc" in configs["titling"]:
+            reverse = configs["titling"]["headwordSortDesc"]
+        if reverse:
+            sortdesc = not sortdesc
 
-    if modifier == "start":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?) group by e.id order by s.level"
-        params1 = (doctype, lowertext+"%", searchtext+"%")
-        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?)"
-        params2 = (doctype, lowertext+"%", searchtext+"%")
-    elif modifier == "wordstart":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or LOWER(s.txt) like ? or s.txt like ? or s.txt like ?) group by e.id order by s.level"
-        params1 = (doctype, lowertext + "%", "% " + lowertext + "%", searchtext + "%", "% " + searchtext + "%")
-        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or LOWER(s.txt) like ? or s.txt like ? or s.txt like ?)"
-        params2 = (doctype, lowertext + "%", "% " + lowertext + "%", searchtext + "%", "% " + searchtext + "%")
-    elif modifier == "substring":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?) group by e.id order by s.level"
-        params1 = (doctype, "%" + lowertext + "%", "%" + searchtext + "%")
-        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?)"
-        params2 = (doctype, "%" + lowertext + "%", "%" + searchtext + "%")
-    elif modifier == "exact":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=? group by e.id order by s.level"
-        params1 = (doctype, searchtext)
-        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=?"
-        params2 = (doctype, searchtext)
-    c1 = dictDB.execute(sql1, params1)
+        if modifier == "start":
+            sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?) group by e.id order by s.level"
+            params1 = (doctype, lowertext+"%", searchtext+"%")
+            sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?)"
+            params2 = (doctype, lowertext+"%", searchtext+"%")
+        elif modifier == "wordstart":
+            sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or LOWER(s.txt) like ? or s.txt like ? or s.txt like ?) group by e.id order by s.level"
+            params1 = (doctype, lowertext + "%", "% " + lowertext + "%", searchtext + "%", "% " + searchtext + "%")
+            sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or LOWER(s.txt) like ? or s.txt like ? or s.txt like ?)"
+            params2 = (doctype, lowertext + "%", "% " + lowertext + "%", searchtext + "%", "% " + searchtext + "%")
+        elif modifier == "substring":
+            sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?) group by e.id order by s.level"
+            params1 = (doctype, "%" + lowertext + "%", "%" + searchtext + "%")
+            sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?)"
+            params2 = (doctype, "%" + lowertext + "%", "%" + searchtext + "%")
+        elif modifier == "exact":
+            sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=? group by e.id order by s.level"
+            params1 = (doctype, searchtext)
+            sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=?"
+            params2 = (doctype, searchtext)
+        c1 = dictDB.execute(sql1, params1)
+        total = dictDB.execute(sql2, params2).fetchone()["total"]
+    
     entries = []
     for r1 in c1.fetchall():
         item = {"id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"]}
@@ -1145,19 +1144,16 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
             item["flag"] = extractText(r1["xml"], configs["flagging"]["flag_element"])
         if fullXML:
             item["xml"] = setHousekeepingAttributes(r1["id"], r1["xml"], configs["subbing"])
-        if r1["level"] > 1:
+        if "level" in r1 and r1["level"] > 1:
             item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
         entries.append(item)
 
-    # sort by selected locale
-    collator = Collator.createInstance(Locale(getLocale(configs)))
-    entries.sort(key=lambda x: collator.getSortKey(x['sortkey']), reverse=sortdesc)
+    if searchtext: # sort by selected locale
+        collator = Collator.createInstance(Locale(getLocale(configs)))
+        entries.sort(key=lambda x: collator.getSortKey(x['sortkey']), reverse=sortdesc)
     # and limit
     entries = entries[0:int(howmany)]
 
-    c2 = dictDB.execute(sql2, params2)
-    r2 = c2.fetchone()
-    total = r2["total"]
     return total, entries, False
 
 def listEntriesPublic(dictDB, dictID, configs, searchtext):
@@ -1338,10 +1334,7 @@ def refresh(dictDB, dictID, configs):
     if not re.match(r"^<([\w]+)([^>]*)(xmlns\:lxnm\=[\"']http://www.lexonomy\.eu\/[\"'])(.*?)>", parentXml): 
         parentXml = re.sub(r"<([^> ]*)", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", parentXml, 1) # add the lexonomy namespace declaration to the root
 
-    try:
-        parentDoc = minidom.parseString(parentXml)
-    except Exception as e: 
-        print("oops")
+    parentDoc = minidom.parseString(parentXml)
    
     # this will be called repeatedly till exhaustion
     while True:
