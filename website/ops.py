@@ -1090,12 +1090,12 @@ def listEntriesById(dictDB, entryID, configs):
 def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
     # fast initial loading, for large dictionaries without search
     if searchtext == "":
-        sqlc = "select count(*) as total from entries"
-        cc = dictDB.execute(sqlc)
+        sqlc = "select count(*) as total from entries where doctype=?"
+        cc = dictDB.execute(sqlc, (doctype,))
         rc = cc.fetchone()
         if int(rc["total"]) > 1000:
-            sqlf = "select * from entries order by sortkey limit 200"
-            cf = dictDB.execute(sqlf)
+            sqlf = "select * from entries where doctype=? order by sortkey limit 200"
+            cf = dictDB.execute(sqlf, (doctype,))
             entries = []
             for rf in cf.fetchall():
                 item = {"id": rf["id"], "title": rf["title"], "sortkey": rf["sortkey"]}
@@ -1283,22 +1283,22 @@ def refac(dictDB, dictID, configs):
             if not(el.hasAttribute(name)) or (requiredValue and requiredValue != el.getAttribute(name)):
                 return False
         return True
+    
+    def isDescendantOfExistingSub(el): 
+        parent = el.parentNode
+        while parent and parent.nodeType == 1:
+            if parent.tagName in configs["subbing"] and matchesAttributes(parent, configs["subbing"][doctype]["attributes"]):
+                return True
+            parent = parent.parentNode
+        return False
 
     for doctype, config in configs["subbing"].items():
         attributes = config["attributes"]
        # get all elements whose tag is in the subentries list
         _els = doc.getElementsByTagName(doctype)
         for el in _els: 
-            if not(matchesAttributes(el, attributes)):
-                continue
-            
-            # climb up the parent tree to check it is not inside of another subentry
-            parent = el.parentNode
-            while parent and parent.nodeType == 1:
-                if parent.tagName in configs["subbing"] and matchesAttributes(parent, configs["subbing"][doctype]["attributes"]):
-                    continue
-                parent = parent.parentNode
-            els.append(el)
+            if matchesAttributes(el, attributes) and not isDescendantOfExistingSub(el):
+                els.append(el)
 
     dictDB.execute("delete from sub where parent_id=?", (entryID, ))
     # keep saving subentries of the current entry until there are no more subentries to save:
