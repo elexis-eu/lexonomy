@@ -452,6 +452,12 @@ def userprofile(user):
         referer = request.headers["Referer"]
     return template("userprofile.tpl", **{"siteconfig": siteconfig, "redirectUrl": referer, "user": user})
 
+@get(siteconfig["rootPath"] + "userprofile.json")
+def userprofilejson():
+    user = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+    return user
+
+
 @get(siteconfig["rootPath"] + "make")
 @auth
 def makedict(user):
