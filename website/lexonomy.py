@@ -1090,10 +1090,22 @@ def elexaboutdict(dictID):
     if not user["valid"]:
         abort(403, "Forbidden (API key not specified or not valid")
     dictinfo = ops.elexisDictAbout(dictID)
-    if dictinfo:
-        return dictinfo
-    else:
+    if dictinfo is None:
         abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return dictinfo
+
+@get(siteconfig["rootPath"] + "list/<dictID>")
+def elexlistlemma(dictID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    lemmalist = ops.elexisLemmaList(dictID, request.query.limit, request.query.offset)
+    if lemmalist is None:
+        abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return json.dumps(lemmalist)
 
 @error(404)
 def error404(error):

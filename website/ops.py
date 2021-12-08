@@ -1932,7 +1932,7 @@ def elexisDictAbout(dictID):
     if dictDB:
         info = {"id": dictID}
         configs = readDictConfigs(dictDB)
-        info["sourceLang"] = configs['ident']['lang']
+        info["sourceLang"] = configs['ident'].get('lang')
         if configs["publico"]["public"]:
             info["release"] = "PUBLIC"
             info["license"] = configs["publico"]["licence"]
@@ -1946,3 +1946,48 @@ def elexisDictAbout(dictID):
         return info
     else:
         return None
+
+def elexisLemmaList(dictID, limit=None, offset=0):
+    dictDB = getDB(dictID)
+    if dictDB:
+        info = {"language": "", "release": "PRIVATE"}
+        configs = readDictConfigs(dictDB)
+        info["language"] = configs['ident'].get('lang')
+        if configs["publico"]["public"]:
+            info["release"] = "PUBLIC"
+        lemmas = []
+        query = "SELECT id, xml FROM entries"
+        if limit != None and limit != "":
+            query += " LIMIT "+str(int(limit))
+        if offset != "" and int(offset) > 0:
+            query += " OFFSET "+str(int(offset))
+        c = dictDB.execute(query)
+        for r in c.fetchall():
+            lemma = {"release": info["release"], "language": info["language"], "formats": ["tei"]}
+            lemma["id"] = str(r["id"])
+            lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
+            pos = elexisGuessPOS(r["xml"])
+            if pos != "":
+                lemma["partOfSpeech"] = [pos]
+            lemmas.append(lemma)
+        return lemmas
+    else:
+        return None
+
+def elexisGuessPOS(xml):
+    # try to guess frequent PoS element
+    pos = ""
+    if "</pos>" in xml:
+        arr = extractText(xml, "pos")
+        if arr[0] and arr[0] != "":
+            pos = arr[0]
+    if "<partOfSpeech>" in xml:
+        arr = extractText(xml, "partOfSpeech")
+        if arr[0] and arr[0] != "":
+            pos = arr[0]
+    if 'type="pos"' in xml:
+        pat = r'<gram[^>]*type="pos"[^>]*>([^<]*)</gram>'
+        arr = re.findall(pat, xml)
+        if arr[0] and arr[0] != "":
+            pos = arr[0]
+    return pos
