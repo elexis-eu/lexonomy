@@ -2019,3 +2019,17 @@ def elexisGuessPOS(xml):
         if arr[0] and arr[0] != "":
             pos = arr[0]
     return pos
+
+def elexisGetEntry(dictID, entryID):
+    dictDB = getDB(dictID)
+    if dictDB:
+        query = "SELECT id, xml FROM entries WHERE id=?"
+        c = dictDB.execute(query, (entryID, ))
+        r = c.fetchone()
+        if not r:
+            return None
+        else:
+            return r["xml"]
+    else:
+        return None
+

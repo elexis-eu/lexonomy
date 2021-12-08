@@ -1119,6 +1119,19 @@ def elexgetlemma(dictID, headword):
     else:
         return json.dumps(lemmalist)
 
+@get(siteconfig["rootPath"] + "tei/<dictID>/<entryID>")
+def elexgetentry(dictID, entryID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    entry = ops.elexisGetEntry(dictID, entryID)
+    if entry is None:
+        abort(404, "No Entry Available")
+    else:
+        response.content_type = "text/xml; charset=utf-8"
+        return entry
+
 @error(404)
 def error404(error):
     if request.path.startswith("/about/") or request.path.startswith("/list/") or request.path.startswith("/lemma/"):
