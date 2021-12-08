@@ -1974,6 +1974,34 @@ def elexisLemmaList(dictID, limit=None, offset=0):
     else:
         return None
 
+def elexisGetLemma(dictID, headword, limit=None, offset=0):
+    dictDB = getDB(dictID)
+    if dictDB:
+        info = {"language": "", "release": "PRIVATE"}
+        configs = readDictConfigs(dictDB)
+        info["language"] = configs['ident'].get('lang')
+        if configs["publico"]["public"]:
+            info["release"] = "PUBLIC"
+        lemmas = []
+        query = "SELECT e.id, e.xml FROM searchables AS s INNER JOIN entries AS e on e.id=s.entry_id WHERE doctype=? AND s.txt=? GROUP BY e.id ORDER by s.level"
+        params = (configs["xema"]["root"], headword)
+        if limit != None and limit != "":
+            query += " LIMIT "+str(int(limit))
+        if offset != "" and int(offset) > 0:
+            query += " OFFSET "+str(int(offset))
+        c = dictDB.execute(query, params)
+        for r in c.fetchall():
+            lemma = {"release": info["release"], "language": info["language"], "formats": ["tei"]}
+            lemma["id"] = str(r["id"])
+            lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
+            pos = elexisGuessPOS(r["xml"])
+            if pos != "":
+                lemma["partOfSpeech"] = [pos]
+            lemmas.append(lemma)
+        return lemmas
+    else:
+        return None
+
 def elexisGuessPOS(xml):
     # try to guess frequent PoS element
     pos = ""

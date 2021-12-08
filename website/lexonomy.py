@@ -1107,9 +1107,21 @@ def elexlistlemma(dictID):
     else:
         return json.dumps(lemmalist)
 
+@get(siteconfig["rootPath"] + "lemma/<dictID>/<headword>")
+def elexgetlemma(dictID, headword):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    lemmalist = ops.elexisGetLemma(dictID, headword, request.query.limit, request.query.offset)
+    if lemmalist is None:
+        abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return json.dumps(lemmalist)
+
 @error(404)
 def error404(error):
-    if request.path.startswith("/about/") or request.path.startswith("/list/"):
+    if request.path.startswith("/about/") or request.path.startswith("/list/") or request.path.startswith("/lemma/"):
         return error.body
     else:
         return template("404.tpl", **{"siteconfig": siteconfig})
