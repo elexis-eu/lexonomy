@@ -3,7 +3,7 @@ var EditingOverride={};
 
  EditingOverride.render=function(div, json){
   $(div).append("<div id='pagebody' class='notop'><div class='pillarform'></div></div>"); var $div=$(div).find("div.pillarform");
-  $div.append("<div class='instro'>You can toggle fullscreen view for each of the editing windows using F11/Esc (first click into the editing window).</div>");
+  $div.append("<div i18n class='instro'>You can toggle fullscreen view for each of the editing windows using F11/Esc (first click into the editing window).</div>");
   var CodeMirrorOpts = {
     matchBrackets: true,
     lineNumbers: true,
@@ -20,9 +20,9 @@ var EditingOverride={};
 
   CodeMirrorOpts.mode="javascript"
   var $block=$("<div class='block theJS'></div>").appendTo($div);
-	$block.append("<div class='title'><a href='javascript:void(null)' onclick=' EditingOverride.exampleJs()'>example</a> JavaScript</div>");
+	$block.append("<div class='title'><a href='javascript:void(null)' onclick=' EditingOverride.exampleJs()' i18n>example</a> JavaScript</div>");
   $block.append("<textarea class='textbox' spellcheck='false'></textarea>");
-  $block.append("<div class='instro'>You can customize the editor by defining two functions in JavaScript: one that will render the HTML editor from the XML entry and one that will harvest the (edited) HTML back into XML. Click on the example link in the upper right corner to load a sample code.</div>");
+  $block.append("<div i18n class='instro'>You can customize the editor by defining two functions in JavaScript: one that will render the HTML editor from the XML entry and one that will harvest the (edited) HTML back into XML. Click on the example link in the upper right corner to load a sample code.</div>");
   $block.append("<div class='error' style='display: none;'></div>");
   CodeMirrorJS = CodeMirror.fromTextArea($block.find("textarea")[0], CodeMirrorOpts);
   if (json._js)
@@ -33,7 +33,7 @@ var EditingOverride={};
   var $block=$("<div class='block theCSS'></div>").appendTo($div);
 	$block.append("<div class='title'><a href='javascript:void(null)' onclick=' EditingOverride.exampleCss()'>example</a> CSS</div>");
   $block.append("<textarea class='textbox' spellcheck='false'></textarea>");
-  $block.append("<div class='instro'>You can customize the editor look and feel by writing your own CSS styles. Click on the example link in the upper right corner to load a sample sheet.</div>");
+  $block.append("<div i18n class='instro'>You can customize the editor look and feel by writing your own CSS styles. Click on the example link in the upper right corner to load a sample sheet.</div>");
   $block.append("<div class='error' style='display: none;'></div>");
   CodeMirrorCSS = CodeMirror.fromTextArea($block.find("textarea")[0], CodeMirrorOpts);
   if (json._css)

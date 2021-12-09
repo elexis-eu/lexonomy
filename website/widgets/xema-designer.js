@@ -63,7 +63,7 @@ XemaDesigner.listNodes=function(){
 	XemaDesigner.resizeBlinders();
 	var parentless=XemaDesigner.getParentlessElements();
 	if(parentless.length>0){
-		$("<div class='title'><span>Unattached elements</span></div>").appendTo($list);
+		$("<div class='title'><span i18n>Unattached elements</span></div>").appendTo($list);
 		parentless.forEach(function(elName){ XemaDesigner.listElement(elName, $list, 0); });
 	}
 	$list.scrollTop(scrollTop);
@@ -155,6 +155,7 @@ XemaDesigner.renderElement=function(elName){
 	if(XemaDesigner.canHaveChildren(elName)) XemaDesigner.renderElementChildren(elName);
 	if(XemaDesigner.canElementHaveValues(elName)) XemaDesigner.renderElementValues(elName);
 	//$details.hide().fadeIn("fast");
+	if (doI18n) doI18n();
 };
 XemaDesigner.renderAttribute=function(elName, atName){
 	var $details=$(".designer .details").html("");
@@ -199,7 +200,7 @@ XemaDesigner.setRoot=function(elName){
 
 XemaDesigner.renderElementName=function(elName){
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Element</div>");
+	$block.append("<div i18n class='title'>Element</div>");
 	$("<input class='textbox tech elName'/>").appendTo($block).val(elName).on("keyup change", function(event){
 		$(".designer .errInvalidRename").hide();
 		$(".designer .errRenameExists").hide();
@@ -226,7 +227,7 @@ XemaDesigner.renderElementName=function(elName){
 };
 XemaDesigner.renderAttributeName=function(elName, atName){
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Attribute</div>");
+	$block.append("<div i18n class='title'>Attribute</div>");
 	$("<input class='textbox tech atName'/>").appendTo($block).val(atName).on("keyup change", function(event){
 		$(".designer .errInvalidAtName").hide();
 		$(".designer .errAtNameExists").hide();
@@ -282,7 +283,7 @@ XemaDesigner.renameChildRefs=function(elName, newName){
 
 XemaDesigner.renderElementAttributes=function(elName){
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title tight'>Attributes</div>");
+	$block.append("<div i18n class='title tight'>Attributes</div>");
 	if(XemaDesigner.hasAttributes(elName)) {
 		var $table=$("<table></table>").appendTo($block);
 		for(var atName in XemaDesigner.xema.elements[elName].attributes){
@@ -292,7 +293,7 @@ XemaDesigner.renderElementAttributes=function(elName){
 			var html="<span class='tech'><span class='ats'>@</span><span class='att'>"+atName+"</span></span>";
 			$(html).appendTo($row.find("td.cell1")).data("atName", atName).on("click", function(event){ XemaDesigner.selectAttribute(elName, $(event.delegateTarget).data("atName")); });
 
-			var $settings=$("<span><label class='radio'><input type='radio' name='"+atName+"' value='optional' "+(at.optionality=="optional"?"checked":"")+"/>optional</label> <label class='radio'><input type='radio' name='"+atName+"' value='obligatory' "+(at.optionality=="obligatory"?"checked":"")+"/>obligatory</label></span>").appendTo($row.find("td.cell2"));
+			var $settings=$("<span><label class='radio'><input type='radio' name='"+atName+"' value='optional' "+(at.optionality=="optional"?"checked":"")+"/><span i18n>optional</span></label> <label class='radio'><input type='radio' name='"+atName+"' value='obligatory' "+(at.optionality=="obligatory"?"checked":"")+"/><span i18n>obligatory</span></label></span>").appendTo($row.find("td.cell2"));
 			$settings.find("input").data("atName", atName).on("click change", function(event){
 				XemaDesigner.changeOptionality(elName, $(event.target).data("atName"), $(event.target).val());
 			});
@@ -319,7 +320,7 @@ XemaDesigner.renderElementAttributes=function(elName){
 }
 XemaDesigner.renderElementChildren=function(elName){
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title tight'>Child elements</div>");
+	$block.append("<div i18n class='title tight'>Child elements</div>");
 	if(XemaDesigner.hasChildren(elName)) {
 		var $table=$("<table></table>").appendTo($block);
 		XemaDesigner.xema.elements[elName].children.forEach(function(child){
@@ -328,7 +329,7 @@ XemaDesigner.renderElementChildren=function(elName){
 			var html="<span class='tech'><span class='brak'>&lt;</span><span class='elm'>"+child.name+"</span><span class='brak'>&gt;</span></span>";
 			$(html).appendTo($row.find("td.cell1")).data("elName", child.name).on("click", function(event){ XemaDesigner.selectElement($(event.delegateTarget).data("elName")); });
 			child.min=parseInt(child.min); child.max=parseInt(child.max);
-			var $settings=$("<span>min <input class='textbox min' value='"+(child.min?child.min:"")+"'/> max <input class='textbox max' value='"+(child.max?child.max:"")+"'/><button class='change iconAccept'>Change</button><button class='cancel iconCancel'>Cancel</button></span>").appendTo($row.find("td.cell2"));
+			var $settings=$("<span><span i18n>min</span> <input class='textbox min' value='"+(child.min?child.min:"")+"'/> <span i18n>max</span> <input class='textbox max' value='"+(child.max?child.max:"")+"'/><button class='change iconAccept'>Change</button><button class='cancel iconCancel'>Cancel</button></span>").appendTo($row.find("td.cell2"));
 			$settings.find("input.min").data("orig", (child.min?child.min:"")).data("childName", child.name);
 			$settings.find("input.max").data("orig", (child.max?child.max:"")).data("childName", child.name);
 			$settings.find("button").data("childName", child.name).hide();
@@ -357,7 +358,7 @@ XemaDesigner.renderElementChildren=function(elName){
 			$("<button class='iconOnly iconCross'>&nbsp;</button>").appendTo($row.find("td.cell9")).data("elName", child.name).on("click", function(event){ XemaDesigner.detachElement(elName, $(event.delegateTarget).data("elName")) });
 		});
 	}
-	$("<button class='butElNewOpener iconAdd'>Add...</button>").appendTo($block).on("click", function(event){
+	$("<button class='butElNewOpener iconAdd' i18n>Add...</button>").appendTo($block).on("click", function(event){
 		$(".designer .butElNewOpener").hide(); $(".designer .txtElNew").show().focus(); $(".designer .butElNew").show(); $(".designer .butElNewCancel").show();
 	});
 	$("<input class='textbox tech elName txtElNew'/>").hide().appendTo($block).on("keyup change", function(event){
@@ -427,13 +428,13 @@ XemaDesigner.changeOptionality=function(elName, atName, optionality){
 XemaDesigner.renderElementFilling=function(elName){
 	var el=XemaDesigner.xema.elements[elName];
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Content</div>");
-	$block.append("<label class='radio'><input type='radio' name='filling' value='chd' "+(el.filling=="chd"?"checked":"")+"/>Child elements</label>");
-	$block.append("<label class='radio'><input type='radio' name='filling' value='txt' "+(el.filling=="txt"?"checked":"")+"/>Text</label>");
-	$block.append("<label class='radio'><input type='radio' name='filling' value='inl' "+(el.filling=="inl"?"checked":"")+"/>Text with markup</label>");
-	$block.append("<label class='radio'><input type='radio' name='filling' value='lst' "+(el.filling=="lst"?"checked":"")+"/>Value from list</label>");
-	$block.append("<label class='radio'><input type='radio' name='filling' value='emp' "+(el.filling=="emp"?"checked":"")+"/>Empty</label>");
-	$block.append("<label class='radio'><input type='radio' name='filling' value='med' "+(el.filling=="med"?"checked":"")+"/>Media</label>");
+	$block.append("<div i18n class='title'>Content</div>");
+	$block.append("<label class='radio'><input type='radio' name='filling' value='chd' "+(el.filling=="chd"?"checked":"")+"/><span i18n>Child elements</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='filling' value='txt' "+(el.filling=="txt"?"checked":"")+"/><span i18n>Text</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='filling' value='inl' "+(el.filling=="inl"?"checked":"")+"/><span i18n>Text with markup</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='filling' value='lst' "+(el.filling=="lst"?"checked":"")+"/><span i18n>Value from list</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='filling' value='emp' "+(el.filling=="emp"?"checked":"")+"/><span i18n>Empty</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='filling' value='med' "+(el.filling=="med"?"checked":"")+"/><span i18n>Media</span></label>");
 	$block.find("input").on("click change", function(event){
 		XemaDesigner.changeElementFilling(elName, $(event.target).val());
 	});
@@ -441,9 +442,9 @@ XemaDesigner.renderElementFilling=function(elName){
 XemaDesigner.renderAttributeFilling=function(elName, atName){
 	var at=XemaDesigner.xema.elements[elName].attributes[atName];
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Content</div>");
-	$block.append("<label class='radio'><input type='radio' name='filling' value='txt' "+(at.filling=="txt"?"checked":"")+"/>Text</label>");
-	$block.append("<label class='radio'><input type='radio' name='filling' value='lst' "+(at.filling=="lst"?"checked":"")+"/>Value from list</label>");
+	$block.append("<div i18n class='title'>Content</div>");
+	$block.append("<label class='radio'><input type='radio' name='filling' value='txt' "+(at.filling=="txt"?"checked":"")+"/><span i18n>Text</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='filling' value='lst' "+(at.filling=="lst"?"checked":"")+"/><span i18n>Value from list</span></label>");
 	$block.find("input").on("click change", function(event){
 		XemaDesigner.changeAttributeFilling(elName, atName, $(event.target).val());
 	});
@@ -481,7 +482,7 @@ XemaDesigner.changeAttributeFilling=function(elName, atName, filling){
 XemaDesigner.renderElementValues=function(elName){
 	var el=XemaDesigner.xema.elements[elName];
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title tight'>Values</div>");
+	$block.append("<div i18n class='title tight'>Values</div>");
 	if(el.values.length>0) {
 		var $table=$("<table></table>").appendTo($block);
 		el.values.forEach(function(obj){
@@ -545,7 +546,7 @@ XemaDesigner.renderElementValues=function(elName){
 XemaDesigner.renderAttributeValues=function(elName, atName){
 	var at=XemaDesigner.xema.elements[elName].attributes[atName];
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Values</div>");
+	$block.append("<div i18n class='title'>Values</div>");
 	if(at.values.length>0) {
 		var $table=$("<table></table>").appendTo($block);
 		at.values.forEach(function(obj){

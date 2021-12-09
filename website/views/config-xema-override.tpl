@@ -37,7 +37,7 @@
 		};
 		Screenful.Editor.allowSourceCode=false;
 		Screenful.Editor.toolbarLinks=[
-			{image: "../../../furniture/cancel.png", caption: "Stop using your own schema...", href: "../../../{{dictID}}/config/xema/"}
+			{image: "../../../furniture/cancel.png", caption: "توقف عن استخدام البنية الخاصة بك (Schema)...", href: "../../../{{dictID}}/config/xema/"}
 		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />

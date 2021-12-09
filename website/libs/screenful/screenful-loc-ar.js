@@ -46,7 +46,7 @@ Screenful.Loc = {
   forgotPwd: "نسيت رقمك السري؟",
   signupEmail: "للحصول على حساب أرسل بريدًا إلكترونيًا إلى",
   newPassword: "كلمة مرور جديدة",
-  change: "يتغيرون",
+  change: "تغيير",
   skeApiKey: "مفتاح API الخاص بمحرك Sketch",
   skeApiKeyChanged: "تم تغيير مفتاح API الخاص بك.",
   skeUserName: "اسم مستخدم Sketch Engine الخاص بك",
@@ -71,7 +71,8 @@ Screenful.Loc = {
   unsavedConfirm: "لم تحفظ التغييرات. هل أنت متأكد؟",
   doItLater: "افعله لاحقا",
   badEmailError: "عنوان البريد الإلكتروني غير صحيح.",
-  forgotPwdEmail: "إذا نسيت كلمة المرور الخاصة بك ، فأدخل عنوان بريدك الإلكتروني وسنرسل إليك إرشادات حول كيفية إنشاء كلمة مرور جديدة.",
+  forgotPwdEmail:
+    "إذا نسيت كلمة المرور الخاصة بك ، فأدخل عنوان بريدك الإلكتروني وسنرسل إليك إرشادات حول كيفية إنشاء كلمة مرور جديدة.",
   recoverPwd: "احصل على كلمة مرور جديدة",
   tokenSent:
     "لقد أرسلنا إليك بريدًا إلكترونيًا يحتوي على إرشادات حول كيفية إعادة تعيين كلمة المرور الخاصة بك.",
@@ -108,16 +109,39 @@ Screenful.Loc = {
   "is exactly": "تطابق تام",
   "contains a word that starts like this": "يحتوي على كلمة كهذه",
   "contains this sequence of characters": "تحتوي على النص",
-  "Headword": "الكلمة الرئيسية",
-};
+  Headword: "الكلمة الرئيسية",
+  "---------------------": "--------------------------------",
 
-$(document).ready(function(params) {
-  if (Screenful.Editor)
-    Screenful.Editor.onEditor = (el, data) => {
-      $(".pillarform .title").each(function (x) {
-        const t = $(this).text();
-        if (Screenful.Loc[t]) 
-          $(this).text(Screenful.Loc[t]);
-      });
-    };
-})
+};
+notFoundLoc = {}
+doI18n = () => {
+  $("[i18n]").each(function (x) {
+    const t = $(this).text();
+    const h = $(this).html();
+    if (Screenful.Loc[t]) {
+      $(this).text(Screenful.Loc[t]);
+    } else if (Screenful.Loc[h]) {
+      $(this).html(Screenful.Loc[h]);
+    } else {
+      console.log({ notFoundLoc: t });
+      notFoundLoc[t] = '';
+    }
+  });
+  $("[i18nh]").each(function (x) {
+    const h = $(this).html();
+    if (Screenful.Loc[h]) {
+      $(this).html(Screenful.Loc[h]);
+    } else {
+      console.log({notFoundLoc: h})
+      notFoundLoc[h] = '';
+    }
+  });
+};
+Screenful.loc = (t) => {
+  if (Screenful.Loc[t]) {
+    return Screenful.Loc[t];
+  } else {
+    notFoundLoc[t] = '';
+    return t;
+  }
+}

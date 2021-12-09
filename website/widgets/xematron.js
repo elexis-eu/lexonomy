@@ -168,7 +168,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 		}); //end of loop over attributes
 		if(submenu.length>0) {
 			del.menu.push({
-				caption: "Attributes",
+				caption: Screenful.loc("Attributes"),
 				menu: submenu,
 			});
 		}

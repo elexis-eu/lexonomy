@@ -59,7 +59,7 @@
 			return JSON.parse(str);
 		};
 		Screenful.Editor.toolbarLinks=[
-			{image: "../../../furniture/cog.png", caption: "Use your own schema...", href: "../../../{{dictID}}/config/xema-override/"}
+			{image: "../../../furniture/cog.png", caption: "استخدم البنية الخاصة بك (Schema)...", href: "../../../{{dictID}}/config/xema-override/"}
 		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />

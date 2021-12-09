@@ -4,11 +4,13 @@ Subbing.change=function(){};
 
 Subbing.render=function(div, json){
   $(div).append("<div id='pagebody' class='notop'><div class='pillarform'></div></div>"); var $div=$(div).find("div.pillarform");
-  $div.append("<div class='title'>Subentries</div>");
-  $div.append("<div class='instro borderBelow'>Elements listed here function as subentries which can be shared by multiple entries.</div>");
+  $div.append("<div i18n class='title'>Subentries</div>");
+  $div.append("<div i18n class='instro borderBelow'>Elements listed here function as subentries which can be shared by multiple entries.</div>");
   $div.append("<div id='elements_list'></div>");
   for(var elName in json) Subbing.addElement(elName, json[elName]);
-  $div.append("<select class='halfwidth' id='elements_new'></select> <button class='iconAdd' onclick='Subbing.newElement()'>Add</button>");
+  $div.append(
+    "<select class='halfwidth' id='elements_new'></select> <button class='iconAdd' onclick='Subbing.newElement()' i18n>Add</button>"
+  );
   for(var elName in xema.elements){
     $("#elements_new").append("<option value='"+elName+"'>"+elName+"</option>");
   }

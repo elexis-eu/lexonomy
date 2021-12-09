@@ -96,7 +96,7 @@ div.signposts {margin-right: unset; }
 #header {background-position: left top;}
 #header a.dicLink.mergeleft {margin-right: -15px;}
 body #header div.email {left: 20px; }
-#header div.doctypes a.doctype {float: right; margin-left: 10px;}
+#header div.doctypes a.doctype {margin-left: 10px;}
 div.dangerzone a {background-position: right center; padding-right: 25px; margin-left: 1em;}
 div.signposts {float: right; margin-left: 20px;}
 
@@ -189,7 +189,8 @@ button#butGoLast {margin-right: -2px; }
 /* screenful-editor.css */
 #container { left: 0px; right: 15px; padding: 5px 0px 5px 20px; }
 #container.withHistory {right: unset;left: 350px; margin-right: unset;margin-left: 10px;}
-#container.withSourceCode {left: unset;right: 0px;}
+#container.withSourceCode {left: 15px;right: 0px;}
+#container.withSourceCode textarea {direction: ltr;}
 #toolbar span.divider {border-left: unset;border-right: 2px dotted #cccccc;}
 #toolbar input#idbox {margin-left: unset;margin-right: -46px;}
 #toolbar button.iconYes#butView {background-image: url(arrow_left.png);}
@@ -206,3 +207,168 @@ button#butGoLast {margin-right: -2px; }
 #waiter { right: 30%;}
 #history { right: unset; }
 #history { left: 0px; }
+
+/* xonomy */
+
+.xonomy .textnode.focused {margin-left: unset;margin-right: -2px !important;}
+
+.xonomy .rollouter.focused {margin-left: unset;margin-right: 2px !important;}
+
+.xonomy.nerd {padding-left: unset;padding-right: 5px;}
+
+.xonomy.nerd .element > .tag.opening > .attributes.rolledout {border-left: unset; padding: 0px 15px 5px 0px; border-right: 1px dotted #cccccc; margin: 0px 10px 0px 0px;}
+
+.xonomy.nerd .element {padding-left: unset;padding-right: 25px;}
+
+.xonomy.nerd .element .connector {left: unset;right: 0px;}
+
+.xonomy.nerd .element .children {margin-left: unset; border-left: unset;margin-right: 10px; border-right: 1px dotted #cccccc;}
+
+.xonomy.nerd .element .children .textnode {padding-left: unset;padding-right: 25px;}
+
+.xonomy.nerd .element.hasText > .children > .element {padding-left: unset;padding-right: 0px;}
+
+.xonomy.nerd .element.hasText .children .connector {top: unset; left: unset; padding-right: unset; ;top: 0px; right: 0px; padding-left: 16px; ;}
+
+.xonomy.nerd .element.hasText .children .element.uncollapsible .connector {padding-right: unset;padding-left: 0px;}
+
+.xonomy.nerd .element.hasText .children .element.noChildren .connector {padding-right: unset;padding-left: 0px;}
+
+.xonomy.nerd .element.hasText .children {padding-left: unset; padding-top: unset; padding-bottom: unset;padding-right: 25px; padding-top: 5px; padding-bottom: 5px;}
+
+.xonomy.nerd .element.hasText .element.hasText .children {margin-left: unset; border-left: unset;margin-right: 0px; border-right: 0px;}
+
+.xonomy.nerd .element.hasText .children .textnode {padding-left: unset;padding-right: 0px;}
+
+.xonomy.nerd .element.oneliner .element {padding-left: unset;padding-right: 0px;}
+
+.xonomy.nerd .element.oneliner .children {margin-left: unset; border-left: unset;margin-right: 0px; border-right: 0px;}
+
+.xonomy.nerd .element.oneliner .element.hasText .children {margin-left: unset; border-left: unset;margin-right: 0px; border-right: 0px;}
+
+.xonomy.nerd .element.oneliner .children .textnode {padding-left: unset;padding-right: 0px;}
+
+.xonomy.nerd .element .children .textnode.empty .value > .insertionPoint > .inside {border-left: unset;border-right: 1px solid #dddddd;}
+
+.xonomy.nerd .element .children .textnode.empty:first-child:last-child .value > .dots {padding-left: unset;padding-right: 2em;}
+
+.xonomy.nerd .element > .connector > .plusminus {left: unset;right: -5px;}
+
+.xonomy.nerd .element.hasText .element.oneliner .connector .plusminus {left: unset;right: 4px;}
+
+.xonomy.nerd .connector > .draghandle {right: unset; ;left: 2px; ;}
+
+.xonomy.nerd .elementDropper > .inside {left: unset;right: -6px;}
+
+.xonomy.nerd .warner .inside {left: unset;right: 0px;}
+
+#xonomyBubble.nerd #xonomyBubbleContent div.menuItem span.keyCaption {margin-left: unset; margin-right: unset;float: left; margin-right: 2em; margin-left: -0.5em;}
+
+#xonomyBubble.nerd #xonomyBubbleContent div.submenu div.menuItem {padding-left: unset;padding-right: 30px;}
+
+#xonomyBubble.nerd #xonomyBubbleContent div.menuItem.techno span.explainer {margin-left: unset;margin-right: 3px;}
+
+#xonomyBubble.nerd #xonomyBubbleContent div.submitline {text-align: left;}
+
+.xonomy.laic {padding-left: unset;padding-right: 5px;}
+
+.xonomy.laic .element > .children {padding-left: unset;padding-right: 40px;}
+
+.xonomy.laic .element > .tag.opening > .attributes > .attribute {margin-left: unset; border-left: unset; padding-left: unset;margin-right: 0.75em; border-right: 1px solid #cccccc; padding-right: 0.75em;}
+
+.xonomy.laic .element > .tag.opening > .attributes > .attribute > .valueContainer {margin-left: unset;margin-right: 10px;}
+
+.xonomy.laic .element.oneliner > .tag.opening {margin-right: unset;margin-left: 1em;}
+
+.xonomy.laic .element > .connector > .plusminus {left: unset;right: -30px;}
+
+.xonomy.laic .element.hasInlineMenu .element .connector > .plusminus {left: unset; margin-right: unset;right: auto; margin-left: 3px;}
+
+.xonomy.laic .attribute > .inlinecaption {margin-left: unset; margin-right: unset;margin-right: 5px; margin-left: 4px;}
+
+.xonomy.laic .element.oneliner > .inlinecaption {margin-left: unset; margin-right: unset;margin-right: 1em; margin-left: 4px;}
+
+.xonomy.laic .element.uncollapsible {padding-left: unset;padding-right: 0px !important;}
+
+.xonomy.laic .element.hasInlineMenu .element > .tag.opening > .name {margin-right: unset;margin-left: 5px;}
+
+.xonomy.laic .element.hasInlineMenu .element > .tag.closing > .name {margin-left: unset;margin-right: 5px;}
+
+.xonomy.laic .element.hasInlineMenu .element > .tag.opening > .attributes > .attribute {margin-left: unset; padding-left: unset; padding-right: unset;margin-right: 0.25em; padding-right: 0.25em; padding-left: 0.5em !important;}
+
+.xonomy.laic .element.hasInlineMenu .element .childrenCollapsed {right: unset;left: auto;}
+
+.xonomy.laic .element.hasInlineMenu .element > .tag.opening .attribute .valueContainer {margin-left: unset;margin-right: 0px;}
+
+.xonomy.laic .element .children .textnode.empty .value > .insertionPoint > .inside {border-left: unset;border-right: 1px solid #dddddd;}
+
+.xonomy.laic .element .children .textnode.empty:only-child .value {padding-right: unset;padding-left: 0.5em;}
+
+.xonomy.laic .connector > .draghandle {right: unset;left: 3px;}
+
+.xonomy.laic .elementDropper > .inside {left: unset;right: -12px;}
+
+
+.xonomy.laic .warner .inside {left: unset;right: 0px;}
+
+.xonomy.laic .rollouter.rolledout {left: unset;right: -9px;}
+
+.xonomy.laic .element > .tag.opening > .attributes.rolledout { border-left: unset; padding: 0px 15px 5px 0px; border-right: 1px dotted #cccccc; margin: 0px 10px 0px 0px;}
+
+#xonomyBubble.laic #xonomyBubbleContent div.menuItem span.keyCaption {margin-left: unset; margin-right: unset;float: left; margin-right: 2em; margin-left: -0.5em;}
+
+#xonomyBubble.laic #xonomyBubbleContent div.submenu div.menuItem {padding-left: unset;padding-right: 30px;}
+
+#xonomyBubble.laic #xonomyBubbleContent div.menuItem.techno span.explainer {margin-left: unset;margin-right: 0.5em;}
+
+#xonomyBubble.laic #xonomyBubbleContent div.menuItem.techno span.explainer.alone {margin-left: unset;margin-right: 0px;}
+
+#xonomyBubble.laic #xonomyBubbleContent div.submitline {text-align: left;}
+
+.xonomy div.modeSwitcher {left: unset;right: 0px;}
+
+.xonomy div.layby {right: unset; padding: unset;left: 0px; padding: 10px 10px 0px 10px;}
+
+.xonomy div.layby span.purger {float: left;}
+
+.xonomy.laic div.layby > div.content {padding-right: unset;padding-left: 1px;}
+
+.xonomy.nerd div.layby > div.content > .element {margin-left: unset;margin-right: 10px;}
+
+.xonomy.laic div.layby > div.content > .element {margin-left: unset;margin-right: 35px;}
+
+/*  */
+
+div#editor.designer label {margin-right:unset;margin-left: 10px;}
+
+div#editor.designer div.instro.undercheck {margin-left:unset; margin-right: 32px; }
+
+div#editor.designer div.warn {background-position:unset; padding-left:unset;background-position: right center; padding-right: 25px;}
+
+div#editor.designer div.list {left:unset; border-right:unset; right: 0px; border-left: 1px solid #1e6bcf; }
+
+div#editor.designer div.list div.children {margin-left:unset; padding-left:unset; border-left:unset;margin-right: 10px; padding-right: 5px; border-right: 1px dotted #cccccc;}
+
+div#editor.designer div.list div.horizontal {left:unset; right: -15px; }
+
+div#editor.designer div.list div.children > div.blinder {left:unset; right: 5px; }
+
+div#editor.designer div.list div.container.hasChildren > div.horizontal span.plusminus {left:unset;right: 17px;}
+
+div#editor.designer div.details {left:unset; right:unset;right: 30%; left: 0px;}
+
+div#editor.designer table tr td div.caption {margin-left:unset;margin-right: 10px;}
+
+div#editor.designer table tr td.cell9 { padding-right:unset;text-align: left; padding-left: 0px;}
+
+div#editor.designer table tr td span.tech {margin-left:unset; margin-right: 5px; }
+
+div#editor.designer input.textbox.val {text-align: right;}
+
+div#editor.designer input.textbox.cap {text-align: right;}
+
+div#editor.designer div.details.narrow {right:30%;left: 40%;}
+
+div#editor.designer div.preview {left:unset; right:unset; border-left:unset; right: 60%; left: 0px; border-right: 1px solid #1e6bcf; }
+
+div#editor.designer div.preview div.block > div.title > span.reload {float:unset; background-position:unset; float: left; background-position: right center; padding: 5px 25px 5px 0px; }

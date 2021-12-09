@@ -390,9 +390,9 @@ function struct2Xonomy(xmlStructure) {
     //attributes submenu
 		if(submenu.length>0) {
 			del.menu.push({
-				caption: "Attributes",
-				menu: submenu,
-			});
+        caption: Screenful.loc("Attributes"),
+        menu: submenu,
+      });
 		}
 
 		//chd elements have menu items for adding children

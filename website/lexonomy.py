@@ -1083,7 +1083,6 @@ debug=False
 if "DEBUG" in os.environ:
     debug=True
 
-debug=True
 host, port = my_url.split(":")
 if cgi: # we are called as CGI script
     run(host=host, port=port, debug=debug, server="cgi")

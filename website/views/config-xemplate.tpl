@@ -55,7 +55,7 @@
 			return JSON.parse(str);
 		};
 		Screenful.Editor.toolbarLinks=[
-			{image: "../../../furniture/cog.png", caption: "Use your own stylesheet...", href: "../../../{{dictID}}/config/xemplate-override/"}
+			{image: "../../../furniture/cog.png", caption: "{{i18n["Use your own stylesheet..."]}}", href: "../../../{{dictID}}/config/xemplate-override/"}
 		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />

@@ -23,6 +23,7 @@
 		</script>
 		<script type="text/javascript">var rootPath="../../../";</script>
 		<script type="text/javascript" src="../../../furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../furniture/ui.css" />
 		%if siteconfig["rtl"]:
 			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
 		%end

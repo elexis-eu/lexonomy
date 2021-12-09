@@ -6,17 +6,17 @@ Titling.render=function(div, json){
   var elements=Xematron.listElements(xema);
 
   var $block=$("<div class='block headword'></div>").appendTo($div);
-	$block.append("<div class='title'>Headword</div>");
+	$block.append("<div i18n class='title'>Headword</div>");
   $block.append("<select></select>");
   $block.find("select").append("<option value=''>(not set)</option>");
   for(var i=0; i<elements.length; i++){
     $block.find("select").append("<option "+(json.headword==elements[i] ? "selected='selected'" : "")+" value='"+elements[i]+"'>"+elements[i]+"</option>");
   }
   $block.find("select").on("change", function(e){Titling.headwordChanged(); Titling.change();});
-  $block.append("<div class='instro'>Select the element which contains the entry's headword. If you make no selection here Lexonomy will try to guess what the headword of each entry is.</div>");
+  $block.append("<div i18n class='instro'>Select the element which contains the entry's headword. If you make no selection here Lexonomy will try to guess what the headword of each entry is.</div>");
 
   var $block=$("<div class='block headwordSorting'></div>").appendTo($div);
-  $block.append("<div class='title'>Headword sorting</div>");
+  $block.append("<div i18n class='title'>Headword sorting</div>");
   $block.append("<select></select>");
   $block.find("select").append("<option value=''>(not set)</option>");
   for(var i=0; i<elements.length; i++){
@@ -24,9 +24,9 @@ Titling.render=function(div, json){
   }
   $block.find("select").on("change", function(e){Titling.headwordChanged(); Titling.change();});
   $block.append("<input type='checkbox' id='sortDesc' " + (json.headwordSortDesc ? "checked" : "") + " style='margin-top: 1em'>")
-  $block.append("<label for='sortDesc'>Sort in descending order</label>")
+  $block.append("<label for='sortDesc' i18n>Sort in descending order</label>")
   $("#sortDesc").on("change", Titling.change);
-  $block.append("<div class='instro'>Select the element which will be used for sorting of headwords in the entry list. If you make no selection here Lexonomy will use the element you chose for headword.</div>");
+  $block.append("<div i18n class='instro'>Select the element which will be used for sorting of headwords in the entry list. If you make no selection here Lexonomy will use the element you chose for headword.</div>");
 
   var $block=$("<div class='block headwordAnnotations'></div>").appendTo($div);
   if(!json.headwordAnnotationsType)
@@ -35,11 +35,11 @@ Titling.render=function(div, json){
     json.headwordAnnotations=[];
   if(!json.headwordAnnotationsAdvanced)
     json.headwordAnnotationsAdvanced="";
-  $block.append("<div class='title'>Headword annotations</div>");
+  $block.append("<div i18n class='title'>Headword annotations</div>");
 
   $block.append("<div class='half'>\
         <input type='radio' name='hwannotype' id='simple' value='simple' "+(json.headwordAnnotationsType=="simple"?"checked":"")+">\
-        <label for='simple'>simple</label>\
+        <label for='simple' i18n>simple</label>\
         <div class='scrollbox "+(json.headwordAnnotationsType=="simple"?"":"disabled")+"'>\
         </div></div>");
   var $scrollbox = $block.find(".scrollbox");
@@ -48,13 +48,13 @@ Titling.render=function(div, json){
           <input type='checkbox' data-name='"+elements[i]+"' "+(json.headwordAnnotations.indexOf(elements[i])>-1?"checked":"")+"/> \
           "+elements[i]+"</label></div>");
   }
-  $scrollbox.parent().append("<div class='instro'>You can select any elements here whose content you want displayed beside the headword in the entry list, such as homograph numbers or part-of-speech labels.</div>");
+  $scrollbox.parent().append("<div i18n class='instro'>You can select any elements here whose content you want displayed beside the headword in the entry list, such as homograph numbers or part-of-speech labels.</div>");
 
   $block.append(" <div class='half'>\
         <input type='radio' name='hwannotype' id='advanced' value='advanced' "+(json.headwordAnnotationsType=="advanced"?"checked":"")+">\
-        <label for='advanced'>advanced</label>\
+        <label for='advanced' i18n>advanced</label>\
         <textarea class='advancedAnnotations' "+(json.headwordAnnotationsType=="advanced"?"":"disabled")+">"+json.headwordAnnotationsAdvanced+"</textarea>\
-        <div class='instro'>You can insert any HTML containing placeholders for elements in the form of '%(element)', e.g. '&lt;b&gt;%(headword)&lt;/b&gt;'.</div></div>");
+        <div i18n class='instro'>You can insert any HTML containing placeholders for elements in the form of '%(element)', e.g. '&lt;b&gt;%(headword)&lt;/b&gt;'.</div></div>");
   var $textarea = $block.find("textarea");
 
   $block.find("input").on("change", Titling.change);
@@ -66,7 +66,7 @@ Titling.render=function(div, json){
   Titling.headwordChanged();
 
   var $block=$("<div class='block abc'></div>").appendTo($div);
-	$block.append("<div class='title'>Alphabetical order</div>");
+	$block.append("<div i18n class='title'>Alphabetical order</div>");
   $block.append("<input class='textbox' id='sort_locale'/>");
   var lang_input = $("#sort_locale");
   var lang_found = langs.find(element => element.code == json.locale);
@@ -78,7 +78,7 @@ Titling.render=function(div, json){
   lang_input.easyAutocomplete({
     theme: "blue-light",
     data: langs,
-    placeholder: "Type to search for language",
+    placeholder: Screenful.loc("Type to search for language"),
     getValue: "lang",
     list: {
       maxNumberOfElements: 20,
@@ -93,10 +93,10 @@ Titling.render=function(div, json){
     },
   });
   
-  $block.append("<div class='instro'>Select language to sort entries alphabetically in the entry list.</div>");
+  $block.append("<div i18n class='instro'>Select language to sort entries alphabetically in the entry list.</div>");
 
   var $numberEntries=$("<div class='block abc'></div>").appendTo($div);
-	$numberEntries.append("<div class='title'>Number of entries to be shown in the entry list at once</div>");
+	$numberEntries.append("<div i18n class='title'>Number of entries to be shown in the entry list at once</div>");
 	$numberEntries.append("<input type='number' id='numberEntries'></input>");
     var $inpt = $numberEntries.find("input#numberEntries");
     var $ne = json.numberEntries || 1000; // just hardcoded, at least better than before. Ideally, this would come from siteconfig.numberEntries
@@ -104,7 +104,7 @@ Titling.render=function(div, json){
     $inpt.on("keyup change", function(e){
         Titling.change();
     });
-    $numberEntries.append("<div class='instro'>If your dictionary contains large entries (large XML files), it is recommended to reduce this number for quicker loading of entry list.</div>");
+    $numberEntries.append("<div i18n class='instro'>If your dictionary contains large entries (large XML files), it is recommended to reduce this number for quicker loading of entry list.</div>");
 };
 Titling.harvest=function(div){
   var ret={};

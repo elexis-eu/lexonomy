@@ -53,7 +53,7 @@
 			return JSON.parse(str);
 		};
 		Screenful.Editor.toolbarLinks=[
-			{image: "../../../furniture/cog.png", caption: "Customize entry editor...", href: "../../../{{dictID}}/config/editing-override/"}
+			{image: "../../../furniture/cog.png", caption: "{{ i18n["Customize entry editor..."] }}", href: "../../../{{dictID}}/config/editing-override/"}
 		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />		
