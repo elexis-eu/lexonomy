@@ -1,0 +1,6 @@
+{
+    // this needs to exist to enable certain typechecking in VSCode
+    "compilerOptions": {
+        "checkJs": true
+    }
+}

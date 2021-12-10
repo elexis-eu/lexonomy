@@ -1,0 +1,9 @@
+{
+  "name": "libs",
+  "version": "1.0.0",
+  "dependencies": {
+    "@kcmertens/xonomy": "^0.1.0",
+    "@types/jquery": "^3.5.6",
+    "monaco-editor": "^0.29.1"
+  }
+}

@@ -12,8 +12,8 @@
     <script type="text/javascript" src="../../../libs/screenful/screenful.js"></script>
     <script type="text/javascript" src="../../../libs/screenful/screenful-editor.js"></script>
     <script type="text/javascript" src="../../../libs/screenful/screenful-loc-en.js"></script>
-    <link type="text/css" rel="stylesheet" href="../../../libs/xonomy/xonomy.css" />
-    <script type="text/javascript" src="../../../libs/xonomy/xonomy.js?2018-02-02"></script>
+    <link type="text/css" rel="stylesheet" href="../../../libs/node_modules/@kcmertens/xonomy/dist/xonomy.css" />
+    <script type="text/javascript" src="../../../libs/node_modules/@kcmertens/xonomy/dist/xonomy.js?2018-02-02"></script>
     <script type="text/javascript" src="../../../widgets/xematron.js"></script>
     <script type="text/javascript" src="../../../libs/xonomy-tools/dtdconvert/dtd2xonomy.js"></script>
     <script type="text/javascript" src="../../../widgets/xemplatron.js"></script>
@@ -37,7 +37,15 @@
     </style>
     %if "_js" in editing:
       <script type="text/javascript">
-        var customizeEditor={{!editing["_js"]}};
+        <%
+          import re
+          hasVar = re.search(r'\s*(var|let|const)\s+customizeEditor', editing["_js"])
+        %>
+        %if hasVar:
+          {{!editing["_js"]}}
+        %else:
+          var customizeEditor = {{!editing["_js"]}}
+        %end
         var usingOwnEditor=customizeEditor.editor && customizeEditor.harvester;
       </script>
     %else:

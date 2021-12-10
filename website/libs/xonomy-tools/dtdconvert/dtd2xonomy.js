@@ -1,4 +1,8 @@
-//var Xonomy = require('./xonomy.js');
+/* eslint-disable */
+
+// These are dependency declarations to allow typescript type-checking (in vscode)
+/// <reference path="../../../types/xonomy.types.js" />
+/// <reference path="../../../types/dtdparser.types.js" />
 
 //element name
 var nameRe = '[:A-Z_a-z][:A-Z_a-z.\\-0-9]*';
@@ -12,12 +16,20 @@ var atRe = '<!ATTLIST\\s+('+nameRe+')\\s+(('+atDefinitionRe+')+)\\s*>';
 //entity definition
 var enRe = '<!ENTITY\\s+%\\s+[a-zA-Z0-9]*\\s+"[^^"]*"[^^>]*>';
 var elements = new Array();
+
+/** @type {XmlAttribute[]} */
 var attributes = new Array();
+/** The list of elements that are a child of another element. Used to find the root element
+ * @type {XmlElement[]} */
 var usedChildren = new Array();
+/** @type {Map<string, string>} */
 var entities = {};
 
-//parse single element definition
-//returns object: element name; can element include text; children structure
+/**
+ * parse single element definition
+ * @param {string} text
+ * @return {XmlElement} 
+ */
 function parseElement(text) {
   var elRegex = new RegExp(elRe, 'g');
   var results = elRegex.exec(text);
@@ -25,7 +37,7 @@ function parseElement(text) {
   var elName = results[1];
   var content = results[2];
   //replace all entities with values
-  Object.entries(entities).forEach(function(val,key) {
+  Object.entries(entities).forEach(function(val) {
     content = content.replace('%'+val[0]+';', val[1]);
   });
   var hasText = false;
@@ -39,7 +51,11 @@ function parseElement(text) {
   return {name:elName, hasText:hasText, children:children};
 }
 
-//parse single attlist, may have more attributes
+/**
+ * Parse an element's attributes and add them to the global attribute list
+ * @param {string} text a part of the DTD defining one ore more attributes
+ * @return {void} 
+ */
 function parseAttribute(text) {
   var atRegex = new RegExp(atRe, 'gm');
   var results = atRegex.exec(text);
@@ -73,8 +89,14 @@ function parseAttribute(text) {
   });
 }
 
-//parse content of element children spec, return object
+/**
+ * parse content of element children spec, return object
+ *
+ * @param {string} elContent part of the DTD defining which children may be present in an element
+ * @return {XmlElementChild} 
+ */
 function parseElementContent(elContent) {
+  /** @type {XmlElementChild[]} */
   var childrenArray = new Array();
   //not interested in text content here
   elContent = elContent.replace(/#PCDATA\s*\|/, '').trim();
@@ -130,6 +152,15 @@ function parseElementContent(elContent) {
   return result;
 }
 
+/**
+ * @param {string} input
+ * @param {string} split (part of) a regex string
+ * @param {string} [open] (part of) a regex string - defaults to a regex matching any of ({[
+ * @param {string} [close] (part of) a regex string - defaults to a regex matching any of )}]
+ * @param {string} [toggle] (part of) a regex string - defaults to a regex matching any of '"
+ * @param {string} [escape] (part of) a regex string - defaults to a regex matching \
+ * @return {string[]}
+ */
 function SplitBalanced(input, split, open, close, toggle, escape) {
     // Build the pattern from params with defaults:
     var pattern = "([\\s\\S]*?)(e)?(?:(o)|(c)|(t)|(sp)|$)"
@@ -170,7 +201,12 @@ function SplitBalanced(input, split, open, close, toggle, escape) {
     return results;
 }
 
-//parse DTD in text string to structure object
+/**
+ * Parse a dtd into a simplified intermediate format 
+ *
+ * @param {string} dtdData
+ * @return {XmlStructure} 
+ */
 function parseDTD(dtdData) {
   elements = new Array();
   attributes = new Array();
@@ -202,7 +238,7 @@ function parseDTD(dtdData) {
   var atRegex = new RegExp('('+atRe+')', 'gm');
   var results = dtdData.match(atRegex);
   if (results != null) results.forEach(function(atMatch){
-    var atResult = parseAttribute(atMatch);
+    parseAttribute(atMatch);
   });
 
   //root element is the element not appearing in children list
@@ -213,6 +249,8 @@ function parseDTD(dtdData) {
     }
   });
   var xmlStructure = {elements: elements, attributes: attributes, root:root};
+  console.log('xmlStructure');
+  console.log(xmlStructure);
   return xmlStructure;
 }
 
@@ -247,9 +285,14 @@ function initialDocument(xmlStructure) {
   return ret;
 }
 
-//transform xml structure to Xonomy docSpec
+/**
+ * transform xml structure to Xonomy docSpec
+ * @param {XmlStructure} xmlStructure 
+ * @returns {XonomyDocSpec}
+ */
 function struct2Xonomy(xmlStructure) {
-	var docSpec = {
+	/** @type {XonomyDocSpec} */
+  var docSpec = {
 		elements: {},
 		unknownElement: function(elName){
 			if(elName.indexOf("lxnm:")==0) return {
@@ -434,8 +477,10 @@ function struct2Xonomy(xmlStructure) {
   return docSpec;
 }
 
-
-//transform xml structure to Lexonomy Xema
+/**
+ * transform xml structure to Lexonomy Xema
+ * @param {XmlStructure} xmlStructure 
+ */
 function struct2Xema(xmlStructure) {
   var xema = {root: xmlStructure.root, elements: {}};
 

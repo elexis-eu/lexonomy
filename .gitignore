@@ -7,3 +7,6 @@ website/siteconfig.json
 website/node_modules/*
 website/package-lock.json
 website/__pycache__/*
+crossref.sqlite
+.vscode/
+/node_modules/

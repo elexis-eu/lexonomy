@@ -22,7 +22,7 @@
 		<script type="text/javascript" src="../../../widgets/defo.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../widgets/pillarform.css" />
 		<script type="text/javascript" src="../../../widgets/xematron.js"></script>
-		<script type="text/javascript" src="../../../libs/xonomy/xonomy.js"></script>
+		<script type="text/javascript" src="../../../libs/node_modules/@kcmertens/xonomy/dist/xonomy.js"></script>
 		<script type="text/javascript">
 		var xema={{!JSON(xema)}};
 		Screenful.Editor.singleton=true;

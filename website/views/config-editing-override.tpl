@@ -5,8 +5,16 @@
     <head>
         %include("head.tpl")
         <title>{{dictTitle}}</title>
+    
+        <script>var require = { paths: { vs: '../../../libs/node_modules/monaco-editor/min/vs' } };</script>
+        <link  href="../../../libs/node_modules/monaco-editor/min/vs/editor/editor.main.css" rel="stylesheet" data-name="vs/editor/editor.main"/>
+        <script src="../../../libs/node_modules/monaco-editor/min/vs/loader.js"></script>
+        <script src="../../../libs/node_modules/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
+        <script src="../../../libs/node_modules/monaco-editor/min/vs/editor/editor.main.js"></script>
+        
         <script type="text/javascript" src="../../../libs/screenful/screenful.js"></script>
-    <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
+
+        <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
         <script type="text/javascript" src="../../../libs/screenful/screenful-loc-en.js"></script>
         <script type="text/javascript" src="../../../libs/screenful/screenful-user.js"></script>
         <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-user.css" />
@@ -21,14 +29,6 @@
         <script type="text/javascript" src="../../../libs/screenful/screenful-editor.js"></script>
         <script type="text/javascript" src="../../../widgets/editing-override.js"></script>
         <link type="text/css" rel="stylesheet" href="../../../widgets/pillarform.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.46.0/codemirror.min.css" integrity="sha256-I8NyGs4wjbMuBSUE40o55W6k6P7tu/7G28/JGUUYCIs=" crossorigin="anonymous" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.46.0/codemirror.min.js" integrity="sha256-OMbqhJ5GYA+UQ2a9UE9iXHA1kn3hlZCFL5aZmpSp/+M=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.46.0/mode/javascript/javascript.min.js" integrity="sha256-h2CaV12bheEEc7Ao3zF6MntAbDLJkPoFR+h+nHvQUqA=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.46.0/mode/css/css.min.js" integrity="sha256-mSK/ZI2z8KrKSjKaCmUIVLJVH5ocYo92K8Zjam/tCyc=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.46.0/addon/edit/matchbrackets.min.js" integrity="sha256-hfP/jiEfynvmq3cvlRWLdhKYZhpVVhYc2g+/ajTXdH0=" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.46.0/addon/display/fullscreen.css" integrity="sha256-SpuaNYgDjBMdeyjrjtsC+U5fpSDpftPNv7oO8HQvG7w=" crossorigin="anonymous" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.46.0/addon/display/fullscreen.min.js" integrity="sha256-7RNoYfNeoShOS6Ry3d3ek7uRgARlr7oRYXbR1ni/ZEg=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.46.0/addon/selection/active-line.min.js" integrity="sha256-D6+2VpcCER+2VNRAVaEznj9zfwUlvgCp9q+K+ELnry4=" crossorigin="anonymous"></script>
         <script type="text/javascript">
         Screenful.Editor.singleton=true;
         Screenful.Editor.entryID="editing";

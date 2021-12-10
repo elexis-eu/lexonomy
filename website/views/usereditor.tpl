@@ -11,8 +11,8 @@
 		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
 		<script type="text/javascript" src="../../libs/screenful/screenful-editor.js"></script>
 		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../libs/xonomy/xonomy.css" />
-		<script type="text/javascript" src="../../libs/xonomy/xonomy.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../libs/node_modules/@kcmertens/xonomy/dist/xonomy.css" />
+		<script type="text/javascript" src="../../libs/node_modules/@kcmertens/xonomy/dist/xonomy.js"></script>
 		<script type="text/javascript" src="../../widgets/user-docspec.js"></script>
 		<script type="text/javascript">
 		Screenful.Editor.createUrl="../../users/usercreate.json";
