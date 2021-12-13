@@ -27,7 +27,7 @@
         <div class="input-field col s10">
           <input value={ this.configData.handle } placeholder="URL" id="ident_handle" type="text" class="validate"/>
 					<label for="ident_title">Metadata from CLARIN repository</label>
-					<span class="helper-text">Link to metadata recorded in CLARIN repository, provide URL to 'handle' link, eg. <tt>http://hdl.handle.net/api/handles/11356/1094</tt>.</span>
+					<span class="helper-text">Link to metadata recorded in CLARIN repository, provide URL to 'handle' link, eg. <tt>http://hdl.handle.net/11356/1094</tt>.</span>
 				</div>
 			</div>
 			<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
