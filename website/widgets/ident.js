@@ -47,7 +47,7 @@ Ident.render=function(div, json){
   $div.append("<div class='title'>Metadata from CLARIN repository</div>");
   $div.append("<input class='textbox' id='ident_handle'/>");
   $div.find("#ident_handle").val(json.handle);
-  $div.append("<div class='instro'>Link to metadata recorded in CLARIN repository, provide URL to 'handle' link, eg. <tt>http://hdl.handle.net/api/handles/11356/1094</tt>.</div>");
+  $div.append("<div class='instro'>Link to metadata recorded in CLARIN repository, provide URL to 'handle' link, eg. <tt>http://hdl.handle.net/11356/1094</tt>.</div>");
 };
 
 Ident.harvest=function(div){
