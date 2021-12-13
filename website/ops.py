@@ -17,6 +17,7 @@ import re
 import secrets
 from collections import defaultdict
 from icu import Locale, Collator
+import requests
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -1932,17 +1933,50 @@ def elexisDictAbout(dictID):
     if dictDB:
         info = {"id": dictID}
         configs = readDictConfigs(dictDB)
-        info["sourceLang"] = configs['ident'].get('lang')
-        if configs["publico"]["public"]:
-            info["release"] = "PUBLIC"
-            info["license"] = configs["publico"]["licence"]
-            if siteconfig["licences"][configs["publico"]["licence"]]:
-                info["license"] = siteconfig["licences"][configs["publico"]["licence"]]["url"]
+        if configs["ident"].get("handle") != "":
+            configs = loadHandleMeta(configs)
+        if configs["metadata"].get("dc.language.iso"):
+            info["sourceLang"] = configs["metadata"].get("dc.language.iso")
         else:
-            info["release"] = "PRIVATE"
+            info["sourceLang"] = configs['ident'].get('lang')
+        if configs["metadata"].get("dc.rights"):
+            if configs["metadata"].get("dc.rights.label") == "PUB":
+                info["release"] = "PUBLIC"
+                if configs["metadata"].get("dc.rights.uri") != "":
+                    info["license"] = configs["metadata"].get("dc.rights.uri")
+                else:
+                    info["license"] = configs["metadata"].get("dc.rights")
+            else:
+                info["release"] = "PRIVATE"
+        else:
+            if configs["publico"]["public"]:
+                info["release"] = "PUBLIC"
+                info["license"] = configs["publico"]["licence"]
+                if siteconfig["licences"][configs["publico"]["licence"]]:
+                    info["license"] = siteconfig["licences"][configs["publico"]["licence"]]["url"]
+            else:
+                info["release"] = "PRIVATE"
         info["creator"] = []
-        for user in configs["users"]:
-            info["creator"].append({"email": user})
+        if configs["metadata"].get("dc.contributor.author"):
+            for auth in configs["metadata"]["dc.contributor.author"]:
+                info["creator"].append({"name": auth})
+        else:
+            for user in configs["users"]:
+                info["creator"].append({"email": user})
+        if configs["metadata"].get("dc.publisher"):
+            info["publisher"] = [{"name": configs["metadata"]["dc.publisher"]}]
+        if configs["metadata"].get("dc.title"):
+            info["title"] = configs["metadata"]["dc.title"]
+        else:
+            info["title"] = configs["ident"]["title"]
+        if configs["metadata"].get("dc.description"):
+            info["abstract"] = configs["metadata"]["dc.description"]
+        else:
+            info["abstract"] = configs["ident"]["blurb"]
+        if configs["metadata"].get("dc.date.issued"):
+            info["issued"] = configs["metadata"]["dc.date.issued"]
+        if configs["metadata"].get("dc.subject"):
+            info["subject"] = '; '.join(configs["metadata"]["dc.subject"])
         return info
     else:
         return None
@@ -2033,3 +2067,26 @@ def elexisGetEntry(dictID, entryID):
     else:
         return None
 
+def loadHandleMeta(configs):
+    configs["metadata"] = {}
+    if configs["ident"].get("handle") and "hdl.handle.net" in configs["ident"].get("handle"):
+        handle = configs["ident"].get("handle").replace("hdl.handle.net", "hdl.handle.net/api/handles")
+        res = requests.get(handle)
+        data = res.json()
+        if data.get('values') and data["values"][0] and data["values"][0]["type"] == "URL":
+            repourl = data["values"][0]["data"]["value"].replace("xmlui", "rest")
+            res2 = requests.get(repourl)
+            data2 = res2.json()
+            if data2.get("id") != "":
+                urlparsed = urllib.parse.urlparse(repourl)
+                repourl2 = urlparsed.scheme + "://" + urlparsed.hostname + "/repository/rest/items/" + str(data2["id"]) + "/metadata"
+                res3 = requests.get(repourl2)
+                data3 = res3.json()
+                for item in data3:
+                    if item["key"] == "dc.contributor.author" or item["key"] == "dc.subject":
+                        if not configs["metadata"].get(item["key"]):
+                            configs["metadata"][item["key"]] = []
+                        configs["metadata"][item["key"]].append(item["value"])
+                    else:
+                        configs["metadata"][item["key"]] = item["value"]
+    return configs
