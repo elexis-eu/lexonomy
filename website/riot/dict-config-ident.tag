@@ -23,6 +23,13 @@
 					<span class="helper-text">Language of dictionary entries, used to sort dictionaries on your home page. You can select language from the list, or write down your own.</span>
 				</div>
 			</div>
+			<div class="row">
+        <div class="input-field col s10">
+          <input value={ this.configData.handle } placeholder="URL" id="ident_handle" type="text" class="validate"/>
+					<label for="ident_title">Metadata from CLARIN repository</label>
+					<span class="helper-text">Link to metadata recorded in CLARIN repository, provide URL to 'handle' link, eg. <tt>http://hdl.handle.net/api/handles/11356/1094</tt>.</span>
+				</div>
+			</div>
 			<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
 			</button>
 
@@ -61,7 +68,8 @@
 				var newData = {
 					'title': $('#ident_title').val(),
 					'blurb': $('#ident_blurb').val(),
-					'lang': $('#ident_lang').val()
+					'lang': $('#ident_lang').val(),
+					'handle': $('#ident_handle').val()
 				};
 				return newData;
 			},
