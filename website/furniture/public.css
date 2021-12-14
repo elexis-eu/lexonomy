@@ -176,3 +176,6 @@ body.doc div.markdown {max-width: 900px; margin-top: 70px; }
 
 div.readonly { text-align: center; padding: 115px 0px 0px 0px; background-image: url(maintenance.png); background-position: center top; background-repeat: no-repeat; line-height: 1.5em; color: #666666;}
 div.readonly div.readonlyTitle { color: #bd6c73; font-size: 1.25rem; margin-bottom: 0.75em;}
+
+#metadata .meta-key {background-color: darkgray; color: white; padding: 3px; vertical-align: top;}
+#metadata .meta-value {display: inline-block;}

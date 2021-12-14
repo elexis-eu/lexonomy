@@ -610,8 +610,9 @@ def publicdict(dictID):
     if not ops.dictExists(dictID):
         return redirect("/")
     user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
+    configs = ops.loadHandleMeta(configs)
     blurb = ops.markdown_text(configs["ident"]["blurb"])
-    return template("dict.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": blurb, "publico": configs["publico"]})
+    return template("dict.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": blurb, "publico": configs["publico"], "metadata": configs["metadata"]})
 
 @get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>")
 def publicentry(dictID, entryID):

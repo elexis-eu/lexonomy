@@ -77,6 +77,26 @@
 					<div class="list"></div>
 				</div>
 			%end
+
+			%if metadata != {}:
+				<div id="metadata">
+				<h3>CLARIN repository metadata</h3>
+				%for meta in metadata:
+					<div class="metadata">
+					<span class="meta-key">{{meta}}</span>
+					<span class="meta-value">
+					%if type(metadata[meta]) is list:
+						%for val in metadata[meta]:
+						{{val}}<br/>
+						%end
+					%else:
+						{{metadata[meta]}}
+					%end
+					</span>
+					</div>
+				%end
+				</div>
+			%end
 		</div>
 
 		<div class="invelope bottom">
