@@ -27,6 +27,7 @@
 			{value: "blank", caption: "{{i18n["(none)"]}}"},
 			{value: "smd", caption: "{{i18n["Simple Monolingual Dictionary"]}}"},
 		    {value: "sbd", caption: "{{i18n["Simple Bilingual Dictionary"]}}"},
+		    {value: "lmf", caption: "LMF"},
 		];
 		Screenful.Make.titleHint="{{i18n["Enter a human-readable title such as \"My Esperanto Dictionary\". You will be able to change this later."]}}";
 		Screenful.Make.urlHint="{{i18n["This will be your dictionary's address on the web. You will be able to change this later."]}}";
