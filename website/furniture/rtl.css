@@ -372,3 +372,7 @@ div#editor.designer div.details.narrow {right:30%;left: 40%;}
 div#editor.designer div.preview {left:unset; right:unset; border-left:unset; right: 60%; left: 0px; border-right: 1px solid #1e6bcf; }
 
 div#editor.designer div.preview div.block > div.title > span.reload {float:unset; background-position:unset; float: left; background-position: right center; padding: 5px 25px 5px 0px; }
+
+#middlebox div.field div.url {
+  direction: ltr;
+}
