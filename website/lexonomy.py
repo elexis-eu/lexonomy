@@ -274,7 +274,8 @@ def getmedia(dictID, query, user, dictDB, configs):
 @auth
 def skeget_corpora(user):
     import base64
-    req = urllib.request.Request("https://api.sketchengine.eu/ca/api/corpora",
+    # req = urllib.request.Request("https://api.sketchengine.eu/ca/api/corpora",
+    req = urllib.request.Request("http://sketchengine.shaa3.com/bonito/run.cgi/corpora",
                                   headers = {"Authorization": "Basic " + base64.b64encode(str.encode(str(user['ske_username'])+':'+str(user['ske_apiKey']))).decode('ascii')})
     ske_response = urllib.request.urlopen(req)
     response.headers['Content-Type'] = ske_response.getheader('Content-Type')

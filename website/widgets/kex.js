@@ -2,10 +2,10 @@ var Kex={};
 
 Kex.change=function(){};
 
-Kex.settings={
-  defaultURL: "https://app.sketchengine.eu/",
-  defaultAPIURL: "https://api.sketchengine.eu/bonito/run.cgi"
-}
+Kex.settings = {
+  defaultURL: "http://sketchengine.shaa3.com/",
+  defaultAPIURL: "http://sketchengine.shaa3.com/bonito/run.cgi",
+};
 
 Kex.ifchange=function(event){
   var $inp=$(event.delegateTarget);
