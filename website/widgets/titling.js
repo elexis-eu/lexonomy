@@ -4,7 +4,7 @@ Titling.change=function(){};
 Titling.render=function(div, json){
   $(div).append("<div id='pagebody' class='notop'><div class='pillarform'></div></div>"); var $div=$(div).find("div.pillarform");
   var elements=Xematron.listElements(xema);
-  
+
   var $block=$("<div class='block headword'></div>").appendTo($div);
 	$block.append("<div class='title'>Headword</div>");
   $block.append("<select></select>");

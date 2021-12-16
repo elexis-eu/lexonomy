@@ -70,7 +70,7 @@ XemaDesigner.listNodes=function(){
 }
 var elNamesDone=[];
 XemaDesigner.listElement=function(elName, $list, level){
-	var isSuspect=(XemaDesigner.xema._dtd ? true : false); //all xemas that originate from a DTD are inherently suspect
+	var isSuspect=(XemaDesigner.xema._dtd || XemaDesigner.xema._rng ? true : false); //all xemas that originate from a DTD are inherently suspect
 	if(XemaDesigner.xema.elements[elName] && (!isSuspect || elNamesDone.indexOf(elName)==-1)){
 		elNamesDone.push(elName);
 		var hasEponymousAscendant=($list.closest(".container."+elName.replace(/\./g, "\\.")).length>0);

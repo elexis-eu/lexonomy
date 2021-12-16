@@ -1,5 +1,5 @@
 {
-  "extends": ["standard"],
+  "extends": "standard",
   "env": {
       "browser": true,
       "node": true
@@ -15,6 +15,9 @@
       "handle-callback-err": "warn",
       "no-redeclare": "warn",
       "dot-notation": "warn",
-      "quote-props": "warn"
+      "quote-props": "warn",
+      "no-undefined": "error",
+      "no-implicit-globals": "error"
   }
+  // "ignorePatterns": ["libs/**"]
 }

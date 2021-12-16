@@ -30,6 +30,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/easy-autocomplete/1.3.5/easy-autocomplete.min.css" integrity="sha256-fARYVJfhP7LIqNnfUtpnbujW34NsfC4OJbtc37rK2rs=" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/easy-autocomplete/1.3.5/easy-autocomplete.themes.min.css" integrity="sha256-kK9BInVvQN0PQuuyW9VX2I2/K4jfEtWFf/dnyi2C0tQ=" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-autocomplete/1.3.5/jquery.easy-autocomplete.min.js" integrity="sha256-aS5HnZXPFUnMTBhNEiZ+fKMsekyUqwm30faj/Qh/gIA=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="http://localhost:80/dist/docspec.js"></script>
     <style>
       .xonomy div.layby.open {width: 55%}
       {{!css}}
@@ -119,6 +121,9 @@
         var xmlStructure=parseDTD(`{{!xema["_dtd"]}}`);
         var docSpec=struct2Xonomy(xmlStructure);
         newXml=initialDocument(xmlStructure);
+      %elif "_rng" in xema:
+        var docSpec = docspeclib.rngToDocspec(xema._rng);
+        newXml=docspeclib.initialDocument(xema._rng)
       %else:
         var docSpec=Xematron.xema2docspec(xema, "{{editing.get("xonomyTextEditor")}}");
       %end

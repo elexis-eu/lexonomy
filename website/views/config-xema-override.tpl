@@ -6,7 +6,7 @@
 		%include("head.tpl")
 		<title>{{dictTitle}}</title>
 		<script type="text/javascript" src="../../../libs/screenful/screenful.js"></script>
-    <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
+		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
 		<script type="text/javascript" src="../../../libs/screenful/screenful-loc-en.js"></script>
 		<script type="text/javascript" src="../../../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-user.css" />
@@ -20,6 +20,10 @@
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-editor.css" />
 		<script type="text/javascript" src="../../../libs/screenful/screenful-editor.js"></script>
 		<script type="text/javascript" src="../../../widgets/xema-override.js"></script>
+		
+		<script type="text/javascript" src="http://localhost:80/dist/index.js"></script>
+		<script type="text/javascript" src="http://localhost:80/dist/rngparser.js"></script>
+
 		<script type="text/javascript" src="../../../libs/xonomy-tools/dtdconvert/dtd2xonomy.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../widgets/pillarform.css" />
 		<script type="text/javascript">
@@ -43,6 +47,6 @@
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
 	</head>
 	<body>
-                %include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Entry structure", configUrl="xema-override", rootPath="../../../")
+		%include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Entry structure", configUrl="xema-override", rootPath="../../../")
 	</body>
 </html>
