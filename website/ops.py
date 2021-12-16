@@ -1935,10 +1935,12 @@ def elexisDictAbout(dictID):
         configs = readDictConfigs(dictDB)
         if configs["ident"].get("handle") != "":
             configs = loadHandleMeta(configs)
-        if configs["metadata"].get("dc.language.iso"):
-            info["sourceLang"] = configs["metadata"].get("dc.language.iso")
+        if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
+            info["sourceLanguage"] = configs["metadata"]["dc.language.iso"][0]
+            info["targetLanguage"] = configs["metadata"]["dc.language.iso"]
         else:
-            info["sourceLang"] = configs['ident'].get('lang')
+            info["sourceLanguage"] = configs['ident'].get('lang')
+            info["targetLanguage"] = [configs['ident'].get('lang')]
         if configs["metadata"].get("dc.rights"):
             if configs["metadata"].get("dc.rights.label") == "PUB":
                 info["release"] = "PUBLIC"
@@ -1948,6 +1950,7 @@ def elexisDictAbout(dictID):
                     info["license"] = configs["metadata"].get("dc.rights")
             else:
                 info["release"] = "PRIVATE"
+                info["license"] = ""
         else:
             if configs["publico"]["public"]:
                 info["release"] = "PUBLIC"
@@ -1957,6 +1960,7 @@ def elexisDictAbout(dictID):
             else:
                 info["release"] = "PRIVATE"
         info["creator"] = []
+        info["publisher"] = []
         if configs["metadata"].get("dc.contributor.author"):
             for auth in configs["metadata"]["dc.contributor.author"]:
                 info["creator"].append({"name": auth})
@@ -1975,8 +1979,15 @@ def elexisDictAbout(dictID):
             info["abstract"] = configs["ident"]["blurb"]
         if configs["metadata"].get("dc.date.issued"):
             info["issued"] = configs["metadata"]["dc.date.issued"]
+        info["genre"] = "gen"
         if configs["metadata"].get("dc.subject"):
             info["subject"] = '; '.join(configs["metadata"]["dc.subject"])
+            if "terminolog" in info["subject"]:
+                info["genre"] = "trm"
+            if "etymolog" in info["subject"]:
+                info["genre"] = "ety"
+            if "historical" in info["subject"]:
+                info["genre"] = "his"
         return info
     else:
         return None
@@ -1986,9 +1997,22 @@ def elexisLemmaList(dictID, limit=None, offset=0):
     if dictDB:
         info = {"language": "", "release": "PRIVATE"}
         configs = readDictConfigs(dictDB)
-        info["language"] = configs['ident'].get('lang')
-        if configs["publico"]["public"]:
-            info["release"] = "PUBLIC"
+        if configs["ident"].get("handle") != "":
+            configs = loadHandleMeta(configs)
+        if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
+            info["language"] = configs["metadata"]["dc.language.iso"][0]
+        else:
+            info["language"] = configs['ident'].get('lang')
+        if configs["metadata"].get("dc.rights"):
+            if configs["metadata"].get("dc.rights.label") == "PUB":
+                info["release"] = "PUBLIC"
+            else:
+                info["release"] = "PRIVATE"
+        else:
+            if configs["publico"]["public"]:
+                info["release"] = "PUBLIC"
+            else:
+                info["release"] = "PRIVATE"
         lemmas = []
         query = "SELECT id, xml FROM entries"
         if limit != None and limit != "":
@@ -2013,9 +2037,22 @@ def elexisGetLemma(dictID, headword, limit=None, offset=0):
     if dictDB:
         info = {"language": "", "release": "PRIVATE"}
         configs = readDictConfigs(dictDB)
-        info["language"] = configs['ident'].get('lang')
-        if configs["publico"]["public"]:
-            info["release"] = "PUBLIC"
+        if configs["ident"].get("handle") != "":
+            configs = loadHandleMeta(configs)
+        if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
+            info["language"] = configs["metadata"]["dc.language.iso"][0]
+        else:
+            info["language"] = configs['ident'].get('lang')
+        if configs["metadata"].get("dc.rights"):
+            if configs["metadata"].get("dc.rights.label") == "PUB":
+                info["release"] = "PUBLIC"
+            else:
+                info["release"] = "PRIVATE"
+        else:
+            if configs["publico"]["public"]:
+                info["release"] = "PUBLIC"
+            else:
+                info["release"] = "PRIVATE"
         lemmas = []
         query = "SELECT e.id, e.xml FROM searchables AS s INNER JOIN entries AS e on e.id=s.entry_id WHERE doctype=? AND s.txt=? GROUP BY e.id ORDER by s.level"
         params = (configs["xema"]["root"], headword)
@@ -2083,7 +2120,7 @@ def loadHandleMeta(configs):
                 res3 = requests.get(repourl2)
                 data3 = res3.json()
                 for item in data3:
-                    if item["key"] == "dc.contributor.author" or item["key"] == "dc.subject":
+                    if item["key"] == "dc.contributor.author" or item["key"] == "dc.subject" or item["key"] == "dc.language.iso":
                         if not configs["metadata"].get(item["key"]):
                             configs["metadata"][item["key"]] = []
                         configs["metadata"][item["key"]].append(item["value"])
