@@ -742,8 +742,15 @@ def dicteditdoc(dictID, doctype, user, dictDB, configs, selectedID=""):
     doctypesUsed = ops.readDoctypesUsed(dictDB)
     doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys()) + doctypesUsed
     doctypes = list(set(doctypes))
+    docTypesDisplay = {} # fetch the actual element names for the root elements so the user isn't shown their internal ID
+    for t in doctypes:
+        if t in configs["xema"]["elements"]:
+            docTypesDisplay[t] = configs["xema"]["elements"][t].get("elementName", t)
+        else:
+            docTypesDisplay[t] = t
+
     numberEntries = configs["titling"]["numberEntries"] if "numberEntries" in configs["titling"] else 1000 # magic number again, still better than before, will not refactor to really fix
-    return template("edit.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "flagging":configs["flagging"], "doctypes": doctypes, "doctype": doctype, "xonomyMode": configs["editing"]["xonomyMode"], "numberEntries": numberEntries, "selectedID": selectedID})
+    return template("edit.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "flagging":configs["flagging"], "doctypes": docTypesDisplay, "doctype": doctype, "xonomyMode": configs["editing"]["xonomyMode"], "numberEntries": numberEntries, "selectedID": selectedID})
 
 @get(siteconfig["rootPath"]+"<dictID>/<doctype>/entryeditor")
 @authDict(["canEdit"], True)
@@ -752,8 +759,7 @@ def entryeditor(dictID, doctype, user, dictDB, configs):
         configs["xemplate"]["_xsl"] = "dummy"
     configs["xema"]["_root"] = configs["xema"]["root"]
     userdicts = ops.getDictsByUser(user["email"])
-    if doctype in configs["xema"]["elements"]:
-        configs["xema"]["root"] = doctype
+    configs["xema"]["root"] = ops.getXemaElementId(configs["xema"], doctype)
     return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"], "linking": configs["links"], "gapi": configs["gapi"], "userdicts": userdicts})
 
 @post(siteconfig["rootPath"]+"<dictID>/<doctype>/entrylist.json")

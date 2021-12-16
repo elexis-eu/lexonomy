@@ -1,3 +1,4 @@
+/* eslint-disable */
 var XemaDesigner={};
 XemaDesigner.onchange=function(){};
 XemaDesigner.isValidXmlName=function(str){
@@ -13,9 +14,8 @@ XemaDesigner.isEmptyObject=function(obj) {
 
 XemaDesigner.xema=null;
 
-XemaDesigner.start=function(xema){ //the editor can be an HTML element, or the string ID of one.
+XemaDesigner.start=function(xema){ 
 	XemaDesigner.xema=xema;
-	if(typeof(editor)=="string") editor=document.getElementById(editor);
 	var $editor=$("#editor").addClass("designer");
 	$editor.append("<div class='list'></div><div class='details'></div>");
 	XemaDesigner.listNodes();
@@ -25,34 +25,34 @@ XemaDesigner.start=function(xema){ //the editor can be an HTML element, or the s
 XemaDesigner.getParentlessElements=function(){
 	var ret=[];
 	var childNames=[];
-	for(var elName in XemaDesigner.xema.elements){
-		if(XemaDesigner.canHaveChildren(elName)){
-			XemaDesigner.xema.elements[elName].children.forEach(function(child){
+	for(var elementId in XemaDesigner.xema.elements){
+		if(XemaDesigner.canHaveChildren(elementId)){
+			XemaDesigner.xema.elements[elementId].children.forEach(function(child){
 				childNames.push(child.name);
 			});
 		}
 	}
-	for(var elName in XemaDesigner.xema.elements){
-		if(elName!=XemaDesigner.xema.root && childNames.indexOf(elName)==-1) ret.push(elName);
+	for(var elementId in XemaDesigner.xema.elements){
+		if(elementId!=XemaDesigner.xema.root && childNames.indexOf(elementId)==-1) ret.push(elementId);
 	}
 	return ret;
 };
-XemaDesigner.hasAttributes=function(elName){
-	return XemaDesigner.xema.elements[elName].attributes && !XemaDesigner.isEmptyObject(XemaDesigner.xema.elements[elName].attributes);
+XemaDesigner.hasAttributes=function(elementId){
+	return XemaDesigner.xema.elements[elementId].attributes && !XemaDesigner.isEmptyObject(XemaDesigner.xema.elements[elementId].attributes);
 };
-XemaDesigner.hasChildren=function(elName){
-	if((XemaDesigner.xema.elements[elName].filling=="chd" || XemaDesigner.xema.elements[elName].filling=="inl") && !XemaDesigner.xema.elements[elName].children) XemaDesigner.xema.elements[elName].children=[];
-	return (XemaDesigner.xema.elements[elName].filling=="chd" || XemaDesigner.xema.elements[elName].filling=="inl") && XemaDesigner.xema.elements[elName].children.length>0;
+XemaDesigner.hasChildren=function(elementId){
+	if((XemaDesigner.xema.elements[elementId].filling=="chd" || XemaDesigner.xema.elements[elementId].filling=="inl") && !XemaDesigner.xema.elements[elementId].children) XemaDesigner.xema.elements[elementId].children=[];
+	return (XemaDesigner.xema.elements[elementId].filling=="chd" || XemaDesigner.xema.elements[elementId].filling=="inl") && XemaDesigner.xema.elements[elementId].children.length>0;
 };
-XemaDesigner.canHaveChildren=function(elName){
-	if((XemaDesigner.xema.elements[elName].filling=="chd" || XemaDesigner.xema.elements[elName].filling=="inl") && !XemaDesigner.xema.elements[elName].children) XemaDesigner.xema.elements[elName].children=[];
-	return (XemaDesigner.xema.elements[elName].filling=="chd" || XemaDesigner.xema.elements[elName].filling=="inl")
+XemaDesigner.canHaveChildren=function(elementId){
+	if((XemaDesigner.xema.elements[elementId].filling=="chd" || XemaDesigner.xema.elements[elementId].filling=="inl") && !XemaDesigner.xema.elements[elementId].children) XemaDesigner.xema.elements[elementId].children=[];
+	return (XemaDesigner.xema.elements[elementId].filling=="chd" || XemaDesigner.xema.elements[elementId].filling=="inl")
 };
-XemaDesigner.canElementHaveValues=function(elName){
-	return (XemaDesigner.xema.elements[elName].filling=="lst")
+XemaDesigner.canElementHaveValues=function(elementId){
+	return (XemaDesigner.xema.elements[elementId].filling=="lst")
 };
-XemaDesigner.canAttributeHaveValues=function(elName, atName){
-	return (XemaDesigner.xema.elements[elName].attributes[atName].filling=="lst")
+XemaDesigner.canAttributeHaveValues=function(elementId, atName){
+	return (XemaDesigner.xema.elements[elementId].attributes[atName].filling=="lst")
 };
 
 XemaDesigner.listNodes=function(){
@@ -189,24 +189,24 @@ XemaDesigner.deleteChildRefs=function(elName){
 	XemaDesigner.onchange();
 };
 
-XemaDesigner.setRoot=function(elName){
+XemaDesigner.setRoot=function(elementId){
 	$(".designer .details").html("");
-	XemaDesigner.xema.root=elName;
+	XemaDesigner.xema.root=elementId;
 	XemaDesigner.listNodes();
-	XemaDesigner.selectElement(elName);
+	XemaDesigner.selectElement(elementId);
 	XemaDesigner.onchange();
 };
 
-XemaDesigner.renderElementName=function(elName){
+XemaDesigner.renderElementName=function(elementId){
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
 	$block.append("<div class='title'>Element</div>");
-	$("<input class='textbox tech elName'/>").appendTo($block).val(elName).on("keyup change", function(event){
+	$("<input class='textbox tech elName'/>").appendTo($block).val(elementId).on("keyup change", function(event){
 		$(".designer .errInvalidRename").hide();
 		$(".designer .errRenameExists").hide();
-		if(event.type=="keyup" && event.which==13) XemaDesigner.renameElement(elName, $(".designer input.elName").val()); //enter
+		if(event.type=="keyup" && event.which==13) XemaDesigner.renameElement(elementId, $(".designer input.elName").val()); //enter
 		else {
-			if(event.type=="keyup" && event.which==27) $(".designer input.elName").val(elName); //escape
-			if($(event.target).val()!=elName) {
+			if(event.type=="keyup" && event.which==27) $(".designer input.elName").val(elementId); //escape
+			if($(event.target).val()!=elementId) {
 				$(".designer .butRename").show(); $(".designer .butRenameCancel").show(); $(".designer .butDeleteElement").hide();
 			}
 			else {
@@ -215,12 +215,12 @@ XemaDesigner.renderElementName=function(elName){
 			}
 		}
 	});
-	$("<button class='butRename iconAccept'>Rename</button>").hide().appendTo($block).on("click", function(event){ XemaDesigner.renameElement(elName, $(".designer input.elName").val()) });
+	$("<button class='butRename iconAccept'>Rename</button>").hide().appendTo($block).on("click", function(event){ XemaDesigner.renameElement(elementId, $(".designer input.elName").val()) });
 	$("<button class='butRenameCancel iconCancel'>Cancel renaming</button>").hide().appendTo($block).on("click", function(event){
-		$(".designer input.elName").val(elName);
+		$(".designer input.elName").val(elementId);
 		$(".designer .butRename").hide(); $(".designer .butRenameCancel").hide(); $(".designer .butDeleteElement").show();
 	});
-	if(XemaDesigner.xema.root!=elName) $("<button class='butDeleteElement iconCross'>Delete element</button>").appendTo($block).on("click", function(event){ XemaDesigner.deleteElement(elName) });
+	if(XemaDesigner.xema.root!=elementId) $("<button class='butDeleteElement iconCross'>Delete element</button>").appendTo($block).on("click", function(event){ XemaDesigner.deleteElement(elementId) });
 	$("<div class='warn errInvalidRename'>Cannot rename, not a valid XML name.</div>").appendTo($block).hide();
 	$("<div class='warn errRenameExists'>Cannot rename, such element already exists.</div>").appendTo($block).hide();
 };
@@ -242,31 +242,31 @@ XemaDesigner.renderAttributeName=function(elName, atName){
 	$("<div class='warn errAtNameExists'>Cannot rename, such attribute already exists.</div>").appendTo($block).hide();
 };
 
-XemaDesigner.renameElement=function(elName, newName){
+XemaDesigner.renameElement=function(elementId, newName){
 	if(!XemaDesigner.isValidXmlName(newName)){
 		$(".designer .errInvalidRename").show();
 	} else if(XemaDesigner.xema.elements[newName]) {
 		$(".designer .errRenameExists").show();
 	} else {
-		XemaDesigner.xema.elements[newName]=XemaDesigner.xema.elements[elName];
-		delete XemaDesigner.xema.elements[elName];
-		if(XemaDesigner.xema.root==elName) XemaDesigner.xema.root=newName;
-		var pars=XemaDesigner.renameChildRefs(elName, newName);
+		XemaDesigner.xema.elements[newName]=XemaDesigner.xema.elements[elementId];
+		delete XemaDesigner.xema.elements[elementId];
+		if(XemaDesigner.xema.root==elementId) XemaDesigner.xema.root=newName;
+		var pars=XemaDesigner.renameChildRefs(elementId, newName);
 		XemaDesigner.listNodes();
 		XemaDesigner.selectElement(newName);
 		XemaDesigner.onchange();
 	}
 };
-XemaDesigner.renameAttribute=function(elName, atName, newName){
+XemaDesigner.renameAttribute=function(elementId, atName, newName){
 	if(!XemaDesigner.isValidXmlName(newName)){
 		$(".designer .errInvalidAtName").show();
-	} else if(XemaDesigner.xema.elements[elName].attributes[newName]) {
+	} else if(XemaDesigner.xema.elements[elementId].attributes[newName]) {
 		$(".designer .errAtNameExists").show();
 	} else {
-		XemaDesigner.xema.elements[elName].attributes[newName]=XemaDesigner.xema.elements[elName].attributes[atName];
-		delete XemaDesigner.xema.elements[elName].attributes[atName];
+		XemaDesigner.xema.elements[elementId].attributes[newName]=XemaDesigner.xema.elements[elementId].attributes[atName];
+		delete XemaDesigner.xema.elements[elementId].attributes[atName];
 		XemaDesigner.listNodes();
-		XemaDesigner.selectAttribute(elName, newName);
+		XemaDesigner.selectAttribute(elementId, newName);
 		XemaDesigner.onchange();
 	}
 };

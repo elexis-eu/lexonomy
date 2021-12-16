@@ -164,7 +164,7 @@ def createEntry(dictDB, configs, entryID, xml, email, historiography):
     xml = removeSubentryParentTags(xml)
     title = getEntryTitle(xml, configs["titling"])
     sortkey = getSortTitle(xml, configs["titling"])
-    doctype = getDoctype(xml)
+    doctype = getDoctype(configs["xema"], xml) # xema is required because root element name may not match root element config ID
     needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
     needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
     # entry title already exists?
@@ -262,10 +262,10 @@ def getEntryHeadword(xml, headword_elem):
         ret = ret[0:255]
     return ret
 
-def getDoctype(xml):
+def getDoctype(xema, xml):
     pat = r"^<([^>\/\s]+)"
     for match in re.findall(pat, xml):
-        return match
+        return getXemaElementId(xema, match)
     return ""
 
 def getSortTitle(xml, titling):
@@ -2049,3 +2049,8 @@ def elexisGetEntry(dictID, entryID):
     else:
         return None
 
+def getXemaElementId(xema, elementName):
+    for key, value in xema["elements"].items():
+        if value.get("elementName") == elementName:
+            return key
+    return elementName
