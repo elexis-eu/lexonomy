@@ -1979,15 +1979,15 @@ def elexisDictAbout(dictID):
             info["abstract"] = configs["ident"]["blurb"]
         if configs["metadata"].get("dc.date.issued"):
             info["issued"] = configs["metadata"]["dc.date.issued"]
-        info["genre"] = "gen"
+        info["genre"] = ["gen"]
         if configs["metadata"].get("dc.subject"):
             info["subject"] = '; '.join(configs["metadata"]["dc.subject"])
             if "terminolog" in info["subject"]:
-                info["genre"] = "trm"
+                info["genre"].append("trm")
             if "etymolog" in info["subject"]:
-                info["genre"] = "ety"
+                info["genre"].append("ety")
             if "historical" in info["subject"]:
-                info["genre"] = "his"
+                info["genre"].append("his")
         return info
     else:
         return None
