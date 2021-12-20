@@ -589,7 +589,7 @@ def getLangList():
         langs.append({"code": r["language"], "language": lang.get("lang")})
     return langs
 
-def getDictList(lang, withLinks):
+def getDictList(lang, withLinks, loadHandle):
     dicts = []
     conn = getMainDB()
     if lang:
@@ -602,6 +602,10 @@ def getDictList(lang, withLinks):
             configs = readDictConfigs(getDB(r["id"]))
             if configs["links"] and len(configs["links"])>0:
                 info["hasLinks"] = True
+            if configs["ident"].get("handle") != "" and loadHandle:
+                configs = loadHandleMeta(configs)
+                if configs["metadata"].get("dc.title"):
+                    info["title"] = configs["metadata"]["dc.title"]
         except:
             info["broken"] = True
         if not withLinks or (withLinks == True and info["hasLinks"] == True):
@@ -772,6 +776,34 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
                     info["targetSense"] = ""
                     info["targetLang"] = ""
                     links.append(info)
+
+    # add dictionary titles
+    dictUsed = {}
+    for link in links:
+        if link["sourceDict"] in dictUsed:
+            dictTitle = dictUsed[link["sourceDict"]]
+        else:
+            dictConf = readDictConfigs(getDB(link["sourceDict"]))
+            if dictConf["ident"].get("handle") != "":
+                dictConf = loadHandleMeta(dictConf)
+                if dictConf["metadata"].get("dc.title"):
+                    dictTitle = dictConf["metadata"]["dc.title"]
+                else:
+                    dictTitle = dictConf["ident"]["title"]
+            dictUsed[link["sourceDict"]] = dictTitle
+        link["sourceDictTitle"] = dictTitle
+        if link["targetDict"] in dictUsed:
+            dictTitle = dictUsed[link["targetDict"]]
+        else:
+            dictConf = readDictConfigs(getDB(link["targetDict"]))
+            if dictConf["ident"].get("handle") != "":
+                dictConf = loadHandleMeta(dictConf)
+                if dictConf["metadata"].get("dc.title"):
+                    dictTitle = dictConf["metadata"]["dc.title"]
+                else:
+                    dictTitle = dictConf["ident"]["title"]
+            dictUsed[link["targetDict"]] = dictTitle
+        link["targetDictTitle"] = dictTitle
 
     return links
 

@@ -900,7 +900,7 @@ def apilistdict():
     if not user["valid"]:
         return {"success": False}
     else:
-        dicts = ops.getDictList(data.get('lang'), data.get('withLinks'))
+        dicts = ops.getDictList(data.get('lang'), data.get('withLinks'), True)
         return {"dictionaries": dicts, "success": True}
 
 @post(siteconfig["rootPath"] + "api/listLinks")
