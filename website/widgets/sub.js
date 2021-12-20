@@ -43,7 +43,7 @@ Sub.extendDocspec=function(docspec, xema){
             if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
             docspec.elements[parName].menu.push({
               icon: rootPath+"furniture/favicon.png",
-              caption: "Find subentries <"+elName+">",
+              caption: Screenful.loc("Find subentries ¡i18n¡", "<"+elName+">"),
               action: Sub.menuSubentries,
               actionParameter: {elName: elName},
             });

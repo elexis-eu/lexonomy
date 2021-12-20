@@ -118,6 +118,7 @@ Screenful.Loc = {
   "Remove ¡i18n¡": "إزالة ¡i18n¡",
   "Duplicate ¡i18n¡": "تكرار ¡i18n¡",
   "Move ¡i18n¡ up": "حرك ¡i18n¡ لأعلى",
+  "Find subentries ¡i18n¡": "بحث عن مدخلات ¡i18n¡",
   "Move ¡i18n¡ down": "حرك ¡i18n¡ لأسفل",
   "Merge ¡i18n¡ with previous": "ادمج ¡i18n¡ مع السابق",
   "Merge ¡i18n¡ with next": "ادمج ¡i18n¡ مع next",
