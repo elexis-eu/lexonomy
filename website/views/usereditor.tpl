@@ -25,8 +25,8 @@
 				html+="<div class='head'>";
 					html+="<div class='title'>"+entry.id+"</div>";
 					var lastSeen=doc.documentElement.getAttribute("lastSeen");
-					if(lastSeen) html+="<div class='subtitle'><span class='label'>LAST SEEN</span> "+lastSeen+"</div>";
-					else html+="<div class='subtitle'><span class='label'>LAST SEEN</span> NEVER</div>";
+					if(lastSeen) html+="<div class='subtitle'><span class='label' i18n>LAST SEEN</span> "+lastSeen+"</div>";
+					else html+="<div class='subtitle'><span class='label' i18n>LAST SEEN</span> <span i18n>NEVER</span></div>";
 				html+="</div>";
 				html+="<div class='body'>";
 					var els=doc.getElementsByTagName("dict");

@@ -110,8 +110,30 @@ Screenful.Loc = {
   "contains a word that starts like this": "يحتوي على كلمة كهذه",
   "contains this sequence of characters": "تحتوي على النص",
   Headword: "الكلمة الرئيسية",
-  "---------------------": "--------------------------------",
+  "LAST SEEN": "آخر قراءة",
+  NEVER: "أبدًا",
+  "Add...": "إضافة",
+  Delete: "حذف",
+  "Unwrap ¡i18n¡": "فك اللف ¡i18n¡",
+  "Remove ¡i18n¡": "إزالة ¡i18n¡",
+  "Duplicate ¡i18n¡": "تكرار ¡i18n¡",
+  "Move ¡i18n¡ up": "حرك ¡i18n¡ لأعلى",
+  "Move ¡i18n¡ down": "حرك ¡i18n¡ لأسفل",
+  "Merge ¡i18n¡ with previous": "ادمج ¡i18n¡ مع السابق",
+  "Merge ¡i18n¡ with next": "ادمج ¡i18n¡ مع next",
+  "This element": "هذا العنصر",
+  "Add @¡i18n¡": "إضافة @ ¡i18n¡",
+  "Remove @¡i18n¡": "إزالة @ ¡i18n¡",
+  Attributes: "صفات",
+  "Add ¡i18n¡": "أضف ¡i18n¡",
+  "Child elements": "العناصر التابعة",
+  "Wrap with ¡i18n¡": "التف مع ¡i18n¡",
+  "Add another ¡i18n¡ before": "أضف ¡i18n¡ آخر من قبل",
+  "Add another ¡i18n¡ after": "أضف ¡i18n¡ آخر بعد",
+  "Remove all ¡i18n¡ siblings": "قم بإزالة جميع أشقاء ¡i18n¡",
+  "Sibling elements": "عناصر شقيقة",
 
+  "---------------------": "--------------------------------",
 };
 notFoundLoc = {}
 doI18n = () => {
@@ -137,11 +159,13 @@ doI18n = () => {
     }
   });
 };
-Screenful.loc = (t) => {
+Screenful.loc = (t, w) => {
   if (Screenful.Loc[t]) {
-    return Screenful.Loc[t];
+    return Screenful.Loc[t].replace('¡i18n¡', w || '');
   } else {
     notFoundLoc[t] = '';
-    return t;
+    if (!t)
+      return t;
+    return t.replace("¡i18n¡", w || "");
   }
 }

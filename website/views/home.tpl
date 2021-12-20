@@ -132,7 +132,7 @@
 						<div class="createdict"><a href="make/">{{i18n["Create a dictionary"]}}</a></div>
 						%if user["isAdmin"]:
 							<div class="yourdicts">{{i18n["Administration"]}}</div>
-							<div class="adminlink"><a href="users/">Users</a> <a href="dicts/">{{i18n["Dictionaries"]}}</a></div>
+							<div class="adminlink"><a href="users/">{{i18n["Users"]}}</a> <a href="dicts/">{{i18n["Dictionaries"]}}</a></div>
 						%end
 					%end
 				%end

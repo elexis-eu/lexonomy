@@ -515,12 +515,14 @@ XemaDesigner.renderElementValues=function(elName){
 			$("<button class='iconOnly iconCross'>&nbsp;</button>").appendTo($row.find("td.cell9")).on("click", function(event){ XemaDesigner.deleteElementValue(elName, obj.value) });
 		});
 	}
-	$("<button class='butNewValue iconAdd'>Add...</button>").appendTo($block).on("click", function(event){
-		$block.find("button.butNewValue").hide();
-		$block.find("input.new").show().first().focus();
-		$block.find("button.butNewValueOK").show();
-		$block.find("button.butNewValueCancel").show();
-	});
+	$("<button class='butNewValue iconAdd' i18n>Add...</button>")
+    .appendTo($block)
+    .on("click", function (event) {
+      $block.find("button.butNewValue").hide();
+      $block.find("input.new").show().first().focus();
+      $block.find("button.butNewValueOK").show();
+      $block.find("button.butNewValueCancel").show();
+    });
 	$("<input class='textbox new val'/>").appendTo($block);
 	$("<input class='textbox new cap'/>").appendTo($block);
 	$block.find("input.new").hide().on("keyup change", function(event){
@@ -533,10 +535,10 @@ XemaDesigner.renderElementValues=function(elName){
 			XemaDesigner.addElementValue(elName, $block.find("input.new.val").val(), $block.find("input.new.cap").val());
 		}
 	});
-	$("<button class='butNewValueOK iconAccept'>Add</button>").hide().appendTo($block).on("click", function(event){
+	$("<button class='butNewValueOK iconAccept' i18n>Add</button>").hide().appendTo($block).on("click", function(event){
 		XemaDesigner.addElementValue(elName, $block.find("input.new.val").val(), $block.find("input.new.cap").val());
 	});
-	$("<button class='butNewValueCancel iconCancel'>Cancel</button>").hide().appendTo($block).on("click", function(event){
+	$("<button class='butNewValueCancel iconCancel' i18n>Cancel</button>").hide().appendTo($block).on("click", function(event){
 		$block.find("input.new").hide().val("");
 		$block.find("button.butNewValueOK").hide();
 		$block.find("button.butNewValueCancel").hide();
