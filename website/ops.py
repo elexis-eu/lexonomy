@@ -589,7 +589,7 @@ def getLangList():
         langs.append({"code": r["language"], "language": lang.get("lang")})
     return langs
 
-def getDictList(lang, withLinks, loadHandle):
+def getDictList(lang, withLinks, loadHandle=False):
     dicts = []
     conn = getMainDB()
     if lang:
