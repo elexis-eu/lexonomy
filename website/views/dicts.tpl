@@ -37,6 +37,7 @@
 			$(div).html(id+"<br/><b>"+title+"</b>");
 		};
 		</script>
+		<link type="text/css" rel="stylesheet" href="../../furniture/ui.css" />
 		%if siteconfig["rtl"]:
 			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
 		%end
