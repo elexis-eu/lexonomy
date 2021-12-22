@@ -2221,7 +2221,8 @@ def elexisNormalisePos(pos):
             "punctuation", "subordinatingConjunction", "symbol", "verb",
             "other"]:
         return pos
-    elif pos == "ADJ":
+    pos = pos.upper().strip(' .')
+    if pos == "ADJ":
         return "adjective"
     elif pos == "ADP":
         return "adposition"
