@@ -2052,8 +2052,15 @@ def elexisLemmaList(dictID, limit=None, offset=0):
         if offset != "" and int(offset) > 0:
             query += " OFFSET "+str(int(offset))
         c = dictDB.execute(query)
+        formats = []
+        firstentry = True
         for r in c.fetchall():
-            lemma = {"release": info["release"], "language": info["language"], "formats": ["tei"]}
+            if firstentry:
+                firstentry = False
+                jsonentry = elexisConvertTei(r["xml"])
+                if jsonentry != None:
+                    formats = ["tei", "json"]
+            lemma = {"release": info["release"], "language": info["language"], "formats": formats}
             lemma["id"] = str(r["id"])
             lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
             pos = elexisGuessPOS(r["xml"])
@@ -2093,8 +2100,15 @@ def elexisGetLemma(dictID, headword, limit=None, offset=0):
         if offset != "" and int(offset) > 0:
             query += " OFFSET "+str(int(offset))
         c = dictDB.execute(query, params)
+        formats = []
+        firstentry = True
         for r in c.fetchall():
-            lemma = {"release": info["release"], "language": info["language"], "formats": ["tei"]}
+            if firstentry:
+                firstentry = False
+                jsonentry = elexisConvertTei(r["xml"])
+                if jsonentry != None:
+                    formats = ["tei", "json"]
+            lemma = {"release": info["release"], "language": info["language"], "formats": formats}
             lemma["id"] = str(r["id"])
             lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
             pos = elexisGuessPOS(r["xml"])
@@ -2159,3 +2173,92 @@ def loadHandleMeta(configs):
                     else:
                         configs["metadata"][item["key"]] = item["value"]
     return configs
+
+def elexisConvertTei(xml_entry):
+    """Convert a TEI entry into Json, return None if not TEI
+    xml_entry: The entry as a string"""
+    from io import BytesIO
+    from lxml import etree as ET
+
+    try:
+        # strip NS
+        it = ET.iterparse(BytesIO(xml_entry.encode("UTF-8")), recover=True)
+        for _, el in it:
+            _, _, el.tag = el.tag.rpartition('}')
+        doc = it.root
+
+        entry = {}
+        for form_elem in doc.iter("form"):
+            if form_elem.attrib["type"] == "lemma":
+                for orth_elem in form_elem.iter("orth"):
+                    if "canonicalForm" not in entry:
+                        entry["canonicalForm"] = {"writtenRep": orth_elem.text}
+        for gramgrp_elem in doc.iter("gramGrp"):
+            for gram in gramgrp_elem.iter("gram"):
+                if gram.attrib["type"] == "pos":
+                    if "norm" in gram.attrib:
+                        entry["partOfSpeech"] = elexisNormalisePos(gram.attrib["norm"])
+                    else:
+                        entry["partOfSpeech"] = elexisNormalisePos(gram.text)
+
+        entry["senses"] = []
+        for sense in doc.iter("sense"):
+            sense = {}
+            for defn in doc.iter("def"):
+                sense["definition"] = defn.text
+            entry["senses"].append(sense)
+        if "canonicalForm" in entry:
+            return entry
+        else:
+            return None
+    except Exception as e:
+        return None
+
+def elexisNormalisePos(pos):
+    if pos in ["adjective", "adposition", "adverb", "auxiliary", 
+            "coordinatingConjunction", "determiner", "interjection",
+            "commonNoun", "numeral", "particle", "pronoun", "properNoun",
+            "punctuation", "subordinatingConjunction", "symbol", "verb",
+            "other"]:
+        return pos
+    elif pos == "ADJ":
+        return "adjective"
+    elif pos == "ADP":
+        return "adposition"
+    elif pos == "ADV":
+        return "adverb"
+    elif pos == "AUX" :
+        return "auxiliary"
+    elif pos == "CCONJ" :
+        return "coordinatingConjunction"
+    elif pos == "DET":
+        return "determiner"
+    elif pos == "INTJ" :
+        return "interjection"
+    elif pos == "NN":
+        return "commonNoun"
+    elif pos == "NOUN":
+        return "commonNoun"
+    elif pos == "NUM":
+        return "numeral"
+    elif pos == "PART":
+        return "particle"
+    elif pos == "PRON":
+        return "pronoun"
+    elif pos == "PROPN":
+        return "properNoun"
+    elif pos == "PUNCT":
+        return "punctuation"
+    elif pos == "SCONJ":
+        return "subordinatingConjunction"
+    elif pos == "SYM":
+        return "symbol"
+    elif pos == "VB":
+        return "verb"
+    elif pos == "VERB":
+        return "verb"
+    elif pos == "X":
+        return "other"
+    else:
+        return "other"
+
