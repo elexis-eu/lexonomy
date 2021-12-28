@@ -43,6 +43,7 @@
 							this.state.userInfo.username = response.email;
 							this.state.userInfo.ske_username = response.ske_username;
 							this.state.userInfo.ske_apiKey = response.ske_apiKey;
+							this.state.userInfo.apiKey = response.apiKey;
 							this.state.authorized = true;
 						}
 					}).always(() => {
@@ -211,6 +212,14 @@
 					this.state.showDictMenu = false;
 					this.state.userAccess = false;
 					this.state.subPage = 'forgot';
+					this.content = 'main-page';
+					this.update();
+				});
+				route('/userprofile', () => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = 'userprofile';
 					this.content = 'main-page';
 					this.update();
 				});

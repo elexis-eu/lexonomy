@@ -4,8 +4,9 @@
 	</div>
 	<div class="col s7">
 		<div if={ props.authorized } >
-			<dict-list if={this.props.mainSubPage != 'new'}></dict-list>
+			<dict-list if={this.props.mainSubPage != 'new' && this.props.mainSubPage != 'userprofile'}></dict-list>
 			<dict-new if={this.props.mainSubPage == 'new'}></dict-new>
+			<userprofile if={this.props.mainSubPage == 'userprofile'} user-info={ props.userInfo } siteconfig={ props.siteconfig }></userprofile>
 		</div>
 		<div if={ !props.authorized }>
 			<login if={this.props.mainSubPage == 'login'} account-ops={ props.accountOps } siteconfig={ props.siteconfig }></login>

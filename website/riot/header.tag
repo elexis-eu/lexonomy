@@ -13,7 +13,7 @@
 	</ul>
 	<ul if={ props.authorized } id="dropdown-menu-user" class="dropdown-content">
 	  <li><a href="#/" onclick={ doLogout }>Log out</a></li>
-	  <li><a href="#/">Your profile</a></li>
+	  <li><a href="#/userprofile">Your profile</a></li>
 	</ul>
 
 	<nav>
