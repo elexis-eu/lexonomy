@@ -153,8 +153,9 @@ def lexonomyconfig():
     configData = {
         "version": version, 
         "licences": siteconfig['licences'],
-        "sketchengineLoginPage": siteconfig['sketchengineLoginPage']
     }
+    if 'sketchengineLoginPage' in siteconfig:
+        configData['sketchengineLoginPage'] = siteconfig['sketchengineLoginPage']
     return configData
 
 @get(siteconfig["rootPath"] + "userdicts.json")

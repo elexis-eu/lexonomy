@@ -1,22 +1,37 @@
 <userprofile>
 	<div>
 		<!-- Sketch Engine account -->
-		<div class="row" if={ 'sketchengineLoginPage' in this.props.siteconfig && this.props.siteconfig.sketchengineLoginPage != "" && this.props.userInfo.ske_username != '' }>
+		<div class="row" if={ 'sketchengineLoginPage' in this.siteconfig && this.siteconfig.sketchengineLoginPage != "" && this.props.userInfo.ske_username != '' }>
 			<div class="col">
 				<p><strong>Sketch Engine login</strong></p>
 				<p>Your Lexonomy account is linked to your Sketch Engine account <strong>{ this.props.userInfo.ske_username }</strong>
 					<br/>
-					<a href={ this.props.siteconfig.sketchengineLoginPage }>Link to a different Sketch Engine account&nbsp;»</a>
+					<a href={ this.siteconfig.sketchengineLoginPage }>Link to a different Sketch Engine account&nbsp;»</a>
 				</p>
 			</div>
 		</div>
-		<div class="row" if={ 'sketchengineLoginPage' in this.props.siteconfig && this.props.siteconfig.sketchengineLoginPage != "" && this.props.userInfo.ske_username == '' }>
+		<div class="row" if={ 'sketchengineLoginPage' in this.siteconfig && this.siteconfig.sketchengineLoginPage != "" && this.props.userInfo.ske_username == '' }>
 			<div class="col">
 				<p><strong>Sketch Engine login</strong></p>
-				<p><a href={ this.props.siteconfig.sketchengineLoginPage }>Link Lexonomy to your Sketch Engine account&nbsp;»</a>
+				<p><a href={ this.siteconfig.sketchengineLoginPage }>Link Lexonomy to your Sketch Engine account&nbsp;»</a>
 				</p>
 			</div>
-			
+		</div>
+		<div class="row" if={ !('sketchengineLoginPage' in this.siteconfig) || this.siteconfig.sketchengineLoginPage == "" }>
+			<div class="col">
+				<p><strong>Sketch Engine login</strong></p>
+				<p if={ this.skeuserMessage != '' }>{ this.skeuserMessage }</p>
+				<div class="input-field col s12">
+					<input id="skeusername" type="text" class="validate" value={ this.props.userInfo.ske_username }/>
+					<label for="skeusername">Sketch Engine login</label>
+					<span class="helper-text">Set your login username to Sketch Engine.</span>
+				</div>
+				<div class="col">
+					<button class="btn waves-effect waves-light" type="submit" onclick={ doChangeUser }>Change username
+						<i class="material-icons right">send</i>
+					</button>
+				</div>
+			</div>
 		</div>
 		<!-- Sketch Engine API key -->
 		<hr/>
@@ -50,15 +65,17 @@
 		</div>
 		<div class="row">
 			<div class="input-field col s12">
-				<input id="password" type="password" class="validate" onkeypress={ doLogin }/>
+				<input id="password" type="password" class="validate" />
 				<label for="password">New password</label>
 				<span class="helper-text">Set your password to access Lexonomy.</span>
 			</div>
 		</div>
 		<div class="row">
-			<button class="btn waves-effect waves-light" type="submit" onclick={ doChangePass }>Change password
-				<i class="material-icons right">send</i>
-			</button>
+			<div class="col">
+				<button class="btn waves-effect waves-light" type="submit" onclick={ doChangePass }>Change password
+					<i class="material-icons right">send</i>
+				</button>
+			</div>
 		</div>
 		
 	</div>
@@ -67,8 +84,19 @@
 		export default {
 			passMessage: '',
 			apiMessage: '',
+			skeuserMessage: '',
+			siteconfig: {},
 			onMounted() {
-				console.log(this.props.siteconfig)
+				if (Object.keys(this.props.siteconfig) == 0) {
+					$.get("/siteconfigread.json", (response) => {
+						this.siteconfig = response;
+						this.update();
+					});
+				} else {
+					this.siteconfig = this.props.siteconfig;
+					this.update();
+				}
+				M.updateTextFields();
 			},
 
 			doChangePass(event) {
@@ -84,6 +112,21 @@
 					});
 				}
 			},
+
+			doChangeUser(event) {
+				if ($('#skeusername').val() != '') {
+					$.post("/changeskeusername.json", {ske_userName: $('#skeusername').val()}, (response) => {
+						if (response.success) {
+							this.skeuserMessage = 'Username changed.';
+							this.update();
+						} else {
+							this.skeuserMessage = 'There was an error saving the username.';
+							this.update();
+						}
+					});
+				}
+			},
+
 
 			doNewKey(event) {
 				var newkey = this.generateKey();
