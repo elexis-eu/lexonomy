@@ -33,7 +33,29 @@
 				</div>
 			</div>
 		</div>
+		<hr/>
 		<!-- Sketch Engine API key -->
+		<div class="row">
+			<div class="col">
+				<p><strong>Sketch Engine API key</strong></p>
+				<p if={ this.skeapiMessage != '' }>{ this.skeapiMessage }</p>
+				<p if={ 'sketchengineLoginPage' in this.siteconfig && this.siteconfig.sketchengineLoginPage != "" }>
+					Unless you need special setup, Please, <a href={ this.siteconfig.sketchengineLoginPage }>login via Sketch Engine</a> to set API key automatically.
+				</p>
+			</div>
+		</div>
+		<div class="row">
+				<div class="input-field col s12">
+					<input id="skeapi" type="text" class="validate" value={ this.props.userInfo.ske_apiKey }/>
+					<label for="skeapi">Sketch Engine API key</label>
+					<span class="helper-text">Set your API key for Sketch Engine.</span>
+				</div>
+				<div class="col">
+					<button class="btn waves-effect waves-light" type="submit" onclick={ doChangeKey }>Change API key
+						<i class="material-icons right">send</i>
+					</button>
+				</div>
+		</div>
 		<hr/>
 		<!-- Lexonomy API key -->
 		<div class="row" if={ this.apiMessage != '' }>
@@ -85,6 +107,7 @@
 			passMessage: '',
 			apiMessage: '',
 			skeuserMessage: '',
+			skeapiMessage: '',
 			siteconfig: {},
 			onMounted() {
 				if (Object.keys(this.props.siteconfig) == 0) {
@@ -127,6 +150,19 @@
 				}
 			},
 
+			doChangeKey(event) {
+				if ($('#skeapi').val() != '') {
+					$.post("/changeskeapi.json", {ske_apiKey: $('#skeapi').val()}, (response) => {
+						if (response.success) {
+							this.skeapiMessage = 'API key changed.';
+							this.update();
+						} else {
+							this.skeapiMessage = 'There was an error saving the API key.';
+							this.update();
+						}
+					});
+				}
+			},
 
 			doNewKey(event) {
 				var newkey = this.generateKey();
