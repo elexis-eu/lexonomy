@@ -69,6 +69,7 @@ XemplateDesigner.renderElement=function(elName){
     XemplateDesigner.renderElementStyles(elName);
     XemplateDesigner.renderElementLabel(elName);
   }
+  if (doI18n) doI18n();
 };
 XemplateDesigner.renderAttribute=function(elName, atName){
 	var $details=$(".designer .details").html("");
