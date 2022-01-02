@@ -99,7 +99,7 @@
       %if not user["canEdit"]:
 	uneditable=true;
       %end
-      Xonomy.lang="en";
+      Xonomy.lang=`{{siteconfig["lang"]}}`;
 
       var newXml="";
       %if "_xonomyDocSpec" in xema:

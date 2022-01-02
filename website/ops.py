@@ -1767,7 +1767,7 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
         if configs["ident"].get("lang"):
             lang = configs["ident"].get("lang")
         else:
-            lang = "en"
+            lang = siteconfig["lang"] if siteconfig["lang"] else "en";
         entryId = re.sub("[\W_]", "",  headword) + "_" + str(r["id"])
         line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/lemon/ontolex#LexicalEntry> ."
         yield line; yield "\n"

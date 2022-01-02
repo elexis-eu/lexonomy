@@ -27,7 +27,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 	};
 	var elnames=[]; for(var elname in xema.elements) elnames.push(elname); elnames.forEach(function(elname){
 		var xel=xema.elements[elname]; //the xema element from which we are creating a docSpec element
-		var del={}; docSpec.elements[elname]=del; //the docSpec element we are creating
+		var del=Object.assign({}, xel); docSpec.elements[elname]=del; //the docSpec element we are creating
 		del.menu=[];
 		del.inlineMenu=[];
 		del.collapsible=false;
@@ -132,7 +132,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 		var submenu=[];
 		var attnames=[]; for(var attname in xel.attributes) attnames.push(attname); attnames.forEach(function(attname){
 			var xatt=xel.attributes[attname]; //the xema attribute from which we are creating a docSpec attribute
-			var datt={}; del.attributes[attname]=datt; //the docSpec attribute we are creating
+			var datt = Object.assign({}, xatt);; del.attributes[attname]=datt; //the docSpec attribute we are creating
 			datt.menu=[];
 
 			//txt attributes are easy:
