@@ -79,6 +79,7 @@ Sub.menuSubentry=function(htmlID){
   }
   html+="</div>";
   document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
+	if (doI18n) doI18n();
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
 };
 

@@ -376,3 +376,9 @@ div#editor.designer div.preview div.block > div.title > span.reload {float:unset
 #middlebox div.field div.url {
   direction: ltr;
 }
+#toolbar input#idbox {
+  direction: ltr;
+}
+#toolbar button.iconOnly#butOpen {
+    transform: rotate(180deg);
+}
