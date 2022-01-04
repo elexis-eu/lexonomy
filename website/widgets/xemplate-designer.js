@@ -16,6 +16,7 @@ XemplateDesigner.start=function(xema, xemplate){ //the editor can be an HTML ele
 XemplateDesigner.onchange=function(){
 	XemplateDesigner.refreshPreview();
 	Screenful.Editor.changed();
+	if (doI18n) doI18n();
 };
 
 XemplateDesigner.renderPreview=function(){

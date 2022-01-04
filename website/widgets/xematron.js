@@ -224,7 +224,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 		var submenu=[];
 		Xematron.listElements(xema).forEach(function(siblingName){
 			submenu.push({
-				caption: Screenful.loc("Add ¡i18n¡, "<"+siblingName+">""),
+				caption: Screenful.loc("Add ¡i18n¡", "<" + siblingName + ">"),
 				action: Xonomy.newElementBefore,
 				actionParameter: Xematron.initialElement(xema, siblingName),
 				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingName) || (jsMe.getPrecedingSibling() && jsMe.getPrecedingSibling().name==jsMe.name) || del.mustBeAfter(jsMe).indexOf(siblingName)==-1; },

@@ -159,7 +159,7 @@ Screenful.Loc = {
   "Curly brackets": "بين قوسين مجعد",
   Comma: "فاصلة",
   Semicolon: "فاصلة منقوطة",
-  Colon: "القولون",
+  Colon: "نقطتين رأسيتين",
   "Text size": "حجم الخط",
   Smaller: "الأصغر",
   Bigger: "أكبر",
