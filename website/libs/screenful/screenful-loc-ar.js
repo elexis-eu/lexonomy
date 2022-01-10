@@ -59,7 +59,7 @@ Screenful.Loc = {
   currentUrl: "الرابط الحالي",
   newUrl: "الرابط الجديد",
   upload: "تحميل",
-  uploadPurge: "تطهير قبل التحميل",
+  uploadPurge: "حذف جميع المدخلات السابقة قبل الرفع",
   uploadFail: "فشل التحميل.",
   uploadSuccess: "نجح التحميل.",
   history: "تاريخ",
@@ -139,12 +139,16 @@ Screenful.Loc = {
   "is not shared with any other entry.": "لا يتم مشاركتها مع أي إدخال آخر.",
   "is shared with one other entry.": "يتم مشاركتها مع إدخال آخر.",
   "is shared with ¡i18n¡ other entries.": "مشترك مع ¡i18n¡ إدخالات أخرى.",
-  "This subentry is not embedded in any entries.": "لم يتم تضمين هذا الإدخال الفرعي في أي إدخالات.",
-  "This subentry is embedded in one entry.": "تم تضمين هذا الإدخال الفرعي في إدخال واحد.",
-  "This subentry is shared by ¡i18n¡ entries.": "يتم مشاركة هذا الإدخال الفرعي بواسطة إدخالات ¡i18n¡.",
-  "New": "جديد",
-  "Insert": "إضافة",
-  "There has been an error getting data from Lexonomy.": "حدث خطأ أثناء الحصول على البيانات من المنصة.",
+  "This subentry is not embedded in any entries.":
+    "لم يتم تضمين هذا الإدخال الفرعي في أي إدخالات.",
+  "This subentry is embedded in one entry.":
+    "تم تضمين هذا الإدخال الفرعي في إدخال واحد.",
+  "This subentry is shared by ¡i18n¡ entries.":
+    "يتم مشاركة هذا الإدخال الفرعي بواسطة إدخالات ¡i18n¡.",
+  New: "جديد",
+  Insert: "إضافة",
+  "There has been an error getting data from Lexonomy.":
+    "حدث خطأ أثناء الحصول على البيانات من المنصة.",
   "No matches found.": "لم يتم العثور على أي نتائج.",
   "---------------------": "--------------------------------",
   "Caption display": "عرض التسمية التوضيحية",

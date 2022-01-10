@@ -9,3 +9,4 @@ website/package-lock.json
 website/__pycache__/*
 .DS_Store
 docker-compose.yml
+definitions.txt

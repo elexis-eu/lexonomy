@@ -185,7 +185,7 @@
   "currentUrl": "الرابط الحالي",
   "newUrl": "الرابط الجديد",
   "upload": "تحميل",
-  "uploadPurge": "تطهير قبل التحميل",
+  "uploadPurge": "حذف جميع المدخلات السابقة قبل الرفع",
   "uploadFail": "فشل التحميل.",
   "uploadSuccess": "نجح التحميل.",
   "history": "تاريخ",

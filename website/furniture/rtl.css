@@ -382,3 +382,11 @@ div#editor.designer div.preview div.block > div.title > span.reload {float:unset
 #toolbar button.iconOnly#butOpen {
     transform: rotate(180deg);
 }
+
+/***********************************/
+/* My own changes to styles */
+/**********************************/
+
+.xonomy.laic .hasInlineMenu > .children > .textnode .word {
+    background-color: #f0f0f0;
+}
