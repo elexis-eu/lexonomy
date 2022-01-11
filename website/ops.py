@@ -602,7 +602,7 @@ def getDictList(lang, withLinks, loadHandle=False):
             configs = readDictConfigs(getDB(r["id"]))
             if configs["links"] and len(configs["links"])>0:
                 info["hasLinks"] = True
-            if configs["ident"].get("handle") != "" and loadHandle:
+            if loadHandle:
                 configs = loadHandleMeta(configs)
                 if configs["metadata"].get("dc.title"):
                     info["title"] = configs["metadata"]["dc.title"]
@@ -784,24 +784,22 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
             dictTitle = dictUsed[link["sourceDict"]]
         else:
             dictConf = readDictConfigs(getDB(link["sourceDict"]))
-            if dictConf["ident"].get("handle") != "":
-                dictConf = loadHandleMeta(dictConf)
-                if dictConf["metadata"].get("dc.title"):
-                    dictTitle = dictConf["metadata"]["dc.title"]
-                else:
-                    dictTitle = dictConf["ident"]["title"]
+            dictConf = loadHandleMeta(dictConf)
+            if dictConf["metadata"].get("dc.title"):
+                dictTitle = dictConf["metadata"]["dc.title"]
+            else:
+                dictTitle = dictConf["ident"]["title"]
             dictUsed[link["sourceDict"]] = dictTitle
         link["sourceDictTitle"] = dictTitle
         if link["targetDict"] in dictUsed:
             dictTitle = dictUsed[link["targetDict"]]
         else:
             dictConf = readDictConfigs(getDB(link["targetDict"]))
-            if dictConf["ident"].get("handle") != "":
-                dictConf = loadHandleMeta(dictConf)
-                if dictConf["metadata"].get("dc.title"):
-                    dictTitle = dictConf["metadata"]["dc.title"]
-                else:
-                    dictTitle = dictConf["ident"]["title"]
+            dictConf = loadHandleMeta(dictConf)
+            if dictConf["metadata"].get("dc.title"):
+                dictTitle = dictConf["metadata"]["dc.title"]
+            else:
+                dictTitle = dictConf["ident"]["title"]
             dictUsed[link["targetDict"]] = dictTitle
         link["targetDictTitle"] = dictTitle
 
@@ -1965,8 +1963,7 @@ def elexisDictAbout(dictID):
     if dictDB:
         info = {"id": dictID}
         configs = readDictConfigs(dictDB)
-        if configs["ident"].get("handle") != "":
-            configs = loadHandleMeta(configs)
+        configs = loadHandleMeta(configs)
         if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
             info["sourceLanguage"] = configs["metadata"]["dc.language.iso"][0]
             info["targetLanguage"] = configs["metadata"]["dc.language.iso"]
@@ -2035,8 +2032,7 @@ def elexisLemmaList(dictID, limit=None, offset=0):
     if dictDB:
         info = {"language": "en", "release": "PRIVATE"}
         configs = readDictConfigs(dictDB)
-        if configs["ident"].get("handle") != "":
-            configs = loadHandleMeta(configs)
+        configs = loadHandleMeta(configs)
         if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
             info["language"] = configs["metadata"]["dc.language.iso"][0]
         elif configs['ident'].get('lang'):
@@ -2082,8 +2078,7 @@ def elexisGetLemma(dictID, headword, limit=None, offset=0):
     if dictDB:
         info = {"language": "en", "release": "PRIVATE"}
         configs = readDictConfigs(dictDB)
-        if configs["ident"].get("handle") != "":
-            configs = loadHandleMeta(configs)
+        configs = loadHandleMeta(configs)
         if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
             info["language"] = configs["metadata"]["dc.language.iso"][0]
         elif configs['ident'].get('lang'):
