@@ -1970,9 +1970,12 @@ def elexisDictAbout(dictID):
         if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
             info["sourceLanguage"] = configs["metadata"]["dc.language.iso"][0]
             info["targetLanguage"] = configs["metadata"]["dc.language.iso"]
-        else:
+        elif configs['ident'].get('lang'):
             info["sourceLanguage"] = configs['ident'].get('lang')
             info["targetLanguage"] = [configs['ident'].get('lang')]
+        else:
+            info["sourceLanguage"] = 'en'
+            info["targetLanguage"] = ['en']
         if configs["metadata"].get("dc.rights"):
             if configs["metadata"].get("dc.rights.label") == "PUB":
                 info["release"] = "PUBLIC"
@@ -2027,13 +2030,13 @@ def elexisDictAbout(dictID):
 def elexisLemmaList(dictID, limit=None, offset=0):
     dictDB = getDB(dictID)
     if dictDB:
-        info = {"language": "", "release": "PRIVATE"}
+        info = {"language": "en", "release": "PRIVATE"}
         configs = readDictConfigs(dictDB)
         if configs["ident"].get("handle") != "":
             configs = loadHandleMeta(configs)
         if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
             info["language"] = configs["metadata"]["dc.language.iso"][0]
-        else:
+        elif configs['ident'].get('lang'):
             info["language"] = configs['ident'].get('lang')
         if configs["metadata"].get("dc.rights"):
             if configs["metadata"].get("dc.rights.label") == "PUB":
@@ -2074,13 +2077,13 @@ def elexisLemmaList(dictID, limit=None, offset=0):
 def elexisGetLemma(dictID, headword, limit=None, offset=0):
     dictDB = getDB(dictID)
     if dictDB:
-        info = {"language": "", "release": "PRIVATE"}
+        info = {"language": "en", "release": "PRIVATE"}
         configs = readDictConfigs(dictDB)
         if configs["ident"].get("handle") != "":
             configs = loadHandleMeta(configs)
         if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
             info["language"] = configs["metadata"]["dc.language.iso"][0]
-        else:
+        elif configs['ident'].get('lang'):
             info["language"] = configs['ident'].get('lang')
         if configs["metadata"].get("dc.rights"):
             if configs["metadata"].get("dc.rights.label") == "PUB":
