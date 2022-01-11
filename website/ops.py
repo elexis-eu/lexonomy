@@ -2023,6 +2023,9 @@ def elexisDictAbout(dictID):
                 info["genre"].append("ety")
             if "historical" in info["subject"]:
                 info["genre"].append("his")
+        c = dictDB.execute("select count(*) as total from entries")
+        r = c.fetchone()
+        info["entryCount"] = r['total']
         return info
     else:
         return None
