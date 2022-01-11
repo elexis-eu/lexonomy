@@ -2208,9 +2208,9 @@ def elexisConvertTei(xml_entry):
                         entry["partOfSpeech"] = elexisNormalisePos(gram.text)
 
         entry["senses"] = []
-        for sense in doc.iter("sense"):
+        for sense_elem in doc.iter("sense"):
             sense = {}
-            for defn in doc.iter("def"):
+            for defn in sense_elem.iter("def"):
                 sense["definition"] = defn.text
             entry["senses"].append(sense)
         if "canonicalForm" in entry:
