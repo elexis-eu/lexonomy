@@ -2133,7 +2133,7 @@ def elexisGuessPOS(xml):
     if 'type="pos"' in xml:
         pat = r'<gram[^>]*type="pos"[^>]*>([^<]*)</gram>'
         arr = re.findall(pat, xml)
-        if arr[0] and arr[0] != "":
+        if arr and arr[0] and arr[0] != "":
             pos = arr[0]
     return pos
 
