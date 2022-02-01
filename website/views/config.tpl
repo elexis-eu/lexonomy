@@ -64,6 +64,7 @@
 					<div class="signpost"><a href="../../{{dictID}}/config/download/">Download settings</a></div>
 					<div class="signpost"><a href="../../{{dictID}}/config/subbing/">Subentries</a></div>
 					<div class="signpost"><a href="../../{{dictID}}/config/gapi/">Multimedia API</a></div>
+					<div class="signpost"><a href="../../{{dictID}}/config/kontext/">KonText</a></div>
 				</div>
 				<div class="signposts sketch">
 					<div class="title">Sketch Engine</div>

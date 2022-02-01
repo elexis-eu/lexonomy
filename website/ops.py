@@ -69,7 +69,7 @@ def readDictConfigs(dictDB):
     c = dictDB.execute("select * from configs")
     for r in c.fetchall():
         configs[r["id"]] = json.loads(r["json"])
-    for conf in ["ident", "publico", "users", "kex", "titling", "flagging",
+    for conf in ["ident", "publico", "users", "kex", "kontext", "titling", "flagging",
                  "searchability", "xampl", "thes", "collx", "defo", "xema",
                  "xemplate", "editing", "subbing", "download", "links", "autonumber", "gapi"]:
         if not conf in configs:

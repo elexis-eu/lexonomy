@@ -350,6 +350,26 @@ def skeget_defo(dictID, user, dictDB, configs):
     data = json.loads(res.read())
     return data
 
+@get(siteconfig["rootPath"] + "<dictID>/kontext/corpora")
+@authDict([])
+def skeget_corpora(dictID, user, dictDB, configs):
+    kontexturl = "https://www.clarin.si/kontext/"
+    if configs.get("kontext") and configs["kontext"].get("url") != "":
+        kontexturl = configs["kontext"].get("url")
+    kontexturl += "corpora/ajax_list_corpora?requestable=1"
+    requrl = kontexturl
+    loadmore = True
+    corpus_list = []
+    while loadmore:
+        res = urllib.request.urlopen(requrl)
+        data = json.loads(res.read())
+        if data["nextOffset"] != None:
+            requrl = kontexturl + "&offset=" + str(data["nextOffset"])
+            corpus_list += data["rows"]
+        else:
+            loadmore = False
+    return {"corpus_list": corpus_list}
+
 @get(siteconfig["rootPath"] + "login")
 def login():
     res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
@@ -753,7 +773,7 @@ def entryeditor(dictID, doctype, user, dictDB, configs):
     userdicts = ops.getDictsByUser(user["email"])
     if doctype in configs["xema"]["elements"]:
         configs["xema"]["root"] = doctype
-    return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"], "linking": configs["links"], "gapi": configs["gapi"], "userdicts": userdicts})
+    return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "kontext": configs["kontext"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"], "linking": configs["links"], "gapi": configs["gapi"], "userdicts": userdicts})
 
 @post(siteconfig["rootPath"]+"<dictID>/<doctype>/entrylist.json")
 @authDict(["canEdit"])
