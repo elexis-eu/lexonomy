@@ -380,6 +380,26 @@ def login():
         referer = request.headers["Referer"]
     return template("login.tpl", **{"siteconfig": siteconfig, "redirectUrl": referer})
 
+@get(siteconfig["rootPath"] + "<dictID>/kontext/corpora")
+@authDict([])
+def skeget_corpora(dictID, user, dictDB, configs):
+    kontexturl = "https://www.clarin.si/kontext/"
+    if configs.get("kontext") and configs["kontext"].get("url") != "":
+        kontexturl = configs["kontext"].get("url")
+    kontexturl += "corpora/ajax_list_corpora?requestable=1"
+    requrl = kontexturl
+    loadmore = True
+    corpus_list = []
+    while loadmore:
+        res = urllib.request.urlopen(requrl)
+        data = json.loads(res.read())
+        if data["nextOffset"] != None:
+            requrl = kontexturl + "&offset=" + str(data["nextOffset"])
+            corpus_list += data["rows"]
+        else:
+            loadmore = False
+    return {"corpus_list": corpus_list}
+
 @post(siteconfig["rootPath"] + "login.json")
 def check_login():
     if request.forms.email != "" and request.forms.password != "":
@@ -645,7 +665,7 @@ def dictconfig(dictID):
         return {"success": False}
     else:
         user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
-        res = {"success": True, "publicInfo": {**configs["ident"], **configs["publico"]}, "userAccess": user["dictAccess"], "configs": {"xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "subbing": configs["subbing"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "flagging": configs["flagging"], "linking": configs["links"], "editing": configs["editing"]}}
+        res = {"success": True, "publicInfo": {**configs["ident"], **configs["publico"]}, "userAccess": user["dictAccess"], "configs": {"xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "kontext": configs["kontext"], "subbing": configs["subbing"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "flagging": configs["flagging"], "linking": configs["links"], "editing": configs["editing"]}}
         res["publicInfo"]["blurb"] = ops.markdown_text(configs["ident"]["blurb"])
         return res
 
@@ -813,7 +833,7 @@ def entryeditor(dictID, doctype, user, dictDB, configs):
     userdicts = ops.getDictsByUser(user["email"])
     if doctype in configs["xema"]["elements"]:
         configs["xema"]["root"] = doctype
-    return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"], "linking": configs["links"], "userdicts": userdicts})
+    return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "kontext": configs["kontext"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"], "linking": configs["links"], "userdicts": userdicts})
 
 @post(siteconfig["rootPath"]+"<dictID>/<doctype>/entrylist.json")
 @authDict(["canEdit"])
