@@ -50,7 +50,7 @@ def getDB(dictID):
         try:
             if dictID not in dictDB or not dictDB[dictID].is_connected():
                 dictDB[dictID] = mysql.connector.connect(
-                    host="host.docker.internal",
+                    host=os.environ['MYSQL_DB_HOST'],
                     user=os.environ['MYSQL_DB_USER'],
                     database="lexo_" + dictID,
                     password=os.environ['MYSQL_DB_PASSWORD'],
@@ -59,7 +59,7 @@ def getDB(dictID):
             conn = dictDB[dictID].cursor(dictionary=True, buffered=True)
         except:
             dictDB[dictID] = mysql.connector.connect(
-                host="host.docker.internal",
+                host=os.environ['MYSQL_DB_HOST'],
                 user=os.environ['MYSQL_DB_USER'],
                 database="lexo_" + dictID,
                 password=os.environ['MYSQL_DB_PASSWORD'],
@@ -79,7 +79,7 @@ def getMainDB():
         try:
             if mainDB == None or not mainDB.is_connected():
                 mainDB = mysql.connector.connect(
-                    host="host.docker.internal",
+                    host=os.environ['MYSQL_DB_HOST'],
                     user=os.environ['MYSQL_DB_USER'],
                     database="lexo",
                     password=os.environ['MYSQL_DB_PASSWORD'],
@@ -88,7 +88,7 @@ def getMainDB():
             conn = mainDB.cursor(dictionary=True, buffered=True)
         except:
             mainDB = mysql.connector.connect(
-                host="host.docker.internal",
+                host=os.environ['MYSQL_DB_HOST'],
                 user=os.environ['MYSQL_DB_USER'],
                 database="lexo",
                 password=os.environ['MYSQL_DB_PASSWORD'],
@@ -108,7 +108,7 @@ def getLinkDB():
         try:
             if linksDB == None or not linksDB.is_connected():
                 linksDB = mysql.connector.connect(
-                    host="host.docker.internal",
+                    host=os.environ['MYSQL_DB_HOST'],
                     user=os.environ['MYSQL_DB_USER'],
                     database="lexo_crossref",
                     password=os.environ['MYSQL_DB_PASSWORD'],
@@ -117,7 +117,7 @@ def getLinkDB():
             conn = linksDB.cursor(dictionary=True)
         except:
             linksDB = mysql.connector.connect(
-                host="host.docker.internal",
+                host=os.environ['MYSQL_DB_HOST'],
                 user=os.environ['MYSQL_DB_USER'],
                 database="lexo_crossref",
                 password=os.environ['MYSQL_DB_PASSWORD'],
@@ -591,7 +591,7 @@ def dictExists(dictID):
         return os.path.isfile(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
     elif DB == 'mysql':
         conn = mysql.connector.connect(
-            host="host.docker.internal",
+            host=os.environ['MYSQL_DB_HOST'],
             user=os.environ['MYSQL_DB_USER'],
             password=os.environ['MYSQL_DB_PASSWORD']
         )
