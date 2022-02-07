@@ -43,6 +43,7 @@
 						Screenful.Editor.deleteUrl="/"+this.dictId+"/entrydelete.json";
 						var xema = this.dictConfigs.xema;
 						var xemplate = this.dictConfigs.xemplate;
+						kontext = this.dictConfigs.kontext;
 						kex = this.dictConfigs.kex;
 						subbing = this.dictConfigs.subbing;
 						xampl = this.dictConfigs.xampl;
@@ -122,6 +123,7 @@
 							Xonomy.setMode(Cookies.get("xonomyMode_" + dictId) || editing["xonomyMode"]);
 							Xrefs.extendDocspec(docSpec, xema);
 							Ske.extendDocspec(docSpec, xema);
+							Kontext.extendDocspec(docSpec, xema);
 							Sub.extendDocspec(docSpec, xema);
 							docSpec.onchange = Screenful.Editor.changed;
 							if (uneditable) {

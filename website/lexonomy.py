@@ -382,7 +382,7 @@ def login():
 
 @get(siteconfig["rootPath"] + "<dictID>/kontext/corpora")
 @authDict([])
-def skeget_corpora(dictID, user, dictDB, configs):
+def kontext_corpora(dictID, user, dictDB, configs):
     kontexturl = "https://www.clarin.si/kontext/"
     if configs.get("kontext") and configs["kontext"].get("url") != "":
         kontexturl = configs["kontext"].get("url")
@@ -399,6 +399,59 @@ def skeget_corpora(dictID, user, dictDB, configs):
         else:
             loadmore = False
     return {"corpus_list": corpus_list}
+
+@get(siteconfig["rootPath"] + "<dictID>/kontext/conc")
+@authDict([])
+def kontext_xampl(dictID, user, dictDB, configs):
+    kontexturl = configs["kontext"].get("url") + "query_submit?format=json"
+    corpus = configs["kontext"].get("corpus")
+    if request.query.querytype == "kontextcql":
+        cql = urllib.parse.quote_plus(request.query.query)
+    else:
+        cql = '[word=\"' + urllib.parse.quote_plus(request.query.query) + '\"]'
+    request_data = {
+        "type": "concQueryArgs",
+        "maincorp": configs["kontext"].get("corpus"),
+        "viewmode": "sen",
+        "pagesize": 40, 
+        "fromp": 0, 
+        "queries": [{
+            "qtype": "advanced",
+            "corpname": configs["kontext"].get("corpus"),
+            "query": cql,
+            "pcq_pos_neg": "pos",
+            "include_empty": False,
+            "default_attr":"word"
+        }],  
+        "text_types": {},  
+        "context":  {
+            "fc_lemword_wsize": [-5, 5],
+            "fc_lemword": "",
+            "fc_lemword_type": "all",
+            "fc_pos_wsize": [-5, 5],
+            "fc_pos": [],
+            "fc_pos_type": "all"
+        },
+        "async": False
+    }
+    if request.query.fromp:
+        request_data['fromp'] = int(request.query.fromp)
+    req = urllib.request.Request(kontexturl)
+    req.add_header('Content-Type', 'application/json; charset=utf-8')
+    jsondata = json.dumps(request_data)
+    jsondataasbytes = jsondata.encode('utf-8')
+    req.add_header('Content-Length', len(jsondataasbytes))
+    res = urllib.request.urlopen(req, jsondataasbytes)
+    data = json.loads(res.read())
+    concurl = configs["kontext"].get("url") + 'view?corpname=' + configs["kontext"].get("corpus") + '&viewmode=sen&q=' + data['Q'][0]
+    if request.query.fromp:
+        concurl += '&fromp=' + request.query.fromp
+    if request.query.redir and request.query.redir == '1':
+        return redirect(concurl)
+    concurl += '&format=json'
+    res = urllib.request.urlopen(concurl)
+    data = json.loads(res.read())
+    return data
 
 @post(siteconfig["rootPath"] + "login.json")
 def check_login():
