@@ -7,6 +7,11 @@ services:
         volumes:
             - <path to siteconfig.json>:/opt/service/website/siteconfig.json
             - <path to data directory>:/opt/service/data
+        environment:
+            - MYSQL_DB_HOST=${MYSQL_DB_HOST}
+            - MYSQL_DB_USER=${MYSQL_DB_USER}
+            - MYSQL_DB_PASSWORD=${MYSQL_DB_PASSWORD}
+            - MYSQL_DB_PORT=${MYSQL_DB_PORT}
         ports:
             - "8000:8000"
 

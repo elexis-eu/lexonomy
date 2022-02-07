@@ -7,4 +7,4 @@ Markdown>=3.1.0
 PyICU>=2.2
 requests
 PyJWT==1.7.1
-mysql-connector
+mysql-connector-python
