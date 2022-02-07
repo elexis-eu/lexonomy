@@ -605,6 +605,18 @@ def dictread(user):
     else:
         return {"success": True, "id": res["id"], "content": res["xml"]}
 
+@get(siteconfig["rootPath"]+"favicon.ico")
+def favicon():
+    return redirect("furniture/favicon.ico")
+
+@get(siteconfig["rootPath"]+"apple-touch-icon.png")
+def appleTouchIcon():
+    return redirect("furniture/favicon.ico")
+
+@get(siteconfig["rootPath"]+"apple-touch-icon-precomposed.png")
+def appleTouchIconPre():
+    return redirect("furniture/favicon.ico")
+
 @get(siteconfig["rootPath"]+"<dictID>")
 def publicdict(dictID):
     if not ops.dictExists(dictID):

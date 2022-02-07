@@ -5,6 +5,7 @@ import json
 import os
 import os.path
 import sqlite3
+import mysql.connector
 import hashlib
 import random
 import string
@@ -17,6 +18,16 @@ import re
 import secrets
 from collections import defaultdict
 from icu import Locale, Collator
+import logging
+import sys
+
+DB = 'mysql'
+mainDB = None
+linksDB = None
+dictDB = {}
+ques = '%s' if DB == 'mysql' else '?'
+SQL_SEP = '`' if DB == 'mysql' else '['
+SQL_SEP_C = '`' if DB == 'mysql' else ']'
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -33,20 +44,90 @@ prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepw
 
 # db management
 def getDB(dictID):
-    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite"))
-    conn.row_factory = sqlite3.Row
-    conn.executescript("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=on")
-    return conn
+    if DB == 'mysql': 
+        global dictDB
+        try:
+            if dictID not in dictDB or not dictDB[dictID].is_connected():
+                dictDB[dictID] = mysql.connector.connect(
+                    host="host.docker.internal",
+                    user=os.environ['MYSQL_DB_USER'],
+                    database="lexo_" + dictID,
+                    password=os.environ['MYSQL_DB_PASSWORD'],
+                    autocommit=True
+                )
+            conn = dictDB[dictID].cursor(dictionary=True, buffered=True)
+        except:
+            dictDB[dictID] = mysql.connector.connect(
+                host="host.docker.internal",
+                user=os.environ['MYSQL_DB_USER'],
+                database="lexo_" + dictID,
+                password=os.environ['MYSQL_DB_PASSWORD'],
+                autocommit=True
+            )
+            conn = dictDB[dictID].cursor(dictionary=True, buffered=True)
+        return conn
+    else:
+        conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite"))
+        conn.row_factory = sqlite3.Row
+        conn.executescript("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=on")
+        return conn
 
 def getMainDB():
-    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite'))
-    conn.row_factory = sqlite3.Row
-    return conn
+    if DB == 'mysql':
+        global mainDB
+        try:
+            if mainDB == None or not mainDB.is_connected():
+                mainDB = mysql.connector.connect(
+                    host="host.docker.internal",
+                    user=os.environ['MYSQL_DB_USER'],
+                    database="lexo",
+                    password=os.environ['MYSQL_DB_PASSWORD'],
+                    autocommit=True
+                )
+            conn = mainDB.cursor(dictionary=True, buffered=True)
+        except:
+            mainDB = mysql.connector.connect(
+                host="host.docker.internal",
+                user=os.environ['MYSQL_DB_USER'],
+                database="lexo",
+                password=os.environ['MYSQL_DB_PASSWORD'],
+                autocommit=True
+            )
+            conn = mainDB.cursor(dictionary=True, buffered=True)
+        return conn
+    else:
+        conn = sqlite3.connect(os.path.join(
+            siteconfig["dataDir"], 'lexonomy.sqlite'))
+        conn.row_factory = sqlite3.Row
+        return conn
 
 def getLinkDB():
-    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'crossref.sqlite'))
-    conn.row_factory = sqlite3.Row
-    return conn
+    if DB == 'mysql': 
+        global linksDB
+        try:
+            if linksDB == None or not linksDB.is_connected():
+                linksDB = mysql.connector.connect(
+                    host="host.docker.internal",
+                    user=os.environ['MYSQL_DB_USER'],
+                    database="lexo_crossref",
+                    password=os.environ['MYSQL_DB_PASSWORD'],
+                    autocommit=True
+                )
+            conn = linksDB.cursor(dictionary=True)
+        except:
+            linksDB = mysql.connector.connect(
+                host="host.docker.internal",
+                user=os.environ['MYSQL_DB_USER'],
+                database="lexo_crossref",
+                password=os.environ['MYSQL_DB_PASSWORD'],
+                autocommit=True
+            )
+            conn = linksDB.cursor(dictionary=True, buffered=True)
+        return conn
+    else:
+        conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'crossref.sqlite'))
+        conn.row_factory = sqlite3.Row
+        return conn
 
 # SMTP
 # SMTP
@@ -76,7 +157,8 @@ def sendmail(mailTo, mailSubject, mailText):
 def readDictConfigs(dictDB):
     configs = {"siteconfig": siteconfig}
     c = dictDB.execute("select * from configs")
-    for r in c.fetchall():
+    c = c if c else dictDB
+    for r in c.fetchall() if c else []:
         configs[r["id"]] = json.loads(r["json"])
     for conf in ["ident", "publico", "users", "kex", "titling", "flagging",
                  "searchability", "xampl", "thes", "collx", "defo", "xema",
@@ -108,8 +190,9 @@ def addSubentryParentTags(db, entryID, xml):
         subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID")
         if el.parentNode.nodeType != Node.ELEMENT_NODE:
             subentryID = entryID
-        c = db.execute("select s.parent_id, e.title from sub as s inner join entries as e on e.id=s.parent_id where s.child_id=?", (subentryID,))
-        for r in c.fetchall():
+        c = db.execute(f"select s.parent_id, e.title from sub as s inner join entries as e on e.id=s.parent_id where s.child_id={ques}", (subentryID,))
+        c = c if c else db
+        for r in c.fetchall() if c else []:
             pel = doc.createElementNS("http://www.lexonomy.eu/", "lxnm:subentryParent")
             pel.setAttribute("id", str(r["parent_id"]))
             pel.setAttribute("title", r["title"])
@@ -125,12 +208,13 @@ def verifyLogin(email, sessionkey):
     now = datetime.datetime.utcnow()
     yesterday = now - datetime.timedelta(days=1)
     email = email.lower()
-    c = conn.execute("select email, ske_apiKey, ske_username, apiKey, consent from users where email=? and sessionKey=? and sessionLast>=?", (email, sessionkey, yesterday))
-    user = c.fetchone()
+    c = conn.execute(f"select email, ske_apiKey, ske_username, apiKey, consent from users where email={ques} and sessionKey={ques} and sessionLast>={ques}", (email, sessionkey, yesterday))
+    c = c if c else conn
+    user = c.fetchone() if c else None
     if not user:
         return {"loggedin": False, "email": None}
-    conn.execute("update users set sessionLast=? where email=?", (now, email))
-    conn.commit()
+    conn.execute(f"update users set sessionLast={ques} where email={ques}", (now, email))
+    close_db(conn, shouldclose=False)
     ret = {"loggedin": True, "email": email, "isAdmin": email in siteconfig["admins"],
            "ske_username": user["ske_username"], "ske_apiKey": user["ske_apiKey"],
            "apiKey": user["apiKey"], "consent": user["consent"] == 1}
@@ -149,17 +233,18 @@ def verifyLoginAndDictAccess(email, sessionkey, dictDB):
 
 def deleteEntry(db, entryID, email):
     # tell my parents that they need a refresh:
-    db.execute ("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (entryID,))
+    db.execute (f"update entries set needs_refresh=1 where id in (select parent_id from sub where child_id={ques})", (entryID,))
     # delete me:
-    db.execute ("delete from entries where id=?", (entryID,))
+    db.execute (f"delete from entries where id={ques}", (entryID,))
     # tell history that I have been deleted:
-    db.execute ("insert into history(entry_id, action, [when], email, xml) values(?,?,?,?,?)",
+    db.execute (f"insert into history(entry_id, action, {SQL_SEP}when{SQL_SEP_C}, email, xml) values({ques},{ques},{ques},{ques},{ques})",
                 (entryID, "delete", datetime.datetime.utcnow(), email, None))
-    db.commit()
+    close_db(db)
 
 def readEntry(db, configs, entryID):
-    c = db.execute("select * from entries where id=?", (entryID,))
-    row = c.fetchone()
+    c = db.execute(f"select * from entries where id={ques}", (entryID,))
+    c = c if c else db
+    row = c.fetchone() if c else None
     if not row:
         return 0, "", ""
     xml = setHousekeepingAttributes(entryID, row["xml"], configs["subbing"])
@@ -178,25 +263,28 @@ def createEntry(dictDB, configs, entryID, xml, email, historiography):
     needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
     needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
     # entry title already exists?
-    c = dictDB.execute("select id from entries where title = ? and id <> ?", (title, entryID))
-    r = c.fetchone()
+    c = dictDB.execute(f"select id from entries where title = {ques} and id <> {ques}", (title, entryID))
+    c = c if c else dictDB
+    r = c.fetchone() if c else None
     feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
     if entryID:
-        sql = "insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values(?, ?, ?, ?, ?, ?, ?)"
+        sql = f"insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques}, {ques})"
         params = (entryID, xml, title, sortkey, needs_refac, needs_resave, doctype)
     else:
-        sql = "insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values(?, ?, ?, ?, ?, ?)"
+        sql = f"insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques})"
         params = (xml, title, sortkey, needs_refac, needs_resave, doctype)
     c = dictDB.execute(sql, params)
+    c = c if c else dictDB
     entryID = c.lastrowid
-    dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
-    dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "create", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
-    dictDB.commit()
+    dictDB.execute(f"insert into searchables(entry_id, txt, level) values({ques}, {ques}, {ques})", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
+    dictDB.execute(f"insert into history(entry_id, action, {SQL_SEP}when{SQL_SEP_C}, email, xml, historiography) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques})", (entryID, "create", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
+    close_db(dictDB, shouldclose=False)
     return entryID, xml, feedback
 
 def updateEntry(dictDB, configs, entryID, xml, email, historiography):
-    c = dictDB.execute("select id, xml from entries where id=?", (entryID, ))
-    row = c.fetchone()
+    c = dictDB.execute(f"select id, xml from entries where id={ques}", (entryID, ))
+    c = c if c else dictDB
+    row = c.fetchone() if c else None
     xml = setHousekeepingAttributes(entryID, xml, configs["subbing"])
     xml = removeSubentryParentTags(xml)
     newxml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
@@ -217,20 +305,21 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
         if oldxml == newxml:
             return entryID, xml, False, None
         else:
-            dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (entryID,))
+            dictDB.execute(f"update entries set needs_refresh=1 where id in (select parent_id from sub where child_id={ques})", (entryID,))
             title = getEntryTitle(xml, configs["titling"])
             sortkey = getSortTitle(xml, configs["titling"])
             doctype = getDoctype(xml)
             needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
             needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
             # entry title already exists?
-            c = dictDB.execute("select id from entries where title = ? and id <> ?", (title, entryID))
-            r = c.fetchone()
+            c = dictDB.execute(f"select id from entries where title = {ques} and id <> {ques}", (title, entryID))
+            c = c if c else dictDB
+            r = c.fetchone() if c else None
             feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
-            dictDB.execute("update entries set doctype=?, xml=?, title=?, sortkey=?, needs_refac=?, needs_resave=? where id=?", (doctype, xml, title, sortkey, needs_refac, needs_resave, entryID))
-            dictDB.execute("update searchables set txt=? where entry_id=? and level=1", (getEntryTitle(xml, configs["titling"], True), entryID))
-            dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
-            dictDB.commit()
+            dictDB.execute(f"update entries set doctype={ques}, xml={ques}, title={ques}, sortkey={ques}, needs_refac={ques}, needs_resave={ques} where id={ques}", (doctype, xml, title, sortkey, needs_refac, needs_resave, entryID))
+            dictDB.execute(f"update searchables set txt={ques} where entry_id={ques} and level=1", (getEntryTitle(xml, configs["titling"], True), entryID))
+            dictDB.execute(f"insert into history(entry_id, action, {SQL_SEP}when{SQL_SEP_C}, email, xml, historiography) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques})", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
+            close_db(dictDB, shouldclose=False)
             if configs["links"]:
                 xml = updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
             return entryID, xml, True, feedback
@@ -294,28 +383,33 @@ def login(email, password):
         return {"success": False}
     conn = getMainDB()
     passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
-    c = conn.execute("select email from users where email=? and passwordHash=?", (email.lower(), passhash))
-    user = c.fetchone()
+    c = conn.execute(f"select email from users where email={ques} and passwordHash={ques}", (email.lower(), passhash))
+    c = c if c else conn
+    user = c.fetchone() if c else None
     if not user:
         return {"success": False}
     key = generateKey()
     now = datetime.datetime.utcnow()
-    conn.execute("update users set sessionKey=?, sessionLast=? where email=?", (key, now, email))
-    conn.commit()
+    conn.execute(f"update users set sessionKey={ques}, sessionLast={ques} where email={ques}", (key, now, email))
+    close_db(conn)
     return {"success": True, "email": user["email"], "key": key}
 
 def logout(user):
     conn = getMainDB()
-    conn.execute("update users set sessionKey='', sessionLast='' where email=?", (user["email"],))
-    conn.commit()
+    if DB == 'sqlite':
+        conn.execute(f"update users set sessionKey='', sessionLast='' where email={ques}", (user["email"],))
+    else:
+        conn.execute(f"update users set sessionKey='', sessionLast=NULL where email={ques}", (user["email"],))
+    close_db(conn)
     return True
 
 def sendSignupToken(email, remoteip):
     if siteconfig["readonly"]:
         return False    
     conn = getMainDB()
-    c = conn.execute("select email from users where email=?", (email.lower(),))
-    user = c.fetchone()
+    c = conn.execute(f"select email from users where email={ques}", (email.lower(),))
+    c = c if c else conn
+    user = c.fetchone() if c else None
     if not user:
         token = secrets.token_hex()
         tokenurl = siteconfig["baseUrl"] + "createaccount/" + token
@@ -326,8 +420,8 @@ def sendSignupToken(email, remoteip):
         mailText += tokenurl + "\n\n"
         mailText += "For security reasons this link is only valid for two days (until "+expireDate.isoformat()+"). If you did not request an account, you can safely ignore this message. \n\n"
         mailText += "Yours,\nThe Lexonomy team"
-        conn.execute("insert into register_tokens (email, requestAddress, token, expiration) values (?, ?, ?, ?)", (email, remoteip, token, expireDate))
-        conn.commit()
+        conn.execute(f"insert into register_tokens (email, requestAddress, token, expiration) values ({ques}, {ques}, {ques}, {ques})", (email, remoteip, token, expireDate))
+        close_db(conn)
         sendmail(email, mailSubject, mailText)
         return True
     else:
@@ -337,8 +431,9 @@ def sendToken(email, remoteip):
     if siteconfig["readonly"]:
         return False    
     conn = getMainDB()
-    c = conn.execute("select email from users where email=?", (email.lower(),))
-    user = c.fetchone()
+    c = conn.execute(f"select email from users where email={ques}", (email.lower(),))
+    c = c if c else conn
+    user = c.fetchone() if c else None
     if user:
         token = secrets.token_hex()
         tokenurl = siteconfig["baseUrl"] + "recoverpwd/" + token
@@ -349,8 +444,8 @@ def sendToken(email, remoteip):
         mailText += tokenurl + "\n\n"
         mailText += "For security reasons this link is only valid for two days (until "+expireDate.isoformat()+"). If you did not request a password reset, you can safely ignore this message. \n\n"
         mailText += "Yours,\nThe Lexonomy team"
-        conn.execute("insert into recovery_tokens (email, requestAddress, token, expiration) values (?, ?, ?, ?)", (email, remoteip, token, expireDate))
-        conn.commit()
+        conn.execute(f"insert into recovery_tokens (email, requestAddress, token, expiration) values ({ques}, {ques}, {ques}, {ques})", (email, remoteip, token, expireDate))
+        close_db(conn)
         sendmail(email, mailSubject, mailText)
         return True
     else:
@@ -358,8 +453,9 @@ def sendToken(email, remoteip):
 
 def verifyToken(token, tokenType):
     conn = getMainDB()
-    c = conn.execute("select * from "+tokenType+"_tokens where token=? and expiration>=datetime('now') and usedDate is null", (token,))
-    row = c.fetchone()
+    c = conn.execute(f"select * from "+tokenType+f"_tokens where token={ques} and expiration>=datetime('now') and usedDate is null", (token,))
+    c = c if c else conn
+    row = c.fetchone() if c else None
     if row:
         return True
     else:
@@ -367,16 +463,17 @@ def verifyToken(token, tokenType):
 
 def createAccount(token, password, remoteip):
     conn = getMainDB()
-    c = conn.execute("select * from register_tokens where token=? and expiration>=datetime('now') and usedDate is null", (token,))
-    row = c.fetchone()
+    c = conn.execute(f"select * from register_tokens where token={ques} and expiration>=datetime('now') and usedDate is null", (token,))
+    c = c if c else conn
+    row = c.fetchone() if c else None
     if row:
-        c2 = conn.execute("select * from users where email=?", (row["email"],))
-        row2 = c2.fetchone()
+        c2 = conn.execute(f"select * from users where email={ques}", (row["email"],))
+        row2 = c2.fetchone() if c2 else None
         if not row2:
             passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
-            conn.execute("insert into users (email,passwordHash) values (?,?)", (row["email"], passhash))
-            conn.execute("update register_tokens set usedDate=datetime('now'), usedAddress=? where token=?", (remoteip, token))
-            conn.commit()
+            conn.execute(f"insert into users (email,passwordHash) values ({ques},{ques})", (row["email"], passhash))
+            conn.execute(f"update register_tokens set usedDate=datetime('now'), usedAddress={ques} where token={ques}", (remoteip, token))
+            close_db(conn)
             return True
         else:
             return False
@@ -385,46 +482,47 @@ def createAccount(token, password, remoteip):
 
 def resetPwd(token, password, remoteip):
     conn = getMainDB()
-    c = conn.execute("select * from recovery_tokens where token=? and expiration>=datetime('now') and usedDate is null", (token,))
-    row = c.fetchone()
+    c = conn.execute(f"select * from recovery_tokens where token={ques} and expiration>=datetime('now') and usedDate is null", (token,))
+    c = c if c else conn
+    row = c.fetchone() if c else None
     if row:
         passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
-        conn.execute("update users set passwordHash=? where email=?", (passhash, row["email"]))
-        conn.execute("update recovery_tokens set usedDate=datetime('now'), usedAddress=? where token=?", (remoteip, token))
-        conn.commit()
+        conn.execute(f"update users set passwordHash={ques} where email={ques}", (passhash, row["email"]))
+        conn.execute(f"update recovery_tokens set usedDate=datetime('now'), usedAddress={ques} where token={ques}", (remoteip, token))
+        close_db(conn)
         return True
     else:
         return False
 
 def setConsent(email, consent):
     conn = getMainDB()
-    conn.execute("update users set consent=? where email=?", (consent, email))
-    conn.commit()
+    conn.execute(f"update users set consent={ques} where email={ques}", (consent, email))
+    close_db(conn)
     return True
 
 def changePwd(email, password):
     conn = getMainDB()
     passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
-    conn.execute("update users set passwordHash=? where email=?", (passhash, email))
-    conn.commit()
+    conn.execute(f"update users set passwordHash={ques} where email={ques}", (passhash, email))
+    close_db(conn)
     return True
 
 def changeSkeUserName(email, ske_userName):
     conn = getMainDB()
-    conn.execute("update users set ske_username=? where email=?", (ske_userName, email))
-    conn.commit()
+    conn.execute(f"update users set ske_username={ques} where email={ques}", (ske_userName, email))
+    close_db(conn)
     return True
 
 def changeSkeApiKey(email, ske_apiKey):
     conn = getMainDB()
-    conn.execute("update users set ske_apiKey=? where email=?", (ske_apiKey, email))
-    conn.commit()
+    conn.execute(f"update users set ske_apiKey={ques} where email={ques}", (ske_apiKey, email))
+    close_db(conn)
     return True
 
 def updateUserApiKey(user, apiKey):
     conn = getMainDB()
-    conn.execute("update users set apiKey=? where email=?", (apiKey, user["email"]))
-    conn.commit()
+    conn.execute(f"update users set apiKey={ques} where email={ques}", (apiKey, user["email"]))
+    close_db(conn)
     sendApiKeyToSke(user, apiKey)
     return True
 
@@ -438,13 +536,14 @@ def sendApiKeyToSke(user, apiKey):
 
 def prepareApiKeyForSke(email):
     conn = getMainDB()
-    c = conn.execute("select * from users where email=?", (email,))
-    row = c.fetchone()
+    c = conn.execute(f"select * from users where email={ques}", (email,))
+    c = c if c else conn
+    row = c.fetchone() if c else None
     if row:
         if row["apiKey"] == None or row["apiKey"] == "":
             lexapi = generateKey()
-            conn.execute("update users set apiKey=? where email=?", (lexapi, email))
-            conn.commit()
+            conn.execute(f"update users set apiKey={ques} where email={ques}", (lexapi, email))
+            close_db(conn)
         else:
             lexapi = row["apiKey"]
         sendApiKeyToSke(row, lexapi)
@@ -453,32 +552,33 @@ def prepareApiKeyForSke(email):
 
 def processJWT(user, jwtdata):
     conn = getMainDB()
-    c = conn.execute("select * from users where ske_id=?", (jwtdata["user"]["id"],))
-    row = c.fetchone()
+    c = conn.execute(f"select * from users where ske_id={ques}", (jwtdata["user"]["id"],))
+    c = c if c else conn
+    row = c.fetchone() if c else None
     key = generateKey()
     now = datetime.datetime.utcnow()
     if row:
         #if SkE ID in database = log in user
-        conn.execute("update users set sessionKey=?, sessionLast=? where email=?", (key, now, row["email"]))
-        conn.commit()
+        conn.execute(f"update users set sessionKey={ques}, sessionLast={ques} where email={ques}", (key, now, row["email"]))
+        close_db(conn)
         prepareApiKeyForSke(row["email"])
         return {"success": True, "email": row["email"], "key": key}
     else:
         if user["loggedin"]:
             #user logged in = save SkE ID in database
-            conn.execute("update users set ske_id=?, ske_username=?, ske_apiKey=?, sessionKey=?, sessionLast=? where email=?", (jwtdata["user"]["id"], jwtdata["user"]["username"], jwtdata["user"]["api_key"], key, now, user["email"]))
-            conn.commit()
+            conn.execute(f"update users set ske_id={ques}, ske_username={ques}, ske_apiKey={ques}, sessionKey={ques}, sessionLast={ques} where email={ques}", (jwtdata["user"]["id"], jwtdata["user"]["username"], jwtdata["user"]["api_key"], key, now, user["email"]))
+            close_db(conn)
             prepareApiKeyForSke(user["email"])
             return {"success": True, "email": user["email"], "key": key}
         else:
             #user not logged in = register and log in
             email = jwtdata["user"]["email"].lower()
-            c2 = conn.execute("select * from users where email=?", (email,))
-            row2 = c2.fetchone()
+            c2 = conn.execute(f"select * from users where email={ques}", (email,))
+            row2 = c2.fetchone() if c2 else None
             if not row2:
                 lexapi = generateKey()
-                conn.execute("insert into users (email, passwordHash, ske_id, ske_username, ske_apiKey, sessionKey, sessionLast, apiKey) values (?, null, ?, ?, ?, ?, ?, ?)", (email, jwtdata["user"]["id"], jwtdata["user"]["username"], jwtdata["user"]["api_key"], key, now, lexapi))
-                conn.commit()
+                conn.execute(f"insert into users (email, passwordHash, ske_id, ske_username, ske_apiKey, sessionKey, sessionLast, apiKey) values ({ques}, null, {ques}, {ques}, {ques}, {ques}, {ques}, {ques})", (email, jwtdata["user"]["id"], jwtdata["user"]["username"], jwtdata["user"]["api_key"], key, now, lexapi))
+                close_db(conn)
                 prepareApiKeyForSke(email)
                 return {"success": True, "email": email, "key": key}
             else:
@@ -486,7 +586,19 @@ def processJWT(user, jwtdata):
 
 
 def dictExists(dictID):
-    return os.path.isfile(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    if DB == 'sqlite':
+        return os.path.isfile(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    elif DB == 'mysql':
+        conn = mysql.connector.connect(
+            host="host.docker.internal",
+            user=os.environ['MYSQL_DB_USER'],
+            password=os.environ['MYSQL_DB_PASSWORD']
+        )
+        mycursor = conn.cursor()
+        mycursor.execute("SHOW DATABASES LIKE %s", ('lexo_' + dictID,))
+        c = mycursor.fetchone()
+        conn.close()
+        return True if c else False
 
 def suggestDictId():
     dictid = generateDictId()
@@ -501,49 +613,54 @@ def makeDict(dictID, template, title, blurb, email):
         blurb = i18n["Yet another Lexonomy dictionary."]
     if dictID in prohibitedDictIDs or dictExists(dictID):
         return False
-    if not template.startswith("/"):
-        template = "dictTemplates/" + template + ".sqlite"
-    shutil.copy(template, os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    if DB == 'sqlite':
+        if not template.startswith("/"):
+            template = "dictTemplates/" + template + ".sqlite"
+        shutil.copy(template, os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    elif DB == 'mysql':
+        import subprocess
+        p = subprocess.call(["adminscripts/copyMysqlDb.sh", template, dictID], start_new_session=True, close_fds=True)
+
     users = {email: {"canEdit": True, "canConfig": True, "canDownload": True, "canUpload": True}}
     dictDB = getDB(dictID)
-    dictDB.execute("update configs set json=? where id='users'", (json.dumps(users),))
+    dictDB.execute(f"update configs set json={ques} where id='users'", (json.dumps(users),))
     ident = {"title": title, "blurb": blurb}
-    dictDB.execute("update configs set json=? where id='ident'", (json.dumps(ident),))
-    dictDB.commit()
+    dictDB.execute(f"update configs set json={ques} where id='ident'", (json.dumps(ident),))
+    close_db(dictDB, shouldclose=False)
     attachDict(dictDB, dictID)
     return True
 
 def attachDict(dictDB, dictID):
     configs = readDictConfigs(dictDB)
     conn = getMainDB()
-    conn.execute("delete from dicts where id=?", (dictID,))
-    conn.execute("delete from user_dict where dict_id=?", (dictID,))
+    conn.execute(f"delete from dicts where id={ques}", (dictID,))
+    conn.execute(f"delete from user_dict where dict_id={ques}", (dictID,))
     title = configs["ident"]["title"]
-    conn.execute("insert into dicts(id, title) values (?, ?)", (dictID, title))
+    conn.execute(f"insert into dicts(id, title) values ({ques}, {ques})", (dictID, title))
     for email in configs["users"]:
-        conn.execute("insert into user_dict(dict_id, user_email) values (?, ?)", (dictID, email.lower()))
-    conn.commit()
+        conn.execute(f"insert into user_dict(dict_id, user_email) values ({ques}, {ques})", (dictID, email.lower()))
+    close_db(conn)
 
 def cloneDict(dictID, email):
     newID = suggestDictId()
     shutil.copy(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"), os.path.join(siteconfig["dataDir"], "dicts/" + newID + ".sqlite"))
     newDB = getDB(newID)
     res = newDB.execute("select json from configs where id='ident'")
-    row = res.fetchone()
+    row = res.fetchone() if res else None
     ident = {"title": "?", "blurb": "?"}
     if row:
         ident = json.loads(row["json"])
         ident["title"] = i18n["Clone of "] + ident["title"]
-    newDB.execute("update configs set json=? where id='ident'", (json.dumps(ident),))
-    newDB.commit()
+    newDB.execute(f"update configs set json={ques} where id='ident'", (json.dumps(ident),))
+    close_db(newDB)
     attachDict(newDB, newID)
     return {"success": True, "dictID": newID, "title": ident["title"]}
 
 def destroyDict(dictID):
     conn = getMainDB()
-    conn.execute("delete from dicts where id=?", (dictID,))
-    conn.execute("delete from user_dict where dict_id=?", (dictID,))
-    conn.commit()
+    conn.execute(f"delete from dicts where id={ques}", (dictID,))
+    conn.execute(f"delete from user_dict where dict_id={ques}", (dictID,))
+    close_db(conn)
     os.remove(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
     return True
 
@@ -552,8 +669,8 @@ def moveDict(oldID, newID):
         return False
     shutil.move(os.path.join(siteconfig["dataDir"], "dicts/" + oldID + ".sqlite"), os.path.join(siteconfig["dataDir"], "dicts/" + newID + ".sqlite"))
     conn = getMainDB()
-    conn.execute("delete from dicts where id=?", (oldID,))
-    conn.commit()
+    conn.execute(f"delete from dicts where id={ques}", (oldID,))
+    close_db(conn)
     dictDB = getDB(newID)
     attachDict(dictDB, newID)
     return True
@@ -574,8 +691,9 @@ def getDictsByUser(email):
     dicts = []
     email = str(email).lower()
     conn = getMainDB()
-    c = conn.execute("select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email=? order by d.title", (email,))
-    for r in c.fetchall():
+    c = conn.execute(f"select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email={ques} order by d.title", (email,))
+    c = c if c else conn
+    for r in c.fetchall() if c else []:
         info = {"id": r["id"], "title": r["title"], "hasLinks": False}
         try:
             configs = readDictConfigs(getDB(r["id"]))
@@ -593,7 +711,8 @@ def getLangList():
     codes = get_iso639_1()
     conn = getMainDB()
     c = conn.execute("SELECT DISTINCT language FROM dicts WHERE language!='' ORDER BY language")
-    for r in c.fetchall():
+    c = c if c else conn
+    for r in c.fetchall() if c else []:
         lang = next((item for item in codes if item["code"] == r["language"]), {})
         langs.append({"code": r["language"], "language": lang.get("lang")})
     return langs
@@ -602,10 +721,12 @@ def getDictList(lang, withLinks):
     dicts = []
     conn = getMainDB()
     if lang:
-        c = conn.execute("SELECT * FROM dicts WHERE language=? ORDER BY title", (lang, ))
+        c = conn.execute(f"SELECT * FROM dicts WHERE language={ques} ORDER BY title", (lang, ))
+        c = c if c else conn
     else:
         c = conn.execute("SELECT * FROM dicts ORDER BY title")
-    for r in c.fetchall():
+        c = c if c else conn
+    for r in c.fetchall() if c else []:
         info = {"id": r["id"], "title": r["title"], "language": r["language"], "hasLinks": False}
         try:
             configs = readDictConfigs(getDB(r["id"]))
@@ -628,9 +749,10 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
     for d in dicts:
         dictDB = getDB(d["id"])
         if dictDB:
-            query = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND s.txt LIKE ? AND s.level=1"
+            query = f"SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND s.txt LIKE {ques} AND s.level=1"
             c = dictDB.execute(query, (headword+"%", ))
-            for entry in c.fetchall():
+            c = c if c else dictDB
+            for entry in c.fetchall() if c else []:
                 info0 = {"sourceDict": d["id"], "sourceHeadword": entry["hw"]}
                 if entry["entry_id"] and entry["entry_id"] != "":
                     info0["sourceID"] = entry["entry_id"]
@@ -645,12 +767,12 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
                     targetDicts = []
                     for td in getDictList(targetLang, True):
                         targetDicts.append(td["id"])
-                    query2 = "SELECT * FROM links WHERE source_dict=? AND source_id=? AND target_dict IN "+"('"+"','".join(targetDicts)+"')"
+                    query2 = f"SELECT * FROM links WHERE source_dict={ques} AND source_id={ques} AND target_dict IN "+"('"+"','".join(targetDicts)+"')"
                 else:
-                    query2 = "SELECT * FROM links WHERE source_dict=? AND source_id=?"
+                    query2 = f"SELECT * FROM links WHERE source_dict={ques} AND source_id={ques}"
                 data2 = (d["id"], entry["link_id"])
                 c2 = linkDB.execute(query2, data2)
-                for r2 in c2.fetchall():
+                for r2 in c2.fetchall() if c2 else []:
                     info = info0
                     info["targetDict"] = r2["target_dict"]
                     info["confidence"] = r2["confidence"]
@@ -658,21 +780,21 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
                     if r2["target_element"] == "sense" and "_" in r2["target_id"]:
                         lia = r2["target_id"].split("_")
                         info["targetSense"] = lia[1]
-                    query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=1"
+                    query3 = f"SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt={ques} AND s.level=1"
                     c3 = getDB(r2["target_dict"]).execute(query3, (r2["target_id"],))
-                    for r3 in c3.fetchall():
+                    for r3 in c3.fetchall() if c3 else []:
                         info["targetHeadword"] = r3["hw"]
                         info["targetID"] = r3["entry_id"]
                         info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
                         links.append(info)
                 # second, find links with search dict as target
                 if targetLang:
-                    query2 = "SELECT * FROM links WHERE target_dict=? AND target_id=? AND source_dict IN "+"('"+"','".join(targetDicts)+"')"
+                    query2 = f"SELECT * FROM links WHERE target_dict={ques} AND target_id={ques} AND source_dict IN "+"('"+"','".join(targetDicts)+"')"
                 else:
-                    query2 = "SELECT * FROM links WHERE target_dict=? AND target_id=?"
+                    query2 = f"SELECT * FROM links WHERE target_dict={ques} AND target_id={ques}"
                 data2 = (d["id"], entry["link_id"])
                 c2 = linkDB.execute(query2, data2)
-                for r2 in c2.fetchall():
+                for r2 in c2.fetchall() if c2 else []:
                     info = info0
                     info["targetDict"] = r2["source_dict"]
                     info["confidence"] = r2["confidence"]
@@ -680,9 +802,9 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
                     if r2["source_element"] == "sense" and "_" in r2["source_id"]:
                         lia = r2["source_id"].split("_")
                         info["targetSense"] = lia[1]
-                    query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=1"
+                    query3 = f"SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt={ques} AND s.level=1"
                     c3 = getDB(r2["source_dict"]).execute(query3, (r2["source_id"],))
-                    for r3 in c3.fetchall():
+                    for r3 in c3.fetchall() if c3 else []:
                         info["targetHeadword"] = r3["hw"]
                         info["targetID"] = r3["entry_id"]
                         info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
@@ -691,12 +813,14 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
 
 def listUsers(searchtext, howmany):
     conn = getMainDB()
-    c = conn.execute("select * from users where email like ? order by email limit ?", ("%"+searchtext+"%", howmany))
+    c = conn.execute(f"select * from users where email like {ques} order by email limit {howmany}", ("%"+searchtext+"%",))
+    c = c if c else conn
     users = []
-    for r in c.fetchall():
+    for r in c.fetchall() if c else []:
         users.append({"id": r["email"], "title": r["email"]})
-    c = conn.execute("select count(*) as total from users where email like ?", ("%"+searchtext+"%", ))
-    r = c.fetchone()
+    c = conn.execute(f"select count(*) as total from users where email like {ques}", (f"%"+searchtext+"%", ))
+    c = c if c else conn
+    r = c.fetchone() if c else None
     total = r["total"]
     return {"entries":users, "total": total}
 
@@ -706,8 +830,8 @@ def createUser(xml):
     email = root.attrib["email"]
     passhash = hashlib.sha1(root.attrib["password"].encode("utf-8")).hexdigest();
     conn = getMainDB()
-    conn.execute("insert into users(email, passwordHash) values(?, ?)", (email.lower(), passhash))
-    conn.commit()
+    conn.execute(f"insert into users(email, passwordHash) values({ques}, {ques})", (email.lower(), passhash))
+    close_db(conn)
     return {"entryID": email, "adjustedXml": readUser(email)["xml"]}
 
 def updateUser(email, xml):
@@ -716,27 +840,28 @@ def updateUser(email, xml):
     if root.attrib['password']:
         passhash = hashlib.sha1(root.attrib["password"].encode("utf-8")).hexdigest();
         conn = getMainDB()
-        conn.execute("update users set passwordHash=? where email=?", (passhash, email.lower()))
-        conn.commit()
+        conn.execute(f"update users set passwordHash={ques} where email={ques}", (passhash, email.lower()))
+        close_db(conn)
     return readUser(email)
 
 def deleteUser(email):
     conn = getMainDB()
-    conn.execute("delete from users where email=?", (email.lower(),))
-    conn.commit()
+    conn.execute(f"delete from users where email={ques}", (email.lower(),))
+    close_db(conn)
     return True
 
 def readUser(email):
     conn = getMainDB()
-    c = conn.execute("select * from users where email=?", (email.lower(), ))
-    r = c.fetchone()
+    c = conn.execute(f"select * from users where email={ques}", (email.lower(), ))
+    c = c if c else conn
+    r = c.fetchone() if c else None
     if r:
         if r["sessionLast"]:
-            xml =  "<user lastSeen='"+r["sessionLast"]+"'>"
+            xml =  "<user lastSeen='"+str(r["sessionLast"])+"'>"
         else:
             xml =  "<user>"
-        c2 = conn.execute("select d.id, d.title from user_dict as ud inner join dicts as d on d.id=ud.dict_id  where ud.user_email=? order by d.title", (r["email"], ))
-        for r2 in c2.fetchall():
+        c2 = conn.execute(f"select d.id, d.title from user_dict as ud inner join dicts as d on d.id=ud.dict_id  where ud.user_email={ques} order by d.title", (r["email"], ))
+        for r2 in c2.fetchall() if c2 else []:
             xml += "<dict id='" + r2["id"] + "' title='" + clean4xml(r2["title"]) + "'/>"
         xml += "</user>"
         return {"email": r["email"], "xml": xml}
@@ -745,23 +870,26 @@ def readUser(email):
 
 def listDicts(searchtext, howmany):
     conn = getMainDB()
-    c = conn.execute("select * from dicts where id like ? or title like ? order by id limit ?", ("%"+searchtext+"%", "%"+searchtext+"%", howmany))
+    c = conn.execute(f"select * from dicts where id like {ques} or title like {ques} order by id limit {howmany}", (f"%"+searchtext+"%", "%"+searchtext+"%"))
+    c = c if c else conn
     dicts = []
-    for r in c.fetchall():
+    for r in c.fetchall() if c else []:
         dicts.append({"id": r["id"], "title": r["title"]})
-    c = conn.execute("select count(*) as total from dicts where id like ? or title like ?", ("%"+searchtext+"%", "%"+searchtext+"%"))
-    r = c.fetchone()
+    c = conn.execute(f"select count(*) as total from dicts where id like {ques} or title like {ques}", (f"%"+searchtext+"%", "%"+searchtext+"%"))
+    c = c if c else conn
+    r = c.fetchone() if c else None
     total = r["total"]
     return {"entries": dicts, "total": total}
 
 def readDict(dictId):
     conn = getMainDB()
-    c = conn.execute("select * from dicts where id=?", (dictId, ))
-    r = c.fetchone()
+    c = conn.execute(f"select * from dicts where id={ques}", (dictId, ))
+    c = c if c else conn
+    r = c.fetchone() if c else None
     if r:
         xml =  "<dict id='"+clean4xml(r["id"])+"' title='"+clean4xml(r["title"])+"'>"
-        c2 = conn.execute("select u.email from user_dict as ud inner join users as u on u.email=ud.user_email where ud.dict_id=? order by u.email", (r["id"], ))
-        for r2 in c2.fetchall():
+        c2 = conn.execute(f"select u.email from user_dict as ud inner join users as u on u.email=ud.user_email where ud.dict_id={ques} order by u.email", (r["id"], ))
+        for r2 in c2.fetchall() if c2 else []:
             xml += "<user email='" + r2["email"] + "'/>"
         xml += "</dict>"
         return {"id": r["id"], "xml": xml}
@@ -793,17 +921,18 @@ def setHousekeepingAttributes(entryID, xml, subbing):
     return xml
 
 def exportEntryXml(dictDB, dictID, entryID, configs, baseUrl):
-    c = dictDB.execute("select * from entries where id=?", (entryID,))
-    row = c.fetchone()
+    c = dictDB.execute(f"select * from entries where id={ques}", (entryID,))
+    c = c if c else dictDB
+    row = c.fetchone() if c else None
     if row:
         xml = setHousekeepingAttributes(entryID, row["xml"], configs["subbing"])
         attribs = " this=\"" + baseUrl + dictID + "/" + str(row["id"]) + ".xml\""
-        c2 = dictDB.execute("select e1.id, e1.title from entries as e1 where e1.sortkey<(select sortkey from entries where id=?) order by e1.sortkey desc limit 1", (entryID, ))
-        r2 = c2.fetchone()
+        c2 = dictDB.execute(f"select e1.id, e1.title from entries as e1 where e1.sortkey<(select sortkey from entries where id={ques}) order by e1.sortkey desc limit 1", (entryID, ))
+        r2 = c2.fetchone() if c2 else None
         if r2:
             attribs += " previous=\"" + baseUrl + dictID + "/" + str(r2["id"]) + ".xml\""
-        c2 = dictDB.execute("select e1.id, e1.title from entries as e1 where e1.sortkey>(select sortkey from entries where id=?) order by e1.sortkey asc limit 1", (entryID, ))
-        r2 = c2.fetchone()
+        c2 = dictDB.execute(f"select e1.id, e1.title from entries as e1 where e1.sortkey>(select sortkey from entries where id={ques}) order by e1.sortkey asc limit 1", (entryID, ))
+        r2 = c2.fetchone() if c2 else None
         if r2:
             attribs += " next=\"" + baseUrl + dictID + "/" + str(r2["id"]) + ".xml\""
         xml = "<lexonomy" + attribs + ">" + xml + "</lexonomy>"
@@ -815,8 +944,9 @@ def readNabesByEntryID(dictDB, dictID, entryID, configs):
     nabes_before = []
     nabes_after = []
     nabes = []
-    c = dictDB.execute("select e1.id, e1.title, e1.sortkey from entries as e1 where e1.doctype=? ", (configs["xema"]["root"],))
-    for r in c.fetchall():
+    c = dictDB.execute(f"select e1.id, e1.title, e1.sortkey from entries as e1 where e1.doctype={ques} ", (configs["xema"]["root"],))
+    c = c if c else dictDB
+    for r in c.fetchall() if c else []:
         nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
 
     # sort by selected locale
@@ -838,8 +968,9 @@ def readNabesByText(dictDB, dictID, configs, text):
     nabes_before = []
     nabes_after = []
     nabes = []
-    c = dictDB.execute("select e1.id, e1.title, e1.sortkey from entries as e1 where e1.doctype=? ", (configs["xema"]["root"],))
-    for r in c.fetchall():
+    c = dictDB.execute(f"select e1.id, e1.title, e1.sortkey from entries as e1 where e1.doctype={ques} ", (configs["xema"]["root"],))
+    c = c if c else dictDB
+    for r in c.fetchall() if c else []:
         nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
 
     # sort by selected locale
@@ -859,8 +990,12 @@ def readRandoms(dictDB):
     limit = 75
     more = False
     randoms = []
-    c = dictDB.execute("select id, title, sortkey from entries where doctype=? and id in (select id from entries order by random() limit ?)", (configs["xema"]["root"], limit))
-    for r in c.fetchall():
+    if DB == 'sqlite':
+        c = dictDB.execute(f"select id, title, sortkey from entries where doctype={ques} and id in (select id from entries order by random() limit {limit})", (configs["xema"]["root"],))
+    elif DB == 'mysql':
+        c = dictDB.execute(f"select id, title, sortkey from entries where doctype={ques} order by RAND() limit {limit}", (configs["xema"]["root"],))
+    c = c if c else dictDB
+    for r in c.fetchall() if c else []:
         randoms.append({"id": r["id"], "title": r["title"], "sortkey": r["sortkey"]})
 
     # sort by selected locale
@@ -868,14 +1003,20 @@ def readRandoms(dictDB):
     randoms.sort(key=lambda x: collator.getSortKey(x['sortkey']))
 
     c = dictDB.execute("select count(*) as total from entries")
-    r = c.fetchone()
+    c = c if c else dictDB
+    r = c.fetchone() if c else None
     if r["total"] > limit:
         more = True
     return {"entries": randoms, "more": more}
 
 def readRandomOne(dictDB, dictID, configs):
-    c = dictDB.execute("select id, title, xml from entries where id in (select id from entries where doctype=? order by random() limit 1)", (configs["xema"]["root"], ))
-    r = c.fetchone()
+    if DB == 'sqlite':
+        c = dictDB.execute(f"select id, title, xml from entries where id in (select id from entries where doctype={ques} order by random() limit 1)", (configs["xema"]["root"], ))
+    elif DB == 'mysql':
+        c = dictDB.execute(
+            f"select id, title, xml from entries where doctype={ques} order by RAND() limit 1", (configs["xema"]["root"], ))
+    c = c if c else dictDB
+    r = c.fetchone() if c else None
     if r:
         return {"id": r["id"], "title": r["title"], "xml": r["xml"]}
     else:
@@ -914,10 +1055,11 @@ def download(dictDB, dictID, configs):
         rootname = "lexonomy"
     yield "<"+rootname+">\n"
     c = dictDB.execute("select id, xml from entries")
+    c = c if c else dictDB
 
     transform = download_xslt(configs)
 
-    for r in c.fetchall():
+    for r in c.fetchall() if c else []:
         xml = setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
         xml_xsl, success = transform(xml)
         if not success:
@@ -929,11 +1071,12 @@ def download(dictDB, dictID, configs):
     yield "</"+rootname+">\n"
 
 def purge(dictDB, email, historiography):
-    dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', ?, ?, xml, ? from entries", (str(datetime.datetime.utcnow()), email, json.dumps(historiography)))
+    dictDB.execute(f"insert into history(entry_id, action, {SQL_SEP}when{SQL_SEP_C}, email, xml, historiography) select id, 'purge', {ques}, {ques}, xml, {ques} from entries", (str(datetime.datetime.utcnow()), email, json.dumps(historiography)))
     dictDB.execute("delete from entries")
-    dictDB.commit()
-    dictDB.execute("vacuum")
-    dictDB.commit()
+    close_db(dictDB, True)
+    if DB == 'sqlite':
+        dictDB.execute("vacuum")
+    close_db(dictDB)
     return True
 
 def showImportErrors(filename, truncate):
@@ -953,8 +1096,11 @@ def importfile(dictID, filename, email):
         return checkImportStatus(pidfile, errfile)
     pidfile_f = open(pidfile, "w")
     errfile_f = open(errfile, "w")
-    dbpath = os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")
-    p = subprocess.Popen(["adminscripts/import.py", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
+    if DB == 'sqlite': 
+        dbpath = os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")
+        p = subprocess.Popen(["adminscripts/import.py", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
+    else:
+        p = subprocess.Popen(["adminscripts/importMysql.py", dictID, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
     return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
 
 def checkImportStatus(pidfile, errfile):
@@ -980,23 +1126,26 @@ def checkImportStatus(pidfile, errfile):
 
 def readDoctypesUsed(dictDB):
     c = dictDB.execute("select doctype from entries group by doctype order by count(*) desc")
+    c = c if c else dictDB
     doctypes = []
-    for r in c.fetchall():
+    for r in c.fetchall() if c else []:
         doctypes.append(r["doctype"])
     return doctypes
 
 def getLastEditedEntry(dictDB, email):
-    c = dictDB.execute("select entry_id from history where email=? order by [when] desc limit 1", (email, ))
-    r = c.fetchone()
+    c = dictDB.execute(f"select entry_id from history where email={ques} order by {SQL_SEP}when{SQL_SEP_C} desc limit 1", (email, ))
+    c = c if c else dictDB
+    r = c.fetchone() if c else None
     if r:
         return str(r["entry_id"])
     else:
         return ""
 
 def listEntriesById(dictDB, entryID, configs):
-    c = dictDB.execute("select e.id, e.title, e.xml from entries as e where e.id=?", (entryID,))
+    c = dictDB.execute(f"select e.id, e.title, e.xml from entries as e where e.id={ques}", (entryID,))
+    c = c if c else dictDB
     entries = []
-    for r in c.fetchall():
+    for r in c.fetchall() if c else []:
         xml = setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
         entries.append({"id": r["id"], "title": r["title"], "xml": xml})
     return entries
@@ -1006,12 +1155,14 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
     if searchtext == "":
         sqlc = "select count(*) as total from entries"
         cc = dictDB.execute(sqlc)
-        rc = cc.fetchone()
+        cc = cc if cc else dictDB
+        rc = cc.fetchone() if cc else None
         if int(rc["total"]) > 1000:
             sqlf = "select * from entries order by sortkey limit 200"
             cf = dictDB.execute(sqlf)
+            cf = cf if cf else dictDB
             entries = []
-            for rf in cf.fetchall():
+            for rf in cf.fetchall() if cf else []:
                 item = {"id": rf["id"], "title": rf["title"], "sortkey": rf["sortkey"]}
                 entries.append(item)
             return rc["total"], entries, True
@@ -1032,28 +1183,29 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
         sortdesc = not sortdesc
 
     if modifier == "start":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?) group by e.id order by s.level"
+        sql1 = f"select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + f" from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or s.txt like {ques}) group by e.id order by s.level"
         params1 = (doctype, lowertext+"%", searchtext+"%")
-        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?)"
+        sql2 = f"select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or s.txt like {ques})"
         params2 = (doctype, lowertext+"%", searchtext+"%")
     elif modifier == "wordstart":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or LOWER(s.txt) like ? or s.txt like ? or s.txt like ?) group by e.id order by s.level"
+        sql1 = f"select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + f" from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or LOWER(s.txt) like {ques} or s.txt like {ques} or s.txt like {ques}) group by e.id order by s.level"
         params1 = (doctype, lowertext + "%", "% " + lowertext + "%", searchtext + "%", "% " + searchtext + "%")
-        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or LOWER(s.txt) like ? or s.txt like ? or s.txt like ?)"
+        sql2 = f"select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or LOWER(s.txt) like {ques} or s.txt like {ques} or s.txt like {ques})"
         params2 = (doctype, lowertext + "%", "% " + lowertext + "%", searchtext + "%", "% " + searchtext + "%")
     elif modifier == "substring":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?) group by e.id order by s.level"
+        sql1 = f"select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + f" from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or s.txt like {ques}) group by e.id order by s.level"
         params1 = (doctype, "%" + lowertext + "%", "%" + searchtext + "%")
-        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (LOWER(s.txt) like ? or s.txt like ?)"
+        sql2 = f"select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or s.txt like {ques})"
         params2 = (doctype, "%" + lowertext + "%", "%" + searchtext + "%")
     elif modifier == "exact":
-        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + " from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=? group by e.id order by s.level"
+        sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + f" from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and s.txt={ques} group by e.id order by s.level"
         params1 = (doctype, searchtext)
-        sql2 = "select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=?"
+        sql2 = f"select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and s.txt={ques}"
         params2 = (doctype, searchtext)
     c1 = dictDB.execute(sql1, params1)
+    c1 = c1 if c1 else dictDB
     entries = []
-    for r1 in c1.fetchall():
+    for r1 in c1.fetchall() if c1 else []:
         item = {"id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"]}
         if "flag_element" in configs["flagging"]:
             item["flag"] = extractText(r1["xml"], configs["flagging"]["flag_element"])
@@ -1070,16 +1222,17 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
     entries = entries[0:int(howmany)]
 
     c2 = dictDB.execute(sql2, params2)
-    r2 = c2.fetchone()
+    c2 = c2 if c2 else dictDB
+    r2 = c2.fetchone() if c2 else None
     total = r2["total"]
     return total, entries, False
 
 def listEntriesPublic(dictDB, dictID, configs, searchtext):
     howmany = 100
-    sql_list = "select s.txt, min(s.level) as level, e.id, e.title, e.sortkey, case when s.txt=? then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like ? and e.doctype=? group by e.id order by priority, level, s.level"
+    sql_list = f"select s.txt, min(s.level) as level, e.id, e.title, e.sortkey, case when s.txt={ques} then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like {ques} and e.doctype={ques} group by e.id order by priority, level, s.level"
     c1 = dictDB.execute(sql_list, ("%"+searchtext+"%", "%"+searchtext+"%", configs["xema"].get("root")))
     entries = []
-    for r1 in c1.fetchall():
+    for r1 in c1.fetchall() if c1 else []:
         item = {"id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"], "exactMatch": (r1["level"] == 1 and r1["priority"] == 1)}
         if r1["level"] > 1:
             item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
@@ -1110,25 +1263,27 @@ def extractFirstText(xml):
 def getDictStats(dictDB):
     res = {"entryCount": 0, "needResave": 0}
     c = dictDB.execute("select count(*) as entryCount from entries")
-    r = c.fetchone()
+    c = c if c else dictDB
+    r = c.fetchone() if c else None
     res["entryCount"] = r["entryCount"]
     c = dictDB.execute("select count(*) as needResave from entries where needs_resave=1 or needs_refresh=1 or needs_refac=1")
-    r = c.fetchone()
+    c = c if c else dictDB
+    r = c.fetchone() if c else None
     res["needResave"] = r["needResave"]
     return res
 
 def updateDictConfig(dictDB, dictID, configID, content):
-    dictDB.execute("delete from configs where id=?", (configID, ))
-    dictDB.execute("insert into configs(id, json) values(?, ?)", (configID, json.dumps(content)))
-    dictDB.commit()
+    dictDB.execute(f"delete from configs where id={ques}", (configID, ))
+    dictDB.execute(f"insert into configs(id, json) values({ques}, {ques})", (configID, json.dumps(content)))
+    close_db(dictDB, shouldclose=False)
     
     if configID == "ident":
         attachDict(dictDB, dictID)
         if content.get('lang'):
             lang = content.get('lang')
             conn = getMainDB()
-            conn.execute("UPDATE dicts SET language=? WHERE id=?", (lang, dictID))
-            conn.commit()
+            conn.execute(f"UPDATE dicts SET language={ques} WHERE id={ques}", (lang, dictID))
+            close_db(conn, shouldclose=False)
         return content, False
     elif configID == 'users':
         attachDict(dictDB, dictID)
@@ -1138,10 +1293,11 @@ def updateDictConfig(dictDB, dictID, configID, content):
         return content, resaveNeeded
     elif configID == "links":
         resaveNeeded = flagForResave(dictDB)
-        c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='linkables'")
-        if not c.fetchone():
-            dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT)")
-            dictDB.execute("CREATE INDEX link ON linkables (txt)")
+        if DB == 'sqlite':
+            c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='linkables'")
+            if not c.fetchone():
+                dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT)")
+                dictDB.execute("CREATE INDEX link ON linkables (txt)")
         return content, resaveNeeded
     elif configID == "subbing":
         refacNeeded = flagForRefac(dictDB)
@@ -1151,12 +1307,14 @@ def updateDictConfig(dictDB, dictID, configID, content):
 
 def flagForResave(dictDB):
     c = dictDB.execute("update entries set needs_resave=1")
-    dictDB.commit()
+    c = c if c else dictDB
+    close_db(dictDB)
     return (c.rowcount > 0)
 
 def flagForRefac(dictDB):
     c = dictDB.execute("update entries set needs_refac=1")
-    dictDB.commit()
+    c = c if c else dictDB
+    close_db(dictDB)
     return (c.rowcount > 0)
 
 def makeQuery(lemma):
@@ -1169,15 +1327,16 @@ def makeQuery(lemma):
 
 def clearRefac(dictDB):
     dictDB.execute("update entries set needs_refac=0, needs_refresh=0")
-    dictDB.commit()
+    close_db(dictDB, shouldclose=False)
 
 
 def refac(dictDB, dictID, configs):
     from xml.dom import minidom, Node
     if len(configs['subbing']) == 0:
         return False
-    c = dictDB.execute("select e.id, e.xml, h.email from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 order by h.[when] asc limit 1")
-    r = c.fetchone()
+    c = dictDB.execute(f"select e.id, e.xml, h.email from entries as e left outer join history as h on h.entry_id=e.id where e.needs_refac=1 order by h.{SQL_SEP}when{SQL_SEP_C} asc limit 1")
+    c = c if c else dictDB
+    r = c.fetchone() if c else None
     if not r:
         return False
     entryID = r["id"]
@@ -1203,7 +1362,7 @@ def refac(dictDB, dictID, configs):
                     p = p.parentNode
                 if not isSubSub:
                     els.append(el)
-    dictDB.execute("delete from sub where parent_id=?", (entryID, ))
+    dictDB.execute(f"delete from sub where parent_id={ques}", (entryID, ))
     # keep saving subentries of the current entry until there are no more subentries to save:
     if len(els) > 0:
         for el in els:
@@ -1212,18 +1371,21 @@ def refac(dictDB, dictID, configs):
             if subentryID:
                 subentryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, xml, email.lower(), {"refactoredFrom":entryID})
                 el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", str(subentryID))
-                dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
+                dictDB.execute(f"insert into sub(parent_id, child_id) values({ques},{ques})", (entryID, subentryID))
                 if changed:
-                    dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?) and id<>?", (subentryID, entryID))
+                    dictDB.execute(f"update entries set needs_refresh=1 where id in (select parent_id from sub where child_id={ques}) and id<>{ques}", (subentryID, entryID))
             else:
                 subentryID, adjustedXml, feedback = createEntry(dictDB, configs, None, xml, email.lower(), {"refactoredFrom":entryID})
                 el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", str(subentryID))
                 subentryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, el.toxml(), email.lower(), {"refactoredFrom":entryID})
-                dictDB.execute("insert into sub(parent_id, child_id) values(?,?)", (entryID, subentryID))
-                dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (subentryID, ))
+                dictDB.execute(f"insert into sub(parent_id, child_id) values({ques},{ques})", (entryID, subentryID))
+                if DB == 'mysql':
+                    dictDB.execute(f"update entries set needs_refresh=1 where id in (select parent_id from sub where child_id={subentryID})", multi=True )
+                else:
+                    dictDB.execute(f"update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (subentryID, ))
     xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
-    dictDB.execute("update entries set xml=?, needs_refac=0 where id=?", (xml, entryID))
-    dictDB.commit()
+    dictDB.execute(f"update entries set xml={ques}, needs_refac=0 where id={ques}", (xml, entryID))
+    close_db(dictDB, shouldclose= False)
 
 def refresh(dictDB, dictID, configs):
     from xml.dom import minidom, Node
@@ -1232,7 +1394,8 @@ def refresh(dictDB, dictID, configs):
     # takes one entry that needs refreshing and sucks into it the latest versions of its subentries
     # get one entry that needs refreshing where none of its children needs refreshing
     c = dictDB.execute("select pe.id, pe.xml from entries as pe left outer join sub as s on s.parent_id=pe.id left join entries as ce on ce.id=s.child_id where pe.needs_refresh=1 and (ce.needs_refresh is null or ce.needs_refresh=0) limit 1")
-    r = c.fetchone()
+    c = c if c else dictDB
+    r = c.fetchone() if c else None
     if not r:
         return False
     parentID = r["id"]
@@ -1258,8 +1421,9 @@ def refresh(dictDB, dictID, configs):
         if el: #if such en element exists
             subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID")
             # get the subentry from the database and inject it into the parent's xml:
-            c = dictDB.execute("select xml from entries where id=?", (subentryID, ))
-            r = c.fetchone()
+            c = dictDB.execute(f"select xml from entries where id={ques}", (subentryID, ))
+            c = c if c else dictDB
+            r = c.fetchone() if c else None
             if not r:
                 el.parentNode.removeChild(el)
             else:
@@ -1276,38 +1440,41 @@ def refresh(dictDB, dictID, configs):
                     el.removeAttributeNS("http://www.lexonomy.eu/", "done")
             parentXml = parentDoc.toxml().replace('<?xml version="1.0" ?>', '').strip()
             # save the parent's xml (into which all subentries have been injected by now) and tell it that it needs a resave:
-            dictDB.execute("update entries set xml=?, needs_refresh=0, needs_resave=1 where id=?", (parentXml, parentID))
+            dictDB.execute(f"update entries set xml={ques}, needs_refresh=0, needs_resave=1 where id={ques}", (parentXml, parentID))
             return True
 
 def resave(dictDB, dictID, configs):
     from xml.dom import minidom, Node
     c = dictDB.execute("select id, xml from entries where needs_resave=1")
-    for r in c.fetchall():
+    c = c if c else dictDB
+    for r in c.fetchall() if c else []:
         entryID = r["id"]
         xml = r["xml"]
         xml = re.sub(r"\s+xmlns:lxnm=['\"]http:\/\/www\.lexonomy\.eu\/[\"']", "", xml)
         xml = re.sub(r"^<([^>^ ]*) ", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", xml)
-        dictDB.execute("update entries set needs_resave=0, title=?, sortkey=? where id=?", (getEntryTitle(xml, configs["titling"]), getSortTitle(xml, configs["titling"]), entryID))
-        dictDB.execute("delete from searchables where entry_id=?", (entryID,))
-        dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
-        dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True).lower(), 1))
+        dictDB.execute(f"update entries set needs_resave=0, title={ques}, sortkey={ques} where id={ques}", (getEntryTitle(xml, configs["titling"]), getSortTitle(xml, configs["titling"]), entryID))
+        dictDB.execute(f"delete from searchables where entry_id={ques}", (entryID,))
+        dictDB.execute(f"insert into searchables(entry_id, txt, level) values({ques}, {ques}, {ques})", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
+        dictDB.execute(f"insert into searchables(entry_id, txt, level) values({ques}, {ques}, {ques})", (entryID, getEntryTitle(xml, configs["titling"], True).lower(), 1))
         headword = getEntryHeadword(xml, configs["titling"].get("headword"))
         for searchable in getEntrySearchables(xml, configs):
             if searchable != headword:
-                dictDB.execute("insert into searchables(entry_id, txt, level) values(?,?,?)", (entryID, searchable, 2))
+                dictDB.execute(f"insert into searchables(entry_id, txt, level) values({ques},{ques},{ques})", (entryID, searchable, 2))
         if configs["links"]:
             updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
-    dictDB.commit()
+    close_db(dictDB, shouldclose=False)
     return True
 
 def getEntryLinks(dictDB, dictID, entryID):
     ret = {"out": [], "in": []}
-    cl = dictDB.execute("SELECT count(*) as count FROM sqlite_master WHERE type='table' and name='linkables'")
-    rl = cl.fetchone()
-    if rl['count'] > 0:
-        c = dictDB.execute("SELECT * FROM linkables WHERE entry_id=?", (entryID,))
+    if DB == 'sqlite':
+        cl = dictDB.execute("SELECT count(*) as count FROM sqlite_master WHERE type='table' and name='linkables'")
+        rl = cl.fetchone() if cl else None
+    if DB != 'sqlite' or rl['count'] > 0:
+        c = dictDB.execute(f"SELECT * FROM linkables WHERE entry_id={ques}", (entryID,))
+        c = c if c else dictDB
         conn = getLinkDB()
-        for r in c.fetchall():
+        for r in c.fetchall() if c else []:
             ret["out"] = ret["out"] + links_get(dictID, r["element"], r["txt"], "", "", "")
             ret["in"] = ret["in"] + links_get("", "", "", dictID, r["element"], r["txt"])
     return ret
@@ -1317,10 +1484,11 @@ def updateEntryLinkables(dictDB, entryID, xml, configs, save=True, save_xml=True
     doc = minidom.parseString(xml)
     ret = []
     # table may not exists for older dictionaries
-    c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='linkables'")
-    if not c.fetchone():
-        dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT)")
-        dictDB.execute("CREATE INDEX link ON linkables (txt)")
+    if DB == 'sqlite':
+        c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='linkables'")
+        if not c.fetchone():
+            dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT)")
+            dictDB.execute("CREATE INDEX link ON linkables (txt)")
 
     for linkref in configs["links"].values():
         for el in doc.getElementsByTagName(linkref["linkElement"]):
@@ -1348,12 +1516,12 @@ def updateEntryLinkables(dictDB, entryID, xml, configs, save=True, save_xml=True
             ret.append({'element': linkref["linkElement"], "identifier": identifier, "preview": preview})
     xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
     if save:
-        dictDB.execute("delete from linkables where entry_id=?", (entryID,))
+        dictDB.execute(f"delete from linkables where entry_id={ques}", (entryID,))
         for linkable in ret:
-            dictDB.execute("insert into linkables(entry_id, txt, element, preview) values(?,?,?,?)", (entryID, linkable["identifier"], linkable["element"], linkable["preview"]))
+            dictDB.execute(f"insert into linkables(entry_id, txt, element, preview) values({ques},{ques},{ques},{ques})", (entryID, linkable["identifier"], linkable["element"], linkable["preview"]))
     if save_xml and len(ret)>0:
-        dictDB.execute("update entries set xml=? where id=?", (xml, entryID))
-    dictDB.commit()
+        dictDB.execute(f"update entries set xml={ques} where id={ques}", (xml, entryID))
+    close_db(dictDB)
     return xml
 
 def getEntrySearchables(xml, configs):
@@ -1367,8 +1535,9 @@ def getEntrySearchables(xml, configs):
     return ret
 
 def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
-    c = dictDB.execute("select id, xml from entries where id=?", (entryID,))
-    row = c.fetchone()
+    c = dictDB.execute(f"select id, xml from entries where id={ques}", (entryID,))
+    c = c if c else dictDB
+    row = c.fetchone() if c else None
     xml = row["xml"] if row else ""
     xml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
     xml = re.sub(r"\=\"([^\"]*)\"", r"='\1'", xml)
@@ -1376,13 +1545,13 @@ def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
     xml = addFlag(xml, flag, configs["flagging"], configs["xema"])
 
     # tell my parents that they need a refresh:
-    dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (entryID, ))
+    dictDB.execute(f"update entries set needs_refresh=1 where id in (select parent_id from sub where child_id={ques})", (entryID, ))
     # update me
     needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
     needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
-    dictDB.execute("update entries set doctype=?, xml=?, title=?, sortkey=$sortkey, needs_refac=?, needs_resave=? where id=?", (getDoctype(xml), xml, getEntryTitle(xml, configs["titling"]), getSortTitle(xml, configs["titling"]), needs_refac, needs_resave, entryID))
-    dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
-    dictDB.commit()
+    dictDB.execute(f"update entries set doctype={ques}, xml={ques}, title={ques}, sortkey=$sortkey, needs_refac={ques}, needs_resave={ques} where id={ques}", (getDoctype(xml), xml, getEntryTitle(xml, configs["titling"]), getSortTitle(xml, configs["titling"]), needs_refac, needs_resave, entryID))
+    dictDB.execute(f"insert into history(entry_id, action, {SQL_SEP}when{SQL_SEP_C}, email, xml, historiography) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques})", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
+    close_db(dictDB)
     return entryID
 
 
@@ -1447,8 +1616,9 @@ def getFlagElementInString(path, xml):
 
 def readDictHistory(dictDB, dictID, configs, entryID):
     history = []
-    c = dictDB.execute("select * from history where entry_id=? order by [when] desc", (entryID,))
-    for row in c.fetchall():
+    c = dictDB.execute(f"select * from history where entry_id={ques} order by {SQL_SEP}when{SQL_SEP_C} desc", (entryID,))
+    c = c if c else dictDB
+    for row in c.fetchall() if c else []:
         xml = row["xml"]
         if row["xml"]:
             xml = setHousekeepingAttributes(entryID, row["xml"], configs["subbing"])
@@ -1457,8 +1627,9 @@ def readDictHistory(dictDB, dictID, configs, entryID):
 
 def verifyUserApiKey(email, apikey):
     conn = getMainDB()
-    c = conn.execute("select email from users where email=? and apiKey=?", (email, apikey))
-    row = c.fetchone()
+    c = conn.execute(f"select email from users where email={ques} and apiKey={ques}", (email, apikey))
+    c = c if c else conn
+    row = c.fetchone() if c else None
     if not row or siteconfig["readonly"]:
         return {"valid": False}
     else:
@@ -1467,21 +1638,25 @@ def verifyUserApiKey(email, apikey):
 def links_add(source_dict, source_el, source_id, target_dict, target_el, target_id, confidence=0, conn=None):
     if not conn:
         conn = getLinkDB()
-    c = conn.execute("SELECT * FROM links WHERE source_dict=? AND source_element=? AND source_id=? AND target_dict=? AND target_element=? AND target_id=?", (source_dict, source_el, source_id, target_dict, target_el, target_id))
-    row = c.fetchone()
+    c = conn.execute(f"SELECT * FROM links WHERE source_dict={ques} AND source_element={ques} AND source_id={ques} AND target_dict={ques} AND target_element={ques} AND target_id={ques}", (source_dict, source_el, source_id, target_dict, target_el, target_id))
+    c = c if c else conn
+    row = c.fetchone() if c else None
     if not row:
-        conn.execute("INSERT INTO links (source_dict, source_element, source_id, target_dict, target_element, target_id, confidence) VALUES (?,?,?,?,?,?,?)", (source_dict, source_el, source_id, target_dict, target_el, target_id, confidence))
-        conn.commit()
-    c = conn.execute("SELECT * FROM links WHERE source_dict=? AND source_element=? AND source_id=? AND target_dict=? AND target_element=? AND target_id=?", (source_dict, source_el, source_id, target_dict, target_el, target_id))
-    row = c.fetchone()
+        conn.execute(f"INSERT INTO links (source_dict, source_element, source_id, target_dict, target_element, target_id, confidence) VALUES ({ques},{ques},{ques},{ques},{ques},{ques},{ques})", (source_dict, source_el, source_id, target_dict, target_el, target_id, confidence))
+        close_db(conn)
+    c = conn.execute(f"SELECT * FROM links WHERE source_dict={ques} AND source_element={ques} AND source_id={ques} AND target_dict={ques} AND target_element={ques} AND target_id={ques}", (source_dict, source_el, source_id, target_dict, target_el, target_id))
+    c = c if c else conn
+    row = c.fetchone() if c else None
     return {"link_id": row["link_id"], "source_dict": row["source_dict"], "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_el": row["target_element"], "target_id": row["target_id"], "confidence": row["confidence"]}
 
 def links_delete(dictID, linkID):
     conn = getLinkDB()
-    conn.execute("DELETE FROM links WHERE source_dict=? AND link_id=?", (dictID, linkID))
-    conn.commit()
-    c = conn.execute("select * from links where link_id=?", (linkID, ))
-    if len(c.fetchall()) > 0:
+    conn.execute(f"DELETE FROM links WHERE source_dict={ques} AND link_id={ques}", (dictID, linkID))
+    close_db(conn)
+    c = conn.execute(f"select * from links where link_id={ques}", (linkID, ))
+    c = c if c else conn
+    rows = c.fetchall() if c else []
+    if len(rows) > 0 :
         return False
     else:
         return True
@@ -1490,33 +1665,34 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
     params = []
     where = []
     if source_dict != "":
-        where.append("source_dict=?")
+        where.append(f"source_dict={ques}")
         params.append(source_dict)
     if source_el != "":
-        where.append("source_element=?")
+        where.append(f"source_element={ques}")
         params.append(source_el)
     if source_id != "":
-        where.append("source_id=?")
+        where.append(f"source_id={ques}")
         params.append(source_id)
     if target_dict != "":
-        where.append("target_dict=?")
+        where.append(f"target_dict={ques}")
         params.append(target_dict)
     if target_el != "":
-        where.append("target_element=?")
+        where.append(f"target_element={ques}")
         params.append(target_el)
     if target_id != "":
-        where.append("target_id=?")
+        where.append(f"target_id={ques}")
         params.append(target_id)
     query = "SELECT * FROM links"
     if len(where) > 0:
         query += " WHERE " + " AND ".join(where)
     conn = getLinkDB()
     c = conn.execute(query, tuple(params))
+    c = c if c else conn
     res = []
     #first, get all dictionaries in results
     dbs = {}
     dbconfigs = {}
-    for row in c.fetchall():
+    for row in c.fetchall() if c else []:
         if not row["source_dict"] in dbs:
             dbs[row["source_dict"]] = getDB(row["source_dict"])
             dbconfigs[row["source_dict"]] = readDictConfigs(dbs[row["source_dict"]])
@@ -1525,7 +1701,8 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
             dbconfigs[row["target_dict"]] = readDictConfigs(dbs[row["target_dict"]])
     #now the actual results
     c = conn.execute(query, tuple(params))
-    for row in c.fetchall():
+    c = c if c else conn
+    for row in c.fetchall() if c else []:
         sourceDB = dbs[row["source_dict"]]
         sourceConfig = dbconfigs[row["source_dict"]]
         targetDB = dbs[row["target_dict"]]
@@ -1534,8 +1711,8 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
         source_hw = ""
         try:
             # test if source DB has linkables tables
-            ress = sourceDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["source_id"],))
-            rows = ress.fetchone()
+            ress = sourceDB.execute(f"SELECT entry_id FROM linkables WHERE txt={ques}", (row["source_id"],))
+            rows = ress.fetchone() if ress else None
             if rows:
                 source_entry = rows["entry_id"]
         except:
@@ -1549,8 +1726,8 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
         target_hw = ""
         try:
             # test if target DB has linkables tables
-            rest = targetDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["target_id"],))
-            rowt = rest.fetchone()
+            rest = targetDB.execute(f"SELECT entry_id FROM linkables WHERE txt={ques}", (row["target_id"],))
+            rowt = rest.fetchone() if rest else None
             if rowt:
                 target_entry = rowt["entry_id"]
         except:
@@ -1566,18 +1743,21 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
 
 def getDictLinkables(dictDB):
     ret = []
-    cl = dictDB.execute("SELECT count(*) as count FROM sqlite_master WHERE type='table' and name='linkables'")
-    rl = cl.fetchone()
-    if rl['count'] > 0:
+    if DB == 'sqlite':
+        cl = dictDB.execute("SELECT count(*) as count FROM sqlite_master WHERE type='table' and name='linkables'")
+        rl = cl.fetchone() if cl else None
+    if DB != 'sqlite' or rl['count'] > 0:
         c = dictDB.execute("SELECT * FROM linkables ORDER BY entry_id, element, txt")
-        for r in c.fetchall():
+        c = c if c else dictDB
+        for r in c.fetchall() if c else []:
             ret.append({"element": r["element"], "link": r["txt"], "entry": r["entry_id"], "preview": r["preview"]})
     return ret
 
 def isrunning(dictDB, bgjob, pid=None):
     if not pid:
-        c = dictDB.execute("SELECT pid FROM bgjobs WHERE id=?", (bgjob,))
-        job = c.fetchone()
+        c = dictDB.execute(f"SELECT pid FROM bgjobs WHERE id={ques}", (bgjob,))
+        c = c if c else dictDB
+        job = c.fetchone() if c else None
         if not job:
             return False
         pid = job["pid"]
@@ -1595,15 +1775,16 @@ def linkNAISC(dictDB, dictID, configs, otherdictDB, otherdictID, otherconfigs):
     res = isLinking(dictDB)
     if "otherdictID" in res:
         return res
-    c = dictDB.execute("INSERT INTO bgjobs (type, data) VALUES ('naisc-local', ?)", (otherdictID,))
-    dictDB.commit()
+    c = dictDB.execute(f"INSERT INTO bgjobs (type, data) VALUES ('naisc-local', {ques})", (otherdictID,))
+    c = c if c else dictDB
+    close_db(dictDB)
     jobid = c.lastrowid
     errfile = open("/tmp/linkNAISC-%s-%s.err" % (dictID, otherdictID), "w")
     outfile = open("/tmp/linkNAISC-%s-%s.out" % (dictID, otherdictID), "w")
     bgjob = subprocess.Popen(['adminscripts/linkNAISC.sh', siteconfig["dataDir"], dictID, otherdictID, siteconfig["naiscCmd"], str(jobid)],
         start_new_session=True, close_fds=True, stderr=errfile, stdout=outfile, stdin=subprocess.DEVNULL)
-    dictDB.execute("UPDATE bgjobs SET pid=? WHERE id=?", (bgjob.pid, jobid))
-    dictDB.commit()
+    dictDB.execute(f"UPDATE bgjobs SET pid={ques} WHERE id={ques}", (bgjob.pid, jobid))
+    close_db(dictDB)
     return {"bgjob": jobid}
 
 def autoImage(dictDB, dictID, configs, addElem, addNumber):
@@ -1612,45 +1793,54 @@ def autoImage(dictDB, dictID, configs, addElem, addNumber):
     if res["bgjob"] and res["bgjob"] > 0:
         return res
     c = dictDB.execute("INSERT INTO bgjobs (type, data) VALUES ('autoimage', 'autoimage')")
-    dictDB.commit()
+    c = c if c else dictDB
+    close_db(dictDB)
     jobid = c.lastrowid
     errfile = open("/tmp/autoImage-%s.err" % (dictID), "w")
     outfile = open("/tmp/autoImage-%s.out" % (dictID), "w")
     bgjob = subprocess.Popen(['adminscripts/autoImage.py', siteconfig["dataDir"], dictID, addElem, str(addNumber), str(jobid)],
         start_new_session=True, close_fds=True, stderr=errfile, stdout=outfile, stdin=subprocess.DEVNULL)
-    dictDB.execute("UPDATE bgjobs SET pid=? WHERE id=?", (bgjob.pid, jobid))
-    dictDB.commit()
+    dictDB.execute(f"UPDATE bgjobs SET pid={ques} WHERE id={ques}", (bgjob.pid, jobid))
+    close_db(dictDB)
     return {"bgjob": jobid}
 
 
 def isLinking(dictDB):
     c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='bgjobs'")
-    if not c.fetchone():
+    c = c if c else dictDB
+    cc = c.fetchone() if c else None
+    if cc:
         dictDB.execute("CREATE TABLE bgjobs (id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT, data TEXT, finished INTEGER DEFAULT -1, pid DEFAULT -1)")
-        dictDB.commit()
+        close_db(dictDB)
     c = dictDB.execute("SELECT * FROM bgjobs WHERE finished=-1")
-    job = c.fetchone()
+    c = c if c else dictDB
+    job = c.fetchone() if c else None
     if job:
         pid = job["pid"]
         if isrunning(dictDB, job["id"], pid):
             return {"bgjob": job["id"], "otherdictID": job["data"]}
         else: # mark as dead
-            c = dictDB.execute("UPDATE bgjobs SET finished=-2 WHERE pid=?", (pid,))
+            c = dictDB.execute(f"UPDATE bgjobs SET finished=-2 WHERE pid={ques}", (pid,))
+            c = c if c else dictDB
     return {"bgjob": -1}
 
 def isAutoImage(dictDB):
     c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='bgjobs'")
-    if not c.fetchone():
+    c = c if c else dictDB
+    cc = c.fetchone() if c else None
+    if cc:
         dictDB.execute("CREATE TABLE bgjobs (id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT, data TEXT, finished INTEGER DEFAULT -1, pid DEFAULT -1)")
-        dictDB.commit()
+        close_db(dictDB)
     c = dictDB.execute("SELECT * FROM bgjobs WHERE finished=-1 AND data='autoimage'")
-    job = c.fetchone()
+    c = c if c else dictDB
+    job = c.fetchone() if c else None
     if job:
         pid = job["pid"]
         if isrunning(dictDB, job["id"], pid):
             return {"bgjob": job["id"]}
         else: # mark as dead
-            c = dictDB.execute("UPDATE bgjobs SET finished=-2 WHERE pid=?", (pid,))
+            c = dictDB.execute(f"UPDATE bgjobs SET finished=-2 WHERE pid={ques}", (pid,))
+            c = c if c else dictDB
     return {"bgjob": -1}
 
 def getNAISCstatus(dictDB, dictID, otherdictID, bgjob):
@@ -1684,8 +1874,9 @@ def addAutoNumbers(dictDB, dictID, countElem, storeElem):
         isAttr = True
         storeElem = storeElem[1:]
     c = dictDB.execute("select id, xml from entries")
+    c = c if c else dictDB
     process = 0
-    for r in c.fetchall():
+    for r in c.fetchall() if c else []:
         entryID = r["id"]
         xml = r["xml"]
         doc = minidom.parseString(xml)
@@ -1712,8 +1903,8 @@ def addAutoNumbers(dictDB, dictID, countElem, storeElem):
                     n_elem.appendChild(doc.createTextNode(str(count)))
             process += 1
             xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
-            dictDB.execute("update entries set xml=?, needs_refac=0 where id=?", (xml, entryID))
-    dictDB.commit()
+            dictDB.execute(f"update entries set xml={ques}, needs_refac=0 where id={ques}", (xml, entryID))
+    close_db(dictDB)
     return process
 
 def get_iso639_1():
@@ -1754,13 +1945,14 @@ def preprocessLex0(entryXml):
 def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
     from lxml import etree as ET
     if searchtext == "":
-        sql = "select id, title, sortkey, xml from entries where doctype=? order by id"
+        sql = f"select id, title, sortkey, xml from entries where doctype={ques} order by id"
         params = (doctype, )
     else:
-        sql = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title, e.xml from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by e.id"
+        sql = f"select s.txt, min(s.level) as level, e.id, e.sortkey, e.title, e.xml from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and s.txt like {ques} group by e.id order by e.id"
         params = (doctype, searchtext+"%")
     c = dictDB.execute(sql, params)
-    for r in c.fetchall():
+    c = c if c else dictDB
+    for r in c.fetchall() if c else []:
         headword = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
         headword = headword.replace('"', "'")
         item = {"id": r["id"], "title": headword}
@@ -1831,3 +2023,10 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
             yield line; yield "\n"
             line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
             yield line; yield "\n"
+
+############### New Additions
+def close_db(db, shouldclose = True):
+    if DB == 'sqlite':
+        db.commit()
+    elif DB == 'mysql' and shouldclose:
+        db.close()
