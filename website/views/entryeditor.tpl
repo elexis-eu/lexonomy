@@ -24,6 +24,8 @@
     <link type="text/css" rel="stylesheet" href="../../../widgets/gmedia.css" />
     <script type="text/javascript" src="../../../widgets/ske.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../widgets/ske.css" />
+    <script type="text/javascript" src="../../../widgets/kontext.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../../widgets/kontext.css" />
     <script type="text/javascript" src="../../../widgets/sub.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../widgets/sub.css" />
     <script type="text/javascript" src="../../../libs/js.cookie.js"></script>
@@ -63,6 +65,7 @@
     var dictID="{{dictID}}";
     var xema={{!JSON(xema)}};
     var xemplate={{!JSON(xemplate)}};
+    var kontext={{!JSON(kontext)}};
     var kex={{!JSON(kex)}};
     var subbing={{!JSON(subbing)}};
     var xampl={{!JSON(xampl)}};
@@ -131,6 +134,7 @@
       Xrefs.extendDocspec(docSpec, xema);
       Gmedia.extendDocspec(docSpec, xema);
       Ske.extendDocspec(docSpec, xema);
+      Kontext.extendDocspec(docSpec, xema);
       Sub.extendDocspec(docSpec, xema);
       docSpec.onchange=Screenful.Editor.changed;
       if(uneditable) {
