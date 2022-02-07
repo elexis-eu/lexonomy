@@ -406,7 +406,6 @@ def kontext_xampl(dictID, user, dictDB, configs):
     }
     if request.query.fromp:
         request_data['fromp'] = int(request.query.fromp)
-    print(request_data)
     req = urllib.request.Request(kontexturl)
     req.add_header('Content-Type', 'application/json; charset=utf-8')
     jsondata = json.dumps(request_data)
