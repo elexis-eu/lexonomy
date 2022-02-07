@@ -21,7 +21,10 @@ from icu import Locale, Collator
 import logging
 import sys
 
-DB = 'mysql'
+
+siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
+                                           "siteconfig.json"), encoding="utf-8"))
+DB = siteconfig['db']
 mainDB = None
 linksDB = None
 dictDB = {}
@@ -29,8 +32,6 @@ ques = '%s' if DB == 'mysql' else '?'
 SQL_SEP = '`' if DB == 'mysql' else '['
 SQL_SEP_C = '`' if DB == 'mysql' else ']'
 
-siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
-                                           "siteconfig.json"), encoding="utf-8"))
 i18n = json.load(open(os.environ.get("LEXONOMY_LANG",
                                            "lang/" + siteconfig["lang"] + ".json"), encoding="utf-8"))
 
