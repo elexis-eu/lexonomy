@@ -7,7 +7,7 @@
 		<title>{{dictTitle}}</title>
 		<script type="text/javascript" src="../../../libs/screenful/screenful.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
-		<script type="text/javascript" src="../../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
 		<script type="text/javascript" src="../../../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-user.css" />
 		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-theme-blue.css" />
@@ -59,12 +59,15 @@
 			return JSON.parse(str);
 		};
 		Screenful.Editor.toolbarLinks=[
-			{image: "../../../furniture/cog.png", caption: "Use your own schema...", href: "../../../{{dictID}}/config/xema-override/"}
+			{image: "../../../furniture/cog.png", caption: "استخدم البنية الخاصة بك (Schema)...", href: "../../../{{dictID}}/config/xema-override/"}
 		];
 		</script>
 		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
+		%if siteconfig["rtl"]:
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+		%end
 	</head>
 	<body>
-                %include("header.tpl", user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle="Entry structure", configUrl="xema", rootPath="../../../")
+                %include("header.tpl", i18n=i18n,user=user, dictID=dictID, dictTitle=dictTitle, current="config", configTitle=i18n["Entry structure"], configUrl="xema", rootPath="../../../")
 	</body>
 </html>

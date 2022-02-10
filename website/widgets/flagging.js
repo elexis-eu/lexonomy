@@ -47,31 +47,31 @@ Flagging.render=function(div, json){
   var elements=Xematron.listElements(xema);
 
   var $block=$("<div class='block flag_element'></div>").appendTo($div);
-  $block.append("<div class='title'>Flag element</div>");
+  $block.append("<div i18n class='title'>Flag element</div>");
   $block.append("<select></select>");
   $block.find("select").append("<option value=''>(not set)</option>");
   for(var i=0; i<elements.length; i++){
     $block.find("select").append("<option "+(json.flag_element==elements[i] ? "selected='selected'" : "")+" value='"+elements[i]+"'>"+elements[i]+"</option>");
   }
   $block.find("select").on("change", function(e){Flagging.change();});
-  $block.append("<div class='instro'>Select the element which the flags should be put into.</div>");
+  $block.append("<div i18n class='instro'>Select the element which the flags should be put into.</div>");
 
   var $block=$("<div class='block flags'></div>").appendTo($div);
-  $block.append("<div class='title'>Flags</div>");
+  $block.append("<div i18n class='title'>Flags</div>");
   $block.append("<table></table");
   var $table = $block.find("table");
-  $table.append("<tr><th>Keyboard shortcut</th><th>Value</th><th>Label</th><th>Color</th><th></th></tr>")
+  $table.append("<tr><th i18n>Keyboard shortcut</th><th i18n>Value</th><th i18n>Label</th><th i18n>Color</th><th></th></tr>");
   if (json.flags.length == 0)
     addRow ($table)
   else {
     for(var x=0; x<json.flags.length; x++)
       addRow($table, json.flags[x]);
   }
-  $block.append("<button class='iconAdd'>Add...</button>");
+  $block.append("<button class='iconAdd' i18n>Add...</button>");
   $("button.iconAdd").on("click", function() {
     addRow($table)
   })
-  $block.append("<div class='instro'>Specify flags to be used when a keyboard shortcut is pressed in the entry list. The respective value will be put into the entry flag element accordingly.</div>");
+  $block.append("<div i18n class='instro'>Specify flags to be used when a keyboard shortcut is pressed in the entry list. The respective value will be put into the entry flag element accordingly.</div>");
 };
 Flagging.harvest=function(div){
   var ret={};

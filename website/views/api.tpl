@@ -6,9 +6,11 @@
 		%include("head.tpl")
 		<title>Lexonomy API</title>
 		<script type="text/javascript" src="libs/screenful/screenful.js"></script>
-		<script type="text/javascript" src="libs/screenful/screenful-loc-en.js"></script>
-		<link type="text/css" rel="stylesheet" href="furniture/public.css" />
-	</head>
+		<script type="text/javascript" src="libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
+		%if siteconfig["rtl"]:
+			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+		%end
+</head>
 	<body>
 		<div class="invelope top">
 			<h1>Lexonomy API documentation and test</h1>

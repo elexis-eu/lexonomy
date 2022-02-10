@@ -16,15 +16,17 @@ XemplateDesigner.start=function(xema, xemplate){ //the editor can be an HTML ele
 XemplateDesigner.onchange=function(){
 	XemplateDesigner.refreshPreview();
 	Screenful.Editor.changed();
+	if (doI18n) doI18n();
 };
 
 XemplateDesigner.renderPreview=function(){
 	var $details=$(".designer .preview").html("");
 	var $block=$("<div class='block'></div>").appendTo($(".designer .preview"));
-	$block.append("<div class='title'><span class='reload' onclick='XemplateDesigner.reloadPreviewXml()'>reload random entry</span> Preview</div>");
+	$block.append("<div class='title'><span class='reload' onclick='XemplateDesigner.reloadPreviewXml()' i18n>reload random entry</span><span i18n> Preview</span></div>");
 	var $area=$("<div class='area viewer'></div>").appendTo($(".designer .preview"));
-	var $area=$("<div class='noentries' style='display: none'>The dictionary has no entries yet.</div>").appendTo($(".designer .preview"));
+	var $area=$("<div class='noentries' style='display: none' i18n>The dictionary has no entries yet.</div>").appendTo($(".designer .preview"));
 	XemplateDesigner.reloadPreviewXml();
+	if (doI18n) doI18n();
 };
 XemplateDesigner.previewXml="";
 XemplateDesigner.reloadPreviewXml=function(){
@@ -68,6 +70,7 @@ XemplateDesigner.renderElement=function(elName){
     XemplateDesigner.renderElementStyles(elName);
     XemplateDesigner.renderElementLabel(elName);
   }
+  if (doI18n) doI18n();
 };
 XemplateDesigner.renderAttribute=function(elName, atName){
 	var $details=$(".designer .details").html("");
@@ -83,7 +86,7 @@ XemplateDesigner.renderAttribute=function(elName, atName){
 XemplateDesigner.renderElementLabel=function(elName){
 	var x=XemplateDesigner.getElementXemplate(elName);
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Label</div>");
+	$block.append("<div i18n class='title'>Label</div>");
 	$block.append("<input class='textbox' value='"+(x.label?x.label.replace("'", "&apos;").replace(">", "&gt;").replace("<", "&lt;"):"")+"'/>");
 	$block.find("input").on("change", function(event){
 		XemplateDesigner.changeElementLabel(elName, $(event.target).val());
@@ -92,7 +95,7 @@ XemplateDesigner.renderElementLabel=function(elName){
 XemplateDesigner.renderAttributeLabel=function(elName, atName){
 	var x=XemplateDesigner.getAttributeXemplate(elName, atName);
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Label</div>");
+	$block.append("<div i18n class='title'>Label</div>");
 	$block.append("<input class='textbox' value='"+(x.label?x.label.replace("'", "&apos;").replace(">", "&gt;").replace("<", "&lt;"):"")+"'/>");
 	$block.find("input").on("change", function(event){
     XemplateDesigner.changeAttributeLabel(elName, atName, $(event.target).val());
@@ -114,9 +117,9 @@ XemplateDesigner.changeAttributeLabel=function(elName, atName, label){
 XemplateDesigner.renderElementShown=function(elName){
 	var x=XemplateDesigner.getElementXemplate(elName);
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Visibility</div>");
-	$block.append("<label class='radio'><input type='radio' name='shown' value='true' "+(x.shown?"checked":"")+"/>Shown</label>");
-	$block.append("<label class='radio'><input type='radio' name='shown' value='false' "+(!x.shown?"checked":"")+"/>Hidden</label>");
+	$block.append("<div i18n class='title'>Visibility</div>");
+	$block.append("<label class='radio'><input type='radio' name='shown' value='true' "+(x.shown?"checked":"")+"/><span i18n>Shown</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='shown' value='false' "+(!x.shown?"checked":"")+"/><span i18n>Hidden</span></label>");
 	$block.find("input").on("click change", function(event){
 		XemplateDesigner.changeElementShown(elName, $(event.target).val());
 	});
@@ -124,9 +127,9 @@ XemplateDesigner.renderElementShown=function(elName){
 XemplateDesigner.renderAttributeShown=function(elName, atName){
 	var x=XemplateDesigner.getAttributeXemplate(elName, atName);
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Visibility</div>");
-	$block.append("<label class='radio'><input type='radio' name='shown' value='true' "+(x.shown?"checked":"")+"/>Shown</label>");
-	$block.append("<label class='radio'><input type='radio' name='shown' value='false' "+(!x.shown?"checked":"")+"/>Hidden</label>");
+	$block.append("<div i18n class='title'>Visibility</div>");
+	$block.append("<label class='radio'><input type='radio' name='shown' value='true' "+(x.shown?"checked":"")+"/><span i18n>Shown</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='shown' value='false' "+(!x.shown?"checked":"")+"/><span i18n>Hidden</span></label>");
 	$block.find("input").on("click change", function(event){
     XemplateDesigner.changeAttributeShown(elName, atName, $(event.target).val());
 	});
@@ -147,9 +150,9 @@ XemplateDesigner.changeAttributeShown=function(elName, atName, shown){
 XemplateDesigner.renderAttributeOrder=function(elName, atName){
 	var x=XemplateDesigner.getAttributeXemplate(elName, atName);
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Position</div>");
-	$block.append("<label class='radio'><input type='radio' name='order' value='before' "+(x.order=="before"?"checked":"")+"/>Before element content</label>");
-	$block.append("<label class='radio'><input type='radio' name='order' value='after' "+(x.order=="after"?"checked":"")+"/>After element content</label>");
+	$block.append("<div i18n class='title'>Position</div>");
+	$block.append("<label class='radio'><input type='radio' name='order' value='before' "+(x.order=="before"?"checked":"")+"/><span i18n>Before element content</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='order' value='after' "+(x.order=="after"?"checked":"")+"/><span i18n>After element content</span></label>");
 	$block.find("input").on("click change", function(event){
     XemplateDesigner.changeAttributeOrder(elName, atName, $(event.target).val());
 	});
@@ -164,9 +167,9 @@ XemplateDesigner.changeAttributeOrder=function(elName, atName, val){
 XemplateDesigner.renderElementLayout=function(elName){
 	var x=XemplateDesigner.getElementXemplate(elName);
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Layout</div>");
-	$block.append("<label class='radio'><input type='radio' name='layout' value='block' "+(x.layout=="block"?"checked":"")+"/>Line break before and after</label>");
-	$block.append("<label class='radio'><input type='radio' name='layout' value='inline' "+(x.layout=="inline"?"checked":"")+"/>Inline</label>");
+	$block.append("<div i18n class='title'>Layout</div>");
+	$block.append("<label class='radio'><input type='radio' name='layout' value='block' "+(x.layout=="block"?"checked":"")+"/><span i18n>Line break before and after</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='layout' value='inline' "+(x.layout=="inline"?"checked":"")+"/><span i18n>Inline</span></label>");
 	$block.find("input").on("click change", function(event){
 		XemplateDesigner.changeElementLayout(elName, $(event.target).val());
 	});
@@ -174,9 +177,9 @@ XemplateDesigner.renderElementLayout=function(elName){
 XemplateDesigner.renderAttributeLayout=function(elName, atName){
 	var x=XemplateDesigner.getAttributeXemplate(elName, atName);
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title'>Layout</div>");
-	$block.append("<label class='radio'><input type='radio' name='layout' value='block' "+(x.layout=="block"?"checked":"")+"/>Line break before and after</label>");
-	$block.append("<label class='radio'><input type='radio' name='layout' value='inline' "+(x.layout=="inline"?"checked":"")+"/>Inline</label>");
+	$block.append("<div i18n class='title'>Layout</div>");
+	$block.append("<label class='radio'><input type='radio' name='layout' value='block' "+(x.layout=="block"?"checked":"")+"/><span i18n>Line break before and after</span></label>");
+	$block.append("<label class='radio'><input type='radio' name='layout' value='inline' "+(x.layout=="inline"?"checked":"")+"/><span i18n>Inline</span></label>");
 	$block.find("input").on("click change", function(event){
 		XemplateDesigner.changeAttributeLayout(elName, atName, $(event.target).val());
 	});
@@ -197,7 +200,7 @@ XemplateDesigner.changeAttributeLayout=function(elName, atName, val){
 XemplateDesigner.renderElementStyles=function(elName){
 	var x=XemplateDesigner.getElementXemplate(elName);
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title tight'>Appearance</div>");
+	$block.append("<div i18n class='title tight'>Appearance</div>");
   var $table=$("<table></table>").appendTo($block);
   var dims=[]; for(var dim in Xemplatron.styles) dims.push(dim); dims.reverse();
   for(var iDim=0; iDim<dims.length; iDim++){
@@ -222,7 +225,7 @@ XemplateDesigner.renderElementStyles=function(elName){
 XemplateDesigner.renderAttributeStyles=function(elName, atName){
 	var x=XemplateDesigner.getAttributeXemplate(elName, atName);
 	var $block=$("<div class='block'></div>").appendTo($(".designer .details"));
-	$block.append("<div class='title tight'>Appearance</div>");
+	$block.append("<div i18n class='title tight'>Appearance</div>");
   var $table=$("<table></table>").appendTo($block);
   var dims=[]; for(var dim in Xemplatron.styles) dims.push(dim); dims.reverse();
   for(var iDim=0; iDim<dims.length; iDim++){

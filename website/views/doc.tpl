@@ -13,7 +13,7 @@
 		<meta property="og:url" content="{{siteconfig["baseUrl"]}}/docs/{{doc["id"]}}/" />
 		<meta name="twitter:url" content="{{siteconfig["baseUrl"]}}/docs/{{doc["id"]}}/" />
 		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
-		<script type="text/javascript" src="../../libs/screenful/screenful-loc-en.js"></script>
+		<script type="text/javascript" src="../../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
 		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
 		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-theme-blue.css" />
@@ -25,6 +25,9 @@
 		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../furniture/public.css" />
 		<link type="text/css" rel="stylesheet" href="../../furniture/github-markdown.css" />
+		%if siteconfig["rtl"]:
+			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+		%end
 	</head>
 	<body class="doc">
 		<div id="header">
@@ -49,8 +52,6 @@
 
 		<div class="invelope bottom">
 			<div id="sitefooter">
-				<div class="right"><a href="https://github.com/elexis-eu/lexonomy" class="github" title="GitHub" target="_blank"></a></div>
-				<div>Lexonomy is developed as part of <a href="https://elex.is/">ELEXIS</a> project.</div>
 				<div class="logolint">
 					<a class="muni" target="_blank" href="https://www.muni.cz/" title="Masaryk University"></a>
 					<a class="ske" target="_blank" href="https://www.sketchengine.co.uk/" title="Sketch Engine"></a>

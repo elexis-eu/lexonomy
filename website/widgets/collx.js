@@ -6,23 +6,23 @@ Collx.render=function(div, json){
   var elements=Xematron.listElements(xema);
 
   var $block=$("<div class='block container'></div>").appendTo($div);
-	$block.append("<div class='title'>Collocation container</div>");
+	$block.append("<div i18n class='title'>Collocation container</div>");
   $block.append("<select></select>");
   $block.find("select").append("<option value=''>(not set)</option>");
   for(var i=0; i<elements.length; i++){
     $block.find("select").append("<option "+(json.container==elements[i] ? "selected='selected'" : "")+" value='"+elements[i]+"'>"+elements[i]+"</option>");
   }
   $block.find("select").on("change", function(e){Collx.containerChanged(); Collx.change();});
-  $block.append("<div class='instro'>Select the element which should wrap each collocation (the collocate plus any other data). When you pull collocations automatically from a corpus, Lexonomy will insert one of these elements for each collocation.</div>");
+  $block.append("<div i18n class='instro'>Select the element which should wrap each collocation (the collocate plus any other data). When you pull collocations automatically from a corpus, Lexonomy will insert one of these elements for each collocation.</div>");
 
   var $block=$("<div class='block template'></div>").appendTo($div);
-	$block.append("<div class='title'>XML template</div>");
+	$block.append("<div i18n class='title'>XML template</div>");
   $block.append("<textarea class='textbox' spellcheck='false'></textarea>");
   $block.find("textarea").val(json.template).data("origval", json.template).on("change keyup", function(e){
     if($div.find(".block.template textarea").val()!=$div.find(".block.template textarea").data("origval")) Collx.change();
     Collx.validateTemplate();
   });
-  $block.append("<div class='instro'>This is the XML that will be inserted into your entries with each collocation. The actual text will be where the placeholder <code>$text</code> is.</div>");
+  $block.append("<div i18n class='instro'>This is the XML that will be inserted into your entries with each collocation. The actual text will be where the placeholder <code>$text</code> is.</div>");
   $block.append("<div class='error' style='display: none;'></div>");
   Collx.validateTemplate();
 };

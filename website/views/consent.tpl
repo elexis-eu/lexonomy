@@ -13,19 +13,22 @@
     <link type="text/css" rel="stylesheet" href="../libs/screenful/screenful-consent.css" />
 		<link type="text/css" rel="stylesheet" href="../furniture/public.css" />
 		<script type="text/javascript">
-		Screenful.User.loggedin={{!JSON(user["loggedin"])}};
-		Screenful.User.username="{{user['email']}}";
-		Screenful.Consentterms = {{!JSON(siteconfig['consent']['terms'])}};
-		Screenful.Consentconfirm = {{!JSON(siteconfig['consent']['confirm'])}};
+			Screenful.User.loggedin={{!JSON(user["loggedin"])}};
+			Screenful.User.username="{{user['email']}}";
+			Screenful.Consentterms = {{!JSON(siteconfig['consent']['terms'])}};
+			Screenful.Consentconfirm = {{!JSON(siteconfig['consent']['confirm'])}};
 		</script>
 		<script type="text/javascript">var rootPath="../";</script>
 		<script type="text/javascript" src="../furniture/screenful-user-config.js"></script>
 		<script type="text/javascript" src="../libs/screenful/screenful-consent.js"></script>
-		<script type="text/javascript" src="../libs/screenful/screenful-loc-en.js"></script>
-    <script type="text/javascript">
-    Screenful.Consent.actionUrl="../consent.json";
-    Screenful.Consent.returnUrl="/";
+		<script type="text/javascript" src="../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
+    	<script type="text/javascript">
+			Screenful.Consent.actionUrl="../consent.json";
+			Screenful.Consent.returnUrl="/";
 		</script>
+		%if siteconfig["rtl"]:
+			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
+		%end
 	</head>
 	<body>
 		<div id="header">

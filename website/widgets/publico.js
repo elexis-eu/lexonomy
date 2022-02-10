@@ -19,20 +19,20 @@ Publico.render=function(div, json){
   Publico.cleanup(json);
 
   if(json.public=="true") json.public=true; else if(json.public=="false") json.public=false;
-  $div.append("<div class='title'>Access level</div>");
-  $div.append("<label><input type='radio' name='publico_public' id='publico_public_0' "+(!json.public?"checked='checked'":"")+"/> Private<label>");
-  $div.append("<label><input type='radio' name='publico_public' id='publico_public_1' "+(json.public?"checked='checked'":"")+"/> Public<label>");
+  $div.append("<div i18n class='title'>Access level</div>");
+  $div.append("<label><input type='radio' name='publico_public' id='publico_public_0' "+(!json.public?"checked='checked'":"")+"/> <span i18n>Private</span><label>");
+  $div.append("<label><input type='radio' name='publico_public' id='publico_public_1' "+(json.public?"checked='checked'":"")+"/> <span i18n>Public</span><label>");
   $div.find("input").on("change", Publico.wrapChange);
-  if(!json.public) $div.append("<div class='instro'><b>Private</b> means that the dictionary is not publicly viewable.</div>");
-  else if(json.public) $div.append("<div class='instro'><b>Public</b> means that the dictionary is publicly viewable.</div>");
+  if(!json.public) $div.append("<div i18n class='instro'><b>Private</b> means that the dictionary is not publicly viewable.</div>");
+  else if(json.public) $div.append("<div i18n class='instro'><b>Public</b> means that the dictionary is publicly viewable.</div>");
 
   if(json.public) {
-    $div.append("<div class='title'>Licence</div>");
+    $div.append("<div i18n class='title'>Licence</div>");
     $div.append("<select id='publico_licence'></select>");
     for(var licID in siteconfig.licences) $div.find("select").append("<option value='"+licID+"'>"+siteconfig.licences[licID].title+"</option>");
     $div.find("select").val(json.licence).on("change", Publico.wrapChange);
     if(siteconfig.licences[json.licence] && siteconfig.licences[json.licence].url) {
-      $div.append("<div class='instro'>More information about this licence: <a href='"+siteconfig.licences[json.licence].url+"' target='_blank'>"+siteconfig.licences[json.licence].url+"</a></div>");
+      $div.append("<div i18n class='instro'>More information about this licence: <a href='"+siteconfig.licences[json.licence].url+"' target='_blank'>"+siteconfig.licences[json.licence].url+"</a></div>");
     }
   }
 };

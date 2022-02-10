@@ -43,7 +43,7 @@ Sub.extendDocspec=function(docspec, xema){
             if(!docspec.elements[parName].menu) docspec.elements[parName].menu=[];
             docspec.elements[parName].menu.push({
               icon: rootPath+"furniture/favicon.png",
-              caption: "Find subentries <"+elName+">",
+              caption: Screenful.loc("Find subentries ¡i18n¡", "<"+elName+">"),
               action: Sub.menuSubentries,
               actionParameter: {elName: elName},
             });
@@ -60,13 +60,13 @@ Sub.menuSubentry=function(htmlID){
   var parents=[]; jsMe.getChildElements("lxnm:subentryParent").map(function(p){if(p.getAttributeValue("id")!=Screenful.Editor.entryID) parents.push(p)});
   var html="<div class='subinfobox'>";
   if(jsMe.parent() || $("#"+htmlID).closest(".xonomy .layby").length>0){
-    if(parents.length==0) html+="<div class='topline'><span class='opener' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>This subentry</span> is not shared with any other entry.</div>";
-    else if(parents.length==1) html+="<div class='topline'><span class='opener' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>This subentry</span> is shared with one other entry.</div>";
-    else html+="<div class='topline'><span class='opener' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>This subentry</span> is shared with "+parents.length+" other entries.</div>";
+    if(parents.length==0) html+="<div class='topline'><span class='opener' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>This subentry</span> <span i18n>is not shared with any other entry.</span></div>";
+    else if(parents.length==1) html+="<div class='topline'><span class='opener' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>This subentry</span> <span i18n>is shared with one other entry.</span></div>";
+    else html+="<div class='topline'><span i18n class='opener' onclick='Xonomy.clickoff(); Screenful.Editor.open(null, "+id+")'>This subentry</span>" + Screenful.loc("is shared with ¡i18n¡ other entries.", parents.length) + "</div>";
   } else {
-    if(parents.length==0) html+="<div class='topline'>This subentry is not embedded in any entries.</div>";
-    else if(parents.length==1) html+="<div class='topline'>This subentry is embedded in one entry.</div>";
-    else html+="<div class='topline'>This subentry is shared by "+parents.length+" entries.</div>";
+    if(parents.length==0) html+="<div class='topline' i18n>This subentry is not embedded in any entries.</div>";
+    else if(parents.length==1) html+="<div class='topline' i18n>This subentry is embedded in one entry.</div>";
+    else html+="<div class='topline'>" + Screenful.loc("This subentry is shared by ¡i18n¡ entries.", parents.length);
   }
   if(parents.length>0) {
     html+="<div class='entrylines'>";
@@ -79,6 +79,7 @@ Sub.menuSubentry=function(htmlID){
   }
   html+="</div>";
   document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
+	if (doI18n) doI18n();
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
 };
 
@@ -109,12 +110,12 @@ Sub.boxSubentries=function(elName){
   		html+="<input name='val' class='textbox focusme' value='"+Sub.getHeadword()+"'/> ";
   		html+="<input name='doctype' type='hidden' value='"+elName+"'/> ";
       html+="<input type='submit' class='button sub' value='&nbsp;'/>";
-      html+="<button class='creator' onclick='Sub.newSubentry(\""+elName+"\"); return false;'>New</button>";
+      html+="<button i18n class='creator' onclick='Sub.newSubentry(\""+elName+"\"); return false;'>New</button>";
     html+="</form>";
     html+="<div class='waiter'></div>";
     html+="<div class='choices' style='display: none'></div>";
     html+="<div class='bottombar' style='display: none;'>";
-      html+="<button class='insert' onclick='Sub.insertSubentries()'>Insert</button>";
+      html+="<button i18n class='insert' onclick='Sub.insertSubentries()'>Insert</button>";
     html+="</div>";
   html+="</div>";
   return html;
@@ -140,11 +141,11 @@ Sub.searchSubentries=function(){
     $.get(rootPath+dictID+"/subget/", {lemma: lemma, doctype: doctype}, function(json){
         $(".subbox .choices").html("");
         if(!json.success){
-          $(".subbox .choices").html("<div class='error'>There has been an error getting data from Lexonomy.</div>");
+          $(".subbox .choices").html("<div class='error' i18n>There has been an error getting data from Lexonomy.</div>");
           $(".subbox .waiter").hide();
           $(".subbox .choices").fadeIn();
         } else if(json.total==0){
-          $(".subbox .choices").html("<div class='error'>No matches found.</div>");
+          $(".subbox .choices").html("<div class='error' i18n>No matches found.</div>");
           $(".subbox .waiter").hide();
           $(".subbox .choices").fadeIn();
         } else {

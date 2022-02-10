@@ -2,10 +2,10 @@ var Kex={};
 
 Kex.change=function(){};
 
-Kex.settings={
-  defaultURL: "https://app.sketchengine.eu/",
-  defaultAPIURL: "https://api.sketchengine.eu/bonito/run.cgi"
-}
+Kex.settings = {
+  defaultURL: "http://sketchengine.shaa3.com/",
+  defaultAPIURL: "http://sketchengine.shaa3.com/bonito/run.cgi",
+};
 
 Kex.ifchange=function(event){
   var $inp=$(event.delegateTarget);
@@ -15,17 +15,17 @@ Kex.ifchange=function(event){
 Kex.render=function(div, json){
   $(div).append("<div id='pagebody' class='notop'><div class='pillarform'></div></div>"); var $div=$(div).find("div.pillarform");
 
-  $div.append("<div class='title'>Sketch Engine URL</div>");
+  $div.append("<div i18n class='title'>Sketch Engine URL</div>");
   $div.append("<input class='textbox' id='kex_url'/>");
   $div.find("#kex_url").val(json.url).data("origval", json.url).on("change keyup", Kex.ifchange);
-  $div.append("<div class='instro'>The URL of the Sketch Engine installation where external links should point. Defaults to <code>https://app.sketchengine.eu</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
+  $div.append("<div i18n class='instro'>The URL of the Sketch Engine installation where external links should point. Defaults to <code>https://app.sketchengine.eu</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
 
-  $div.append("<div class='title'>Sketch Engine API URL</div>");
+  $div.append("<div i18n class='title'>Sketch Engine API URL</div>");
   $div.append("<input class='textbox' id='kex_apiurl'/>");
   $div.find("#kex_apiurl").val(json.apiurl).data("origval", json.apiurl).on("change keyup", Kex.ifchange);
-  $div.append("<div class='instro'>The path to the <code>run.cgi</code> API script in Sketch Engine. Defaults to <code>https://api.sketchengine.eu/bonito/run.cgi</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
+  $div.append("<div i18n class='instro'>The path to the <code>run.cgi</code> API script in Sketch Engine. Defaults to <code>https://api.sketchengine.eu/bonito/run.cgi</code>. Do not change this unless you are using a local installation of Sketch Engine.</div>");
 
-  $div.append("<div class='title'>Corpus name</div>");
+  $div.append("<div i18n class='title'>Corpus name</div>");
   if (ske_username && ske_apiKey) {
     $div.append("<input class='textbox' id='kex_corpus' value='Retrieving available corpora from Sketch Engine, please wait...' disabled/>");
     var corpus_input = $("#kex_corpus");
@@ -87,7 +87,7 @@ Kex.render=function(div, json){
           var corpus = res.data.find(function(el) {return el.corpname == json.corpus});
           if (corpus) {
             corpus_input.val(corpus.name);
-            $("<div class='instro'>Currently selected corpus: " + corpus.name + ", show <a style='display: inline; text-decoration: none' href='" + $.trim($("#kex_url").val()) + "#dashboard?corp_info=1&corpname=" + corpus.corpname + "' target='ske'>detailed corpus info ℹ️</a></div>").insertAfter($("#kex_corpus").parent());
+            $("<div i18n class='instro'>Currently selected corpus: " + corpus.name + ", show <a style='display: inline; text-decoration: none' href='" + $.trim($("#kex_url").val()) + "#dashboard?corp_info=1&corpname=" + corpus.corpname + "' target='ske'>detailed corpus info ℹ️</a></div>").insertAfter($("#kex_corpus").parent());
           } else {
             corpus_input.val("Your current corpus is no longer available, please select a new one.");
           }
@@ -95,22 +95,22 @@ Kex.render=function(div, json){
           corpus_input.val("");
         }
       })
-    $div.append("<div class='instro'>Select a Sketch Engine corpus from the list of corpora available to you.</div>");
+    $div.append("<div i18n class='instro'>Select a Sketch Engine corpus from the list of corpora available to you.</div>");
   } else
-    $div.append("Please setup your Sketch Engine account in your <a href='/userprofile'>profile</a> settings to be able to select a corpus.")
+    $div.append("<span i18nh>Please setup your Sketch Engine account in your <a href='/userprofile'>profile</a> settings to be able to select a corpus.</span>")
 
-  $div.append("<div class='title'>Concordance query</div>");
+  $div.append("<div i18n class='title'>Concordance query</div>");
   $div.append("<input class='textbox' id='kex_concquery'/>");
   $div.find("#kex_concquery").val(json.concquery).data("origval", json.concquery).on("change keyup", Kex.ifchange);
-  $div.append("<div class='instro'>The CQL query that will be used to obtain concordance from Sketch Engine. You can use placeholders for elements in the form of '%(element)', e.g. '[lemma=\"%(headword)\"]'. If left empty the 'simple' query type will be used as configured for the respective corpus. Please note that you cannot use CQL syntax with default attribute because it is not specified.</div>");
+  $div.append("<div i18n class='instro'>The CQL query that will be used to obtain concordance from Sketch Engine. You can use placeholders for elements in the form of '%(element)', e.g. '[lemma=\"%(headword)\"]'. If left empty the 'simple' query type will be used as configured for the respective corpus. Please note that you cannot use CQL syntax with default attribute because it is not specified.</div>");
   $div.append("<input type='number' min='0' placeholder='0' class='textbox' style='width: auto' id='kex_concsampling'/>");
   $div.find("#kex_concsampling").val(json.concsampling).data("origval", json.concsampling).on("change keyup", Kex.ifchange);
-  $div.append("<div class='instro'>Whether to apply automatic sampling of the concordance. Any non-zero value means to automatically create a random sample of that size.</div>");
+  $div.append("<div i18n class='instro'>Whether to apply automatic sampling of the concordance. Any non-zero value means to automatically create a random sample of that size.</div>");
 
   if (!json.searchElements) {
     json.searchElements = [];
   }
-  $div.append("<div class='title'>Additional search elements</div>");
+  $div.append("<div i18n class='title'>Additional search elements</div>");
   $div.append("<div class='scrollbox'>");
   var $scrollbox = $div.find(".scrollbox");
   var elements=Xematron.listElements(xema);
@@ -121,7 +121,7 @@ Kex.render=function(div, json){
           "+elements[i]+"</label></div>");
   }
   $scrollbox.find("label").on("click", Kex.change);
-  $scrollbox.parent().append("<div class='instro'>You can select any textual elements here whose content you would like to search for in Sketch Engine. A menu will be displayed next to all these elements like for the root entry element.</div>");
+  $scrollbox.parent().append("<div i18n class='instro'>You can select any textual elements here whose content you would like to search for in Sketch Engine. A menu will be displayed next to all these elements like for the root entry element.</div>");
 };
 
 Kex.harvest=function(div){

@@ -3,9 +3,13 @@ Autonumber.change=function(){};
 
 Autonumber.render=function(div, json){
   $(div).append("<div id='pagebody' class='notop'><div class='pillarform'></div></div>"); var $div=$(div).find("div.pillarform");
-  $div.append("<div class='title'>Auto-numbering of elements</div>");
-  $div.append("<div class='instro borderBelow'>If you need to number some of entry elements automatically, Lexonomy can do that for you. First, go to Entry structure and add element/attribute where you want to store the number. Eg. in element <tt>sense</tt> add attribute <tt>number</tt>. When you're ready, select element to number (eg. <tt>sense</tt>) and element/attribute to store numbering (eg. <tt>@number</tt>). Lexonomy will fill the numbers where missing.</div>");
-  $div.append("Element to number: <select onchange='Autonumber.changeElem()' class='halfwidth' style='width:20%' id='elements'></select> Add numbers to: <select class='halfwidth' style='width:20%' id='children'></select> <button class='iconAdd' onclick='Autonumber.addNumbers()'>Add numbers</button><span id='autowait' style='display:none;vertical-align:bottom'><img src='/furniture/loader.gif'/></span>");
+  $div.append("<div i18n class='title'>Auto-numbering of elements</div>");
+  $div.append(
+    "<div class='instro borderBelow' i18nh>If you need to number some of entry elements automatically, Lexonomy can do that for you. First, go to Entry structure and add element/attribute where you want to store the number. Eg. in element <tt>sense</tt> add attribute <tt>number</tt>. When you're ready, select element to number (eg. <tt>sense</tt>) and element/attribute to store numbering (eg. <tt>@number</tt>). Lexonomy will fill the numbers where missing.</div>"
+  );
+  $div.append(
+    "<span i18n>Element to number:</span> <select onchange='Autonumber.changeElem()' class='halfwidth' style='width:20%' id='elements'></select> <span i18n>Add numbers to:</span> <select class='halfwidth' style='width:20%' id='children'></select> <button class='iconAdd' onclick='Autonumber.addNumbers()'><span i18n>Add numbers</span></button><span id='autowait' style='display:none;vertical-align:bottom'><img src='/furniture/loader.gif'/></span>"
+  );
   for(var elName in xema.elements){
     $("#elements").append("<option value='"+elName+"'>"+elName+"</option>");
   }

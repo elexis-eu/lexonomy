@@ -11,7 +11,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 			};
 			return {
 				oneliner: function(jsMe){ return !jsMe.hasElements(); },
-				menu: [{caption: "Delete", action: Xonomy.deleteElement, hideIf: function(jsMe){return !jsMe.parent();}}],
+				menu: [{caption: Screenful.loc("Delete"), action: Xonomy.deleteElement, hideIf: function(jsMe){return !jsMe.parent();}}],
 			};
 		},
 		unknownAttribute: function(elName, atName){
@@ -20,14 +20,14 @@ Xematron.xema2docspec=function(xema, stringAsker){
 				isInvisible: true,
 			};
 			return  {
-				menu: [{caption: "Delete", action: Xonomy.deleteAttribute}],
+				menu: [{caption: Screenful.loc("Delete"), action: Xonomy.deleteAttribute}],
 			};
 		},
 		validate: function(jsElement){ Xematron.validate(xema, jsElement); },
 	};
 	var elnames=[]; for(var elname in xema.elements) elnames.push(elname); elnames.forEach(function(elname){
 		var xel=xema.elements[elname]; //the xema element from which we are creating a docSpec element
-		var del={}; docSpec.elements[elname]=del; //the docSpec element we are creating
+		var del=Object.assign({}, xel); docSpec.elements[elname]=del; //the docSpec element we are creating
 		del.menu=[];
 		del.inlineMenu=[];
 		del.collapsible=false;
@@ -36,7 +36,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		//children of inl elements have a menu item to unwrap themselves:
 		submenu.push({
-			caption: "Unwrap <"+elname+">",
+			caption: Screenful.loc("Unwrap ¡i18n¡", "<"+elname+">"),
 			action: Xonomy.unwrap,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling!="inl"; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
@@ -45,7 +45,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		//all elements have a menu item to remove themselves, except the top-level element and except children of inl elements:
 		submenu.push({
-			caption: "Remove <"+elname+">",
+			caption: Screenful.loc("Remove ¡i18n¡", "<"+elname+">"),
 			action: Xonomy.deleteElement,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
@@ -54,7 +54,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		//all elements have a menu item to duplicate themselves, except the top-level element and except children of inl elements:
 		submenu.push({
-			caption: "Duplicate <"+elname+">",
+			caption: Screenful.loc("Duplicate ¡i18n¡", "<"+elname+">"),
 			action: Xonomy.duplicateElement,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==68 },
@@ -63,14 +63,14 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		//all elements have a menu item to move themselves up and down, except the top-level element, and except children of inl elements, and expect elements that have nowhere to move to:
 		submenu.push({
-			caption: "Move <"+elname+"> up",
+			caption: Screenful.loc("Move ¡i18n¡ up", "<"+elname+">"),
 			action: Xonomy.moveElementUp,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementUp(jsMe.htmlID); },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==38 },
 			keyCaption: "Ctrl + Shift + Up",
 		});
 		submenu.push({
-			caption: "Move <"+elname+"> down",
+			caption: Screenful.loc("Move ¡i18n¡ down", "<"+elname+">"),
 			action: Xonomy.moveElementDown,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementDown(jsMe.htmlID); },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==40 },
@@ -79,14 +79,14 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		//all elements have a menu item to merge themselves with a sibling, except the top-level element, and except children of inl elements, and expect elements that have no-one to merge with:
 		submenu.push({
-			caption: "Merge <"+elname+"> with previous",
+			caption: Screenful.loc("Merge ¡i18n¡ with previous", "<"+elname+">"),
 			action: Xonomy.mergeWithPrevious,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getPrecedingSibling() || jsMe.getPrecedingSibling().name!=elname },
 			keyTrigger: function(event){ return event.altKey && event.shiftKey && event.which==38 },
 			keyCaption: "Alt + Shift + Up",
 		});
 		submenu.push({
-			caption: "Merge <"+elname+"> with next",
+			caption: Screenful.loc("Merge ¡i18n¡ with next", "<"+elname+">"),
 			action: Xonomy.mergeWithNext,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getFollowingSibling() || jsMe.getFollowingSibling().name!=elname },
 			keyTrigger: function(event){ return event.altKey && event.shiftKey && event.which==40 },
@@ -95,7 +95,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		if(submenu.length>0) {
 			del.menu.push({
-				caption: "This element",
+				caption: Screenful.loc("This element"),
 				menu: submenu,
 				expanded: true,
 			});
@@ -132,7 +132,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 		var submenu=[];
 		var attnames=[]; for(var attname in xel.attributes) attnames.push(attname); attnames.forEach(function(attname){
 			var xatt=xel.attributes[attname]; //the xema attribute from which we are creating a docSpec attribute
-			var datt={}; del.attributes[attname]=datt; //the docSpec attribute we are creating
+			var datt = Object.assign({}, xatt);; del.attributes[attname]=datt; //the docSpec attribute we are creating
 			datt.menu=[];
 
 			//txt attributes are easy:
@@ -151,7 +151,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 			//every attribute's owner element has a menu item to add the attribute:
 			submenu.push({
-				caption: "Add @"+attname+"",
+				caption: Screenful.loc("Add @¡i18n¡",attname),
 				action: Xonomy.newAttribute,
 				actionParameter: {name: attname, value: ""},
 				hideIf: function(jsMe){ return jsMe.hasAttribute(attname); },
@@ -159,7 +159,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 			//every attribute has a menu item to remove itself:
 			datt.menu.push({
-				caption: "Remove @"+attname+"",
+				caption: Screenful.loc("Remove @¡i18n¡", attname),
 				action: Xonomy.deleteAttribute,
 				keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
 				keyCaption: "Ctrl + Shift + X",
@@ -168,7 +168,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 		}); //end of loop over attributes
 		if(submenu.length>0) {
 			del.menu.push({
-				caption: "Attributes",
+				caption: Screenful.loc("Attributes"),
 				menu: submenu,
 			});
 		}
@@ -179,14 +179,14 @@ Xematron.xema2docspec=function(xema, stringAsker){
 			var submenu=[];
 			xel.children.forEach(function(obj){
 				submenu.push({
-					caption: "Add <"+obj.name+">",
+					caption: Screenful.loc("Add ¡i18n¡", "<"+obj.name+">"),
 					action: Xonomy.newElementChild,
 					actionParameter: Xematron.initialElement(xema, obj.name),
 				});
 			});
 			if(submenu.length>0) {
 				del.menu.push({
-					caption: "Child elements",
+					caption: Screenful.loc("Child elements"),
 					menu: submenu,
 				});
 			}
@@ -204,7 +204,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 			if(!xel.children) xel.children=[];
 			xel.children.forEach(function(obj){
 				del.inlineMenu.push({
-					caption: "Wrap with <"+obj.name+">",
+					caption: Screenful.loc("Wrap with ¡i18n¡", "<"+obj.name+">"),
 					action: Xonomy.wrap,
 					actionParameter: {template: "<"+obj.name+Xematron.initialAttributes(xema, obj.name)+">$</"+obj.name+">", placeholder: "$"},
 				});
@@ -224,34 +224,34 @@ Xematron.xema2docspec=function(xema, stringAsker){
 		var submenu=[];
 		Xematron.listElements(xema).forEach(function(siblingName){
 			submenu.push({
-				caption: "Add <"+siblingName+">",
+				caption: Screenful.loc("Add ¡i18n¡", "<" + siblingName + ">"),
 				action: Xonomy.newElementBefore,
 				actionParameter: Xematron.initialElement(xema, siblingName),
 				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingName) || (jsMe.getPrecedingSibling() && jsMe.getPrecedingSibling().name==jsMe.name) || del.mustBeAfter(jsMe).indexOf(siblingName)==-1; },
 			});
 		});
 		submenu.push({
-			caption: "Add another <"+elname+"> before",
+			caption: Screenful.loc("Add another ¡i18n¡ before", "<"+elname+">"),
 			action: Xonomy.newElementBefore,
 			actionParameter: Xematron.initialElement(xema, elname),
 			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl"; },
 		});
 		submenu.push({
-			caption: "Add another <"+elname+"> after",
+			caption: Screenful.loc("Add another ¡i18n¡ after", "<"+elname+">"),
 			action: Xonomy.newElementAfter,
 			actionParameter: Xematron.initialElement(xema, elname),
 			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl"; },
 		});
 		Xematron.listElements(xema).forEach(function(siblingName){
 			submenu.push({
-				caption: "Add <"+siblingName+">",
+				caption: Screenful.loc("Add ¡i18n¡", "<"+siblingName+">"),
 				action: Xonomy.newElementAfter,
 				actionParameter: Xematron.initialElement(xema, siblingName),
 				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingName) || (jsMe.getFollowingSibling() && jsMe.getFollowingSibling().name==jsMe.name) || del.mustBeBefore(jsMe).indexOf(siblingName)==-1; },
 			});
 		});
 		submenu.push({
-			caption: "Remove all <"+elname+"> siblings",
+			caption: Screenful.loc("Remove all ¡i18n¡ siblings", "<"+elname+">"),
 			action: Xonomy.deleteEponymousSiblings,
 			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().getChildElements(jsMe.name).length<2; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==90 },
@@ -259,7 +259,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 		});
 		if(submenu.length>0) {
 			del.menu.push({
-				caption: "Sibling elements",
+				caption: Screenful.loc("Sibling elements"),
 				menu: submenu,
 			});
 		}

@@ -1648,6 +1648,7 @@ Xonomy.changed=function(jsElement) { //called when the document changes
 	Xonomy.refresh();
 	Xonomy.validate();
 	Xonomy.docSpec.onchange(jsElement); //report that the document has changed
+	if (doI18n) doI18n();
 };
 Xonomy.validate=function() {
 	var js=Xonomy.harvestElement($(".xonomy .element").toArray()[0], null);
