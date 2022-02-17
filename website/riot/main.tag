@@ -152,7 +152,7 @@
 						this.update();
 					} else {
 						route("/");
-					}					
+					}
 				});
 			},
 
@@ -181,6 +181,14 @@
 				this.checkAuthCookie();
 
 				console.log('mount')
+				route('/opendicts', (token) => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = '';
+					this.content = 'open-dict-list';
+					this.update();
+				});
 				route('/createaccount/*', (token) => {
 					this.dictId = '';
 					this.state.showDictMenu = false;
