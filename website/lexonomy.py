@@ -1033,8 +1033,16 @@ def ontolex(dictID, doctype):
 def pushtest():
     return template("pushapi.tpl", **{"siteconfig": siteconfig})
 
+@app.route(siteconfig["rootPath"] + "push.api", 'OPTIONS')
+def pushapioptions():
+    response.add_header('Access-Control-Allow-Origin', '*')
+    response.add_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    return {}
+
 @post(siteconfig["rootPath"] + "push.api")
 def pushapi():
+    response.add_header('Access-Control-Allow-Origin', '*')
+    response.add_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
     data = json.loads(request.body.getvalue().decode('utf-8'))
     user = ops.verifyUserApiKey(data["email"], data["apikey"])
     if not user["valid"]:
