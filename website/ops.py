@@ -587,7 +587,7 @@ def getPublicDicts():
         try:
             config = readDictConfigs(getDB(r["id"]))
             if config["publico"]["public"]:
-                dictinfo = {"id": r["id"], "title": r["title"], "author": list(config["users"].keys())[0], "lang": config["ident"].get("lang")}
+                dictinfo = {"id": r["id"], "title": r["title"], "author": list(config["users"].keys())[0], "lang": config["ident"].get("lang"), "licence": config["publico"]["licence"]}
                 dicts.append(dictinfo)
         except:
             skip = True
