@@ -579,6 +579,20 @@ def getDictsByUser(email):
         dicts.append(info)
     return dicts
 
+def getPublicDicts():
+    conn = getMainDB()
+    c = conn.execute("select * from dicts order by title")
+    dicts = []
+    for r in c.fetchall():
+        try:
+            config = readDictConfigs(getDB(r["id"]))
+            if config["publico"]["public"]:
+                dictinfo = {"id": r["id"], "title": r["title"], "author": list(config["users"].keys())[0], "lang": config["ident"].get("lang")}
+                dicts.append(dictinfo)
+        except:
+            skip = True
+    return dicts
+
 def listUsers(searchtext, howmany):
     conn = getMainDB()
     c = conn.execute("select * from users where email like ? order by email limit ?", ("%"+searchtext+"%", howmany))

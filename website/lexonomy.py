@@ -1077,6 +1077,9 @@ def pushapi():
         elif data["command"] == "listDicts":
             dicts = ops.getDictsByUser(user["email"])
             return {"entries": dicts, "success": True}
+        elif data["command"] == "publicDicts":
+            dicts = ops.getPublicDicts()
+            return {"entries": dicts, "success": True}
         elif data["command"] == "createEntries":
             dictID = data["dictID"]
             entryXmls = data["entryXmls"]
