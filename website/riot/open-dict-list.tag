@@ -80,19 +80,7 @@
             query: "",
 
 
-            loadData(){/*
-                setTimeout(() => {
-                    // toto je testovací a takto to funguje
-                    let payload = {"entries": [{"id": "kjmcbe2g", "title": "Besti\u00e1\u0159", "hasLinks": false, "lang": "Czech", licence: "free", author: "Petr"}, {"id": "sw5v3weq", "title": "Clone of moj", "hasLinks": false, "lang": "English", "currentUserCanEdit": true, "currentUserCanDelete": true, author:"John"}, {"id": "5ur4adnu", "title": "Clone of moj", "hasLinks": false, "lang": "", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "ewcmhdrj", "title": "Clone of test3", "hasLinks": false, "lang": "Hebrew", author: "Samuel", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "unevfhvs", "title": "Jakub & Stepan PL-CZ Dictionary", "hasLinks": false, "lang": "", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "navloexx01anita", "title": "Lao Examples Fix 1 Batch 1 (Anita)", "hasLinks": false, "lang": "Czech", "currentUserCanEdit": true}, {"id": "qeyjxer9", "title": "Slovn\u00edk \u010desk\u00fdch televizn\u00edch po\u0159ad\u016f", "hasLinks": false, "lang": "English", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "y728bdws", "title": "druh\u00fd test", "hasLinks": false, "lang": "", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "st7j78pf", "title": "linking1", "hasLinks": true, "lang": "English", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "ty3sb5in", "title": "linking2", "hasLinks": true, "lang": "", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "3mrebqnx", "title": "moj", "hasLinks": false, "lang": "", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "fjiceh5b", "title": "muj prvni slovnik", "hasLinks": false, "lang": "", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "5jutw2fi", "title": "test3", "hasLinks": false, "lang": "", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "7drc88a2", "title": "testing dictionary", "hasLinks": true, "lang": "", "currentUserCanEdit": true, "currentUserCanDelete": true}, {"id": "v-h-s", "title": "vojensko-historick\u00fd slovn\u00edk", "hasLinks": false, "lang": ""}], "success": true}
-                    this.allDicts = payload.entries
-                    this.visibleDicts = this.allDicts
-                    this.isLoading = false
-                    this.languageList = [...new Set(this.allDicts.map(d => d.lang))].filter(l => l != "")
-                    this.update()
-                    this.initializeLanguageSelect()
-                    $("#search").focus()
-                }, 1000)
-                */
+            loadData(){
                 $.post({url: "https://beta.lexonomy.eu/push.api",
                     data: JSON.stringify({
                         "email": "rambousek@gmail.com",
