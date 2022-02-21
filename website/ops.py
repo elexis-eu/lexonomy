@@ -17,6 +17,7 @@ import re
 import secrets
 from collections import defaultdict
 from icu import Locale, Collator
+import requests
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
@@ -586,12 +587,22 @@ def getPublicDicts():
     dicts = []
     for r in c.fetchall():
         try:
-            config = readDictConfigs(getDB(r["id"]))
-            if config["publico"]["public"]:
-                dictinfo = {"id": r["id"], "title": r["title"], "author": list(config["users"].keys())[0], "lang": config["ident"].get("lang"), "licence": config["publico"]["licence"]}
-                dicts.append(dictinfo)
+            configs = readDictConfigs(getDB(r["id"]))
         except:
-            skip = True
+            continue
+        if configs["publico"]["public"]:
+            configs = loadHandleMeta(configs)
+            dictinfo = {"id": r["id"], "title": r["title"], "author": list(configs["users"].keys())[0], "lang": configs["ident"].get("lang"), "licence": configs["publico"]["licence"]}
+            if configs["metadata"].get("dc.title"):
+                dictinfo["title"] = configs["metadata"]["dc.title"]
+            if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
+                langs = [t['lang'] for t in get_iso639_1() if t['code3'] == configs["metadata"]["dc.language.iso"][0]]
+                dictinfo["lang"] = langs[0] or dictinfo["lang"]
+            if configs["metadata"].get("dc.rights") and configs["metadata"].get("dc.rights") != "":
+                dictinfo["licence"] = configs["metadata"].get("dc.rights")
+            if configs["metadata"].get("dc.contributor.author") and len(configs["metadata"].get("dc.contributor.author")) > 0:
+                dictinfo["author"] = '; '.join(configs["metadata"].get("dc.contributor.author"))
+            dicts.append(dictinfo)
     return dicts
 
 def listUsers(searchtext, howmany):
@@ -1605,7 +1616,7 @@ def get_iso639_1():
     for line in open("libs/iso-639-3.tab").readlines():
         la = line.split("\t")
         if la[3] != "" and la[3] != "Part1":
-            codes.append({'code':la[3], 'lang':la[6]})
+            codes.append({'code':la[3], 'code3':la[1], 'lang':la[6]})
     return codes
 
 def get_locales():
@@ -1715,3 +1726,29 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
             yield line; yield "\n"
             line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
             yield line; yield "\n"
+
+def loadHandleMeta(configs):
+    configs["metadata"] = {}
+    if configs["ident"].get("handle") and "hdl.handle.net" in configs["ident"].get("handle"):
+
+        handle = configs["ident"].get("handle").replace("hdl.handle.net", "hdl.handle.net/api/handles")
+        res = requests.get(handle)
+        data = res.json()
+        if data.get('values') and data["values"][0] and data["values"][0]["type"] == "URL":
+            repourl = data["values"][0]["data"]["value"].replace("xmlui", "rest")
+            res2 = requests.get(repourl)
+            data2 = res2.json()
+            if data2.get("id") != "":
+                urlparsed = urllib.parse.urlparse(repourl)
+                repourl2 = urlparsed.scheme + "://" + urlparsed.hostname + "/repository/rest/items/" + str(data2["id"]) + "/metadata"
+                res3 = requests.get(repourl2)
+                data3 = res3.json()
+                for item in data3:
+                    if item["key"] == "dc.contributor.author" or item["key"] == "dc.subject" or item["key"] == "dc.language.iso":
+                        if not configs["metadata"].get(item["key"]):
+                            configs["metadata"][item["key"]] = []
+                        configs["metadata"][item["key"]].append(item["value"])
+                    else:
+                        configs["metadata"][item["key"]] = item["value"]
+    return configs
+
