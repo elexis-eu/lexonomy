@@ -81,12 +81,7 @@
 
 
             loadData(){
-                $.post({url: "https://beta.lexonomy.eu/push.api",
-                    data: JSON.stringify({
-                        "email": "rambousek@gmail.com",
-                        "apikey": "GCFVC7IU6CPTVLXDB69QCJIR26S2WY5O",
-                        "command": "publicDicts"
-                    }),
+                $.get({url: "/publicdicts.json",
                     success: payload => {
                         this.allDicts = payload.entries
                         this.visibleDicts = this.allDicts

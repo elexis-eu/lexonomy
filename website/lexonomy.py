@@ -1085,9 +1085,6 @@ def pushapi():
         elif data["command"] == "listDicts":
             dicts = ops.getDictsByUser(user["email"])
             return {"entries": dicts, "success": True}
-        elif data["command"] == "publicDicts":
-            dicts = ops.getPublicDicts()
-            return {"entries": dicts, "success": True}
         elif data["command"] == "createEntries":
             dictID = data["dictID"]
             entryXmls = data["entryXmls"]
@@ -1104,6 +1101,14 @@ def pushapi():
                 return {"success": False}
         else:
             return {"success": False}
+
+@get(siteconfig["rootPath"]+"publicdicts.json")
+def publicdicts():
+    response.add_header('Access-Control-Allow-Origin', '*')
+    response.add_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    dicts = ops.getPublicDicts()
+    return {"entries": dicts, "success": True}
+
 
 @get(siteconfig["rootPath"]+"<dictID>/links")
 @authDict([])

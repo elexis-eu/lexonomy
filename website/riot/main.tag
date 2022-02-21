@@ -181,7 +181,7 @@
 				this.checkAuthCookie();
 
 				console.log('mount')
-				route('/opendicts', (token) => {
+				route('/opendictionaries', (token) => {
 					this.dictId = '';
 					this.state.showDictMenu = false;
 					this.state.userAccess = false;
