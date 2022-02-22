@@ -592,7 +592,7 @@ def getPublicDicts():
             continue
         if configs["publico"]["public"]:
             configs = loadHandleMeta(configs)
-            dictinfo = {"id": r["id"], "title": r["title"], "author": list(configs["users"].keys())[0], "lang": configs["ident"].get("lang"), "licence": configs["publico"]["licence"]}
+            dictinfo = {"id": r["id"], "title": r["title"], "author": re.sub(r"@.*","@...", list(configs["users"].keys())[0]), "lang": configs["ident"].get("lang"), "licence": configs["publico"]["licence"]}
             if configs["metadata"].get("dc.title"):
                 dictinfo["title"] = configs["metadata"]["dc.title"]
             if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
