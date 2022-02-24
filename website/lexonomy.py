@@ -1235,7 +1235,14 @@ def error404(error):
 debug=False
 if "DEBUG" in os.environ:
     debug=True
-host, port = my_url.split(":")
+if ":" in my_url:
+    host, port = my_url.split(":")
+elif siteconfig.get("port") and siteconfig["port"] > 0:
+    host = my_url
+    port = siteconfig["port"]
+else:
+    host = my_url
+    port = 3000
 if cgi: # we are called as CGI script
     run(host=host, port=port, debug=debug, server="cgi")
 else: # run a standalone server, prefer the paste server if available over the builtin one
