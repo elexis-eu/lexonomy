@@ -219,7 +219,7 @@ def entryflag(dictID, user, dictDB, configs):
 @get(siteconfig["rootPath"]+"<dictID>/subget")
 @authDict(["canEdit"])
 def subget(dictID, user, dictDB, configs):
-    total, entries = ops.listEntries(dictDB, dictID, configs, request.query.doctype, request.query.lemma, "wordstart", 100, False, False, True)
+    total, entries, first = ops.listEntries(dictDB, dictID, configs, request.query.doctype, request.query.lemma, "wordstart", 100, False, False, True)
     return {"success": True, "total": total, "entries": entries}
 
 @post(siteconfig["rootPath"]+"<dictID>/history.json")
