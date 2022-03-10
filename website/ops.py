@@ -494,8 +494,13 @@ def makeDict(dictID, template, title, blurb, email):
     if dictID in prohibitedDictIDs or dictExists(dictID):
         return False
     if not template.startswith("/"):
-        template = "dictTemplates/" + template + ".sqlite"
-    shutil.copy(template, os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+        template = "dictTemplates/" + template + ".sqlite.schema"
+    #init db schema
+    schema = open(template, 'r').read()
+    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    conn.executescript(schema)
+    conn.commit()
+    #update dictionary info
     users = {email: {"canEdit": True, "canConfig": True, "canDownload": True, "canUpload": True}}
     dictDB = getDB(dictID)
     dictDB.execute("update configs set json=? where id='users'", (json.dumps(users),))

@@ -1,0 +1,46 @@
+CREATE TABLE configs (id TEXT PRIMARY KEY, json TEXT);
+INSERT INTO configs VALUES('editing','{	"xonomyMode": "nerd"}');
+INSERT INTO configs VALUES('ident','{	"title": "Simple Monolingual Dictionary",	"blurb": "This is a simple dictionary of English, with only three entries, intended to demonstrate the capabilities of Lexonomy.","lang":"English"}');
+INSERT INTO configs VALUES('publico','{	"public": false}');
+INSERT INTO configs VALUES('kex','{"url": "https://app.sketchengine.eu/", "apiurl": "https://api.sketchengine.eu/bonito/run.cgi"}');
+INSERT INTO configs VALUES('titling','{"headword": "headword"}');
+INSERT INTO configs VALUES('xampl','{	"container": "example",	"template": "<example>$text</example>",	"markup": "h"}');
+INSERT INTO configs VALUES('xema','{	"root": "entry",	"elements": {		"entry": {			"filling": "chd",			"values": [],			"children": [				{					"name": "headword",					"min": "1",					"max": "1"				},				{					"name": "partOfSpeech",					"min": "0",					"max": "1"				},				{					"name": "sense",					"min": "1",					"max": "0"				}			],			"attributes": {}		},		"headword": {			"filling": "txt",			"values": [],			"children": [],			"attributes": {}		},		"partOfSpeech": {			"filling": "lst",			"values": [				{					"value": "n",					"caption": "noun"				},				{					"value": "v",					"caption": "verb"				},				{					"value": "adj",					"caption": "adjective"				}			],			"children": [],			"attributes": {}		},		"sense": {			"filling": "chd",			"values": [],			"children": [				{					"name": "definition",					"min": "0",					"max": "1"				},				{					"name": "example",					"min": "0",					"max": "0"				}			],			"attributes": {}		},		"definition": {			"filling": "txt",			"values": [],			"children": [],			"attributes": {}		},		"example": {			"filling": "inl",			"values": [],			"children": [				{					"name": "h",					"min": "0",					"max": "0"				}			],			"attributes": {}		},		"h": {			"filling": "txt",			"values": [],			"children": [],			"attributes": {}		}	}}');
+INSERT INTO configs VALUES('xemplate','{        "entry": {                "shown": true,                "layout": "block"        },        "headword": {                "shown": true,                "layout": "inline",                "separation": "space",                "gutter": "",                "weight": "bold",                "slant": "",                "colour": "red"        },        "partOfSpeech": {                "shown": true,                "layout": "inline",                "separation": "space",                "gutter": "",                "weight": "",                "slant": "italic",                "colour": "green"        },        "sense": {                "shown": true,                "layout": "block",                "separation": "space",                "gutter": "sensenum1",                "weight": "",                "slant": "",                "colour": ""        },        "definition": {                "shown": true,                "layout": "block",                "separation": "space",                "gutter": "",                "weight": "",                "slant": "",                "colour": ""        },        "example": {                "shown": true,                "layout": "block",                "separation": "space",                "gutter": "disk",                "weight": "",                "slant": "italic",                "colour": "blue"        },        "h": {                "shown": true,                "layout": "inline",                "separation": "space",                "gutter": "",                "weight": "bold",                "slant": "",                "colour": ""        }}');
+CREATE TABLE searchables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, level INTEGER);
+INSERT INTO searchables VALUES(1,1,'able',1);
+INSERT INTO searchables VALUES(2,3,'arm',1);
+INSERT INTO searchables VALUES(3,2,'ask',1);
+CREATE TABLE history (
+    id             INTEGER  PRIMARY KEY AUTOINCREMENT,
+    entry_id       INTEGER,
+    [action]       TEXT,
+    [when]         DATETIME,
+    email          TEXT,
+    xml            TEXT,
+    historiography TEXT
+);
+CREATE TABLE sub (id INTEGER PRIMARY KEY AUTOINCREMENT, parent_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, child_id INTEGER REFERENCES entries (id) ON DELETE CASCADE);
+CREATE TABLE entries (id INTEGER PRIMARY KEY AUTOINCREMENT, doctype TEXT, xml TEXT, title TEXT, sortkey TEXT, needs_resave BOOLEAN DEFAULT (0), needs_refresh BOOLEAN DEFAULT (0), needs_refac BOOLEAN DEFAULT (0));
+INSERT INTO entries VALUES(1,'entry','<entry><headword xml:space="preserve">able</headword><partOfSpeech xml:space="preserve">adj</partOfSpeech><sense><definition xml:space="preserve">If someone is able to do something, they can do it.</definition><example xml:space="preserve">I''m busy tomorrow, so I won''t be <h xml:space="preserve">able</h> to see you.</example></sense><sense><definition xml:space="preserve">If a person is able, they are good or skillful at what they do.</definition><example xml:space="preserve">She is an <h xml:space="preserve">able</h> teacher.</example></sense></entry>','<span class=''headword''>able</span>','_00000_00011_00053_00021',0,0,0);
+INSERT INTO entries VALUES(2,'entry','<entry><headword xml:space="preserve">ask</headword><partOfSpeech xml:space="preserve">v</partOfSpeech><sense><definition xml:space="preserve">To look for an answer to a question.</definition><example xml:space="preserve">I need to <h xml:space="preserve">ask</h> you a question.</example><example xml:space="preserve">I don''t know, <h xml:space="preserve">ask</h> your mother.</example></sense><sense><definition xml:space="preserve">To talk to someone to see if they will do something.</definition><example xml:space="preserve">She <h xml:space="preserve">asked</h> me to help her.</example><example xml:space="preserve">We will have to <h xml:space="preserve">ask</h> for more money.</example></sense></entry>','<span class=''headword''>ask</span>','_00000_00081_00050',0,0,0);
+INSERT INTO entries VALUES(3,'entry','<entry><headword xml:space="preserve">arm</headword><partOfSpeech xml:space="preserve">n</partOfSpeech><sense><definition xml:space="preserve">One of the upper limbs, from shoulder to wrist.</definition><example xml:space="preserve">You have very long <h xml:space="preserve">arms</h>.</example><example xml:space="preserve">My left <h xml:space="preserve">arm</h> hurts.</example></sense><sense><definition xml:space="preserve">A weapon.</definition><example xml:space="preserve">The <h xml:space="preserve">arms</h> dealer was arrested.</example></sense></entry>','<span class=''headword''>arm</span>','_00000_00077_00059',0,0,0);
+CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT);
+CREATE INDEX search ON searchables (txt, level);
+CREATE INDEX history_by_entry_id ON history (
+    entry_id,
+    "when"
+);
+CREATE INDEX history_by_email ON history (
+    email,
+    "when"
+);
+CREATE INDEX history_by_when ON history (
+    "when"
+);
+CREATE INDEX history_by_action ON history (
+    "action",
+    "when"
+);
+CREATE INDEX sortkey ON entries (sortkey);
+CREATE INDEX needs_re ON entries (needs_resave, needs_refresh, needs_refac);

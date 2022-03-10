@@ -1,0 +1,43 @@
+CREATE TABLE configs (id TEXT PRIMARY KEY, json TEXT);
+INSERT INTO configs VALUES ('editing','{	"xonomyMode": "nerd"}');
+INSERT INTO configs VALUES ('ident','{	"title": "Push",	"blurb": "Yet another Lexonomy dictionary.", "lang":"English"}');
+INSERT INTO configs VALUES ('publico','{	"public": false,	"licence": "cc-by-4.0"}');
+INSERT INTO configs VALUES ('users','{	"valselob@gmail.com": {		"canEdit": true,		"canConfig": true,		"canDownload": true,		"canUpload": true	}}');
+INSERT INTO configs VALUES ('kex','{"url": "https://app.sketchengine.eu/", "apiurl": "https://api.sketchengine.eu/bonito/run.cgi"}');
+INSERT INTO configs VALUES ('xampl','{	"container": "exampleContainer",	"template": "<exampleContainer><example>$text</example></exampleContainer>",	"markup": "h"}');
+INSERT INTO configs VALUES ('xema','{	"root": "entry",	"elements": {		"entry": {			"filling": "chd",			"values": [],			"children": [				{					"name": "headwordContainer",					"min": 1,					"max": 1,					"rec": 0				},				{					"name": "sense",					"min": 1,					"max": 0,					"rec": 0				}			],			"attributes": {}		},		"headwordContainer": {			"filling": "chd",			"children": [				{					"name": "headword",					"min": 1,					"max": 1,					"rec": 0				},				{					"name": "partOfSpeech",					"min": 0,					"max": 1,					"rec": 0				}			],			"attributes": {}		},		"headword": {			"filling": "txt",			"children": [],			"attributes": {}		},		"partOfSpeech": {			"filling": "lst",			"children": [],			"attributes": {},			"values": []		},		"sense": {			"filling": "chd",			"children": [				{					"name": "label",					"min": 0,					"max": 0,					"rec": 0				},				{					"name": "definition",					"min": 0,					"max": 1,					"rec": 0				},				{					"name": "exampleContainer",					"min": 0,					"max": 0,					"rec": 0				},				{					"name": "collocation",					"min": 0,					"max": 0,					"rec": 0				},				{					"name": "thesaurusItems",					"min": 0,					"max": 0,					"rec": 0				}			],			"attributes": {}		},		"label": {			"filling": "lst",			"children": [],			"attributes": {},			"values": []		},		"definition": {			"filling": "txt",			"children": [],			"attributes": {}		},		"exampleContainer": {			"filling": "chd",			"children": [				{					"name": "example",					"min": 1,					"max": 1,					"rec": 0				}			],			"attributes": {}		},		"example": {			"filling": "inl",			"children": [				{					"name": "h",					"min": 0,					"max": 0,					"rec": 0				}			],			"attributes": {}		},		"h": {			"filling": "txt",			"children": [],			"attributes": {}		},		"collocation": {			"filling": "chd",			"children": [				{					"name": "collocate",					"min": 1,					"max": 1,					"rec": 0				},				{					"name": "collocatePartOfSpeech",					"min": 0,					"max": 1,					"rec": 0				},				{					"name": "exampleContainer",					"min": 0,					"max": 0,					"rec": 0				}			],			"attributes": {}		},		"collocate": {			"filling": "txt",			"children": [],			"attributes": {}		},		"collocatePartOfSpeech": {			"filling": "lst",			"children": [],			"attributes": {},			"values": []		},		"thesaurusItems": {			"filling": "chd",			"children": [				{					"name": "thesaurusItem",					"min": 1,					"max": 0,					"rec": 0				}			],			"attributes": {}		},		"thesaurusItem": {			"filling": "txt",			"children": [],			"attributes": {}		}	}}');
+INSERT INTO configs VALUES ('xemplate','{	"entry": {		"shown": true,		"layout": "block"	},	"headwordContainer": {		"shown": true,		"layout": "block",		"separation": "space"	},	"partOfSpeech": {		"shown": true,		"layout": "inline",		"separation": "space",		"colour": "green",		"slant": "italic"	},	"headword": {		"shown": true,		"layout": "inline",		"separation": "space",		"weight": "bold",		"colour": "red"	},	"sense": {		"shown": true,		"layout": "block",		"separation": "space",		"gutter": "sensenum1"	},	"label": {		"shown": true,		"layout": "inline",		"colour": "grey",		"background": "yellow",		"border": "dotted",		"separation": "space"	},	"definition": {		"shown": true,		"layout": "inline",		"separation": "space"	},	"exampleContainer": {		"shown": true,		"layout": "block",		"separation": ""	},	"example": {		"shown": true,		"layout": "block",		"slant": "italic",		"colour": "grey"	},	"h": {		"shown": true,		"layout": "inline",		"weight": "bold"	},	"collocation": {		"shown": true,		"layout": "block",		"separation": "space",		"gutter": "square"	},	"collocate": {		"shown": true,		"layout": "inline",		"separation": "space",		"colour": "blue"	},	"collocatePartOfSpeech": {		"shown": true,		"layout": "inline",		"separation": "space",		"colour": "green",		"slant": "italic"	},	"thesaurusItems": {		"shown": true,		"layout": "block",		"gutter": "arrow"	},	"thesaurusItem": {		"shown": true,		"layout": "inline",		"outerPunc": "comma",		"colour": "red",		"slant": "italic",		"interactivity": "xref"	}}');
+INSERT INTO configs VALUES ('collx','{	"container": "collocation",	"template": "<collocation><collocate>$text</collocate></collocation>"}');
+INSERT INTO configs VALUES ('thes','{	"container": "thesaurusItem",	"template": "<thesaurusItem>$text</thesaurusItem>"}');
+INSERT INTO configs VALUES ('defo','{	"container": "definition",	"template": "<definition>$text</definition>"}');
+CREATE TABLE searchables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, level INTEGER);
+CREATE TABLE history (
+    id             INTEGER  PRIMARY KEY AUTOINCREMENT,
+    entry_id       INTEGER,
+    [action]       TEXT,
+    [when]         DATETIME,
+    email          TEXT,
+    xml            TEXT,
+    historiography TEXT
+);
+CREATE TABLE sub (id INTEGER PRIMARY KEY AUTOINCREMENT, parent_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, child_id INTEGER REFERENCES entries (id) ON DELETE CASCADE);
+CREATE TABLE entries (id INTEGER PRIMARY KEY AUTOINCREMENT, doctype TEXT, xml TEXT, title TEXT, sortkey TEXT, needs_resave BOOLEAN DEFAULT (0), needs_refresh BOOLEAN DEFAULT (0), needs_refac BOOLEAN DEFAULT (0));
+CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT);
+CREATE INDEX search ON searchables (txt, level);
+CREATE INDEX history_by_entry_id ON history (
+    entry_id,
+    "when"
+);
+CREATE INDEX history_by_email ON history (
+    email,
+    "when"
+);
+CREATE INDEX history_by_when ON history (
+    "when"
+);
+CREATE INDEX history_by_action ON history (
+    "action",
+    "when"
+);
+CREATE INDEX sortkey ON entries (sortkey);
+CREATE INDEX needs_re ON entries (needs_resave, needs_refresh, needs_refac);
