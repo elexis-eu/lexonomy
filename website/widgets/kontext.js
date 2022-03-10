@@ -27,7 +27,7 @@ Kontext.render=function(div, json){
     var corpus_input = $("#kontext_corpus");
     corpus_input.data("corpname", json.corpus);
     $.get({
-      url: "/" + dictId + "/kontext/corpora",
+      url: "/" + dictID + "/kontext/corpora",
     }).done(function(res) {
         Kontext.corpora = res.corpus_list;
         corpus_input.easyAutocomplete({
@@ -224,7 +224,7 @@ Kontext.menuRoot=function(htmlID, additional=false){
   }
   if(headword) {
     html+="<div class='menuItem')'>";
-        html+="<a target='kontext' href='/"+dictId+"/kontext/conc?lemma="+headword+"&redir=1'>";
+        html+="<a target='kontext' href='/"+dictID+"/kontext/conc?lemma="+headword+"&redir=1'>";
         html+="<span class='icon'><img src='../../../furniture/kontext.png'/></span> ";
         html+="Show concordance";
       html+="</a>";
@@ -303,7 +303,7 @@ Kontext.searchExamples=function(fromp){
   var query=$.trim($(".kontextbox input.textbox:enabled").val());
   var querytype=$("input[name=kontextsearchtype]:checked").val();
   if(query!="") {
-    $.get("/"+dictId+"/kontext/conc/", {querytype: querytype, query: query, fromp: fromp}, function(json){
+    $.get(rootPath+dictID+"/kontext/conc/", {querytype: querytype, query: query, fromp: fromp}, function(json){
         $(".kontextbox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".kontextbox .choices").html("<div class='error'>No results found.</div>");

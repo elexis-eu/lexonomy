@@ -1,4 +1,4 @@
-CREATE TABLE dicts (id TEXT PRIMARY KEY, title TEXT);
+CREATE TABLE dicts (id TEXT PRIMARY KEY, title TEXT, language TEXT);
 CREATE INDEX title ON dicts (title);
 CREATE TABLE users (email TEXT PRIMARY KEY, passwordHash TEXT, sessionKey TEXT, sessionLast DATETIME, apiKey TEXT, ske_id INTEGER, ske_username TEXT, consent INTEGER, ske_apiKey TEXT);
 CREATE INDEX email_password ON users (email, passwordHash);

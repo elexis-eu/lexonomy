@@ -151,6 +151,7 @@
 /*Chewed selectable text*/
 .xonomy.nerd .element > .children > .textnode .char { }
 .xonomy.nerd .element > .children > .textnode .word { white-space: nowrap; }
+.xonomy.nerd .hasInlineMenu > .children > .textnode .word {left: 0px; right: 0px; bottom: -2px; height: 1px; background-color: #eeeeee; z-index: 2;}
 .xonomy.nerd .hasInlineMenu > .children > .textnode .char > .selector { position: absolute; left: 0px; right: 0px; bottom: -2px; height: 1px; background-color: #eeeeee; z-index: 2; }
 .xonomy.nerd .hasInlineMenu > .children > .textnode .char > .selector > .inside { position: absolute; left: 0px; right: 0px; bottom: -2px; top: -3px; background-color: transparent; }
 .xonomy.nerd .hasInlineMenu > .children > .textnode .char > .selector > .inside:hover { background-color: #cccccc; left: -1px; right: -1px; }
@@ -348,6 +349,7 @@
 /*Chewed selectable text*/
 .xonomy.laic .element > .children > .textnode .char { }
 .xonomy.laic .element > .children > .textnode .word { white-space: nowrap; }
+.xonomy.laic .hasInlineMenu > .children > .textnode .word { left: 0px; right: 0px; bottom: -7px; height: 0px; background-color: #999999; z-index: 2; }
 .xonomy.laic .hasInlineMenu > .children > .textnode .char > .selector { position: absolute; left: 0px; right: 0px; bottom: -7px; height: 0px; background-color: #999999; z-index: 2; }
 .xonomy.laic .hasInlineMenu > .children > .textnode .char > .selector > .inside { position: absolute; left: 0px; right: 0px; bottom: -3px; top: -5px; background-color: transparent; }
 .xonomy.laic .hasInlineMenu > .children > .textnode .char > .selector > .inside:hover { background-color: #00cc00; left: -1px; right: -1px; }
@@ -466,3 +468,4 @@
 .xonomy.laic div.layby > div.content > .element {margin-left: 35px;}
 .xonomy.laic div.layby > div.content .children {background-color: transparent !important;}
 .xonomy.laic div.layby > div.content .textnode > .value {background-color: transparent !important;}
+

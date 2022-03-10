@@ -20,8 +20,12 @@
     <link type="text/css" rel="stylesheet" href="../../../widgets/xemplatron.css" />
     <script type="text/javascript" src="../../../widgets/xrefs.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../widgets/xrefs.css" />
+    <script type="text/javascript" src="../../../widgets/gmedia.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../../widgets/gmedia.css" />
     <script type="text/javascript" src="../../../widgets/ske.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../widgets/ske.css" />
+    <script type="text/javascript" src="../../../widgets/kontext.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../../widgets/kontext.css" />
     <script type="text/javascript" src="../../../widgets/sub.js"></script>
     <link type="text/css" rel="stylesheet" href="../../../widgets/sub.css" />
     <script type="text/javascript" src="../../../libs/js.cookie.js"></script>
@@ -61,6 +65,7 @@
     var dictID="{{dictID}}";
     var xema={{!JSON(xema)}};
     var xemplate={{!JSON(xemplate)}};
+    var kontext={{!JSON(kontext)}};
     var kex={{!JSON(kex)}};
     var subbing={{!JSON(subbing)}};
     var xampl={{!JSON(xampl)}};
@@ -71,6 +76,7 @@
     var flagging={{!JSON(flagging)}};
     var linking={{!JSON(linking)}};
     var userdicts={{!JSON(userdicts)}};
+    var gapi={{!JSON(gapi)}};
     var ske_username = {{!JSON(user.get("ske_username"))}};
     var ske_apiKey = {{!JSON(user.get("ske_apiKey"))}};
     if(!xemplate[xema.root]) xemplate[xema.root]={shown: false};
@@ -88,6 +94,7 @@
           window.parent.$("#searchbox").val(text);
           window.parent.Screenful.Navigator.list();
         });
+        Gmedia.addVoice(entry);
       };
     }
 
@@ -124,9 +131,11 @@
         docSpec.laybyMessage="This is your temporary lay-by for entry fragments. You can drag and drop XML elements here.";
       }
       Xonomy.setMode(Cookies.get("xonomyMode_{{dictID}}") || "{{editing["xonomyMode"]}}");
-      Ske.extendDocspec(docSpec, xema);
-      Sub.extendDocspec(docSpec, xema);
       Xrefs.extendDocspec(docSpec, xema);
+      Gmedia.extendDocspec(docSpec, xema);
+      Ske.extendDocspec(docSpec, xema);
+      Kontext.extendDocspec(docSpec, xema);
+      Sub.extendDocspec(docSpec, xema);
       docSpec.onchange=Screenful.Editor.changed;
       if(uneditable) {
         for(elName in docSpec.elements) docSpec.elements[elName].isReadOnly=true;
@@ -149,6 +158,7 @@
       } else {
         customizeEditor.editor(div, entry ? entry : {content: newXml, id: 0}, uneditable);
       }
+      Gmedia.addVoice();
     };
     Screenful.Editor.harvester=function(div){
       if(!usingOwnEditor){

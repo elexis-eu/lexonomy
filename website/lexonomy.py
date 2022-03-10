@@ -242,7 +242,7 @@ def entryflag(dictID, user, dictDB, configs):
 @get(siteconfig["rootPath"]+"<dictID>/subget")
 @authDict(["canEdit"])
 def subget(dictID, user, dictDB, configs):
-    total, entries = ops.listEntries(dictDB, dictID, configs, request.query.doctype, request.query.lemma, "wordstart", 100, False, False, True)
+    total, entries, first = ops.listEntries(dictDB, dictID, configs, request.query.doctype, request.query.lemma, "wordstart", 100, False, False, True)
     return {"success": True, "total": total, "entries": entries}
 
 @post(siteconfig["rootPath"]+"<dictID>/history.json")
@@ -281,6 +281,12 @@ def consent(user):
 def save_consent(user):
     res = ops.setConsent(user["email"], request.forms.consent)
     return {"success": res}
+
+@get(siteconfig["rootPath"] + "<dictID>/getmedia/<query>")
+@authDict(["canEdit"])
+def getmedia(dictID, query, user, dictDB, configs):
+    res = media.get_images(configs, query)
+    return {"images": res}
 
 @get(siteconfig["rootPath"] + "skeget/corpora")
 @auth
@@ -622,7 +628,7 @@ def changeoneclickapi(user):
 def skelogin(token):
     secret = siteconfig["sketchengineKey"]
     try:
-        jwtdata = jwt.decode(token, secret, audience="lexonomy.eu")
+        jwtdata = jwt.decode(token, secret, audience="lexonomy.eu", algorithms="HS256")
         user = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
         res = ops.processJWT(user, jwtdata)
         if res["success"]:
@@ -718,7 +724,7 @@ def dictconfig(dictID):
         return {"success": False}
     else:
         user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
-        res = {"success": True, "publicInfo": {**configs["ident"], **configs["publico"]}, "userAccess": user["dictAccess"], "configs": {"xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "kontext": configs["kontext"], "subbing": configs["subbing"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "flagging": configs["flagging"], "linking": configs["links"], "editing": configs["editing"]}}
+        res = {"success": True, "publicInfo": {**configs["ident"], **configs["publico"]}, "userAccess": user["dictAccess"], "configs": {"xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "kontext": configs["kontext"], "subbing": configs["subbing"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "flagging": configs["flagging"], "linking": configs["links"], "editing": configs["editing"]}, "metadata": configs["metadata"]}
         res["publicInfo"]["blurb"] = ops.markdown_text(configs["ident"]["blurb"])
         return res
 
@@ -773,6 +779,8 @@ def publicentry(dictID, entryID):
         entrydata = re.sub(r"'", "\\'", xml)
         entrydata = re.sub(r"[\n\r]", "", entrydata)
         html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
+        if configs["gapi"] and configs["gapi"]["voicekey"] and configs["gapi"]["voicekey"] != "" and configs["gapi"]["voicelang"]:
+            html += "<script type='text/javascript'>Gmedia.addVoicePublic('" + re.sub(r"\<[^\<\>]+\>", "", _title) + "', '" + configs["gapi"]["voicekey"] + "', '" + configs["gapi"]["voicelang"] + "');</script>"
         #rewrite xemplatron to python, too?
     css = ""
     if "_css" in configs["xemplate"]:
@@ -886,7 +894,7 @@ def entryeditor(dictID, doctype, user, dictDB, configs):
     userdicts = ops.getDictsByUser(user["email"])
     if doctype in configs["xema"]["elements"]:
         configs["xema"]["root"] = doctype
-    return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "kontext": configs["kontext"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"], "linking": configs["links"], "userdicts": userdicts})
+    return template("entryeditor.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "flagging":configs["flagging"], "doctype": doctype, "xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "kontext": configs["kontext"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "css": configs["xemplate"].get("_css"), "editing": configs["editing"], "subbing": configs["subbing"], "linking": configs["links"], "gapi": configs["gapi"], "userdicts": userdicts})
 
 @post(siteconfig["rootPath"]+"<dictID>/<doctype>/entrylist.json")
 @authDict(["canEdit"])
@@ -899,8 +907,8 @@ def entrylist(dictID, doctype, user, dictDB, configs):
             entries = ops.listEntriesById(dictDB, request.forms.id, configs)
             return {"success": True, "entries": entries}
     else:
-        total, entries = ops.listEntries(dictDB, dictID, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.howmany, request.forms.sortdesc, False)
-        return {"success": True, "entries": entries, "total": total}
+        total, entries, first = ops.listEntries(dictDB, dictID, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.howmany, request.forms.sortdesc, False)
+        return {"success": True, "entries": entries, "total": total, "firstRun": first}
 
 @get(siteconfig["rootPath"]+"<dictID>/config")
 @authDict(["canConfig"], True)
@@ -1028,6 +1036,43 @@ def ontolex(dictID, doctype):
         else:
             response.headers['Content-Type'] = "text/plain; charset=utf-8"
             return ops.listOntolexEntries(dictDB, dictID, configs, doctype, search)
+
+@get(siteconfig["rootPath"] + "api")
+def apitest():
+    return template("api.tpl", **{"siteconfig": siteconfig})
+
+@post(siteconfig["rootPath"] + "api/listLang")
+def apilistlang():
+    data = json.loads(request.body.getvalue().decode('utf-8'))
+    user = ops.verifyUserApiKey(data["email"], data["apikey"])
+    if not user["valid"]:
+        return {"success": False}
+    else:
+        langs = ops.getLangList()
+        return {"languages": langs, "success": True}
+
+@post(siteconfig["rootPath"] + "api/listDict")
+def apilistdict():
+    data = json.loads(request.body.getvalue().decode('utf-8'))
+    user = ops.verifyUserApiKey(data["email"], data["apikey"])
+    if not user["valid"]:
+        return {"success": False}
+    else:
+        dicts = ops.getDictList(data.get('lang'), data.get('withLinks'), True)
+        return {"dictionaries": dicts, "success": True}
+
+@post(siteconfig["rootPath"] + "api/listLinks")
+def apilistlink():
+    data = json.loads(request.body.getvalue().decode('utf-8'))
+    user = ops.verifyUserApiKey(data["email"], data["apikey"])
+    if not user["valid"]:
+        return {"success": False, "msg": "invalid user"}
+    else:
+        if data.get('headword') and (data.get('sourceLanguage') or data.get('sourceDict')):
+            dicts = ops.getLinkList(data.get('headword'), data.get('sourceLanguage'), data.get('sourceDict'), data.get('targetLanguage'))
+            return {"links": dicts, "success": True}
+        else:
+            return {"success": False, "msg": "missing parameters"}
 
 @get(siteconfig["rootPath"] + "push.api")
 def pushtest():
@@ -1208,9 +1253,84 @@ def entrylinks(dictID, user, dictDB, configs):
     res = ops.getEntryLinks(dictDB, dictID, request.query.id)
     return {"links": res}
 
+# ELEXIS REST API https://elexis-eu.github.io/elexis-rest/
+@get(siteconfig["rootPath"] + "dictionaries")
+def elexlistdict():
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    else:
+        dicts = list(map(lambda h: h['id'], ops.getDictList(None, None)))
+        return {"dictionaries": dicts}
+    
+@get(siteconfig["rootPath"] + "about/<dictID>")
+def elexaboutdict(dictID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    dictinfo = ops.elexisDictAbout(dictID)
+    if dictinfo is None:
+        abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return dictinfo
+
+@get(siteconfig["rootPath"] + "list/<dictID>")
+def elexlistlemma(dictID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    lemmalist = ops.elexisLemmaList(dictID, request.query.limit, request.query.offset)
+    if lemmalist is None:
+        abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return json.dumps(lemmalist)
+
+@get(siteconfig["rootPath"] + "lemma/<dictID>/<headword>")
+def elexgetlemma(dictID, headword):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    lemmalist = ops.elexisGetLemma(dictID, headword, request.query.limit, request.query.offset)
+    if lemmalist is None:
+        abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return json.dumps(lemmalist)
+
+@get(siteconfig["rootPath"] + "tei/<dictID>/<entryID>")
+def elexgetentry(dictID, entryID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    entry = ops.elexisGetEntry(dictID, entryID)
+    if entry is None:
+        abort(404, "No Entry Available")
+    else:
+        response.content_type = "text/xml; charset=utf-8"
+        return entry
+
+@get(siteconfig["rootPath"] + "json/<dictID>/<entryID>")
+def elexgetentry(dictID, entryID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    entry = ops.elexisConvertTei(ops.elexisGetEntry(dictID, entryID))
+    if entry is None:
+        abort(404, "No Entry Available")
+    else:
+        return entry
+
 @error(404)
 def error404(error):
-    return template("404.tpl", **{"siteconfig": siteconfig})
+    if request.path.startswith("/about/") or request.path.startswith("/list/") or request.path.startswith("/lemma/") or request.path.startswith("/tei/") or request.path.startswith("/json/"):
+        return error.body
+    else:
+        return template("404.tpl", **{"siteconfig": siteconfig})
 
 # deployment
 debug=False

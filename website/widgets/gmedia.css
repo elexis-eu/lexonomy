@@ -1,0 +1,15 @@
+.xonomy .lexonomyGmediaCaption {margin-right: 1px; white-space: nowrap; background-color: #eeeeee; color: #666666; border: 1px outset #cccccc; padding: 7px 10px 6px 40px; border-radius: 5px; cursor: pointer; text-shadow: 1px 1px 0px #ffffff; position: relative; top: -2px; background-image: url(../furniture/images.png); background-position: 10px center; background-repeat: no-repeat;}
+.xonomy.laic .lexonomyGmediaCaption {top: 0px; margin-right: 0px; margin-left: 10px;}
+.xonomy .readonly .lexonomyGmediaCaption {display: none;}
+.xonomy .lexonomyGmediaCaption:hover {color: #004f9b; }
+#xonomyBubble .menuItem > a {display: block; color: inherit; text-decoration: inherit;}
+.Gmediathumb {max-width: 100px; max-height: 80px}
+#viewer .voicetts {
+  display: inline-block;
+  vertical-align: top;
+}
+#viewer .voicetts-icon img {
+  width: 30px;
+  cursor: pointer;
+  margin-left: 1em;
+}

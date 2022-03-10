@@ -49,5 +49,11 @@ try:
 except sqlite3.Error as e:
     print("Database error: %s" % e)
 
+print("Add column language for dictionary")
+try:
+    conn.execute("ALTER TABLE dicts ADD COLUMN language TEXT")
+except sqlite3.Error as e:
+    print("Database error: %s" % e)
+
 conn.commit()
 conn.close()
