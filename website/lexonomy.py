@@ -953,6 +953,8 @@ def configupdate(dictID, user, dictDB, configs):
         resaveNeeded = False
     else:
         adjustedJson, resaveNeeded = ops.updateDictConfig(dictDB, dictID, request.forms.id, json.loads(request.forms.content))
+    if request.forms.id == 'users':
+        ops.notifyUsers(configs['users'], adjustedJson, configs['ident'], dictID)
     if resaveNeeded:
         configs = ops.readDictConfigs(dictDB)
         ops.resave(dictDB, dictID, configs)

@@ -1877,6 +1877,27 @@ def addAutoNumbers(dictDB, dictID, countElem, storeElem):
     dictDB.commit()
     return process
 
+def notifyUsers(configOld, configNew, dictInfo, dictID):
+    for user in configNew:
+        if not configOld[user]:
+            mailSubject = "Lexonomy, added to the dictionary"
+            mailText = "Dear Lexonomy user,\n\n"
+            mailText += "you are now able to access the following dictionary:\n"
+            mailText += "  " + dictInfo['title'] + "\n\n"
+            mailText += "You have the following permissions:\n"
+            if configNew[user]['canEdit']:
+                mailText += " * edit\n"
+            if configNew[user]['canConfig']:
+                mailText += " * configure\n"
+            if configNew[user]['canDownload']:
+                mailText += " * download\n"
+            if configNew[user]['canUpload']:
+                mailText += " * upload\n"
+            mailText += "\nYou can access the dictionary at the following address:\n"
+            mailText += siteconfig['baseUrl'] + "#/" + dictID
+            mailText += "\n\nYours,\nThe Lexonomy team"
+            sendmail(user, mailSubject, mailText)
+
 def get_iso639_1():
     codes = []
     for line in open("libs/iso-639-3.tab").readlines():
