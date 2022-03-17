@@ -62,6 +62,8 @@
 				var files = $('#file')[0].files[0];
 				fd.append('myfile', files);
 				if (purge) fd.append('purge', 'on');
+				$('#startButton').attr('disabled', 'disabled');
+				$('#info').html('Upload started, please keep the window open.');
 				$.ajax({
 					url: '/' + this.dictId + '/upload.html',
 					data: fd,
@@ -73,7 +75,6 @@
 						if (response.success) {
 							$('#info').data('file', response.file);
 							$('#info').data('uploadStart', response.uploadStart);
-							$('#startButton').attr('disabled', 'disabled');
 						} else {
 							$('#info').html('Error while uploading file');
 						}

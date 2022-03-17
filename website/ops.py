@@ -1106,7 +1106,7 @@ def importfile(dictID, filename, email):
     errfile_f = open(errfile, "w")
     dbpath = os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")
     p = subprocess.Popen(["adminscripts/import.py", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
-    return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
+    return {"progressMessage": "Import started. You may close the window, import will run in the background. Please wait...", "finished": False, "errors": False}
 
 def checkImportStatus(pidfile, errfile):
     content = ''

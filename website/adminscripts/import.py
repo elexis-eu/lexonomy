@@ -17,7 +17,7 @@ if len(sys.argv) < 3:
     sys.exit()
 
 print("PID "+ str(os.getpid()))
-print("Import started. Please wait...")
+print("Import started. You may close the window, import will run in the background. Please wait...")
 args = sys.argv[1:]
 purge = False
 if args[0] == "-p":
