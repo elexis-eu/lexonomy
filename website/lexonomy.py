@@ -734,8 +734,7 @@ def dictconfig(dictID):
         return {"success": False}
     else:
         user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
-        doctypesUsed = ops.readDoctypesUsed(ops.getDB(dictID))
-        doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys()) + doctypesUsed
+        doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys())
         doctypes = list(set(doctypes))
         res = {"success": True, "doctype": configs["xema"]["root"], "doctypes": doctypes, "userAccess": user["dictAccess"]}
         return res
