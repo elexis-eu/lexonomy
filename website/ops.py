@@ -951,6 +951,13 @@ def setHousekeepingAttributes(entryID, xml, subbing):
     xml = re.sub(r"^<([^\s>\/]+)", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/'", xml)
     return xml
 
+def cleanHousekeeping(xml):
+    xml = re.sub(r"^(<[^>\/]*)\s+xmlns:lxnm=['\"]http:\/\/www\.lexonomy\.eu\/[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>\/]*)\s+lxnm:entryID=['\"][^\"\']*[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>\/]*)\s+lxnm:subentryID=['\"][^\"\']*[\"']", r"\1", xml)
+    xml = re.sub(r"^(<[^>\/]*)\s+lxnm:linkable=['\"][^\"\']*[\"']", r"\1", xml)
+    return xml    
+
 def exportEntryXml(dictDB, dictID, entryID, configs, baseUrl):
     c = dictDB.execute("select * from entries where id=?", (entryID,))
     row = c.fetchone()
@@ -1068,7 +1075,7 @@ def download_xslt(configs):
     return transform
 
 
-def download(dictDB, dictID, configs):
+def download(dictDB, dictID, configs, cleanXML=False):
     rootname = dictID.lstrip(" 0123456789")
     if rootname == "":
         rootname = "lexonomy"
@@ -1078,7 +1085,10 @@ def download(dictDB, dictID, configs):
     transform = download_xslt(configs)
 
     for r in c.fetchall():
-        xml = setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
+        if cleanXML:
+            xml = cleanHousekeeping(r["xml"])
+        else:
+            xml = setHousekeepingAttributes(r["id"], r["xml"], configs["subbing"])
         xml_xsl, success = transform(xml)
         if not success:
             return xml_xsl, 400
@@ -1161,7 +1171,8 @@ def listEntriesById(dictDB, entryID, configs):
         entries.append({"id": r["id"], "title": r["title"], "xml": xml})
     return entries
 
-def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
+def listEntries(dictDB, dictID, configs, doctype, s$('.download-link').attr(
+earchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
     # fast initial loading, for large dictionaries without search
     if searchtext == "":
         sqlc = "select count(*) as total from entries"

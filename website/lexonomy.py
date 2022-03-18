@@ -826,9 +826,12 @@ def download(dictID, user, dictDB, configs):
 @get(siteconfig["rootPath"]+"<dictID>/download.xml")
 @authDict(["canDownload"], True)
 def downloadxml(dictID, user, dictDB, configs):
+    clean = False
+    if request.query.clean and request.query.clean == "true":
+        clean = True
     response.content_type = "text/xml; charset=utf-8"
-    response.set_header("Content-Disposition", "attachment; filename="+dictID+".xml")
-    return ops.download(dictDB, dictID, configs)
+    #response.set_header("Content-Disposition", "attachment; filename="+dictID+".xml")
+    return ops.download(dictDB, dictID, configs, clean)
 
 @get(siteconfig["rootPath"]+"<dictID>/upload")
 @authDict(["canUpload"], True)

@@ -9,8 +9,19 @@
 	</nav>
 	<div class="row">
 		<div class="col s6 offset-s3">
-			<a class="waves-effect waves-light btn" target="_blank" href="/{ this.props.dictId }/download.xml"><i class="material-icons left">file_download</i>Download { this.props.dictId }.xml</a>
+			<a class="waves-effect waves-light btn download-link" target="_blank" href="/{ this.props.dictId }/download.xml"><i class="material-icons left">file_download</i>Download { this.props.dictId }.xml</a>
 		</div>
+	</div>
+	<div class="row">
+		<div class="col s4 offset-s3">
+			<span class="">
+				<label>
+					<input type="checkbox" class="noAttributes" name="noAttributes" />
+					<span>XML without Lexonomy attributes</span>
+				</label>
+			</span>
+		</div>
+
 	</div>
 
 	<script>
@@ -21,7 +32,17 @@
 				console.log('download dict '+ this.dictId)
 				this.props.loadDictDetail();
 				console.log(this.props)
-				this.update()
+				this.update();
+				$(document).ready(function() {
+					$('.noAttributes').change(function() {
+						var href = $('.download-link').attr('href');
+						if (this.checked) {
+							$('.download-link').attr('href', href + '?clean=true');
+						} else {
+							$('.download-link').attr('href', href.replace('?clean=true', ''));
+						}
+					});
+				});
 			},
 		}
 	</script>
