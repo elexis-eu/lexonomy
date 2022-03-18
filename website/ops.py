@@ -369,6 +369,15 @@ def createAccount(token, password, remoteip):
             conn.execute("insert into users (email,passwordHash) values (?,?)", (row["email"], passhash))
             conn.execute("update register_tokens set usedDate=datetime('now'), usedAddress=? where token=?", (remoteip, token))
             conn.commit()
+            # notify admins?
+            if siteconfig.get('notifyRegister') == True:
+                mailSubject = "Lexonomy, new user registered"
+                mailText = "Hi,\n\n"
+                mailText += "new user registered to Lexonomy at " + siteconfig["baseUrl"] + " :\n\n"
+                mailText += "  " + row["email"]
+                mailText += "\n\nYours,\nThe Lexonomy team"
+                for adminMail in siteconfig["admins"]:
+                    sendmail(adminMail, mailSubject, mailText)
             return True
         else:
             return False
