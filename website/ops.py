@@ -1171,8 +1171,7 @@ def listEntriesById(dictDB, entryID, configs):
         entries.append({"id": r["id"], "title": r["title"], "xml": xml})
     return entries
 
-def listEntries(dictDB, dictID, configs, doctype, s$('.download-link').attr(
-earchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
+def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
     # fast initial loading, for large dictionaries without search
     if searchtext == "":
         sqlc = "select count(*) as total from entries"
