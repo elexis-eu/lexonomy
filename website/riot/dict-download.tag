@@ -14,11 +14,12 @@
 	</div>
 	<div class="row">
 		<div class="col s4 offset-s3">
+			<label>
+				<input type="checkbox" class="noAttributes" name="noAttributes" />
+				<span>XML without Lexonomy attributes</span>
+			</label>
 			<span class="">
-				<label>
-					<input type="checkbox" class="noAttributes" name="noAttributes" />
-					<span>XML without Lexonomy attributes</span>
-				</label>
+				<br/>If you want to import the XML file back to Lexonomy, you need Lexonomy attributes.
 			</span>
 		</div>
 
