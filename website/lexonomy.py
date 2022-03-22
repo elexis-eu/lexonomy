@@ -852,7 +852,7 @@ def uploadhtml(dictID, user, dictDB, configs):
         uploadStart = str(datetime.datetime.utcnow())
         temppath = tempfile.mkdtemp()
         upload.save(temppath)
-        filepath = temppath+"/"+upload.filename
+        filepath = os.path.join(temppath, upload.filename)
         if request.forms.purge == "on":
             ops.purge(dictDB, user["email"], { "uploadStart": uploadStart, "filename": filepath })
         return {"file": filepath,  "uploadStart": uploadStart, "success": True}
