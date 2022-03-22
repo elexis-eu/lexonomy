@@ -15,7 +15,7 @@
 			siteconfig: {},
 			state: {
 				authorized: false,
-				userInfo: {username: ''},
+				userInfo: {username: '', consent: false},
 				userAccess: false,
 				dictDetails: {},
 				showDictMenu: false,
@@ -44,6 +44,7 @@
 							this.state.userInfo.ske_username = response.ske_username;
 							this.state.userInfo.ske_apiKey = response.ske_apiKey;
 							this.state.userInfo.apiKey = response.apiKey;
+							this.state.userInfo.consent = response.consent;
 							this.state.authorized = true;
 						}
 					}).always(() => {
@@ -63,6 +64,8 @@
 								this.state.userInfo.username = this.getCookie('email');
 								this.state.userInfo.ske_username = response.ske_username;
 								this.state.userInfo.ske_apiKey = response.ske_apiKey;
+								this.state.userInfo.apiKey = response.apiKey;
+								this.state.userInfo.consent = response.consent;
 								this.state.authorized = true;
 							}
 						}).always(() => {
@@ -116,6 +119,15 @@
 							}
 						}).fail(() => {
 								resolve({success: false, errorMessage: 'Error while accessing account.'});
+						});
+					}
+
+					if (type == 'consent') {
+						$.post("/consent.json", {consent: 1}, (response) => {
+							if (response.success) {
+								this.state.userInfo.consent = true;
+								this.update();
+							}
 						});
 					}
 				});

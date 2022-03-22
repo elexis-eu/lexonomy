@@ -286,7 +286,7 @@ def login(email, password):
         return {"success": False}
     conn = getMainDB()
     passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
-    c = conn.execute("select email, apiKey, ske_username, ske_apiKey from users where email=? and passwordHash=?", (email.lower(), passhash))
+    c = conn.execute("select email, apiKey, ske_username, ske_apiKey, consent from users where email=? and passwordHash=?", (email.lower(), passhash))
     user = c.fetchone()
     if not user:
         return {"success": False}
@@ -294,7 +294,7 @@ def login(email, password):
     now = datetime.datetime.utcnow()
     conn.execute("update users set sessionKey=?, sessionLast=? where email=?", (key, now, email))
     conn.commit()
-    return {"success": True, "email": user["email"], "key": key, "ske_username": user["ske_username"], "ske_apiKey": user["ske_apiKey"], "apiKey": user["apiKey"]}
+    return {"success": True, "email": user["email"], "key": key, "ske_username": user["ske_username"], "ske_apiKey": user["ske_apiKey"], "apiKey": user["apiKey"], "consent": user["consent"] == 1}
 
 def logout(user):
     conn = getMainDB()
