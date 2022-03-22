@@ -42,8 +42,11 @@
 					<a class="btn-floating add-user" onclick={ doAddUser }><i class="material-icons">add</i></a>
 				</div>
 			</div>
+			<div class="row">
 			<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
 			</button>
+			<span id="userConfigError"></span>
+		</div>
 	</div>
 	<style>
 		.user-checkbox {
@@ -51,6 +54,10 @@
 		}
 		.delete-user, .add-user {
 			float: right;
+		}
+		#userConfigError {
+			margin-left: 1em;
+			color: red;
 		}
 	</style>
 	<script>
@@ -109,9 +116,14 @@
 			},
 
 			saveData() {
-				console.log(this.getConfigData())
-				$('#submit_button').html('Saving...');
-				this.props.saveConfigData(this.configId, this.getConfigData());
+				var data = this.getConfigData();
+				if (Object.values(data).find(row=>row['canConfig']) == undefined) {
+					$('#userConfigError').html('At least one user must have <i>Configure</i> permission.');
+				} else {
+					$('#userConfigError').html('');
+					$('#submit_button').html('Saving...');
+					this.props.saveConfigData(this.configId, this.getConfigData());
+				}
 			}
 		}
 	</script>
