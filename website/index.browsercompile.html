@@ -1,0 +1,95 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/riot@5.4.2/riot+compiler.min.js"></script>
+  	<script src="https://cdn.jsdelivr.net/npm/riot-route@3.1.4/dist/route.min.js"></script>
+    <script type="text/javascript" src="libs/screenful/screenful.js"></script>
+    <script type="text/javascript" src="libs/screenful/screenful-editor.js"></script>
+    <script type="text/javascript" src="libs/screenful/screenful-loc-en.js"></script>
+    <script type="text/javascript" src="libs/screenful/screenful-history.js"></script>
+    <link type="text/css" rel="stylesheet" href="/libs/screenful/screenful.css" />
+    <link type="text/css" rel="stylesheet" href="/libs/screenful/screenful-editor.css" />
+    <link type="text/css" rel="stylesheet" href="/libs/screenful/screenful-theme-blue.css" />
+    <link type="text/css" rel="stylesheet" href="/libs/screenful/screenful-history.css" />
+    <script type="text/javascript" src="libs/xonomy/xonomy.js"></script>
+    <link type="text/css" rel="stylesheet" href="/libs/xonomy/xonomy.css" />
+    <script type="text/javascript" src="widgets/xematron.js"></script>
+    <script type="text/javascript" src="libs/xonomy-tools/dtdconvert/dtd2xonomy.js"></script>
+    <script type="text/javascript" src="widgets/xemplatron.js"></script>
+    <link type="text/css" rel="stylesheet" href="/widgets/xemplatron.css" />
+    <script type="text/javascript" src="widgets/xrefs.js"></script>
+    <link type="text/css" rel="stylesheet" href="/widgets/xrefs.css" />
+    <script type="text/javascript" src="widgets/ske.js"></script>
+    <link type="text/css" rel="stylesheet" href="/widgets/ske.css" />
+    <script type="text/javascript" src="widgets/kontext.js"></script>
+    <link type="text/css" rel="stylesheet" href="/widgets/kontext.css" />
+    <script type="text/javascript" src="widgets/sub.js"></script>
+    <link type="text/css" rel="stylesheet" href="/widgets/sub.css" />
+    <script type="text/javascript" src="libs/js.cookie.js"></script>
+    <script type="text/javascript" src="widgets/xema-designer.js"></script>
+    <link type="text/css" rel="stylesheet" href="/widgets/xema-designer.css" />
+    <script type="text/javascript" src="widgets/xemplate-designer.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+		<link type="text/css" rel="stylesheet" href="/css/materialize-colorpicker.min.css" />
+    <script type="text/javascript" src="js/materialize-colorpicker.min.js"></script>
+    <script type="text/javascript" src="libs/fuzzysort/fuzzysort.js"></script>
+
+    <title>Lexonomy</title>
+  </head>
+  <body>
+    <main></main>
+    <script type="riot" data-src="riot/main.tag"></script>
+    <script type="riot" data-src="riot/header.tag"></script>
+    <script type="riot" data-src="riot/login.tag"></script>
+    <script type="riot" data-src="riot/footer.tag"></script>
+    <script type="riot" data-src="riot/welcome.tag"></script>
+    <script type="riot" data-src="riot/main-page.tag"></script>
+    <script type="riot" data-src="riot/dict-config.tag"></script>
+    <script type="riot" data-src="riot/dict-config-nav.tag"></script>
+    <script type="riot" data-src="riot/dict-config-ident.tag"></script>
+    <script type="riot" data-src="riot/dict-config-publico.tag"></script>
+    <script type="riot" data-src="riot/dict-config-users.tag"></script>
+    <script type="riot" data-src="riot/dict-config-ske.tag"></script>
+    <script type="riot" data-src="riot/dict-config-subbing.tag"></script>
+    <script type="riot" data-src="riot/dict-config-searchability.tag"></script>
+    <script type="riot" data-src="riot/dict-config-url.tag"></script>
+    <script type="riot" data-src="riot/dict-config-download.tag"></script>
+    <script type="riot" data-src="riot/dict-config-links.tag"></script>
+    <script type="riot" data-src="riot/dict-config-autonumber.tag"></script>
+    <script type="riot" data-src="riot/dict-config-flagging.tag"></script>
+    <script type="riot" data-src="riot/dict-config-editing.tag"></script>
+    <script type="riot" data-src="riot/dict-config-gapi.tag"></script>
+    <script type="riot" data-src="riot/dict-config-xema.tag"></script>
+    <script type="riot" data-src="riot/dict-config-xemplate.tag"></script>
+    <script type="riot" data-src="riot/dict-config-titling.tag"></script>
+    <script type="riot" data-src="riot/dict-config-kontext.tag"></script>
+    <script type="riot" data-src="riot/dict-list.tag"></script>
+    <script type="riot" data-src="riot/dict-new.tag"></script>
+    <script type="riot" data-src="riot/dict-edit.tag"></script>
+    <script type="riot" data-src="riot/dict-edit-entry.tag"></script>
+    <script type="riot" data-src="riot/dict-public.tag"></script>
+    <script type="riot" data-src="riot/dict-public-entry.tag"></script>
+    <script type="riot" data-src="riot/dict-download.tag"></script>
+    <script type="riot" data-src="riot/dict-upload.tag"></script>
+    <script type="riot" data-src="riot/entry-view.tag"></script>
+    <script type="riot" data-src="riot/list-headword.tag"></script>
+    <script type="riot" data-src="riot/register.tag"></script>
+    <script type="riot" data-src="riot/register-password.tag"></script>
+    <script type="riot" data-src="riot/forgot.tag"></script>
+    <script type="riot" data-src="riot/forgot-password.tag"></script>
+    <script type="riot" data-src="riot/userprofile.tag"></script>
+    <script type="riot" data-src="riot/open-dict-list.tag"></script>
+    <script type="riot" data-src="riot/user-consent.tag"></script>
+    <script>
+      var kex, kontext, subbing, linking, xampl, thes, collx, defo;
+      riot.compile().then(()=>{
+        riot.mount('main');
+      });
+    </script>
+  </body>
+</html>
+
