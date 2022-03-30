@@ -468,7 +468,7 @@ def check_login():
         if res["success"]:
             #response.set_cookie("email", res["email"], path="/")
             #response.set_cookie("sessionkey", res["key"], path="/")
-            response.add_header('Set-Cookie', "email="+res["email"]+"; Path=/; SameSite=None; Secure")
+            response.add_header('Set-Cookie', "email=\""+res["email"]+"\"; Path=/; SameSite=None; Secure")
             response.add_header('Set-Cookie', "sessionkey="+res["key"]+"; Path=/; SameSite=None; Secure")
             return {"success": True, "email": res["email"], "sessionkey": res["key"], "ske_username": res["ske_username"], "ske_apiKey": res["ske_apiKey"], "apiKey": res["apiKey"], "consent": res["consent"]}
     if request.cookies.email != "" and request.cookies.sessionkey != "":
