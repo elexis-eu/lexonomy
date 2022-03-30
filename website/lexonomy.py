@@ -1087,14 +1087,10 @@ def pushtest():
 
 @app.route(siteconfig["rootPath"] + "push.api", 'OPTIONS')
 def pushapioptions():
-    response.add_header('Access-Control-Allow-Origin', '*')
-    response.add_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
     return {}
 
 @post(siteconfig["rootPath"] + "push.api")
 def pushapi():
-    response.add_header('Access-Control-Allow-Origin', '*')
-    response.add_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
     data = json.loads(request.body.getvalue().decode('utf-8'))
     user = ops.verifyUserApiKey(data["email"], data["apikey"])
     if not user["valid"]:
@@ -1156,8 +1152,6 @@ def pushapi():
 
 @get(siteconfig["rootPath"]+"publicdicts.json")
 def publicdicts():
-    response.add_header('Access-Control-Allow-Origin', '*')
-    response.add_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
     dicts = ops.getPublicDicts()
     return {"entries": dicts, "success": True}
 
