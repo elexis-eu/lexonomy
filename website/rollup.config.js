@@ -1,8 +1,6 @@
 import riot from 'rollup-plugin-riot'
 import nodeResolve from '@rollup/plugin-node-resolve'
-const options = {
-  ext: 'tag'
-}
+const options = {}
 export default {
   input: 'app.js',
   output: {
