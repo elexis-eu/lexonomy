@@ -12,6 +12,7 @@ License:	Copyright (c) 2017-2022 Michal Boleslav Měchura, Lexical Computing CZ 
 URL:		https://www.lexonomy.eu/
 Source0:	lexonomy-%{version}.tar.gz
 
+BuildRequires:	make
 BuildRequires:	python3 >= 3.5
 BuildRequires:	git
 BuildRequires:	nodejs
@@ -37,7 +38,7 @@ cd website
 make
 
 %install
-DESTDIR=$RPM_BUILD_ROOT INSTALLDIR=/opt/lexonomy/ make install
+make DESTDIR=$RPM_BUILD_ROOT INSTALLDIR=/opt/lexonomy/ install
 echo %{version} > $RPM_BUILD_ROOT/opt/lexonomy/website/version.txt
 
 %post
