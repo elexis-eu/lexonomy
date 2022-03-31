@@ -3,22 +3,23 @@
 # top-most EditorConfig file
 root = true
 
-# UTF-8 files with 
+# UTF-8 files with
 # space (instead of tab)
-# Unix-style newlines with 
+# Unix-style newlines with
 # a newline ending every file
 [*]
 charset = utf-8
 indent_style = space
 end_of_line = lf
 insert_final_newline = true
+trim_trailing_whitespace = true
 
 # 4 space indentation (THE python way)
 [*.py]
 indent_size = 4
 
 # Indentation override for all JS (to make call-back hell more readable)
-[*.js]
+[*.{js,riot,html}]
 indent_size = 2
 
 # in md double space at end-of-line has special meaning
@@ -28,11 +29,6 @@ trim_trailing_whitespace = false
 # Tab indentation (no size specified)
 [Makefile]
 indent_style = tab
-
-# Matches multiple files with brace expansion notation
-# Set default charset
-[*.{js,py}]
-charset = utf-8
 
 # Matches the exact files either package.json or .travis.yml
 [{package.json,.travis.yml}]
