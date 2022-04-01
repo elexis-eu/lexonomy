@@ -1089,7 +1089,7 @@ def error404(error):
     if request.path.startswith("/about/") or request.path.startswith("/list/") or request.path.startswith("/lemma/") or request.path.startswith("/tei/") or request.path.startswith("/json/"):
         return error.body
     else:
-        return template("404.tpl", **{"siteconfig": siteconfig})
+        return redirect("/#/e404")
 
 # deployment
 debug=False

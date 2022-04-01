@@ -29,6 +29,7 @@ import dict_new from './riot/dict-new.riot'
 import dict_public_entry from './riot/dict-public-entry.riot'
 import dict_public from './riot/dict-public.riot'
 import dict_upload from './riot/dict-upload.riot'
+import e404 from './riot/e404.riot'
 import entry_view from './riot/entry-view.riot'
 import footer from './riot/footer.riot'
 import forgot_password from './riot/forgot-password.riot'
@@ -72,6 +73,7 @@ riot_register('dict-new', dict_new)
 riot_register('dict-public-entry', dict_public_entry)
 riot_register('dict-public', dict_public)
 riot_register('dict-upload', dict_upload)
+riot_register('e404', e404)
 riot_register('entry-view', entry_view)
 riot_register('footer', footer)
 riot_register('forgot-password', forgot_password)

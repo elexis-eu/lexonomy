@@ -201,6 +201,14 @@
 					this.content = 'api';
 					this.update();
 				});
+				route('/e404', () => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = '';
+					this.content = 'e404';
+					this.update();
+				});
 				route('/opendictionaries', () => {
 					this.dictId = '';
 					this.state.showDictMenu = false;
