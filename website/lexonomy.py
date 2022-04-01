@@ -929,22 +929,6 @@ def publicdicts():
     dicts = ops.getPublicDicts()
     return {"entries": dicts, "success": True}
 
-
-@get(siteconfig["rootPath"]+"<dictID>/links")
-@authDict([])
-def config(dictID, user, dictDB, configs):
-    stats = ops.getDictStats(dictDB)
-    links = {"out": {}, "in": {}}
-    for link in ops.links_get(dictID, "", "", "", "", ""):
-        if not link["target_dict"] in links["out"]:
-            links["out"][link["target_dict"]] = []
-        links["out"][link["target_dict"]].append(link)
-    for link in ops.links_get("", "", "", dictID, "", ""):
-        if not link["source_dict"] in links["in"]:
-            links["in"][link["source_dict"]] = []
-        links["in"][link["source_dict"]].append(link)
-    return template("links.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "links": links})
-
 @get(siteconfig["rootPath"] + "<dictID>/links/add")
 @authDict(["canEdit"])
 def linksadd(dictID, user, dictDB, configs):
