@@ -138,6 +138,7 @@ def lexonomyconfig():
     configData = {
         "version": version,
         "licences": siteconfig['licences'],
+        "baseUrl": siteconfig['baseUrl']
     }
     if 'sketchengineLoginPage' in siteconfig:
         configData['sketchengineLoginPage'] = siteconfig['sketchengineLoginPage']
@@ -674,11 +675,6 @@ def publicrandom(dictID):
 def randomone(dictID, user, dictDB, configs):
     return ops.readRandomOne(dictDB, dictID, configs)
 
-@get(siteconfig["rootPath"]+"<dictID>/download")
-@authDict(["canDownload"], True)
-def download(dictID, user, dictDB, configs):
-    return template("download.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"]})
-
 @get(siteconfig["rootPath"]+"<dictID>/download.xml")
 @authDict(["canDownload"], True)
 def downloadxml(dictID, user, dictDB, configs):
@@ -688,11 +684,6 @@ def downloadxml(dictID, user, dictDB, configs):
     response.content_type = "text/xml; charset=utf-8"
     #response.set_header("Content-Disposition", "attachment; filename="+dictID+".xml")
     return ops.download(dictDB, dictID, configs, clean)
-
-@get(siteconfig["rootPath"]+"<dictID>/upload")
-@authDict(["canUpload"], True)
-def upload(dictID, user, dictDB, configs):
-    return template("upload.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"]})
 
 @post(siteconfig["rootPath"]+"<dictID>/upload.html")
 @authDict(["canUpload"])
@@ -709,11 +700,6 @@ def uploadhtml(dictID, user, dictDB, configs):
         if request.forms.purge == "on":
             ops.purge(dictDB, user["email"], { "uploadStart": uploadStart, "filename": filepath })
         return {"file": filepath,  "uploadStart": uploadStart, "success": True}
-
-@get(siteconfig["rootPath"]+"<dictID>/import")
-@authDict(["canUpload"], True)
-def importhtml(dictID, user, dictDB, configs):
-    return template("import.tpl", **{"siteconfig": siteconfig, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "filename": request.query.file, "uploadStart": request.query.uploadStart})
 
 @get(siteconfig["rootPath"]+"<dictID>/import.json")
 @authDict(["canUpload"])
@@ -834,7 +820,7 @@ def ontolex(dictID, doctype):
 
 @get(siteconfig["rootPath"] + "api")
 def apitest():
-    return template("api.tpl", **{"siteconfig": siteconfig})
+    return redirect("/#/api")
 
 @post(siteconfig["rootPath"] + "api/listLang")
 def apilistlang():
@@ -871,7 +857,7 @@ def apilistlink():
 
 @get(siteconfig["rootPath"] + "push.api")
 def pushtest():
-    return template("pushapi.tpl", **{"siteconfig": siteconfig})
+    return redirect("/#/api")
 
 @app.route(siteconfig["rootPath"] + "push.api", 'OPTIONS')
 def pushapioptions():

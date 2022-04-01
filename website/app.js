@@ -1,5 +1,6 @@
 import {register as riot_register, component} from 'riot'
 import App from './riot/main.riot'
+import api from './riot/api.riot'
 import dict_config_autonumber from './riot/dict-config-autonumber.riot'
 import dict_config_download from './riot/dict-config-download.riot'
 import dict_config_editing from './riot/dict-config-editing.riot'
@@ -42,6 +43,7 @@ import register from './riot/register.riot'
 import user_consent from './riot/user-consent.riot'
 import userprofile from './riot/userprofile.riot'
 import welcome from './riot/welcome.riot'
+riot_register('api', api)
 riot_register('dict-config-autonumber', dict_config_autonumber)
 riot_register('dict-config-download', dict_config_download)
 riot_register('dict-config-editing', dict_config_editing)

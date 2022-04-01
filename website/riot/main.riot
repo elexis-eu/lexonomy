@@ -193,7 +193,15 @@
 				this.checkAuthCookie();
 
 				console.log('mount')
-				route('/opendictionaries', (token) => {
+				route('/api', () => {
+					this.dictId = '';
+					this.state.showDictMenu = false;
+					this.state.userAccess = false;
+					this.state.subPage = '';
+					this.content = 'api';
+					this.update();
+				});
+				route('/opendictionaries', () => {
 					this.dictId = '';
 					this.state.showDictMenu = false;
 					this.state.userAccess = false;
