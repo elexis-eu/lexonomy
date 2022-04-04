@@ -927,6 +927,9 @@ def pushapi():
 @get(siteconfig["rootPath"]+"publicdicts.json")
 def publicdicts():
     dicts = ops.getPublicDicts()
+    user = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+    if user["loggedin"] and user["isAdmin"]:
+        [dic.update({'isAdmin': True}) for dic in dicts]
     return {"entries": dicts, "success": True}
 
 @get(siteconfig["rootPath"] + "<dictID>/links/add")
