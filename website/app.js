@@ -39,6 +39,7 @@ import list_headword from './riot/list-headword.riot'
 import login from './riot/login.riot'
 import main_page from './riot/main-page.riot'
 import main from './riot/main.riot'
+import open_dict_list from './riot/open-dict-list.riot'
 import register_password from './riot/register-password.riot'
 import register from './riot/register.riot'
 import user_consent from './riot/user-consent.riot'
@@ -83,6 +84,7 @@ riot_register('list-headword', list_headword)
 riot_register('login', login)
 riot_register('main-page', main_page)
 riot_register('main', main)
+riot_register('open-dict-list', open_dict_list);
 riot_register('register-password', register_password)
 riot_register('register', register)
 riot_register('user-consent', user_consent)
