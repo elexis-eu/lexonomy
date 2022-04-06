@@ -1,68 +1,99 @@
 <dict-list>
-	<ul class="collection">
-		<li each={ dict in userdicts } class="collection-item ">
-			<div>
-				<a href="#/{ dict.id }" style="cursor: pointer">{ dict.title }</a>
-				<span if={ dict.lang } class="dict-lang">{ dict.lang }</span>
-				<a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="delete dictionary" onclick={ doDeleteDict }><i class="material-icons">delete</i></a>
-				<a style="cursor: pointer" class="secondary-content" data-dict-id={ dict.id } title="clone dictionary" onclick={ doCloneDict }><i class="material-icons">content_copy</i></a>
-				<a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="config dictionary" onclick={ doConfigDict }><i class="material-icons">settings</i></a>
-				<a style="cursor: pointer" if={ dict.currentUserCanEdit } class="secondary-content" data-dict-id={ dict.id } title="edit dictionary" onclick={ doEditDict }><i class="material-icons">edit</i></a>
-			</div>
-		</li>
-	</ul>
-	<a href="#/make" class="waves-effect waves-light btn-small"><i class="material-icons left">add</i>create new dictionary</a>
+   <div if={isLoading} class="grey-text center-align">
+      <h3>loading dictionaries...</h3>
+   </div>
+   <template if={!isLoading}>
+      <div if={userdicts.length}>
+         <h3>your dictionaries</h3>
+         <ul class="collection">
+            <li each={ dict in userdicts } class="collection-item ">
+               <div>
+                  <a href="#/{ dict.id }" style="cursor: pointer">{ dict.title }</a>
+                  <span if={ dict.lang } class="dict-lang">{ dict.lang }</span>
+                  <a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="delete dictionary" onclick={ doDeleteDict }><i class="material-icons">delete</i></a>
+                  <a style="cursor: pointer" class="secondary-content" data-dict-id={ dict.id } title="clone dictionary" onclick={ doCloneDict }><i class="material-icons">content_copy</i></a>
+                  <a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="config dictionary" onclick={ doConfigDict }><i class="material-icons">settings</i></a>
+                  <a style="cursor: pointer" if={ dict.currentUserCanEdit } class="secondary-content" data-dict-id={ dict.id } title="edit dictionary" onclick={ doEditDict }><i class="material-icons">edit</i></a>
+               </div>
+            </li>
+         </ul>
+         <a href="#/make" class="btn waves-effect waves-light">
+            <i class="material-icons left">add</i>
+            create new dictionary
+         </a>
+      </div>
+      <div if={!userdicts.length} class="grey-text center-align">
+         <h3>no dictionaries</h3>
+         <div>
+            You have no dictionary yet. Create one using button below.
+         </div>
+         <br>
+         <a href="#/make" class="btn waves-effect waves-light">
+            <i class="material-icons left">add</i>
+            create new dictionary
+         </a>
+      </div>
+   </template>
 
-	<script>
-		export default {
-			userdicts: [],
-			onMounted() {
-				console.log('list dict')
-				$.get("/userdicts.json", (response) => {
-					console.log(response.dicts);
-					this.userdicts = response.dicts;
-					this.update();
-				});
-			}, 
-		
-			doEditDict(event) {
-				var dictId = event.target.parentNode.getAttribute('data-dict-id');
-				route(dictId + "/edit");
-			},
+   <script>
+      export default {
+         isLoading: true,
+         userdicts: [],
+         onMounted() {
+            $.ajax({
+               url: window.API_URL + "userdicts.json",
+               type: "GET",
+               success: (response) => {
+                  this.userdicts = response.dicts || [];
+               },
+               error: () => {
+                  M.toast("Dictionary list could not be loaded.")
+               },
+               complete: () => {
+                  this.isLoading = false;
+                  this.update();
+               }
+            });
+         },
 
-			doConfigDict(event) {
-				var dictId = event.target.parentNode.getAttribute('data-dict-id');
-				route(dictId + "/config");
-			},
+         doEditDict(event) {
+            var dictId = event.target.parentNode.getAttribute('data-dict-id');
+            route(dictId + "/edit");
+         },
 
-			doCloneDict(event) {
-				var dictId = event.target.parentNode.getAttribute('data-dict-id');
-				$.post("/" + dictId + "/clone.json", (response) => {
-					if (response.success) {
-						this.userdicts = response.dicts;
-						this.update();
-					}
-				});
-			},
+         doConfigDict(event) {
+            var dictId = event.target.parentNode.getAttribute('data-dict-id');
+            route(dictId + "/config");
+         },
 
-			doDeleteDict(event) {
-				var dictId = event.target.parentNode.getAttribute('data-dict-id');
-				var dictTitle = event.target.parentNode.getAttribute('data-dict-title');
-				if (confirm("Are you sure you want to delete dictionary " + dictTitle + "? You will not be able to undo this.")) {
-					$.post("/" + dictId + "/destroy.json", (response) => {
-						if (response.success) {
-							this.userdicts = response.dicts;
-							this.update();
-						}
-					});
-				}
-			}
-		}
-	</script>
+         doCloneDict(event) {
+            var dictId = event.target.parentNode.getAttribute('data-dict-id');
+            $.post(window.API_URL + dictId + "/clone.json", (response) => {
+               if (response.success) {
+                  this.userdicts = response.dicts;
+                  this.update();
+               }
+            });
+         },
 
-	<style>
-		.dict-lang {
-			padding-left: 0.5em;
-		}
-	</style>
+         doDeleteDict(event) {
+            var dictId = event.target.parentNode.getAttribute('data-dict-id');
+            var dictTitle = event.target.parentNode.getAttribute('data-dict-title');
+            if (confirm("Are you sure you want to delete dictionary " + dictTitle + "? You will not be able to undo this.")) {
+               $.post(window.API_URL + dictId + "/destroy.json", (response) => {
+                  if (response.success) {
+                     this.userdicts = response.dicts;
+                     this.update();
+                  }
+               });
+            }
+         }
+      }
+   </script>
+
+   <style>
+      .dict-lang {
+         padding-left: 0.5em;
+      }
+   </style>
 </dict-list>

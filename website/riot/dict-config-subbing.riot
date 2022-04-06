@@ -1,96 +1,108 @@
 <dict-config-subbing>
-	<dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title } configId={ this.configId } configTitle={ this.configTitle }/>
-	<div>
-			<div class="row element-info" each={ element in this.configData.elements } data-element={ element }>
-				<div class="col s7">
-					<a class="btn-floating delete-el" data-element={ element } onclick={ doDeleteEl }><i class="material-icons">delete</i></a>
-					<p><strong>{ element }</strong></p>
-				</div>
-			</div>
-			<div class="row">
-				<div class="input-field col s6">
-					<select id="new-element">
-					</select>
-					<label for="new-element">Subentry element</label>
-					<span class="helper-text">Elements listed here function as subentries which can be shared by multiple entries.</span>
-				</div>
-				<div class="col s1">
-					<a class="btn-floating add-el" onclick={ doAddEl }><i class="material-icons">add</i></a>
-				</div>
-			</div>
-			<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
-			</button>
-	</div>
-	<style>
-		.delete-el, .add-el {
-			float: right;
-		}
-	</style>
-	<script>
-		export default {
-			dictId: '',
-			configId: '',
-			configTitle: 'Subentries', 
-			configData: {elements:[]},
-		
-			doDeleteEl(event) {
-				var el = event.target.parentNode.getAttribute('data-element');
-				this.configData.elements = this.configData.elements.filter(val => val != el);
-				this.update()
-			},
+   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <h3>Subentries</h3>
+   <div if={isLoading} class="center-align grey-text">
+      <h3>Loading elements...</h3>
+   </div>
+   <template if={!isLoading}>
+      <div>
+         <label>
+            Selected subentries
+         </label>
+         <div if={!configData.elements.length} class="grey-text">
+            <i>no subentry element selected</i>
+         </div>
+         <div if={configData.elements.length}>
+            <div each={ element in configData.elements } class="chip">
+               { element }
+               <i class="close material-icons" onclick={onRemoveElementClick.bind(this, element)}>close</i>
+            </div>
+            <br>
+         </div>
+         <br>
+      </div>
+      <template if={selectOptions.length}>
+         <label for="new-element">Add subentry element</label>
+         <div class="input-field">
+            <div class="buttons" style="max-width: 500px;">
+               <select id="new-element">
+               </select>
+               <a class="btn" onclick={ doAddEl } style="margin-top: 4px;">
+                  add
+                  <i class="material-icons right">add</i>
+               </a>
+            </div>
+            <span class="helper-text">Elements listed here function as subentries which can be shared by multiple entries.</span>
+         </div>
+      </template>
+   </template>
+   <br><br>
+   <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
 
-			doAddEl(event) {
-				if ($('#new-element').val() != '') {
-					this.configData.elements.push($('#new-element').val());
-					this.update();
-				}
-			},
+   <script>
+      export default {
+         isLoading: true,
+         dictId: '',
+         configId: '',
+         configTitle: 'Subentries',
+         configData: {elements:[]},
 
-			onMounted() {
-				this.dictId = this.props.dictId;
-				this.configId = this.props.configId;
-				console.log('config dict '+ this.dictId + '-' + this.configId)
-				this.props.loadDictDetail();
-				this.fillConfigForm();
-				console.log(this.props);
-			},
+         onRemoveElementClick(el, evt) {
+            evt.stopPropagation()
+            this.configData.elements = this.configData.elements.filter(val => val != el);
+            this.update()
+         },
 
-			onUpdated() {
-				if (this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements) {
-					if ($('#new-element option').length == 0) {
-						Object.entries(this.props.dictConfigs.xema.elements).forEach(([key, info]) => {
-							$('#new-element').append('<option value="' + key + '">' + key + '</option>');
-						});
-					}
-					$('select').formSelect();
-				}
-			},
+         doAddEl(event) {
+            this.configData.elements.push($('#new-element').val());
+            this.update();
+         },
 
-			async fillConfigForm() {
-				this.props.loadConfigData(this.configId).then((response)=>{
-					this.configData = {elements:[]}
-					for (var key in response) {
-						this.configData.elements.push(key);
-					}
-					this.update();
-				});
-			},
+         onMounted() {
+            this.dictId = this.props.dictId;
+            this.configId = this.props.configId;
+            this.props.loadDictDetail();
+            this.fillConfigForm();
+         },
 
-			getConfigData() {
-				var newData = {};
-				$('.element-info').each(function() {
-					var el = $(this).data('element');
-					newData[el] = {};
-				});
-				return newData;
-			},
+         onBeforeUpdate(){
+            this.selectOptions = Object.keys(this.props.dictConfigs.xema.elements).filter(key => {
+               return !this.configData.elements.includes(key)
+            })
+         },
 
-			saveData() {
-				console.log(this.getConfigData())
-				$('#submit_button').html('Saving...');
-				this.props.saveConfigData(this.configId, this.getConfigData());
-			}
-		}
-	</script>
-	
+         onUpdated() {
+            if (this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements) {
+               var $select = $('select')
+               if(this.selectOptions.length && $select.length){
+                  var instance = M.FormSelect.getInstance($select);
+                  instance && instance.destroy()
+                  $select.empty()
+                  this.selectOptions.forEach(key => {
+                     $('#new-element').append('<option value="' + key + '">' + key + '</option>');
+                  });
+                  $select.formSelect();
+               }
+            }
+         },
+
+         async fillConfigForm() {
+            this.props.loadConfigData(this.configId).then((response)=>{
+               this.isLoading = false;
+               this.configData = {elements: Object.keys(response)}
+               this.update();
+            });
+         },
+
+         saveData() {
+            let data = {}
+            this.configData.elements.forEach(el => {
+               data[el] = {}
+            })
+            $('#submit_button').html('Saving...');
+            this.props.saveConfigData(this.configId, data);
+         }
+      }
+   </script>
+
 </dict-config-subbing>

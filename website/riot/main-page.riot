@@ -1,24 +1,39 @@
 <main-page>
-  <div class="col s5">
-    <welcome></welcome>
-  </div>
-  <div class="col s7">
-    <div if={ props.authorized } >
+   <div if={ props.authorized }>
       <template if={ props.siteconfig.consent && props.siteconfig.consent.terms && !props.userInfo.consent }>
-        <user-consent user-info={ props.userInfo } siteconfig={ props.siteconfig } account-ops={ props.accountOps }></user-consent>
+         <user-consent user-info={ props.userInfo } siteconfig={ props.siteconfig } account-ops={ props.accountOps }></user-consent>
       </template>
       <template if={ !props.siteconfig.consent || !props.siteconfig.consent.terms || props.userInfo.consent }>
-        <dict-list if={this.props.mainSubPage != 'new' && this.props.mainSubPage != 'userprofile'}></dict-list>
-        <dict-new if={this.props.mainSubPage == 'new'}></dict-new>
-        <userprofile if={this.props.mainSubPage == 'userprofile'} user-info={ props.userInfo } siteconfig={ props.siteconfig }></userprofile>
+         <dict-list if={this.props.mainSubPage != 'new' && this.props.mainSubPage != 'userprofile'}></dict-list>
+         <dict-new if={this.props.mainSubPage == 'new'}></dict-new>
+         <userprofile if={this.props.mainSubPage == 'userprofile'} user-info={ props.userInfo } siteconfig={ props.siteconfig }></userprofile>
       </template>
-    </div>
-    <div if={ !props.authorized }>
-      <login if={this.props.mainSubPage == 'login'} account-ops={ props.accountOps } siteconfig={ props.siteconfig }></login>
-      <register if={this.props.mainSubPage == 'register'} account-ops={ props.accountOps }></register>
-      <register-password if={this.props.mainSubPage == 'registerPassword'} account-ops={ props.accountOps } token={ props.token }></register-password>
-      <forgot if={this.props.mainSubPage == 'forgot'} account-ops={ props.accountOps }></forgot>
-      <forgot-password if={this.props.mainSubPage == 'forgotPassword'} account-ops={ props.accountOps } token={ props.token }></forgot-password>
-    </div>
-  </div>
+   </div>
+   <div if={ !props.authorized } class="row">
+      <div class="col m7 s12">
+         <welcome></welcome>
+      </div>
+      <div class="col m5 s12">
+         <login if={this.props.mainSubPage == 'login'} account-ops={ props.accountOps } siteconfig={ props.siteconfig }></login>
+         <register if={this.props.mainSubPage == 'register'} account-ops={ props.accountOps }></register>
+         <register-password if={this.props.mainSubPage == 'registerPassword'} account-ops={ props.accountOps } token={ props.token }></register-password>
+         <forgot if={this.props.mainSubPage == 'forgot'} account-ops={ props.accountOps }></forgot>
+         <forgot-password if={this.props.mainSubPage == 'forgotPassword'} account-ops={ props.accountOps } token={ props.token }></forgot-password>
+      </div>
+   </div>
+
+   <div class="divider" style="margin-top: 50px;"></div>
+   <div class="section" style="opacity: 0.6;">
+      <h5>Reference</h5>
+         <p>Měchura, M. B. (2017) ‘<a href="docs/elex2017.pdf">Introducing Lexonomy: an open-source dictionary writing and publishing system</a>’ in <i>Electronic Lexicography in the 21st Century: Lexicography from Scratch. Proceedings of the eLex 2017 conference, 19-21 September 2017, Leiden, The Netherlands.</i><br/>
+         <span class="">If you are referring to Lexonomy from an academic publication, it is recommended that you cite this paper.</span>
+      </p>
+   </div>
+
+   <style>
+      :host{
+         margin-top: 20px;
+      }
+   </style>
 </main-page>
+

@@ -1,19 +1,17 @@
 <list-headword>
-	<a onclick={ doSelectEntry } class="headword-link collection-item"></a>
-  <script>
-		export default {
-			doSelectEntry() {
-				this.props.changeEntryEdit(this.props.entryData.id)
-			},
-			setInnerHTML() {
-				$('.headword-link', this.root).html(this.props.entryData.title);
-      },
-      onMounted() {
-        this.setInnerHTML()
-      },
-      onUpdated() {
-        this.setInnerHTML()
+   <a href="{props.link}" class="headword-link collection-item {props.active ? 'red-text' : ''}"></a>
+
+   <script>
+      export default {
+         setInnerHTML() {
+            $('.headword-link', this.root).html(this.props.entryData.title);
+         },
+         onMounted() {
+            this.setInnerHTML()
+         },
+         onUpdated() {
+            this.setInnerHTML()
+         }
       }
-    }
   </script>
 </list-headword>

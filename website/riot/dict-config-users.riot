@@ -1,131 +1,178 @@
 <dict-config-users>
-	<dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title } configId={ this.configId } configTitle={ this.configTitle }/>
-	<div>
-			<div class="row user-info" each={ user in this.configData.users } data-email={ user.email }>
-				<div class="col s7">
-					<a class="btn-floating delete-user" data-email={ user.email} onclick={ doDeleteUser }><i class="material-icons">delete</i></a>
-					<p><strong>{ user.email }</strong></p>
-					<p>
-						<span class="user-checkbox">
-							<label>
-								<input type="checkbox" name="canEdit" checked={ user.canEdit }/>
-								<span>Edit</span>
-							</label>
-						</span>
-						<span class="user-checkbox">
-							<label>
-								<input type="checkbox" name="canConfig" checked={ user.canConfig }/>
-								<span>Configure</span>
-							</label>
-						</span>
-						<span class="user-checkbox">
-							<label>
-								<input type="checkbox" name="canDownload" checked={ user.canDownload }/>
-								<span>Download</span>
-							</label>
-						</span>
-						<span class="user-checkbox">
-							<label>
-								<input type="checkbox" name="canUpload" checked={ user.canUpload }/>
-								<span>Upload</span>
-							</label>
-						</span>
-					</p>
-				</div>
-			</div>
-			<div class="row">
-        <div class="input-field col s6">
-          <input id="new-email" type="email" class="validate" >
-          <label for="new-email">Add user with e-mail</label>
-				</div>
-				<div class="col s1">
-					<a class="btn-floating add-user" onclick={ doAddUser }><i class="material-icons">add</i></a>
-				</div>
-			</div>
-			<div class="row">
-			<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
-			</button>
-			<span id="userConfigError"></span>
-		</div>
-	</div>
-	<style>
-		.user-checkbox {
-			padding-right: 2em;
-		}
-		.delete-user, .add-user {
-			float: right;
-		}
-		#userConfigError {
-			margin-left: 1em;
-			color: red;
-		}
-	</style>
-	<script>
-		export default {
-			dictId: '',
-			configId: '',
-			configTitle: 'Users', 
-			configData: {users:[]},
-		
-			doDeleteUser(event) {
-				var email = event.target.parentNode.getAttribute('data-email');
-				this.configData.users = this.configData.users.filter(user => user.email != email);
-				this.update()
-			},
+   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <h3>Users</h3>
+   <div if={isLoading} class="center-align grey-text">
+      <h3>Loading users...</h3>
+   </div>
+   <template if={!isLoading}>
+      <div if={!configData.users.length} class="grey-text center-align">
+         <h4>No users</h4>
+         <br>
+         <button class="btn btn-primary" onclick={doAddUser}>
+            <i class="material-icons right">add</i>
+            Add new user
+         </button>
+         <br><br><br><br>
+         <div class="buttons" style="justify-content: center;">
+            <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+         </div>
+      </div>
+      <div>
 
-			doAddUser(event) {
-				if ($('#new-email').val() != '') {
-					this.configData.users.push({email: $('#new-email').val()});
-					this.update();
-				}
-			},
+      <div if={configData.users.length}>
+         <table>
+            <thead>
+               <tr style="border-bottom: none;">
+                  <th>
+                  </th>
+                  <th colspan="5">Privileges</th>
+               </tr>
+               <tr>
+                  <th>User email</th>
+                  <th>Edit</th>
+                  <th>Configure</th>
+                  <th>Download</th>
+                  <th>Upload</th>
+                  <th></th>
+               </tr>
+            </thead>
+            <tbody>
+               <tr each={ (user, idx) in configData.users } no-reorder key={user.id}>
+                  <td>
+                     <span if={user.isEditable}>
+                        <input id="new-email" type="email" class="validate" oninput={onEmailInput.bind(this, idx)} style="max-width: 300px;">
+                     </span>
+                     <span if={!user.isEditable}>
+                        { user.email }
+                     </span>
+                  </td>
+                  <td>
+                     <label>
+                        <input type="checkbox" name="canEdit" checked={ user.canEdit } onchange={onPermissionChange.bind(this, idx)}/>
+                        <span></span>
+                     </label>
+                  </td>
+                  <td>
+                     <label>
+                        <input type="checkbox" name="canConfig" checked={ user.canConfig } onchange={onPermissionChange.bind(this, idx)}/>
+                        <span></span>
+                     </label>
+                  </td>
+                  <td>
+                     <label>
+                        <input type="checkbox" name="canDownload" checked={ user.canDownload } onchange={onPermissionChange.bind(this, idx)}/>
+                        <span></span>
+                     </label>
+                  </td>
+                  <td>
+                     <label>
+                        <input type="checkbox" name="canEdit" checked={ user.canUpload } onchange={onPermissionChange.bind(this, idx)}/>
+                        <span></span>
+                     </label>
+                  </td>
+                  <td>
+                     <a class="btn btn-floating delete-user" onclick={ doDeleteUser.bind(this, idx) }>
+                        <i class="material-icons">delete</i>
+                     </a>
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+         <br>
+         <div>
+            <button class="btn" onclick={doAddUser}>
+               <i class="material-icons right">add</i>
+               Add new user
+            </button>
+         </div>
+         <br><br>
+         <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+         <div id="userConfigError"></div>
+      </div>
+   </template>
 
-			onMounted() {
-				this.dictId = this.props.dictId;
-				this.configId = this.props.configId;
-				console.log('config dict '+ this.dictId + '-' + this.configId)
-				this.props.loadDictDetail();
-				this.fillConfigForm();
-				console.log(this.props);
-			},
+   <style>
+      .user-checkbox {
+         padding-right: 2em;
+      }
+      .delete-user, .add-user {
+         float: right;
+      }
+      #userConfigError {
+         margin-left: 1em;
+         color: red;
+      }
+   </style>
+   <script>
+      export default {
+         isLoading: true,
+         dictId: '',
+         configId: '',
+         configTitle: 'Users',
+         configData: {users:[]},
 
-			async fillConfigForm() {
-				this.props.loadConfigData(this.configId).then((response)=>{
-					this.configData = {users:[]}
-					for (var key in response) {
-						var info = response[key];
-						info.email = key;
-						this.configData.users.push(info);
-					}
-					this.update();
-				});
-			},
+         onEmailInput(idx, evt){
+            this.configData.users[idx].email = evt.target.value
+         },
 
-			getConfigData() {
-				var newData = {};
-				$('.user-info').each(function() {
-					var email = $(this).data('email');
-					newData[email] = {
-						canEdit: $(this).find('[name=canEdit]').is(':checked'),
-						canConfig: $(this).find('[name=canConfig]').is(':checked'),
-						canDownload: $(this).find('[name=canDownload]').is(':checked'),
-						canUpload: $(this).find('[name=canUpload]').is(':checked'),
-					};
-				});
-				return newData;
-			},
+         onPermissionChange(idx, evt){
+            this.configData.users[idx][evt.target.name] = evt.target.checked
+         },
 
-			saveData() {
-				var data = this.getConfigData();
-				if (Object.values(data).find(row=>row['canConfig']) == undefined) {
-					$('#userConfigError').html('At least one user must have <i>Configure</i> permission.');
-				} else {
-					$('#userConfigError').html('');
-					$('#submit_button').html('Saving...');
-					this.props.saveConfigData(this.configId, this.getConfigData());
-				}
-			}
-		}
-	</script>
-	
+         doDeleteUser(idx) {
+            this.configData.users.splice(idx, 1);
+            this.update()
+         },
+
+         doAddUser(event) {
+            this.configData.users.push({
+               id: this.configData.users.length,
+               email: "",
+               canEdit: false,
+               canConfig: false,
+               canDownload: false,
+               canUpload: false,
+               isEditable: true
+            });
+            this.update();
+            $('table input[type="email"]', this.root).last().focus()
+         },
+
+         onMounted() {
+            this.dictId = this.props.dictId;
+            this.configId = this.props.configId;
+            console.log('config dict '+ this.dictId + '-' + this.configId)
+            this.props.loadDictDetail();
+            this.fillConfigForm();
+            console.log(this.props);
+         },
+
+         async fillConfigForm() {
+            this.props.loadConfigData(this.configId).then((response)=>{
+               this.isLoading = false;
+               this.configData = {users:[]}
+               let id = 0
+               for (var key in response) {
+                  var info = response[key];
+                  info.email = key;
+                  info.id = id
+                  id++
+                  this.configData.users.push(info);
+               }
+               this.update();
+            });
+         },
+
+         saveData() {
+            if (Object.values(this.configData.users).find(row => row.canConfig) == undefined) {
+               $('#userConfigError').html('At least one user must have <i>Configure</i> permission.');
+            } else {
+               $('#userConfigError').html('');
+               $('#submit_button').html('Saving...');
+               this.props.saveConfigData(this.configId, this.configData.users);
+            }
+         }
+      }
+   </script>
+
 </dict-config-users>

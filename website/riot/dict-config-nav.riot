@@ -1,13 +1,13 @@
 <dict-config-nav>
-	<nav>
-	<div class="nav-wrapper deep-orange lighten-4">
-      <div class="col s12">
-        <a href="#/{ this.props.dictId }" class="breadcrumb">{ this.props.dictTitle }</a>
-        <a href="#/{ this.props.dictId }/config" class="breadcrumb">Configure</a>
-        <a if={ this.props.configId } href="#/{ this.props.dictId }/config/{ this.props.configId }" class="breadcrumb">{ this.props.configTitle }</a>
+	<nav class="nav-breadcrumbs">
+      <div class="nav-wrapper">
+         <a href="#/{ props.dictId }"
+               class="breadcrumb">{ props.dictTitle }</a>
+         <a href="#/{ props.dictId }/config"
+               class="breadcrumb">Configure</a>
+         <a if={ props.configId }
+               href="#/{ props.dictId }/config/{ props.configId }"
+               class="breadcrumb">{ props.configTitle }</a>
       </div>
-		
-		</div>
 	</nav>
-
 </dict-config-nav>

@@ -10,6 +10,7 @@ import dict_config_ident from './riot/dict-config-ident.riot'
 import dict_config_kontext from './riot/dict-config-kontext.riot'
 import dict_config_links from './riot/dict-config-links.riot'
 import dict_config_nav from './riot/dict-config-nav.riot'
+import dict_config_buttons from './riot/dict-config-buttons.riot'
 import dict_config_publico from './riot/dict-config-publico.riot'
 import dict_config_searchability from './riot/dict-config-searchability.riot'
 import dict_config_ske from './riot/dict-config-ske.riot'
@@ -42,9 +43,10 @@ import main from './riot/main.riot'
 import open_dict_list from './riot/open-dict-list.riot'
 import register_password from './riot/register-password.riot'
 import register from './riot/register.riot'
-import user_consent from './riot/user-consent.riot'
 import userprofile from './riot/userprofile.riot'
 import welcome from './riot/welcome.riot'
+import user_consent from './riot/user-consent.riot'
+
 riot_register('api', api)
 riot_register('dict-config-autonumber', dict_config_autonumber)
 riot_register('dict-config-download', dict_config_download)
@@ -55,6 +57,7 @@ riot_register('dict-config-ident', dict_config_ident)
 riot_register('dict-config-kontext', dict_config_kontext)
 riot_register('dict-config-links', dict_config_links)
 riot_register('dict-config-nav', dict_config_nav)
+riot_register('dict-config-buttons', dict_config_buttons)
 riot_register('dict-config-publico', dict_config_publico)
 riot_register('dict-config-searchability', dict_config_searchability)
 riot_register('dict-config-ske', dict_config_ske)
@@ -87,8 +90,8 @@ riot_register('main', main)
 riot_register('open-dict-list', open_dict_list);
 riot_register('register-password', register_password)
 riot_register('register', register)
-riot_register('user-consent', user_consent)
 riot_register('userprofile', userprofile)
 riot_register('welcome', welcome)
+riot_register('user-consent', user_consent)
 
 component(App)(document.getElementById('root'))

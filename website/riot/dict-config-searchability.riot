@@ -1,77 +1,79 @@
 <dict-config-searchability>
-	<dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title } configId={ this.configId } configTitle={ this.configTitle }/>
-	<div>
-			<div class="row">
-				<div class="input-field col s6">
-					<select id="search-element" multiple>
-					</select>
-					<label for="search-element">Searchable elements</label>
-					<span class="helper-text">The contents of elements you select here will be searchable (in addition to each entry's headword).</span>
-				</div>
-			</div>
-			<button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i>
-			</button>
-	</div>
-	<style>
-		.delete-el, .add-el {
-			float: right;
-		}
-	</style>
-	<script>
-		export default {
-			dictId: '',
-			configId: '',
-			configTitle: 'Searching', 
-			configData: {searchableElements:[]},
-		
-			onMounted() {
-				this.dictId = this.props.dictId;
-				this.configId = this.props.configId;
-				console.log('config dict '+ this.dictId + '-' + this.configId)
-				this.props.loadDictDetail();
-				this.fillConfigForm();
-				console.log(this.props);
-			},
+   <dict-config-nav dictId={ dictId }  dictTitle={ props.dictDetails.title }  configId={ configId }  configTitle={ configTitle }/>
+   <h3>Searching</h3>
+   <div if={isLoading} class="center-align grey-text">
+      <h3>
+         loading searchable elements...
+      </h3>
+   </div>
+   <div if={!isLoading && !hasElements}
+         class="center-align grey-text">
+      <h3>No elements found</h3>
+   </div>
+   <div if={!isLoading && hasElements}>
+      <label for="search-element">Searchable elements</label>
+      <div class="helper-text">
+         The contents of elements you select here will be searchable (in addition to each entry's headword).
+      </div>
+      <br>
+      <div each={element in Object.keys(props.dictConfigs.xema.elements)}>
+         <label>
+            <input type="checkbox"
+                  value={element}
+                  checked={configData.searchableElements && configData.searchableElements.includes(element)}
+                  disabled={element == props.dictConfigs.titling.headword}/>
+            <span>{element}</span>
+         </label>
+      </div>
+   </div>
+   <br><br>
+   <dict-config-buttons save-data={saveData} dict-id={dictId} show-save={hasElements}></dict-config-buttons>
 
-			onUpdated() {
-				if (this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements) {
-					if ($('#search-element option').length == 0) {
-						console.log(this.configData)
-						console.log(this.configData.searchableElements)
-						console.log(this.props.dictConfigs.titling.headword)
-						Object.entries(this.props.dictConfigs.xema.elements).forEach(([key, info]) => {
-							if (key == this.props.dictConfigs.titling.headword) {
-								$('#search-element').append('<option value="' + key + '" selected disabled>' + key + '</option>');
-							} else {
-								var checked = (this.configData.searchableElements.includes(key))? 'selected':'';
-								$('#search-element').append('<option value="' + key + '" ' + checked + '>' + key + '</option>');
-							}
-						});
-					}
-					$('#search-element').val(this.configData.searchableElements);
-					$('select').formSelect();
-				}
-			},
+   <script>
+      export default {
+         isLoading: true,
+         hasElements: false,
+         dictId: '',
+         configId: '',
+         configTitle: 'Searching',
+         configData: {searchableElements: []},
 
-			async fillConfigForm() {
-				this.props.loadConfigData(this.configId).then((response)=>{
-					this.configData = response;
-					$('#search-element').val(this.configData.searchableElements);
-					this.update();
-				});
-			},
+         onMounted() {
+            this.dictId = this.props.dictId;
+            this.configId = this.props.configId;
+            console.log('config dict '+ this.dictId + '-' + this.configId)
+            this.props.loadDictDetail();
+            this.fillConfigForm();
+            console.log(this.props);
+         },
 
-			getConfigData() {
-				var newData = {searchableElements: $('#search-element').val()};
-				return newData;
-			},
+         onUpdated() {
+            this.hasElements = this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements && this.props.dictConfigs.xema.elements
+         },
 
-			saveData() {
-				console.log(this.getConfigData())
-				$('#submit_button').html('Saving...');
-				this.props.saveConfigData(this.configId, this.getConfigData());
-			}
-		}
-	</script>
-	
+         async fillConfigForm() {
+            this.props.loadConfigData(this.configId).then((response)=>{
+               this.configData = response;
+               this.isLoading = false;
+               this.update();
+            });
+         },
+
+         getConfigData() {
+            let searchableElements = $('input[type="checkbox"]:checked').toArray().map(function(elem){
+               return $(elem).attr("value")
+            })
+            return {
+               searchableElements: searchableElements
+            }
+         },
+
+         saveData() {
+            console.log(this.getConfigData())
+            $('#submit_button').html('Saving...');
+            this.props.saveConfigData(this.configId, this.getConfigData());
+         }
+      }
+   </script>
+
 </dict-config-searchability>

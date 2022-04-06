@@ -1,0 +1,19 @@
+<dict-config-buttons class="buttons">
+   <a href="#{props.dictId}/config"
+         class="btn btn-secondary {!props.showSave ? '' : 'btn-flat'}">
+      Back
+   </a>
+   <button if={typeof props.showSave == "undefined" ? true : props.showSave}
+         class="btn waves-effect waves-light"
+         onclick={props.saveData}
+         id="submit_button">
+      {props.label || "Save"}
+      <i class="material-icons right">save</i>
+   </button>
+
+   <style>
+      :host{
+         margin-top: 20px;
+      }
+   </style>
+</dict-config-buttons>
