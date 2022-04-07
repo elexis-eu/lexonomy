@@ -61,7 +61,7 @@ def sendmail(mailTo, mailSubject, mailText):
         message = "Subject: " + mailSubject + "\n\n" + mailText
         server.sendmail(siteconfig["mailconfig"]["from"], mailTo, message)
         server.quit()
-        
+
 
 # config
 def readDictConfigs(dictDB):
@@ -304,7 +304,7 @@ def logout(user):
 
 def sendSignupToken(email, remoteip):
     if siteconfig["readonly"]:
-        return False    
+        return False
     conn = getMainDB()
     c = conn.execute("select email from users where email=?", (email.lower(),))
     user = c.fetchone()
@@ -327,7 +327,7 @@ def sendSignupToken(email, remoteip):
 
 def sendToken(email, remoteip):
     if siteconfig["readonly"]:
-        return False    
+        return False
     conn = getMainDB()
     c = conn.execute("select email from users where email=?", (email.lower(),))
     user = c.fetchone()
@@ -450,7 +450,7 @@ def prepareApiKeyForSke(email):
             lexapi = row["apiKey"]
         sendApiKeyToSke(row, lexapi)
     return True
-    
+
 
 def processJWT(user, jwtdata):
     conn = getMainDB()
@@ -512,9 +512,19 @@ def makeDict(dictID, template, title, blurb, email):
     #update dictionary info
     users = {email: {"canEdit": True, "canConfig": True, "canDownload": True, "canUpload": True}}
     dictDB = getDB(dictID)
-    dictDB.execute("update configs set json=? where id='users'", (json.dumps(users),))
+    c = dictDB.execute("SELECT count(*) AS total FROM configs WHERE id='users'")
+    r = c.fetchone()
+    if r['total'] == 0:
+        dictDB.execute("INSERT INTO configs (id, json) VALUES (?, ?)", ("users", json.dumps(users)))
+    else:
+        dictDB.execute("UPDATE configs SET json=? WHERE id=?", (json.dumps(users), "users"))
     ident = {"title": title, "blurb": blurb}
-    dictDB.execute("update configs set json=? where id='ident'", (json.dumps(ident),))
+    c = dictDB.execute("SELECT count(*) AS total FROM configs WHERE id='ident'")
+    r = c.fetchone()
+    if r['total'] == 0:
+        dictDB.execute("INSERT INTO configs (id, json) VALUES (?, ?)", ("ident", json.dumps(ident)))
+    else:
+        dictDB.execute("UPDATE configs SET json=? WHERE id=?", (json.dumps(ident), "ident"))
     dictDB.commit()
     attachDict(dictDB, dictID)
     return True
@@ -956,7 +966,7 @@ def cleanHousekeeping(xml):
     xml = re.sub(r"^(<[^>\/]*)\s+lxnm:entryID=['\"][^\"\']*[\"']", r"\1", xml)
     xml = re.sub(r"^(<[^>\/]*)\s+lxnm:subentryID=['\"][^\"\']*[\"']", r"\1", xml)
     xml = re.sub(r"^(<[^>\/]*)\s+lxnm:linkable=['\"][^\"\']*[\"']", r"\1", xml)
-    return xml    
+    return xml
 
 def exportEntryXml(dictDB, dictID, entryID, configs, baseUrl):
     c = dictDB.execute("select * from entries where id=?", (entryID,))
@@ -988,8 +998,8 @@ def readNabesByEntryID(dictDB, dictID, entryID, configs):
     # sort by selected locale
     collator = Collator.createInstance(Locale(getLocale(configs)))
     nabes.sort(key=lambda x: collator.getSortKey(x['sortkey']))
-   
-    #select before/after entries 
+
+    #select before/after entries
     entryID_seen = False
     for n in nabes:
         if not entryID_seen:
@@ -1011,8 +1021,8 @@ def readNabesByText(dictDB, dictID, configs, text):
     # sort by selected locale
     collator = Collator.createInstance(Locale(getLocale(configs)))
     nabes.sort(key=lambda x: collator.getSortKey(x['sortkey']))
-   
-    #select before/after entries 
+
+    #select before/after entries
     for n in nabes:
         if collator.getSortKey(n["sortkey"]) <= collator.getSortKey(text):
             nabes_before.append(n)
@@ -1049,7 +1059,7 @@ def readRandomOne(dictDB, dictID, configs):
         return {"id": 0, "title": "", "xml": ""}
 
 def download_xslt(configs):
-    if 'download' in configs and 'xslt' in configs['download'] and configs['download']['xslt'].strip != "" and len(configs['download']['xslt']) > 0 and configs['download']['xslt'][0] == "<": 
+    if 'download' in configs and 'xslt' in configs['download'] and configs['download']['xslt'].strip != "" and len(configs['download']['xslt']) > 0 and configs['download']['xslt'][0] == "<":
         import lxml.etree as ET
         try:
             xslt_dom = ET.XML(configs["download"]["xslt"].encode("utf-8"))
@@ -1291,7 +1301,7 @@ def updateDictConfig(dictDB, dictID, configID, content):
     dictDB.execute("delete from configs where id=?", (configID, ))
     dictDB.execute("insert into configs(id, json) values(?, ?)", (configID, json.dumps(content)))
     dictDB.commit()
-    
+
     if configID == "ident":
         attachDict(dictDB, dictID)
         if content.get('lang'):
@@ -1564,8 +1574,8 @@ def addFlag(xml, flag, flagconfig, xemaconfig):
 
     return "{0}<{1}>{2}</{1}>{3}".format(
             xml[:loc1], flag_element, flag, xml[loc2:])
-           
-            
+
+
 def getFlagElementPath(xema, flag_element):
     result = getFlagElementPath_recursive(xema, flag_element, xema["root"])
     if result is not None:
@@ -2292,7 +2302,7 @@ def elexisConvertTei(xml_entry):
         return None
 
 def elexisNormalisePos(pos):
-    if pos in ["adjective", "adposition", "adverb", "auxiliary", 
+    if pos in ["adjective", "adposition", "adverb", "auxiliary",
             "coordinatingConjunction", "determiner", "interjection",
             "commonNoun", "numeral", "particle", "pronoun", "properNoun",
             "punctuation", "subordinatingConjunction", "symbol", "verb",
