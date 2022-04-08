@@ -44,8 +44,9 @@ if purge:
         print("Purging history...")
         db.execute("delete from history")
     else:
-        print("Moving all entries to history...")
+        print("Copying all entries to history...")
         db.execute("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', ?, ?, xml, ? from entries", (str(datetime.datetime.utcnow()), email, json.dumps(historiography)))
+    print("Purging entries...")
     db.execute("delete from entries")
     db.commit()
     print("Compressing database...")
@@ -143,7 +144,9 @@ for entry in re.findall(re_entry, xmldata):
         db.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, searchTitle.lower(), 1))
         db.commit() 
         entryInserted += 1
-        print("\r%.2d%% (%d/%d entries imported)" % ((entryInserted/entryCount*100), entryInserted, entryCount))
+        if entryInserted % 100 == 0:
+            print("\r%.2d%% (%d/%d entries imported)" % ((entryInserted/entryCount*100), entryInserted, entryCount), end='')
+print("\r%.2d%% (%d/%d entries imported)" % ((entryInserted/entryCount*100), entryInserted, entryCount))
         
 db.commit() 
 
