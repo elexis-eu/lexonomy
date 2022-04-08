@@ -144,7 +144,6 @@ for entry in re.findall(re_entry, xmldata):
         searchTitle = ops.getEntryTitle(entry, configs["titling"], True)
         db.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, searchTitle, 1))
         db.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, searchTitle.lower(), 1))
-        db.commit() 
         entryInserted += 1
         if entryInserted % 100 == 0:
             print("\r%.2d%% (%d/%d entries imported)" % ((entryInserted/entryCount*100), entryInserted, entryCount), end='')
