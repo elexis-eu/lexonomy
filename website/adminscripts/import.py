@@ -13,15 +13,21 @@ import ops
 
 if len(sys.argv) < 3:
     print("Usage: ./import.py [-p] PATH_TO_DICTIONARY.sqlite FILE_TO_IMPORT.xml [AUTHOR_EMAIL]")
-    print("       -p   purge dictionary before importing")
+    print("       -p   purge dictionary before importing but keep backup in history")
+    print("       -pp  like -p but do not keep purged content in history and purge any existing history as well")
     sys.exit()
 
 print("PID "+ str(os.getpid()))
 print("Import started. You may close the window, import will run in the background. Please wait...")
 args = sys.argv[1:]
 purge = False
+purge_history = False
 if args[0] == "-p":
     purge = True
+    args.pop(0)
+elif args[0] == "-pp":
+    purge = True
+    purge_history = True
     args.pop(0)
 
 
@@ -34,9 +40,15 @@ db.row_factory = sqlite3.Row
 historiography={"importStart": str(datetime.datetime.utcnow()), "filename": os.path.basename(filename)}
 
 if purge:
-    db.execute("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', ?, ?, xml, ? from entries", (str(datetime.datetime.utcnow()), email, json.dumps(historiography)))
+    if purge_history:
+        print("Purging history...")
+        db.execute("delete from history")
+    else:
+        print("Moving all entries to history...")
+        db.execute("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', ?, ?, xml, ? from entries", (str(datetime.datetime.utcnow()), email, json.dumps(historiography)))
     db.execute("delete from entries")
     db.commit()
+    print("Compressing database...")
     db.execute("vacuum")
     db.commit()
 
