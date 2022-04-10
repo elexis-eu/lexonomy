@@ -9,8 +9,7 @@ a working installation of Python 3.
 You also need to download the source code from this repository into a directory
 on your computer.
 
-
-# Run Lexonomy locally
+# Run Lexonomy
 
 Whichever way you choose to run Lexonomy locally, with the default
 configuration:
@@ -18,51 +17,13 @@ configuration:
 - You should be able to navigate to this address with your web browser and see
   Lexonomy's home page
 
-## Inside a Docker environment
-
-Bootstrapping a local development environment in Docker has (so far) only been
-tested on Linux. Most likely this also works for MacOS - and most likely does
-*not* work for Windows.
-
-### Prerequisites
-- [docker](https://docs.docker.com/install/) 17.09.0+
-- [docker-compose](https://docs.docker.com/compose/install/) 1.17.0+  
-  The two need to accept `version: '3'` [docker-compose
-  files](https://docs.docker.com/compose/compose-file/compose-versioning/#version-3)
-- make
-
-Make sure that your docker-compose points to the right volume locations on the host:
-```
-- <path to siteconfig.json>:/opt/service/website/siteconfig.json
-- <path to data directory>:/opt/service/data
-```
-
-Initialize database and admin user:
-```
-docker-compose exec python3 adminscripts/init.js
-```
-This will create a database file inside your data volume.
-
-Now you can run Lexonomy:
-```
-docker-compose up -d
-```
-This command will also build the Docker image, if there wasn't one built beforehand.
-
-You can also manually build the image with:
-```
-docker-compose build
-```
-
-
-## Inside a user environment
-
-### Prerequisites
+## Prerequisites
 
 - [Download and install Python](https://www.python.org/downloads/) 3.5+
 - [Download and install the JWT module for Python3](https://github.com/jpadilla/pyjwt)
 - [Download and install the LXML module for Python3](https://lxml.de/installation.html)
 - [Download and install the Markdown module for Python3](https://python-markdown.github.io/)
+- [(Optional) Download and install NodeJS to build the frontend](https://nodejs.org/en/)
 - In your terminal, go to the `website` directory of the repository:
 ```sh
 cd website
@@ -78,30 +39,26 @@ cp siteconfig.json.template siteconfig.json
 python3 ./adminscripts/init.py
 ```
 
-### Punch it
+- Optional but recommended: build the frontend into a single Javascript bundle.
+Lexonomy uses [https://riot.js.org/](Riot.js) a its front-end library. Riot supports in-browser
+compilation, so it is not necessary to build the bundle, however the first loading of Lexonomy is
+then quite slower (because your browser is compiling all the Javascript together).
+To use the in-browser compilation, navigate to `http://localhost:8080/index.browsercompile.html`.
+Of course, you can rename this file as you wish. The default `index.html` uses a precompiled
+Javascript bundle. For the compilation, you need to install NodeJS and run
+```sh
+make
+```
+in the top-level directory. It produces `bundle.js` which contains a complete frontend for Lexonomy.
+
+
+## Punch it
 In your terminal and in the `website` directory, start Lexonomy with this:
 ```sh
 python3 lexonomy.py
 ```
 
-## Install on MacOS
-
-**NOTE:** Lexonomy does not run on the ["native"](https://docs.python.org/3/using/mac.html) Python3 (issue [#231](https://github.com/elexis-eu/lexonomy/issues/231)). Use [Homebrew](https://brew.sh/) Python3 instead, which you can install by running: _$ brew install python3_
-
-1. [RECOMMENDED] Create and use a virtual environment.
-
-   ```
-   $ python -m venv env && source ./env/bin/activate
-   $ python -m pip install -U pip wheel setuptools
-   ```
-
-2. Install the required Python packages.
-
-   ```
-   $ cd <YOUR_LEXONOMY_DIR>/lexonomy/website
-   $ pip install -r requirements.txt --user
-
-# Configuring your Lexonomy (for a server installation)
+# Configuring your Lexonomy
 
 By default, configuration is located in the file `website/siteconfig.json`, however this can be changed by setting the `$LEXONOMY_SITECONFIG` environmental variable. This file contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
 
@@ -152,6 +109,12 @@ sudo python3 lexonomy.py
 This is the path to the `data` folder where Lexonomy will store all its data, including (importantly) all the dictionaries. Note that the directory name does not have to be `data`, it can be anything you want.
 
 If the path given here is relative, it is interpreted relatively to the web application's current directory (= the `website` directory). It can also be an absolute path, eg. `/home/joebloggs/lexonomydata/`.
+
+Upon start, Lexonomy creates three subdirectories automatically:
+
+- `dicts` – a directory with individual dictionaries, each being an SQLite database,
+- `uploads` – a directory for temporary storage of user-uploaded imports,
+- `sqlite_tmp` – a directory that SQLite will use as its temporary directory.
 
 ## Logging
 

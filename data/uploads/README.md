@@ -1,1 +1,0 @@
-This folder is where Lexonomy stores various temporary files while users upload dictionaries (using the *Upload* section of the website). Normally, Lexonomy deletes files here when they're no longer needed. Any files here that are older than, say, a couple of hours are most likely the remains of failed uploads and can be safely deleted.
