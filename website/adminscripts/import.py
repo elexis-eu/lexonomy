@@ -48,6 +48,8 @@ if purge:
         db.execute("insert into history(entry_id, action, [when], email, xml, historiography) select id, 'purge', ?, ?, xml, ? from entries", (str(datetime.datetime.utcnow()), email, json.dumps(historiography)))
     print("Purging entries...")
     db.execute("delete from entries")
+    db.execute("delete from linkables")
+    db.execute("delete from searchables")
     db.commit()
     print("Compressing database...")
     db.execute("vacuum")
