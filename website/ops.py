@@ -15,12 +15,16 @@ import shutil
 import markdown
 import re
 import secrets
+import pathlib
 from collections import defaultdict
 from icu import Locale, Collator
 import requests
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
                                            "siteconfig.json"), encoding="utf-8"))
+for datadir in ["dicts", "uploads", "sqlite_tmp"]:
+    pathlib.Path(os.path.join(siteconfig["dataDir"], datadir)).mkdir(parents=True, exist_ok=True)
+os.environ["SQLITE_TMPDIR"] = os.path.join(siteconfig["dataDir"], "sqlite_tmp")
 
 defaultDictConfig = {"editing": {"xonomyMode": "nerd", "xonomyTextEditor": "askString" },
                      "searchability": {"searchableElements": []},
