@@ -29,9 +29,14 @@ configuration:
 cd website
 ```
 
-- Copy `siteconfig.json.template` to `siteconfig.json`
+- Copy `siteconfig.json.template` to `siteconfig.json`; this is the backend configuration
 ```sh
 cp siteconfig.json.template siteconfig.json
+```
+
+- Copy `config.js.template` to `config.js`; this is the frontend configuration
+```sh
+cp config.js.template config.js
 ```
 
 - Initialize database and admin user:
@@ -59,8 +64,9 @@ python3 lexonomy.py
 ```
 
 # Configuring your Lexonomy
+The frontend configuration file is `website/config.js`. Currently the only setting is the URL of the backend configuration (as `window.API_URL`), which should in most cases be the same as `baseUrl` specified below. However, you can point Lexonomy frontend to an arbitrary backend installation.
 
-By default, configuration is located in the file `website/siteconfig.json`, however this can be changed by setting the `$LEXONOMY_SITECONFIG` environmental variable. This file contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
+By default, backend configuration is located in the file `website/siteconfig.json`, however this can be changed by setting the `$LEXONOMY_SITECONFIG` environmental variable. This file contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
 
 ## Base URL
 

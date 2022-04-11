@@ -4,7 +4,7 @@ SOURCE_RIOT=$(wildcard website/riot/*.riot)
 SOURCE_JS=website/app.js $(SOURCE_RIOT)
 INSTALL_JS=app.js bundle.js
 SOURCE_PY=lexonomy.py ops.py bottle.py media.py
-SOURCE_CONF=siteconfig.json.template package.json rollup.config.js
+SOURCE_CONF=siteconfig.json.template package.json rollup.config.js config.js.template
 SOURCE_WEBDIRS=adminscripts css dictTemplates docs furniture img js libs widgets
 SOURCE_WEBSITE=$(SOURCE_JS) $(addprefix website/, $(SOURCE_PY) $(SOURCE_CONF) $(SOURCE_WEBDIRS)) website/index.html website/index.browsercompile.html
 INSTALL_WEBSITE=$(addprefix website/, $(INSTALL_JS) $(SOURCE_PY) $(SOURCE_CONF) $(SOURCE_WEBDIRS)) website/index.html website/index.browsercompile.html
@@ -17,6 +17,7 @@ install: $(INSTALL_WEBSITE) $(SOURCE_DOCS)
 	mkdir -p $(DESTDIR)$(INSTALLDIR)
 	cp -rp --parents $^ $(DESTDIR)$(INSTALLDIR)/
 	mv $(DESTDIR)$(INSTALLDIR)/website/siteconfig.json.template $(DESTDIR)$(INSTALLDIR)/website/siteconfig.json
+	mv $(DESTDIR)$(INSTALLDIR)/website/config.js.template $(DESTDIR)$(INSTALLDIR)/website/config.js
 dist-gzip: $(SOURCE_WEBSITE) $(SOURCE_DOCS) Makefile website/Makefile
 	tar czvf lexonomy-$(VERSION).tar.gz --transform 's,^,lexonomy-$(VERSION)/,' $^
 

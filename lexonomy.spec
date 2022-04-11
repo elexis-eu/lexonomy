@@ -51,5 +51,6 @@ chmod -R g+rwX /opt/lexonomy/data
 /opt/lexonomy/
 %config(noreplace) /opt/lexonomy/data
 %config(noreplace) /opt/lexonomy/website/siteconfig.json
+%config(noreplace) /opt/lexonomy/website/config.js
 
 %changelog
