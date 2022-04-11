@@ -36,7 +36,6 @@ Lexonomy is a free tool for writing and publishing dictionaries and other dictio
 
 
 %build
-cd website
 make
 make libSqliteIcu.so
 
