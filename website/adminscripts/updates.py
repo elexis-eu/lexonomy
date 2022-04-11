@@ -6,54 +6,46 @@ import json
 import os.path
 import sqlite3
 
+sc_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
-                                           "siteconfig.json"), encoding="utf-8"))
-path = os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite')
+                                           os.path.join(sc_dir, "siteconfig.json")), encoding="utf-8"))
+path = os.path.join(os.path.normpath(os.path.join(sc_dir, siteconfig["dataDir"])), 'lexonomy.sqlite')
 print("Updating lexonomy database: %s" % path)
 conn = sqlite3.connect(path)
 conn.row_factory = sqlite3.Row
 
-print("Create table recovery_tokens")
-try:
-    conn.execute("CREATE TABLE IF NOT EXISTS recovery_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text)")
-except sqlite3.Error as e:
-    print("Database error: %s" % e)
+#### HELPER FUNCTIONS ####
 
-print("Create table register_tokens")
-try:
-    conn.execute("CREATE TABLE IF NOT EXISTS register_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text)")
-except sqlite3.Error as e:
-    print("Database error: %s" % e)
+def get_table_column_names(conn, table):
+    r = conn.execute("PRAGMA table_info(%s)" % table)
+    return set([x[1] for x in r.fetchall()])
 
-print("Add column ske_id")
-try:
-    conn.execute("ALTER TABLE users ADD COLUMN ske_id INTEGER")
-except sqlite3.Error as e:
-    print("Database error: %s" % e)
+def do_query(conn, q):
+    try:
+        conn.execute(q)
+    except sqlite3.Error as e:
+        print("Database error: %s" % e)
+        print("Query was: '%s'" % q)
 
-print("Add column ske_username")
-try:
-    conn.execute("ALTER TABLE users ADD COLUMN ske_username TEXT")
-except sqlite3.Error as e:
-    print("Database error: %s" % e)
+#### ADDING NEW TABLES ####
 
-print("Add column consent")
-try:
-    conn.execute("ALTER TABLE users ADD COLUMN consent INTEGER")
-except sqlite3.Error as e:
-    print("Database error: %s" % e)
+do_query(conn, "CREATE TABLE IF NOT EXISTS recovery_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text)")
+do_query(conn, "CREATE TABLE IF NOT EXISTS register_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text)")
 
-print("Add column ske_apiKey")
-try:
-    conn.execute("ALTER TABLE users ADD COLUMN ske_apiKey TEXT")
-except sqlite3.Error as e:
-    print("Database error: %s" % e)
+#### ADDING COLUMNS TO EXISTING TABLES ####
 
-print("Add column language for dictionary")
-try:
-    conn.execute("ALTER TABLE dicts ADD COLUMN language TEXT")
-except sqlite3.Error as e:
-    print("Database error: %s" % e)
+upgrades = {
+    "users" : [("ske_id", "INTEGER"), ("ske_username", "TEXT"), ("consent", "INTEGER"), ("ske_apiKey", "TEXT")],
+    "dicts" : [("language", "TEXT")]
+}
+
+for db, newcols in upgrades.items():
+    db_columns = get_table_column_names(conn, db)
+    for column in newcols:
+        if column[0] not in db_columns:
+            do_query(conn, "ALTER TABLE %s ADD COLUMN %s %s" % (db, column[0], column[1]))
+
+#### COMMIT & DONE ####
 
 conn.commit()
 conn.close()

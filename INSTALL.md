@@ -24,6 +24,12 @@ configuration:
 - [Download and install the LXML module for Python3](https://lxml.de/installation.html)
 - [Download and install the Markdown module for Python3](https://python-markdown.github.io/)
 - [(Optional) Download and install NodeJS to build the frontend](https://nodejs.org/en/)
+
+# Configuring your Lexonomy
+The frontend configuration file is `website/config.js`. Currently the only setting is the URL of the backend configuration (as `window.API_URL`), which should in most cases be the same as `baseUrl` specified below. However, you can point Lexonomy frontend to an arbitrary backend installation.
+
+By default, backend configuration is located in the file `website/siteconfig.json`, however this can be changed by setting the `$LEXONOMY_SITECONFIG` environmental variable. This file contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
+
 - In your terminal, go to the `website` directory of the repository:
 ```sh
 cd website
@@ -39,11 +45,6 @@ cp siteconfig.json.template siteconfig.json
 cp config.js.template config.js
 ```
 
-- Initialize database and admin user:
-```
-python3 ./adminscripts/init.py
-```
-
 - Optional but recommended: build the frontend into a single Javascript bundle.
 Lexonomy uses [https://riot.js.org/](Riot.js) a its front-end library. Riot supports in-browser
 compilation, so it is not necessary to build the bundle, however the first loading of Lexonomy is
@@ -56,17 +57,7 @@ make
 ```
 in the top-level directory. It produces `bundle.js` which contains a complete frontend for Lexonomy.
 
-
-## Punch it
-In your terminal and in the `website` directory, start Lexonomy with this:
-```sh
-python3 lexonomy.py
-```
-
-# Configuring your Lexonomy
-The frontend configuration file is `website/config.js`. Currently the only setting is the URL of the backend configuration (as `window.API_URL`), which should in most cases be the same as `baseUrl` specified below. However, you can point Lexonomy frontend to an arbitrary backend installation.
-
-By default, backend configuration is located in the file `website/siteconfig.json`, however this can be changed by setting the `$LEXONOMY_SITECONFIG` environmental variable. This file contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
+# Backend configuration
 
 ## Base URL
 
@@ -180,3 +171,10 @@ starts a standalone web server. If you have the [Paste](https://pythonpaste.read
 
 You can run Lexonomy inside Apache as CGI or WSGI. For the latter please refer to the relevant [Bottle](http://bottlepy.org) documentation (the Bottle app is WSGI-compatible), for the former you can get inspiration in the [configuration file](website/docs/lexonomy_httpd.conf) that is part of Lexonomy.
 
+# Upgrading to newer versions
+
+You should generally be able to upgrade by copying new files over and running an update script to upgrade DB schemas. The upgrade script is idempotent so you may run it at any time or multiple times with no harm:
+
+```sh
+python3 adminscripts/updates.py
+```
