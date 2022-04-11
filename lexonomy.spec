@@ -40,7 +40,7 @@ make
 %install
 make DESTDIR=$RPM_BUILD_ROOT INSTALLDIR=/opt/lexonomy/ install
 echo %{version} > $RPM_BUILD_ROOT/opt/lexonomy/website/version.txt
-mkdir -p /opt/lexonomy/data
+mkdir -p $RPM_BUILD_ROOT/opt/lexonomy/data
 
 %post
 chown -R apache: /opt/lexonomy/data
