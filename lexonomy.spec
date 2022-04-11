@@ -19,6 +19,7 @@ BuildRequires:	nodejs
 BuildRequires:	npm
 BuildRequires:	sqlite-devel
 BuildRequires:	libicu-devel
+BuildRequires:	wget
 
 Requires:	python3 >= 3.5
 Requires:	python3-jwt
