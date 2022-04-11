@@ -17,6 +17,8 @@ BuildRequires:	python3 >= 3.5
 BuildRequires:	git
 BuildRequires:	nodejs
 BuildRequires:	npm
+BuildRequires:	sqlite-devel
+BuildRequires:	libicu-devel
 
 Requires:	python3 >= 3.5
 Requires:	python3-jwt
@@ -36,11 +38,13 @@ Lexonomy is a free tool for writing and publishing dictionaries and other dictio
 %build
 cd website
 make
+make libSqliteIcu.so
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT INSTALLDIR=/opt/lexonomy/ install
 echo %{version} > $RPM_BUILD_ROOT/opt/lexonomy/website/version.txt
 mkdir -p $RPM_BUILD_ROOT/opt/lexonomy/data
+cp -p libSqliteIcu.so $RPM_BUILD_ROOT/opt/lexonomy/
 
 %post
 chown -R apache: /opt/lexonomy/data

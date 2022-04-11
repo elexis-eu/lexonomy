@@ -20,7 +20,15 @@ install: $(INSTALL_WEBSITE) $(SOURCE_DOCS)
 	mv $(DESTDIR)$(INSTALLDIR)/website/config.js.template $(DESTDIR)$(INSTALLDIR)/website/config.js
 dist-gzip: $(SOURCE_WEBSITE) $(SOURCE_DOCS) Makefile website/Makefile
 	tar czvf lexonomy-$(VERSION).tar.gz --transform 's,^,lexonomy-$(VERSION)/,' $^
-
+libSqliteIcu.so: release.tar.gz
+	rm -rf sqlite-release
+	tar xzf $<
+	cd sqlite-release/ext/icu; \
+	gcc -fPIC -shared icu.c `pkg-config --libs --cflags icu-uc icu-io` -o libSqliteIcu.so
+	cp sqlite-release/ext/icu/libSqliteIcu.so .
+	rm -rf sqlite-release
+release.tar.gz:
+	wget https://github.com/sqlite/sqlite/archive/refs/tags/release.tar.gz
 
 
 
