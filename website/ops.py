@@ -1443,23 +1443,29 @@ def updateEntryLinkables(dictDB, entryID, xml, configs, save=True, save_xml=True
             identifier = linkref["identifier"]
             for pattern in re.findall(r"%\([^)]+\)", linkref["identifier"]):
                 text = ""
-                extract = extractText(el.toxml(), pattern[2:-1])
-                extractfull = extractText(xml, pattern[2:-1])
-                if len(extract) > 0:
-                    text = extract[0]
-                elif len(extractfull) > 0:
-                    text = extractfull[0]
+                if pattern[2] == '@':
+                    text = el.getAttribute(pattern[3:-1])
+                else:
+                    extract = extractText(el.toxml(), pattern[2:-1])
+                    extractfull = extractText(xml, pattern[2:-1])
+                    if len(extract) > 0:
+                        text = extract[0]
+                    elif len(extractfull) > 0:
+                        text = extractfull[0]
                 identifier = identifier.replace(pattern, text)
             el.setAttribute('lxnm:linkable', identifier)
             preview = linkref["preview"]
             for pattern in re.findall(r"%\([^)]+\)", linkref["preview"]):
                 text = ""
-                extract = extractText(el.toxml(), pattern[2:-1])
-                extractfull = extractText(xml, pattern[2:-1])
-                if len(extract) > 0:
-                    text = extract[0]
-                elif len(extractfull) > 0:
-                    text = extractfull[0]
+                if pattern[2] == '@':
+                    text = el.getAttribute(pattern[3:-1])
+                else:
+                    extract = extractText(el.toxml(), pattern[2:-1])
+                    extractfull = extractText(xml, pattern[2:-1])
+                    if len(extract) > 0:
+                        text = extract[0]
+                    elif len(extractfull) > 0:
+                        text = extractfull[0]
                 preview = preview.replace(pattern, text)
             ret.append({'element': linkref["linkElement"], "identifier": identifier, "preview": preview})
     xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
