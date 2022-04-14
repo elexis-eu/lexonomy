@@ -1946,7 +1946,10 @@ def notifyUsers(configOld, configNew, dictInfo, dictID):
             mailText += "\nYou can access the dictionary at the following address:\n"
             mailText += siteconfig['baseUrl'] + "#/" + dictID
             mailText += "\n\nYours,\nThe Lexonomy team"
-            sendmail(user, mailSubject, mailText)
+            try:
+                sendmail(user, mailSubject, mailText)
+            except Exception as e:
+                pass
 
 def get_iso639_1():
     codes = []
