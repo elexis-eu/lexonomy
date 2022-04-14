@@ -847,24 +847,28 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
         if link["sourceDict"] in dictUsed:
             dictTitle = dictUsed[link["sourceDict"]]
         else:
-            dictConf = readDictConfigs(getDB(link["sourceDict"]))
-            dictConf = loadHandleMeta(dictConf)
-            if dictConf["metadata"].get("dc.title"):
-                dictTitle = dictConf["metadata"]["dc.title"]
-            else:
-                dictTitle = dictConf["ident"]["title"]
-            dictUsed[link["sourceDict"]] = dictTitle
+            dictDB = getDB(link["sourceDict"])
+            if dictDB:
+                dictConf = readDictConfigs(dictDB)
+                dictConf = loadHandleMeta(dictConf)
+                if dictConf["metadata"].get("dc.title"):
+                    dictTitle = dictConf["metadata"]["dc.title"]
+                else:
+                    dictTitle = dictConf["ident"]["title"]
+                dictUsed[link["sourceDict"]] = dictTitle
         link["sourceDictTitle"] = dictTitle
         if link["targetDict"] in dictUsed:
             dictTitle = dictUsed[link["targetDict"]]
         else:
-            dictConf = readDictConfigs(getDB(link["targetDict"]))
-            dictConf = loadHandleMeta(dictConf)
-            if dictConf["metadata"].get("dc.title"):
-                dictTitle = dictConf["metadata"]["dc.title"]
-            else:
-                dictTitle = dictConf["ident"]["title"]
-            dictUsed[link["targetDict"]] = dictTitle
+            dictDB = getDB(link["targetDict"])
+            if dictDB:
+                dictConf = readDictConfigs(dictDB)
+                dictConf = loadHandleMeta(dictConf)
+                if dictConf["metadata"].get("dc.title"):
+                    dictTitle = dictConf["metadata"]["dc.title"]
+                else:
+                    dictTitle = dictConf["ident"]["title"]
+                dictUsed[link["targetDict"]] = dictTitle
         link["targetDictTitle"] = dictTitle
 
     return links
