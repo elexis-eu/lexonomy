@@ -169,7 +169,16 @@
             } else {
                $('#userConfigError').html('');
                $('#submit_button').html('Saving...');
-               this.props.saveConfigData(this.configId, this.configData.users);
+               let data = {}
+               this.configData.users.forEach(u => {
+                  data[u.email] = {
+                     canEdit: u.canEdit,
+                     canConfig: u.canConfig,
+                     canDownload: u.canDownload,
+                     canUpload: u.canUpload
+                  }
+               })
+               this.props.saveConfigData(this.configId, data);
             }
          }
       }
