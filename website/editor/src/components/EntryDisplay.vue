@@ -1,0 +1,46 @@
+<template>
+  <div v-if="state.entry.editorConfig">
+    <ComponentGeneratorComponent
+      :children="preparedDataForEntry"
+      :content="content"
+    />
+
+<!--      <component v-for="(elementData, element) in state.entry.editorConfig"-->
+<!--                 :key="element"-->
+<!--                 :is="getComponentFromElementName({[element]: elementData})"-->
+<!--                 v-bind="getPropsForElement({[element]: elementData})"-->
+<!--                 @createAdditionalElements="createAdditionalElements($event)"-->
+<!--      />-->
+  </div>
+</template>
+
+<script>
+import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
+
+export default {
+  name: "EntryDisplay",
+  components: {
+    ComponentGeneratorComponent
+  },
+  props: {
+    content: {
+      type: Object,
+      required: true
+    },
+    contentHtml: {
+      type: String,
+      required: false
+    }
+  },
+  computed: {
+    preparedDataForEntry() {
+      console.log(this.state.entry.editorConfig)
+      return [this.state.entry.editorConfig]
+    }
+  },
+}
+</script>
+
+<style scoped>
+
+</style>
