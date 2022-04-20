@@ -1,7 +1,7 @@
 <template>
   <div class="popup">
     <section v-if="elementData.show">
-      <p>Popup component</p>
+      <p>Popup component - 12312312325345</p>
       <p> {{ elementName }}</p>
     </section>
     <ComponentGeneratorComponent

@@ -160,17 +160,22 @@
             "text-input",
             "textarea-input",
             "dropdown",
-            "media"
+            "media",
+            "text-input-with-markup", //example is what we're looking at
+            "link to another entry?" // sometimes id is passed which is a reference to a different element
           ]
+          //What happends if element isn't in structure
           let editorConfig = {
             entry: {
               show: true,
               displayType: "inline",
+              // add ability to add additional element
               children: [
                 {
                   headword: {
                     show: true,
-                    displayType: "read-only"
+                    // displayType: "read-only"
+                    displayType: "text-input"
                   }
                 },
                 {
