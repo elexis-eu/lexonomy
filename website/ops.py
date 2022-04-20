@@ -1568,6 +1568,8 @@ def getEntrySearchables(xml, configs):
     return ret
 
 def flagEntry(dictDB, dictID, configs, entryID, flag, email, historiography):
+    if configs["flagging"]["flag_element"] == configs["xema"]["root"]:
+        return False
     c = dictDB.execute("select id, xml from entries where id=?", (entryID,))
     row = c.fetchone()
     xml = row["xml"] if row else ""

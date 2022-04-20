@@ -224,8 +224,11 @@ def entrycreate(dictID, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/entryflag.json")
 @authDict(["canEdit"])
 def entryflag(dictID, user, dictDB, configs):
-    ops.flagEntry(dictDB, dictID, configs, request.forms.id, request.forms.flag, user["email"], {})
-    return {"success": True, "id": request.forms.id}
+    res = ops.flagEntry(dictDB, dictID, configs, request.forms.id, request.forms.flag, user["email"], {})
+    if res:
+        return {"success": True, "id": request.forms.id}
+    else:
+        return {"success": False, "id": request.forms.id}
 
 @get(siteconfig["rootPath"]+"<dictID>/subget")
 @authDict(["canEdit"])
