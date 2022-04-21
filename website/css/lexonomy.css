@@ -7,7 +7,7 @@ html body{
     flex-direction:column;
 }
 
-footer{
+app-footer{
   margin-top:auto;
 }
 
@@ -29,6 +29,11 @@ footer{
 }
 .nav-breadcrumbs .breadcrumb{
     font-size: 14px;
+}
+.nav-breadcrumbs .breadcrumb:last-child{
+    text-decoration: none;
+    pointer-events: none;
+    cursor: default;
 }
 
 /* MATERIALIZE TWEAKS  */
@@ -77,7 +82,9 @@ h3{
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
-
+.btn{
+    border-radius: 0;
+}
 .btn:not(.btn-flat){
     box-shadow: none;
     background-color: #231f20;
@@ -104,6 +111,25 @@ h3{
 .btn.btn-flat:hover,
 .btn.btn-secondary:hover{
     background-color: #cccccc;
+}
+
+.tabs{
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e4e4e4;
+}
+.tabs .tab a{
+    color: #767676;
+    cursor: pointer;
+}
+.tabs .tab a:hover{
+    color: #c62132;
+}
+.tabs li[active]{
+    border-bottom: 3px solid black;
+}
+.tabs li[active] a{
+    color: #000;
+    text-decoration: none;
 }
 
 label{
@@ -329,6 +355,10 @@ nav a.sidenav-trigger i{
     color: #231f20;
 }
 
+.collection{
+    border: none;
+}
+
 .collection a.collection-item{
      color: #000;
 }
@@ -342,4 +372,54 @@ thead tr{
 
 .inlineBlock{
     display: inline-block;
+}
+
+.clickable{
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.clickable:hover{
+    opacity: 1;
+}
+
+.message{
+    text-align: center;
+    font-weight: bold;
+    padding: 10px 15px;
+    color: #fff;
+}
+
+.message.messageInfo{
+    background-color: #607d8b;
+}
+
+.message.messageSuccess{
+    background-color: #388E3C;
+}
+
+.message.messageError{
+    background-color: #D32F2F;
+}
+
+/* flag in entry list  */
+.flagDropdown li{
+    display: flex;
+    min-width: 170px;
+    padding: 12px 15px;
+}
+.flagDropdown li i{
+    margin-right: 5px;
+}
+.flagDropdown li .right{
+    margin-left: auto;
+    padding-left: 20px;
+}
+
+/* responsivity  */
+
+@media screen and (max-width: 1500px) {
+    .container.wideContainer{
+        width: 95vw;
+    }
 }

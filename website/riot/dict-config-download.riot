@@ -1,49 +1,47 @@
 <dict-config-download>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["download", "Download settings"]]}/>
    <h3>Download settings</h3>
    <div class="row">
       <div class="input-field">
-         <textarea id="download_xslt" class="materialize-textarea">{ configData.xslt }</textarea>
+         <textarea id="download_xslt" class="materialize-textarea">{ state.data.xslt }</textarea>
          <label for="download_xslt">XSLT transformation on download</label>
          <span class="helper-text">You can use this functionality to automatically apply an XSLT transformation when the dictionary is downloaded. If you do not input valid XSLT here, no transformation will be applied.</span>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
    <script>
       export default {
-         dictId: '',
-         configId: '',
-         configTitle: 'Download settings',
-         configData: {xslt: ''},
-
-         onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            console.log(this.props);
+         state: {
+            isLoading: true,
+            isSaving: false,
+            data: {xslt: ''}
          },
 
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.configData = response;
-               this.update();
-               M.updateTextFields();
-               M.textareaAutoResize($('#download_xslt'));
-            });
+         onMounted() {
+            this.store.loadDictionaryConfig("donwload")
+                  .done(response => {
+                     this.state.data = response.content
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                     M.updateTextFields()
+                     M.textareaAutoResize($('#download_xslt'))
+                  })
          },
 
          saveData() {
-            var xslt = $('#download_xslt').val();
+            var xslt = $('#download_xslt').val()
             try {
-               var data = {xslt: xslt};
-               parsed_xslt = $.parseXML(xslt);
-               $('#submit_button').html('Saving...');
-               this.props.saveConfigData(this.configId, data);
+               var data = {xslt: xslt}
+               // TODO  parsed_xslt??
+               parsed_xslt = $.parseXML(xslt)
+               this.update({isSaving: true})
+               this.store.updateDictionaryConfig("download", data)
+                     .always(() => this.update({isSaving: false}))
             } catch(e) {
-               alert('Failed to parse XSLT');
+               M.toast({html: 'Failed to parse XSLT'})
             }
          }
       }

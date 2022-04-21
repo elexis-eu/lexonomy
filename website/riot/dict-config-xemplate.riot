@@ -1,7 +1,8 @@
 <dict-config-xemplate>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["xemplate", "Entry formatting"]]}/>
    <h3>Entry formatting</h3>
-   <div if={ (!this.configData._xsl || this.configData._xsl == "") && (!this.configData._css || this.configData._css == "") && !this.override }>
+   <div if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
       <div class="row designer" id="editor">
       </div>
       <div class="row">
@@ -11,17 +12,17 @@
          </div>
       </div>
    </div>
-   <div if={ (this.configData._xsl && this.configData._xsl != "") || (this.configData._css && this.configData._css != "") || this.override }>
+   <div if={ (state.data._xsl && state.data._xsl != "") || (state.data._css && state.data._css != "") || state.override }>
       <div class="row">
          <div class="input-field col s10">
-            <textarea id="editor_xsl" class="materialize-textarea" placeholder="">{ this.configData._xsl }</textarea>
+            <textarea id="editor_xsl" class="materialize-textarea" placeholder="">{ state.data._xsl }</textarea>
             <label for="editor_xsl">XSL</label>
             <span class="helper-text">Custom XSL stylesheet. If you would like to see an example, <a onclick={ exampleXsl }>click here to load a sample XSL</a>.</span>
          </div>
       </div>
       <div class="row">
          <div class="input-field col s10">
-            <textarea id="editor_css" class="materialize-textarea" placeholder="">{ this.configData._css }</textarea>
+            <textarea id="editor_css" class="materialize-textarea" placeholder="">{ state.data._css }</textarea>
             <label for="editor_css">CSS</label>
             <span class="helper-text">Custom CSS stylesheet. If you would like to see an example, <a onclick={ exampleCss }>click here to load a sample CSS</a>.</span>
          </div>
@@ -34,7 +35,7 @@
          </div>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
    <style>
       #editor {
@@ -59,23 +60,22 @@
 
    <script>
       export default {
-         dictId: '',
-         configId: '',
-         configTitle: 'Entry formatting',
-         override: false,
-         configData: {},
+         state: {
+            isLoading: true,
+            isSaving: false,
+            override: false,
+            data: {}
+         },
 
          startOverride() {
-            this.override = true;
-            this.update();
+            this.update({override: true});
          },
 
          stopOverride() {
-            this.override = false;
-            delete this.configData._xsl;
-            delete this.configData._css;
-            this.update();
-            XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId);
+            delete this.state.data._xsl;
+            delete this.state.data._css;
+            this.update({override: false});
+            XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId);
          },
 
          exampleXsl() {
@@ -103,32 +103,24 @@ div.myEntry span.myHeadword {font-weight: bold}
          },
 
          onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            console.log(this.props);
-         },
-
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.configData = response;
-               if ((this.configData._xsl && this.configData._xsl != "") || (this.configData._css && this.configData._css != "")) {
-                  this.override = true;
-                  this.update();
-                  M.updateTextFields();
-                  M.textareaAutoResize($('#editor_css'));
-                  M.textareaAutoResize($('#editor_xsl'));
-               } else {
-                  this.update();
-               }
-            });
+            this.store.loadDictionaryConfig("xemplate")
+                  .done(response => {
+                     this.state.data = response.content
+                     this.state.override = this.state.data._xsl || this.state.data._css
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                     if(this.state.override){
+                        M.updateTextFields();
+                        M.textareaAutoResize($('#editor_css'));
+                        M.textareaAutoResize($('#editor_xsl'));
+                     }
+                  })
          },
 
          onUpdated() {
-            if (this.props.dictConfigs.xema && this.configData != {} && !this.override) {
-               XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId);
+            if (this.dictData.dictConfigs.xema && this.state.data != {} && !this.state.override) {
+               XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId);
             }
          },
 
@@ -137,7 +129,7 @@ div.myEntry span.myHeadword {font-weight: bold}
             if (XemplateDesigner.xemplate) {
                newData = XemplateDesigner.xemplate;
             }
-            if (this.override) {
+            if (this.state.override) {
                if ($('#editor_css').val() != "") newData._css = $('#editor_css').val();
                if ($('#editor_xsl').val() != "") newData._xsl = $('#editor_xsl').val();
             }
@@ -145,9 +137,9 @@ div.myEntry span.myHeadword {font-weight: bold}
          },
 
          saveData() {
-            console.log(this.getConfigData())
-            $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, this.getConfigData());
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("xemplate", this.getConfigData())
+                  .always(() => this.update({isSaving: false}))
          }
       }
    </script>

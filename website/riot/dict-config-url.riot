@@ -1,10 +1,11 @@
 <dict-config-url>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["url", "Change URL"]]}/>
    <h3>Change URL</h3>
    <div class="row">
       <label for="url">Current URL</label>
       <div style="margin: 0 0 30px;">
-         <span>https://www.lexonomy.eu/{ props.dictId }</span>
+         <span>https://www.lexonomy.eu/{ dictData.dictId }</span>
       </div>
    </div>
    <div class="row">
@@ -21,7 +22,7 @@
          </div>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData} dict-id={dictId} label="Change"></dict-config-buttons>
+   <dict-config-buttons save-data={saveData} label="Change"></dict-config-buttons>
    <br>
    <div>
       <span id="error" style="display:none">This URL is already taken.</span>
@@ -30,42 +31,18 @@
 
    <script>
       export default {
-         dictId: '',
-         configId: '',
-         configTitle: 'Change URL',
-         configData: {searchableElements:[]},
-
-         onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            M.updateTextFields();
-         },
-
-         onUpdated() {
-         },
-
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.configData = response;
-               $('#search-element').val(this.configData.searchableElements);
-               this.update();
-            });
-         },
-
          saveData() {
+            this.update({isSaving: true})
             var newurl = $('#url').val();
             if (newurl != "" && $('#url').hasClass('valid')) {
-               $('#submit_button').html('Saving...');
-               $.post(window.API_URL + this.dictId+"/move.json", {url: newurl}, (response) => {
+               $.post(window.API_URL + this.dictData.dictId + "/move.json", {url: newurl}, (response) => {
                   if (response.success) {
                      $('#success').show();
-                     $('#newlink').attr('href', '#/'+newurl+'/edit');
+                     $('#newlink').attr('href', '#/' + newurl);
                   } else {
                      $('#error').show();
-                     $('#submit_button').html('Change');
                   }
+                  this.update({isSaving: false})
                });
             }
          }

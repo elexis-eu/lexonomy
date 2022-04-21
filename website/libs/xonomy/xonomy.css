@@ -174,10 +174,10 @@
 .xonomy.nerd .element > .inlinecaption {margin-left: 0.5em; margin-right: 0.5em;}
 
 /*Pop-up box*/
-#xonomyBubble.nerd { display: none; position: absolute; z-index: 10; min-width: 100px; }
-#xonomyBubble.nerd > div.inside { box-shadow: 0px 0px 5px #99cbff; border: 1px solid #333333; background-color: #dddddd; border-radius: 2px; margin-top: 8px; }
-#xonomyBubble.nerd > div.inside > #xonomyBubbleContent { font-family: Verdana, sans-serif; font-size: 0.8rem; color: #666666; margin: 5px; padding: 5px; background-color: #ffffff; border-radius: 2px; }
-#xonomyBubble.nerd span.punc { color: #669acc; }
+#xonomyBubble { display: none; position: absolute; z-index: 10; min-width: 100px; }
+#xonomyBubble > div.inside {border: 1px solid #d9d9d8;background-color: #ffffff;border-radius: 0px;margin-top: 8px;box-shadow: 0 8px 17px 2px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%), 0 5px 5px -3px rgb(0 0 0 / 20%);}
+#xonomyBubble > div.inside > #xonomyBubbleContent { font-family: Verdana, sans-serif; font-size: 0.8rem; color: #666666; margin: 5px; padding: 5px; background-color: #ffffff; border-radius: 2px; }
+#xonomyBubble span.punc { color: #669acc; }
 
 /*When the pop-up box functions as menu or picker*/
 #xonomyBubble.nerd #xonomyBubbleContent div.menu { margin: -5px; max-height: 250px; overflow-y: auto; white-space: nowrap; line-height: 1;}
@@ -203,11 +203,11 @@
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem:hover { background-color: #ffffcc; }
 
 /*When the pop-up box takes input from the user*/
-#xonomyBubble.nerd #xonomyBubbleContent form { margin: -5px; padding: 5px; background-color: #eeeeee; }
+#xonomyBubble.nerd #xonomyBubbleContent form { margin: -5px; padding: 5px;}
 #xonomyBubble.nerd #xonomyBubbleContent form.overmenu { margin-bottom: 5px; }
 #xonomyBubble.nerd #xonomyBubbleContent form.undermenu { margin-top: 5px; }
 #xonomyBubble.nerd #xonomyBubbleContent div.submitline { text-align: right; margin-top: 5px; }
-#xonomyBubble.nerd #xonomyBubbleContent input { border-width: 1px; padding: 3px; color: #333333; font: inherit; }
+/*xonomyBubble.nerd #xonomyBubbleContent input { border-width: 1px; padding: 3px; color: #333333; font: inherit; }*/
 #xonomyBubble.nerd #xonomyBubbleContent textarea { border-width: 1px; padding: 3px; color: #333333; font: inherit; }
 #xonomyBubble.nerd #xonomyBubbleContent input.textbox { font-family: 'Roboto Mono', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans HK', 'Noto Naskh Arabic', monospace; font-size: 1rem; width: 250px; border: 1px solid #dddddd; }
 #xonomyBubble.nerd #xonomyBubbleContent textarea.textbox { font-family: 'Roboto Mono', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans HK', 'Noto Naskh Arabic', monospace; font-size: 1rem; width: 400px; height: 100px; border: 1px solid #dddddd; }
@@ -386,7 +386,7 @@
 
 /*Pop-up box*/
 #xonomyBubble.laic { display: none; position: absolute; z-index: 20; min-width: 100px; }
-#xonomyBubble.laic > div.inside { box-shadow: 0px 0px 5px #99cbff; border: 1px solid #333333; background-color: #dddddd; border-radius: 2px; }
+/*#xonomyBubble.laic > div.inside { box-shadow: 0px 0px 5px #99cbff; border: 1px solid #333333; background-color: #dddddd; border-radius: 2px; }*/
 #xonomyBubble.laic > div.inside > #xonomyBubbleContent { font-family: Verdana, sans-serif; font-size: 0.75rem; color: #666666; margin: 0px; padding: 10px; background-color: #ffffff; border-radius: 2px; }
 #xonomyBubble.laic span.punc { display: none; }
 
@@ -413,11 +413,11 @@
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem:hover { background-color: #f6f6f6; }
 
 /*When the pop-up box takes input from the user*/
-#xonomyBubble.laic #xonomyBubbleContent form { margin: -5px; padding: 5px; background-color: #eeeeee; }
+#xonomyBubble.laic #xonomyBubbleContent form { margin: -5px; padding: 5px;}
 #xonomyBubble.laic #xonomyBubbleContent form.overmenu { margin-bottom: 15px; }
 #xonomyBubble.laic #xonomyBubbleContent form.undermenu { margin-top: 15px; }
 #xonomyBubble.laic #xonomyBubbleContent div.submitline { text-align: right; margin-top: 5px; }
-#xonomyBubble.laic #xonomyBubbleContent input { border-width: 1px; padding: 6px; color: #333333; font: inherit; font-size: 0.85rem; }
+/*#xonomyBubble.laic #xonomyBubbleContent input { border-width: 1px; padding: 6px; color: #333333; font: inherit; font-size: 0.85rem; }*/
 #xonomyBubble.laic #xonomyBubbleContent textarea { border-width: 1px; padding: 6px; color: #333333; font: inherit; font-size: 0.85rem; }
 #xonomyBubble.laic #xonomyBubbleContent input.textbox { font-family: 'Roboto Mono', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans HK', 'Noto Naskh Arabic', monospace; font-size: 1rem; width: 400px; border: 1px solid #dddddd; font-size: 0.85rem; }
 #xonomyBubble.laic #xonomyBubbleContent textarea.textbox { font-family: 'Roboto Mono', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans HK', 'Noto Naskh Arabic', monospace; font-size: 1rem; width: 400px; height: 100px; border: 1px solid #dddddd; font-size: 0.85rem; }
@@ -444,15 +444,16 @@
 .xonomy.nerd div.modeSwitcher span.nerd {background-color: #fbeb93; }
 .xonomy.laic div.modeSwitcher span.laic {background-color: #fbeb93; }
 
-.xonomy div.layby { position: fixed; bottom: 0px; top: 0px; right: 0px; padding: 10px 10px 0px 10px; background-color: #fffef4; z-index: 12; border-left: 3px solid #cccccc; z-index: 9}
+.xonomy div.layby { position: fixed; bottom: 0px; top: 0px; right: 0px; padding: 10px 10px 0px 10px; background-color: #f2f2f2; z-index: 12; border-left: 3px solid #cccccc; z-index: 9}
 .xonomy div.layby.closed { width: 0px; padding: 5px 10px 0px 5px; cursor: pointer; }
 .xonomy div.layby.closed:hover {background-color: #f9f6dc;}
 .xonomy div.layby span.button {display: inline-block; width: 30px; height: 30px; background-position: center center; background-repeat: no-repeat; background-color: #ffffff; border: 1px solid #cccccc; cursor: pointer;}
 .xonomy div.layby span.button:hover {box-shadow: 0px 0px 1px #333333;}
-.xonomy div.layby span.closer {background-image: url(bullet_arrow_down.png);}
-.xonomy div.layby span.purger {background-image: url(bin_closed.png); float: right;}
-.xonomy div.layby.closed span.closer { display: none; }
-.xonomy div.layby.closed span.purger { display: none; }
+/*.xonomy div.layby span.closer {background-image: url(bullet_arrow_down.png);}
+.xonomy div.layby span.purger {background-image: url(bin_closed.png); float: right;}*/
+.xonomy div.layby.closed .btn { display: none; }
+/*.xonomy div.layby.closed span.closer { display: none; }
+.xonomy div.layby.closed span.purger { display: none; }*/
 .xonomy div.layby.closed div.content { display: none; }
 .xonomy div.layby.open { width: 30%; }
 .xonomy div.layby.open span.closer { display: inline-block; }

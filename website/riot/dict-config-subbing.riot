@@ -1,19 +1,17 @@
 <dict-config-subbing>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["subbing", "Subentries"]]}/>
    <h3>Subentries</h3>
-   <div if={isLoading} class="center-align grey-text">
-      <h3>Loading elements...</h3>
-   </div>
-   <template if={!isLoading}>
+   <template if={!state.isLoading}>
       <div>
          <label>
             Selected subentries
          </label>
-         <div if={!configData.elements.length} class="grey-text">
+         <div if={!state.data.elements.length} class="grey-text">
             <i>no subentry element selected</i>
          </div>
-         <div if={configData.elements.length}>
-            <div each={ element in configData.elements } class="chip">
+         <div if={state.data.elements.length}>
+            <div each={ element in state.data.elements } class="chip">
                { element }
                <i class="close material-icons" onclick={onRemoveElementClick.bind(this, element)}>close</i>
             </div>
@@ -37,42 +35,45 @@
       </template>
    </template>
    <br><br>
-   <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
    <script>
       export default {
-         isLoading: true,
-         dictId: '',
-         configId: '',
-         configTitle: 'Subentries',
-         configData: {elements:[]},
+         state: {
+            isLoading: true,
+            isSaving: false,
+            data: {elements:[]}
+         },
 
          onRemoveElementClick(el, evt) {
             evt.stopPropagation()
-            this.configData.elements = this.configData.elements.filter(val => val != el);
+            this.state.data.elements = this.state.data.elements.filter(val => val != el);
             this.update()
          },
 
          doAddEl(event) {
-            this.configData.elements.push($('#new-element').val());
+            this.state.data.elements.push($('#new-element').val());
             this.update();
          },
 
          onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            this.props.loadDictDetail();
-            this.fillConfigForm();
+            this.store.loadDictionaryConfig("subbing")
+                  .done(response => {
+                     this.state.data = {elements: Object.keys(response.content)}
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                  })
          },
 
          onBeforeUpdate(){
-            this.selectOptions = Object.keys(this.props.dictConfigs.xema.elements).filter(key => {
-               return !this.configData.elements.includes(key)
+            this.selectOptions = Object.keys(this.dictData.config.xema.elements).filter(key => {
+               return !this.state.data.elements.includes(key)
             })
          },
 
          onUpdated() {
-            if (this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements) {
+            if (this.dictData.config.xema && this.dictData.config.xema.elements) {
                var $select = $('select')
                if(this.selectOptions.length && $select.length){
                   var instance = M.FormSelect.getInstance($select);
@@ -86,21 +87,14 @@
             }
          },
 
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.isLoading = false;
-               this.configData = {elements: Object.keys(response)}
-               this.update();
-            });
-         },
-
          saveData() {
             let data = {}
-            this.configData.elements.forEach(el => {
+            this.state.data.elements.forEach(el => {
                data[el] = {}
             })
-            $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, data);
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("subbing", data)
+                  .always(() => this.update({isSaving: false}))
          }
       }
    </script>

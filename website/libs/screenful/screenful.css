@@ -2,13 +2,13 @@ body {font-family: 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 
 #header { position: absolute; top: 0px; left: 0px; right: 0px; z-index: 2; }
 #envelope { position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px;}
 #envelope.scrollable {overflow-y: auto;}
-#statusbar { /*position: absolute;*/ bottom: 0px; left: 0px; right: 0px; padding: 5px 15px; background-color: #dddddd; color: #666666; font-size: 0.9em; box-sizing: border-box; height: 1.8rem; overflow: hidden; box-shadow: 0px -2px 2px #999999; z-index: 5;}
+#statusbar { /*position: absolute;*/ bottom: 0px; left: 0px; right: 0px; padding: 0; background-color: #dddddd; color: #666666; font-size: 0.9em; box-sizing: border-box; min-height: 1.8rem; overflow: hidden; box-shadow: 0px -2px 2px #999999; z-index: 5;}
 #footer { position: absolute; bottom: 0px; left: 0px; right: 0px; }
 #curtain { position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background-color: #333333; opacity: 0.5; z-index: 5;}
 
 .xonomy {background-color: transparent !important;}
 
-.xonomy-envelope button {font: inherit; border-width: 0px; cursor: pointer; border-radius: 4px; background-color: #ffffff; box-shadow: 0px 0px 2px #666666; color: var(--link); padding: 5px 10px; margin: 10px 5px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
+/*.xonomy-envelope button {font: inherit; border-width: 0px; cursor: pointer; border-radius: 4px; background-color: #ffffff; box-shadow: 0px 0px 2px #666666; color: var(--link); padding: 5px 10px; margin: 10px 5px; min-height: 1.3em; display: inline-block; vertical-align: middle;}*/
 .xonomy-envelope button:hover { background-color: #f7f9ea;}
 .xonomy-envelope button.pressed { box-shadow: inset 0px 0px 2px #666666; background-color: #e9e9e9;}
 .xonomy-envelope button.iconYes {padding-left: 35px; background-position: left+10px center; background-repeat: no-repeat;}
@@ -19,7 +19,7 @@ body {font-family: 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 
 
 #statusbar span.wait { background-image: url(loader.gif); display: inline-block; width: 30px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 1em;}
 #statusbar span.warn { background-image: url(exclamation.png); display: inline-block; width: 16px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 0.75em;}
-#statusbar .alertmessage { display: none; color: black; background-color: #ffff77; font-weight: bold; padding: 2px; margin-right: 20px; border: 2px solid black; }
-#statusbar .closeIcon { display: inline-block; width: 16px; height: 16px; position: relative; top: 3px; background-image: url(cross.png); cursor: pointer; }
+#statusbar .alertmessage { position: fixed; left: 0; top: 0; right: 0;display: none; color: black; font-weight: bold; padding: 2px 10px; height: 20px;}
+#statusbar .statusmessage {padding: 5px;}
 
 .wyc { display: inline-block; background-image: url(loader.gif); background-position: center center; background-repeat: no-repeat; width: 30px; height: 10px; }

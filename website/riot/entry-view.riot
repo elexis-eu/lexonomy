@@ -6,9 +6,8 @@
          entryId: '',
 
          readEntry() {
-            if (this.props.dictId != '') {
-               $.post(window.API_URL + this.props.dictId + "/entryread.json", {id: this.props.entryId}, (response) => {
-                  console.log(response)
+            if (this.dictData.dictId != '') {
+               $.post(window.API_URL + this.dictData.dictId + "/entryread.json", {id: this.props.entryId}, (response) => {
                   if (response.success) {
                      $('.viewer').html(response.contentHtml);
                   }
@@ -18,12 +17,10 @@
 
          onMounted() {
             this.entryId = this.props.entryId;
-            console.log('view '+this.props.dictId+'-'+this.props.entryId)
             this.readEntry();
          },
 
          onUpdated() {
-            console.log('up view '+this.props.dictId+'-'+this.props.entryId+'-'+this.entryId)
             if (this.entryId != this.props.entryId) {
                this.entryId = this.props.entryId;
                this.readEntry();

@@ -1,58 +1,59 @@
 <dict-public-entry>
    <h3 class="header">
-      <a href="#/{ this.props.dictId }">{ this.props.dictDetails.title }</a>
+      <a href="#/{ dictData.dictId }">{ dictData.title }</a>
    </h3>
-   <template if={ this.props.dictDetails.public }>
+   <template if={ dictData.public }>
       <div class="divider"></div>
       <div class="row">
          <div class="col s9">
-            <entry-view is="entry-view" dict-id={ this.props.dictId } entry-id={ this.props.entryId }></entry-view>
+            <entry-view is="entry-view" dict-id={ dictData.dictId } entry-id={ props.entryId }></entry-view>
          </div>
          <div class="col s3">
             <ul class="nabes">
-               <li each={ entry in this.moreEntries} active={entry.id == this.props.entryId}><a href="#/{ this.props.dictId }/{ entry.id }">{ entry.titlePlain }</a></li>
+               <li each={ entry in state.moreEntries} active={entry.id == props.entryId}>
+                  <a href="#/{ dictData.dictId }/{ entry.id }">{ entry.titlePlain }</a>
+               </li>
             </ul>
          </div>
       </div>
       <div class="divider"></div>
       <div class="section">
-         { this.props.dictDetails.licence }
+         { dictData.licence }
       </div>
    </template>
-
-   <script>
-      export default {
-         moreEntries: [],
-         entryId: '',
-
-         loadMoreEntries() {
-            $.get(window.API_URL + this.props.dictId + "/" + this.props.entryId + "/nabes.json", (response) => {
-               if (response.nabes) {
-                  this.moreEntries = response.nabes;
-                  this.update();
-               }
-            });
-         },
-         onMounted() {
-            console.log('list dict entry '+ this.props.dictId+'-'+this.props.entryId)
-            this.entryId = this.props.entryId;
-            this.props.loadDictDetail();
-            this.loadMoreEntries();
-            console.log(this.props)
-         },
-
-         onUpdated() {
-            if (this.entryId != this.props.entryId) {
-               this.entryId = this.props.entryId;
-               this.loadMoreEntries();
-            }
-         }
-      }
-   </script>
 
    <style>
       .nabes li a:hover {text-decoration: underline;}
       .nabes li[active=active] a {background-color: #ffccbc;}
    </style>
+
+   <script>
+      export default {
+         state: {
+            entryId: null,
+            moreEntries: []
+         },
+
+         loadMoreEntries() {
+            $.get(window.API_URL + this.dictData.dictId + "/" + this.props.entryId + "/nabes.json", (response) => {
+               if (response.nabes) {
+                  this.update({more: response.nabes})
+               }
+            });
+         },
+
+         onMounted() {
+            this.state.entryId = this.props.entryId;
+            this.loadMoreEntries();
+         },
+
+         onUpdated() {
+            if (this.state.entryId != this.props.entryId) {
+               this.state.entryId = this.props.entryId;
+               this.loadMoreEntries();
+            }
+         }
+      }
+   </script>
 </dict-public-entry>
 

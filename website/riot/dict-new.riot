@@ -1,4 +1,5 @@
 <dict-new>
+   <loading-overlay if={state.isLoading}/>
    <h3>
       New dictionary
    </h3>
@@ -15,9 +16,9 @@
 
    <div class="row">
       <div style="display: flex; align-items: baseline;">
-         <span id="baseUrl" class="grey-text">https://www.lexonomy.eu/</span>
+         <span class="grey-text">{state.baseUrl}</span>
          <span class="input-field" style="margin-top: 0;">
-            <input id="url" type="text" class="validate inlineBlock" required minlength="5" pattern="[a-zA-Z0-9\-_]*" style="max-width: 300px;"/>
+            <input type="text" class="validate inlineBlock" value={state.url} required minlength="5" pattern="[a-zA-Z0-9\-_]*" style="max-width: 300px;"/>
             <span class="helper-text">This will be your dictionary's address on the web. You will be able to change this later. Allowed:  letters, numbers, - and _</span>
          </span>
       </div>
@@ -35,13 +36,9 @@
       <label>Template</label>
       <span class="helper-text">You can choose a template here to start you off. Each template comes with a few sample entries. You will be able to change or delete those and to customize the template.</span>
    </div>
-   <div if={ errorMessage != ''} class="row">
-      <div class="col s8">
-         <div class="card red darken-2">
-            <div class="card-content white-text">
-               <p>{ errorMessage }</p>
-            </div>
-         </div>
+   <div if={ state.errorMessage != ''} class="section">
+      <div class="message messageError">
+         { state.errorMessage }
       </div>
    </div>
    <div class="buttons">
@@ -53,30 +50,45 @@
 
    <script>
       export default {
-         errorMessage: '',
+         state: {
+            isLoading: true,
+            errorMessage: '',
+            url: '',
+            baseUrl: 'https://www.lexonomy.eu/'
+         },
+
          onMounted() {
-            console.log('list dict')
-            $.get(window.API_URL + "makesuggest.json", (response) => {
-               $('#url').val(response.suggested);
-               $('#baseUrl').html(response.baseUrl);
-               M.updateTextFields();
-            });
-            $('select').formSelect();
+            this.store.suggestUrl()
+                  .done(response => {
+                     this.update({
+                        isLoading: false,
+                        url: response.suggested,
+                        baseUrl: response.baseUrl
+                     })
+                     M.updateTextFields();
+                     $('select').formSelect();
+                  })
          },
 
          doMake(event) {
-            if ($('#url').val() != '' && $('#title').val() != '') {
-               $.post(window.API_URL + "make.json", {url: $('#url').val(), template: $('#template').val(), title: $('#title').val()}, (response) => {
-                  if (response.success) {
-                     this.errorMessage = '';
-                     route('/'+response.url);
-                  } else {
-                     this.errorMessage = 'Selected URL is already taken.';
-                     this.update();
-                  }
-               });
+            let title = $('#title').val()
+            if(title){
+               this.update({isLoading: true})
+               this.store.createDictionary({
+                  url: $('#url').val(),
+                  template: $('#template').val(),
+                  title: title
+               })
+                     .done(response => {
+                        if (response.success) {
+                           route('/' + response.url)
+                        } else {
+                           this.state.errorMessage = 'Selected URL is already taken.';
+                        }
+                     })
+                     .always(this.update.bind(this, {isLoading: false}))
             }
-         },
+         }
       }
    </script>
 </dict-new>

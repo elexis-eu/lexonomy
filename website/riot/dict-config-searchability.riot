@@ -1,77 +1,64 @@
 <dict-config-searchability>
-   <dict-config-nav dictId={ dictId }  dictTitle={ props.dictDetails.title }  configId={ configId }  configTitle={ configTitle }/>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["searchability", "Searching"]]}/>
    <h3>Searching</h3>
-   <div if={isLoading} class="center-align grey-text">
-      <h3>
-         loading searchable elements...
-      </h3>
-   </div>
-   <div if={!isLoading && !hasElements}
+   <div if={!state.isLoading && !state.hasElements}
          class="center-align grey-text">
       <h3>No elements found</h3>
    </div>
-   <div if={!isLoading && hasElements}>
+   <div if={!state.isLoading && state.hasElements}>
       <label for="search-element">Searchable elements</label>
       <div class="helper-text">
          The contents of elements you select here will be searchable (in addition to each entry's headword).
       </div>
       <br>
-      <div each={element in Object.keys(props.dictConfigs.xema.elements)}>
+      <div each={element in Object.keys(dictData.config.xema.elements)}>
          <label>
             <input type="checkbox"
                   value={element}
-                  checked={configData.searchableElements && configData.searchableElements.includes(element)}
-                  disabled={element == props.dictConfigs.titling.headword}/>
+                  checked={state.data.searchableElements && state.data.searchableElements.includes(element)}
+                  disabled={element == dictData.config.titling.headword}/>
             <span>{element}</span>
          </label>
       </div>
    </div>
    <br><br>
-   <dict-config-buttons save-data={saveData} dict-id={dictId} show-save={hasElements}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData} dict-id={dictId} show-save={state.hasElements}></dict-config-buttons>
 
    <script>
       export default {
-         isLoading: true,
-         hasElements: false,
-         dictId: '',
-         configId: '',
-         configTitle: 'Searching',
-         configData: {searchableElements: []},
+         state: {
+            isLoading: true,
+            isSaving: false,
+            hasElements: false,
+            data: {searchableElements: []}
+         },
+
+         onBeforeMount() {
+            this.state.hasElements = this.dictData.config.xema && this.dictData.config.xema.elements && Object.keys(this.dictData.config.xema.elements).length
+         },
 
          onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            console.log(this.props);
-         },
-
-         onUpdated() {
-            this.hasElements = this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements && this.props.dictConfigs.xema.elements
-         },
-
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.configData = response;
-               this.isLoading = false;
-               this.update();
-            });
+            this.store.loadDictionaryConfig("searchability")
+                  .done(response => {
+                     this.state.data = response.content
+                  }).always(() => {
+                     this.update({isLoading: false})
+                  })
          },
 
          getConfigData() {
-            let searchableElements = $('input[type="checkbox"]:checked').toArray().map(function(elem){
-               return $(elem).attr("value")
-            })
             return {
-               searchableElements: searchableElements
+               searchableElements: $('input[type="checkbox"]:checked').toArray().map(function(elem){
+                  return $(elem).attr("value")
+               })
             }
          },
 
          saveData() {
-            console.log(this.getConfigData())
-            $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, this.getConfigData());
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("searchability", this.getConfigData())
+                  .always(() => this.update({isSaving: false}))
          }
       }
    </script>

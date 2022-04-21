@@ -1,73 +1,59 @@
 <dict-public>
-   <h3 class="header">
-      { this.props.dictDetails.title }
-      <div class="buttons right" style="margin-top: 5px;">
-         <a if={props.userAccess.canEdit} href="#/{dictId}/edit" class="btn">edit</a>
-         <a if={props.userAccess.canConfig} href="#/{dictId}/config" class="btn">config</a>
-         <a if={props.userAccess.canUpload} href="#/{dictId}/upload" class="btn">upload</a>
-         <a if={props.userAccess.canDownload} href="#/{dictId}/download" class="btn">download</a>
+   <dict-nav/>
+   <loading-overlay if={dictData.isDictionaryLoading}/>
+   <template if={!dictData.isDictionaryLoading}>
+      <h3 class="header">
+         { dictData.title }
+         <div class="buttons right" style="margin-top: 5px;">
+            <a if={dictData.userAccess.canEdit} href="#/{dictData.dictId}/edit" class="btn">edit</a>
+            <a if={dictData.userAccess.canConfig} href="#/{dictData.dictId}/config" class="btn">config</a>
+            <a if={dictData.userAccess.canUpload} href="#/{dictData.dictId}/upload" class="btn">upload</a>
+            <a if={dictData.userAccess.canDownload} href="#/{dictData.dictId}/download" class="btn">download</a>
+         </div>
+      </h3>
+      <p class="blurb">
+         <raw-html content={dictData.blurb}></raw-html>
+      </p>
+
+      <div if={ dictData.public } class="section">
+         <br>
+         <div class="divider"></div>
+         <a class="btn btn-floating waves-effect waves-light right" onclick={ onReloadExamplesClick } style="margin-top: 15px;"><i class="material-icons">refresh</i></a>
+         <h5 style="margin-left: 8px;">Examples</h5>
+         <div if={dictData.isDictionaryExamplesLoading} class="grey-text" style="min-height: 20px; margin: 15px 10px;">
+            Loading...
+         </div>
+         <ul class="random-entries s10" if={ !dictData.isDictionaryExamplesLoading && dictData.dictionaryExamples }>
+            <li each={ entry in dictData.dictionaryExamples }>
+               <a href="#/{ dictData.dictId }/{ entry.id }">{ entry.titlePlain }</a>
+            </li>
+         </ul>
+         <div class="divider"></div>
+         <div class="section right" style="opacity: .5;">
+            { dictData.licence }
+         </div>
       </div>
-   </h3>
-   <p class="blurb">{ this.props.dictDetails.blurb }</p>
-   <div if={ this.props.dictDetails.public } class="section">
-      <br>
-      <div class="divider"></div>
-      <a class="btn btn-floating waves-effect waves-light right" onclick={ onReloadExamplesClick } style="margin-top: 15px;"><i class="material-icons">refresh</i></a>
-      <h5 style="margin-left: 8px;">Examples</h5>
-      <div if={loadingExamples} class="grey-text" style="min-height: 20px; margin: 15px 10px;">
-         Loading...
-      </div>
-      <ul class="random-entries s10" if={ !loadingExamples && randomEntries }>
-         <li each={ entry in randomEntries }><a href="#/{ this.dictId }/{ entry.id }">{ entry.titlePlain }</a></li>
-      </ul>
-      <div class="divider"></div>
-      <div class="section right" style="opacity: .5;">
-         { this.props.dictDetails.licence }
-      </div>
-   </div>
-
-   <script>
-      export default {
-         dictId: '',
-         randomEntries: [],
-         loadingExamples: true,
-
-         onReloadExamplesClick(){
-            this.reloadRandom()
-            this.update()
-         },
-
-         reloadRandom() {
-            this.loadingExamples = true
-            $.post(window.API_URL + this.dictId + "/random.json", (response) => {
-               console.log(response)
-               this.loadingExamples = false
-               this.randomEntries = response.entries;
-               this.update();
-            });
-         },
-
-         onMounted() {
-            this.dictId = this.props.dictId;
-            console.log('list dict '+ this.dictId)
-            this.props.loadDictDetail().then(()=>{
-               if (this.props.dictDetails.public && this.randomEntries.length == 0) {
-                  this.reloadRandom();
-               }
-            });
-            console.log(this.props)
-         },
-
-         onUpdated() {
-            console.log('list dict update'+ this.dictId)
-            $('.blurb').html(this.props.dictDetails.blurb);
-         }
-      }
-   </script>
+   </template>
 
    <style>
       .random-entries li {display: inline; padding: 5px 10px;}
       .random-entries li a:hover {text-decoration: underline;}
    </style>
+
+   <script>
+      export default {
+         bindings: [["store", "dictionaryChanged", "onDictionaryChanged"],
+                    ["store", "isDictionaryExamplesLoading", "update"]],
+
+         onReloadExamplesClick(){
+            this.store.reloadDictionaryExamples()
+            this.update()
+         },
+
+         onDictionaryChanged(){
+            this.store.reloadDictionaryExamples()
+         }
+      }
+   </script>
 </dict-public>
 

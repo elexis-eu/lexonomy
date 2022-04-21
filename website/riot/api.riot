@@ -1,208 +1,204 @@
 <api>
-  <div class="container">
-    <h4>Lexonomy API documentation and test</h4>
-    <p>Lexonomy also supports <a href="https://elexis-eu.github.io/elexis-rest/">ELEXIS REST API</a> - calls <tt>dictionaries, about, list, lemma, tei</tt>. Use your API key as <tt>X-API-KEY</tt>.</p>
-    <hr/>
-    <p>Following calls are Lexonomy API with specific information.</p>
-    <p><b>API URL:</b> { this.siteconfig.baseUrl }api</p>
+   <div class="container">
+      <h4>Lexonomy API documentation and test</h4>
+      <p>Lexonomy also supports <a href="https://elexis-eu.github.io/elexis-rest/">ELEXIS REST API</a> - calls <tt>dictionaries, about, list, lemma, tei</tt>. Use your API key as <tt>X-API-KEY</tt>.</p>
+      <hr/>
+      <p>Following calls are Lexonomy API with specific information.</p>
+      <p><b>API URL:</b> { dictData.siteconfig.baseUrl }api</p>
 
-    <hr/>
-    <h5>List languages used in dictionaries</h5>
-    <p>POST { this.siteconfig.baseUrl }api/listLang</p>
-    <textarea id="input_listLang" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU"
-    }</textarea>
-    <button onclick={ listLang }>Post</button> and watch your console.
-    <hr/>
-    <h5>List all dictionaries metadata</h5>
-    <p>POST { this.siteconfig.baseUrl }api/listDict</p>
-    <textarea id="input_listDict" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU"
-    }</textarea>
-    <button onclick={ listDict }>Post</button> and watch your console.
-		<hr/>
-		<h5>List dictionaries metadata for selected language</h5>
-    <p>POST { this.siteconfig.baseUrl }api/listDict</p>
-    <textarea id="input_listDict2" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
-      "lang": "sl"
-    }</textarea>
-		<button onclick={ listDict2 }>Post</button> and watch your console.
-		<hr/>
-		<h5>List dictionaries metadata for selected language, with links only</h5>
-		<p>POST { this.siteconfig.baseUrl }api/listDict</p>
-		<textarea id="input_listDict3" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
-      "lang": "sl",
-      "withLinks": true
-    }</textarea>
-    <button onclick={ listDict3 }>Post</button> and watch your console.
-    <hr/>
-    <h5>Find links, from headword in language</h5>
-	  <p>POST { this.siteconfig.baseUrl }api/listLinks</p>
-		<textarea id="input_listLinks1" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
-      "headword": "zopet",
-      "sourceLanguage": "sl"
-    }</textarea>
-		<button onclick={ listLinks1 }>Post</button> and watch your console.
-		<hr/>
-		<h5>Find links, headword with specific dictionary</h5>
-		<p>POST { this.siteconfig.baseUrl }api/listLinks</p>
-		<textarea id="input_listLinks2" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
-      "headword": "zopet",
-      "sourceLanguage": "sl",
-      "sourceDict": "elexis-zrcsazu-pletersnik"
-    }</textarea>
-		<button onclick={ listLinks2 }>Post</button> and watch your console.
-		<hr/>
-		<h5>Find links, headword to target language</h5>
-		<p>POST { this.siteconfig.baseUrl }api/listLinks</p>
-		<textarea id="input_listLinks3" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
-      "headword": "zopet",
-      "sourceLanguage": "sl",
-      "targetLanguage": "en"
-    }</textarea>
-    <button onclick={ listLinks3 }>Post</button> and watch your console.
+      <hr/>
+      <h5>List languages used in dictionaries</h5>
+      <p>POST { dictData.siteconfig.baseUrl }api/listLang</p>
+      <textarea id="input_listLang" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU"
+      }</textarea>
+      <button onclick={ listLang }>Post</button> and watch your console.
+      <hr/>
+      <h5>List all dictionaries metadata</h5>
+      <p>POST { dictData.siteconfig.baseUrl }api/listDict</p>
+      <textarea id="input_listDict" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU"
+      }</textarea>
+      <button onclick={ listDict }>Post</button> and watch your console.
+      <hr/>
+      <h5>List dictionaries metadata for selected language</h5>
+      <p>POST { dictData.siteconfig.baseUrl }api/listDict</p>
+      <textarea id="input_listDict2" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
+         "lang": "sl"
+      }</textarea>
+      <button onclick={ listDict2 }>Post</button> and watch your console.
+      <hr/>
+      <h5>List dictionaries metadata for selected language, with links only</h5>
+      <p>POST { dictData.siteconfig.baseUrl }api/listDict</p>
+      <textarea id="input_listDict3" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
+         "lang": "sl",
+         "withLinks": true
+      }</textarea>
+      <button onclick={ listDict3 }>Post</button> and watch your console.
+      <hr/>
+      <h5>Find links, from headword in language</h5>
+      <p>POST { dictData.siteconfig.baseUrl }api/listLinks</p>
+      <textarea id="input_listLinks1" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
+         "headword": "zopet",
+         "sourceLanguage": "sl"
+      }</textarea>
+      <button onclick={ listLinks1 }>Post</button> and watch your console.
+      <hr/>
+      <h5>Find links, headword with specific dictionary</h5>
+      <p>POST { dictData.siteconfig.baseUrl }api/listLinks</p>
+      <textarea id="input_listLinks2" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
+         "headword": "zopet",
+         "sourceLanguage": "sl",
+         "sourceDict": "elexis-zrcsazu-pletersnik"
+      }</textarea>
+      <button onclick={ listLinks2 }>Post</button> and watch your console.
+      <hr/>
+      <h5>Find links, headword to target language</h5>
+      <p>POST { dictData.siteconfig.baseUrl }api/listLinks</p>
+      <textarea id="input_listLinks3" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
+         "headword": "zopet",
+         "sourceLanguage": "sl",
+         "targetLanguage": "en"
+      }</textarea>
+      <button onclick={ listLinks3 }>Post</button> and watch your console.
 
-    <h4>Lexonomy Push API documentation and test</h4>
-    <p><b>PUSH API URL:</b> { this.siteconfig.baseUrl }push.api</p>
-		<h5>Make a dictionary, TEI Lex0 format</h5>
-		<textarea id="input_makeDictTei" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
-      "command": "makeDict",
-      "format": "teilex0",
-      "dictTitle": "My TEI Lex0 Dictionary",
-      "dictBlurb": "Yet another dictionary draft."
-    }</textarea>
-		<button onclick={ makeDictTei }>Post</button> and watch your console.
-		<h5>Create entries, TEI Lex0 format</h5>
-		<textarea id="input_createEntriesTei" style="font-size: 1rem; width: 100%; height: 9em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
-      "command": "createEntries",
-      "format": "teilex0",
-      "dictID": "jakobrno",
-      "entryXmls": ["<entry><form type='lemma'><orth>Earth</orth></form></entry>", "<entry><form type='lemma'><orth>Mars</orth></form></entry>"]
-    }</textarea>
-		<button onclick={ createEntriesTei }>Post</button> and watch your console.
-		<h5>Make a dictionary</h5>
-		<textarea id="input_makeDict" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
-      "command": "makeDict",
-      "dictTitle": "My Pushy Dictionary",
-      "dictBlurb": "Yet another dictionary draft.",
-      "poses": ["n", "v", "adj", "adv"],
-      "labels": ["colloquial", "formal", "mostly plural", "Irish English", "vulgar"]
-    }</textarea>
-		<button onclick={ makeDict }>Post</button> and watch your console.
-		<h5>Create entries</h5>
-		<textarea id="input_createEntries" style="font-size: 1rem; width: 100%; height: 9em; resize: vertical" spellcheck="false">\{
-      "email": "rambousek@gmail.com",
-      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
-      "command": "createEntries",
-      "dictID": "jakobrno",
-      "entryXmls": ["<heslo/>", "<heslo/>"]
-    }</textarea>
-		<button onclick={ createEntries }>Post</button> and watch your console.
+      <h4>Lexonomy Push API documentation and test</h4>
+      <p><b>PUSH API URL:</b> { dictData.siteconfig.baseUrl }push.api</p>
+      <h5>Make a dictionary, TEI Lex0 format</h5>
+      <textarea id="input_makeDictTei" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
+         "command": "makeDict",
+         "format": "teilex0",
+         "dictTitle": "My TEI Lex0 Dictionary",
+         "dictBlurb": "Yet another dictionary draft."
+      }</textarea>
+      <button onclick={ makeDictTei }>Post</button> and watch your console.
+      <h5>Create entries, TEI Lex0 format</h5>
+      <textarea id="input_createEntriesTei" style="font-size: 1rem; width: 100%; height: 9em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
+         "command": "createEntries",
+         "format": "teilex0",
+         "dictID": "jakobrno",
+         "entryXmls": ["<entry><form type='lemma'><orth>Earth</orth></form></entry>", "<entry><form type='lemma'><orth>Mars</orth></form></entry>"]
+      }</textarea>
+      <button onclick={ createEntriesTei }>Post</button> and watch your console.
+      <h5>Make a dictionary</h5>
+      <textarea id="input_makeDict" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
+         "command": "makeDict",
+         "dictTitle": "My Pushy Dictionary",
+         "dictBlurb": "Yet another dictionary draft.",
+         "poses": ["n", "v", "adj", "adv"],
+         "labels": ["colloquial", "formal", "mostly plural", "Irish English", "vulgar"]
+      }</textarea>
+      <button onclick={ makeDict }>Post</button> and watch your console.
+      <h5>Create entries</h5>
+      <textarea id="input_createEntries" style="font-size: 1rem; width: 100%; height: 9em; resize: vertical" spellcheck="false">\{
+         "email": "rambousek@gmail.com",
+         "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",
+         "command": "createEntries",
+         "dictID": "jakobrno",
+         "entryXmls": ["<heslo/>", "<heslo/>"]
+      }</textarea>
+      <button onclick={ createEntries }>Post</button> and watch your console.
 
 
-  </div>
+   </div>
 
-  <script>
-		export default {
-			siteconfig: {},
-			onMounted() {
-				if (Object.keys(this.props.siteconfig) == 0) {
-					$.get("/siteconfigread.json", (response) => {
-            this.siteconfig = response;
-						this.update();
-					});
-				} else {
-          this.siteconfig = this.props.siteconfig;
-					this.update();
-				}
-      },
+   <script>
+      export default {
 
-			listLang() {
-        var json = $("#input_listLang").val();
-				$.ajax("/api/listLang", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			},
-			listDict() {
-				var json = $("#input_listDict").val();
-				$.ajax("/api/listDict", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			},
-			listDict2() {
-				var json = $("#input_listDict2").val();
-				$.ajax("/api/listDict", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			},
-			listDict3() {
-				var json = $("#input_listDict3").val();
-				$.ajax("/api/listDict", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			},
-			listLinks1() {
-				var json = $("#input_listLinks1").val();
-				$.ajax("/api/listLinks", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			},
-			listLinks2(){
-				var json=$("#input_listLinks2").val();
-				$.ajax("/api/listLinks", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			},
-			listLinks3() {
-				var json = $("#input_listLinks3").val();
-				$.ajax("/api/listLinks", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-      },
-			makeDictTei() {
-				var json = $("#input_makeDictTei").val();
-				$.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			},
-			createEntriesTei() {
-				var json = $("#input_createEntriesTei").val();
-				console.log(json);
-				$.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			},
-			makeDict() {
-				var json = $("#input_makeDict").val();
-				$.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			},
-			createEntries() {
-				var json = $("#input_createEntries").val();
-				console.log(json);
-				$.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
-					console.log(data);
-				});
-			}
-    }
-  </script>
+         /*onMounted() {
+            this.store.on("siteconfigChanged", this.update.bind(this))
+         },
+
+         onBeforeUnount() {
+            this.store.off("siteconfigChanged", this.update.bind(this))
+         },*/
+
+         listLang() {
+            var json = $("#input_listLang").val();
+            $.ajax("/api/listLang", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         listDict() {
+            var json = $("#input_listDict").val();
+            $.ajax("/api/listDict", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         listDict2() {
+            var json = $("#input_listDict2").val();
+            $.ajax("/api/listDict", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         listDict3() {
+            var json = $("#input_listDict3").val();
+            $.ajax("/api/listDict", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         listLinks1() {
+            var json = $("#input_listLinks1").val();
+            $.ajax("/api/listLinks", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         listLinks2(){
+            var json=$("#input_listLinks2").val();
+            $.ajax("/api/listLinks", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         listLinks3() {
+            var json = $("#input_listLinks3").val();
+            $.ajax("/api/listLinks", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         makeDictTei() {
+            var json = $("#input_makeDictTei").val();
+            $.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         createEntriesTei() {
+            var json = $("#input_createEntriesTei").val();
+            console.log(json);
+            $.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         makeDict() {
+            var json = $("#input_makeDict").val();
+            $.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         },
+         createEntries() {
+            var json = $("#input_createEntries").val();
+            console.log(json);
+            $.ajax("push.api", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){
+               console.log(data);
+            });
+         }
+      }
+   </script>
 </api>

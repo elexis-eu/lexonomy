@@ -1,4 +1,4 @@
-<footer class="Xpage-footer">
+<app-footer class="Xpage-footer">
    <div class="footer-logos">
       <div class="logolint">
          <a target="_blank" href="https://www.muni.cz/" title="Masaryk University">
@@ -8,8 +8,8 @@
             <img class="skelogo" src="img/logo_ske_small.png"/>
          </a>
       </div>
-      <div if={ this.props.siteconfig.version } class="version right white-text">
-         Version: { this.props.siteconfig.version }
+      <div if={ dictData.siteconfig && dictData.siteconfig.version } class="version right white-text">
+         Version: { dictData.siteconfig.version }
       </div>
    </div>
    <div class="footer-copyright">
@@ -55,10 +55,7 @@
 
    <script>
       export default {
-         onMounted() {
-            this.props.siteconfig.version ="as"
-            console.log('foo')
-         }
+
       }
    </script>
-</footer>
+</app-footer>

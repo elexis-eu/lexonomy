@@ -1,11 +1,9 @@
 <dict-config-flagging>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["flagging", "Entry flags"]]}/>
    <h3>Entry flags</h3>
-   <div if={isLoading} class="center-align grey-text">
-      <h3>Loading entry flags...</h3>
-   </div>
-   <template if={!isLoading}>
-      <div if={!configData.flags.length} class="center-align grey-text">
+   <template if={!state.isLoading}>
+      <div if={!state.data.flags.length} class="center-align grey-text">
          <h3>no entry flags</h3>
          <br>
          <a class="btn btn-primary waves-effect waves-light" onclick={ doAddEl }>
@@ -14,7 +12,7 @@
          </a>
       </div>
 
-      <template if={configData.flags.length}>
+      <template if={state.data.flags.length}>
          <table>
             <thead>
                <tr>
@@ -35,7 +33,7 @@
                </tr>
             </thead>
             <tbody>
-               <tr each={ (flag, index) in configData.flags } class="flag-info">
+               <tr each={ (flag, index) in state.data.flags } class="flag-info">
                   <td>
                      <input type="text" value={ flag.key } placeholder="key" class="flag-key"/>
                   </td>
@@ -73,7 +71,7 @@
       </template>
    </template>
    <br><br>
-   <dict-config-buttons save-data={saveData} dict-id={dictId} show-save={configData.flags.length}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData} show-save={state.data.flags.length}></dict-config-buttons>
 
    <style>
       .delete-el {
@@ -86,89 +84,79 @@
          padding: 3px 10px 3px 0;
       }
    </style>
+
    <script>
       export default {
-         isLoading: true,
-         dictId: '',
-         configId: '',
-         configTitle: 'Entry flags',
-         configData: {flag_elements: "", flags: []},
+         state: {
+            isLoading: true,
+            isSaving: false,
+            data: {flag_elements: "", flags: []}
+         },
 
          doDeleteEl(idx) {
-            this.configData = this.getConfigData();
-            this.configData.flags.splice(idx, 1);
+            this.state.data = this.getConfigData()
+            this.state.data.flags.splice(idx, 1)
             this.update()
          },
 
          doAddEl(event) {
-            this.configData.flags.push({key: "", name: "", label: "", color: ""});
-            this.update();
+            this.state.data.flags.push({key: "", name: "", label: "", color: ""})
+            this.update()
          },
 
          addColor() {
             $('.flag-color').each(function() {
-               var cid = $(this)[0].id;
-               $('#'+cid).colorpicker().on('changeColor', function(ev) {
-                  $(this).css('background-color',ev.color.toHex());
-               });
-            });
+               var cid = $(this)[0].id
+               $('#' + cid).colorpicker().on('changeColor', function(ev) {
+                  $(this).css('background-color',ev.color.toHex())
+               })
+            })
          },
 
          onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            M.updateTextFields();
-            console.log(this.props);
-            this.addColor();
+            this.store.loadDictionaryConfig("flagging")
+                  .done(response => {
+                     if (response.content.flag_element) {
+                        this.state.data = response.content
+                     }
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                  })
          },
 
          onUpdated() {
-            if (this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements) {
+            if (this.dictData.config.xema && this.dictData.config.xema.elements) {
                if ($('#flag-element option').length == 0) {
-                 Object.entries(this.props.dictConfigs.xema.elements).forEach(([key, info]) => {
-                   if (key != this.props.dictConfigs.xema.root) {
-                     $('#flag-element').append('<option value="' + key + '">' + key + '</option>');
-                   }
-                 });
+                  Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
+                     if(key != this.dictData.config.xema.root){
+                        $('#flag-element').append('<option value="' + key + '"' + (key == this.state.data.flag_element ? 'selected' : '') +  '>' + key + '</option>')
+                     }
+                  })
                }
-               $('select').formSelect();
+               $('select').formSelect()
             }
-            M.updateTextFields();
-            this.addColor();
-         },
-
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               debugger
-               this.configData = {flag_element: "", flags: []}
-               if (response.flag_element && response.flag_element != "") {
-                  this.configData = response;
-               }
-               this.isLoading = false;
-               this.update();
-            });
+            M.updateTextFields()
+            this.addColor()
          },
 
          getConfigData() {
-            var newData = {flag_element: $('#flag-element').val(), flags: []};
+            var newData = {flag_element: $('#flag-element').val(), flags: []}
             $('.flag-info').each(function() {
                newData.flags.push({
                   key: $(this).find('.flag-key').val(),
                   name: $(this).find('.flag-name').val(),
                   label: $(this).find('.flag-label').val(),
                   color: $(this).find('.flag-color').val()
-               });
-            });
-            return newData;
+               })
+            })
+            return newData
          },
 
          saveData() {
-            console.log(this.getConfigData())
-            $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, this.getConfigData());
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("flagging", this.getConfigData())
+                  .always(() => this.update({isSaving: false}))
          }
       }
    </script>

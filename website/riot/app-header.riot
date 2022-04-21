@@ -1,0 +1,66 @@
+<app-header>
+   <ul if={ authData.authorized && dictData.isDictionaryLoaded } id="dropdown-menu-dict" class="dropdown-content">
+      <li if={ dictData.userAccess && dictData.userAccess.canEdit }><a href="#/{ dictData.dictId }">View</a></li>
+      <li if={ dictData.userAccess && dictData.userAccess.canEdit }><a href="#/{ dictData.dictId }/edit">Edit</a></li>
+      <li if={ dictData.userAccess && dictData.userAccess.canConfig }><a href="#/{ dictData.dictId }/config">Configure</a></li>
+      <li if={ dictData.userAccess && dictData.userAccess.canDownload }><a href="#/{ dictData.dictId }/download">Download</a></li>
+      <li if={ dictData.userAccess && dictData.userAccess.canUpload }><a href="#/{ dictData.dictId }/upload">Upload</a></li>
+   </ul>
+   <ul if={ !authData.authorized } id="dropdown-menu-anon" class="dropdown-content">
+      <li><a href="#/">Log in</a></li>
+      <li><a href="#/register">Get an account</a></li>
+      <li><a href="#/forgot">Forgot your password?</a></li>
+   </ul>
+   <ul if={ authData.authorized } id="dropdown-menu-user" class="dropdown-content">
+      <li><a href="#/" onclick={ doLogout }>Log out</a></li>
+      <li><a href="#/userprofile">Your profile</a></li>
+   </ul>
+
+   <nav class="white">
+      <div class="nav-wrapper">
+         <a href="#" class="brand-logo">
+            <img class="site-logo" src="img/logo_50.png"/>
+         </a>
+         <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li if={ authData.authorized && dictData.isDictionaryLoaded }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-dict">Dictionary<i class="material-icons right">arrow_drop_down</i></a></li>
+            <li if={ !authData.authorized }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-anon">anonymous user<i class="material-icons right">arrow_drop_down</i></a></li>
+            <li if={ authData.authorized }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-user">{authData.username}<i class="material-icons right">arrow_drop_down</i></a></li>
+         </ul>
+      </div>
+   </nav>
+
+   <style>
+      .brand-logo{
+         padding: 0 20px 0 40px;
+      }
+      .site-logo{
+         height: 50px;
+         position: relative;
+         top: 20px
+      }
+      nav{
+         border-bottom: 1px solid black;
+         box-shadow: none;
+      }
+   </style>
+
+   <script>
+      export default {
+         doLogout(event) {
+            this.auth.logout()
+         },
+
+         onUpdated() {
+            $(".dropdown-trigger").each((idx, el) => {
+               $el = $(el)
+               $el[0].M_Dropdown && $el[0].M_Dropdown.destroy()
+               $el.dropdown({coverTrigger: false, constrainWidth: false});
+            })
+         },
+
+         onMounted(){
+            $(".dropdown-trigger").dropdown({coverTrigger: false, constrainWidth: false});
+         }
+      }
+   </script>
+</app-header>

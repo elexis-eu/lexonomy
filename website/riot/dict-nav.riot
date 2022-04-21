@@ -1,0 +1,29 @@
+<dict-nav>
+	<nav class="nav-breadcrumbs">
+      <div class="nav-wrapper">
+         <a href="#/"
+               class="breadcrumb">Dictionaries</a>
+         <a if={dictData.dictId} href="#/{dictData.dictId}"
+               class="breadcrumb">{dictData.title}</a>
+         <a if={props.links && props.links.length}
+               each={(link, idx) in props.links}
+               href="{getLink(idx)}"
+               class="breadcrumb">{link[1]}</a>
+      </div>
+	</nav>
+
+   <script>
+      export default {
+         getLink(idx){
+            var link = "#"
+            if(this.dictData.dictId){
+               link += "/" + this.dictData.dictId
+            }
+            for(var i = 0; i <= idx; i++){
+               link += "/" + this.props.links[i][0]
+            }
+            return link
+         }
+      }
+   </script>
+</dict-nav>

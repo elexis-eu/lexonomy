@@ -1,5 +1,6 @@
 <dict-config-titling>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["titling", "Headword list"]]}/>
    <h3>Headword</h3>
    <div class="row">
       <div class="input-field col s6">
@@ -20,7 +21,7 @@
       </div>
       <div class="input-field col s6">
          <label style="padding-top: 30px;">
-            <input type="checkbox" id="sortDesc" checked={ configData.sortDesc }/>
+            <input type="checkbox" id="sortDesc" checked={ state.data.sortDesc }/>
             <span>Sort in descending order</span>
          </label>
       </div>
@@ -31,50 +32,54 @@
    <div class="row">
       <div class="col s5">
          <label>
-            <input name="hwannotype" type="radio" value="simple" checked={ configData.headwordAnnotationsType == "simple" } onchange={ changeAnnotation }/>
+            <input name="hwannotype" type="radio" value="simple" checked={ state.data.headwordAnnotationsType == "simple" } onchange={ changeAnnotation }/>
             <span>simple</span>
          </label>
          <br/>
          <div class="input-field">
-            <select id="headwordAnnotations" multiple disabled={ configData.headwordAnnotationsType == 'advanced' }>
+            <select id="headwordAnnotations" multiple disabled={ state.data.headwordAnnotationsType == 'advanced' }>
             </select>
             <span class="helper-text">You can select any elements here whose content you want displayed beside the headword in the entry list, such as homograph numbers or part-of-speech labels.</span>
          </div>
       </div>
       <div class="col s5">
          <label>
-            <input name="hwannotype" type="radio" value="advanced" checked={ configData.headwordAnnotationsType == "advanced" } onchange={ changeAnnotation }/>
+            <input name="hwannotype" type="radio" value="advanced" checked={ state.data.headwordAnnotationsType == "advanced" } onchange={ changeAnnotation }/>
             <span>advanced</span>
          </label>
          <br/>
          <div class="input-field">
-            <textarea id="advancedAnnotations" class="materialize-textarea" placeholder="headword annotations" disabled={ configData.headwordAnnotationsType == 'simple' }>{ this.configData.headwordAnnotationsAdvanced }</textarea>
+            <textarea id="advancedAnnotations" class="materialize-textarea" placeholder="headword annotations" disabled={ state.data.headwordAnnotationsType == 'simple' }>{ state.data.headwordAnnotationsAdvanced }</textarea>
             <span class="helper-text">You can insert any HTML containing placeholders for elements in the form of '%(element)', e.g. '&lt;b>%(headword)&lt;/b>'.</span>
          </div>
       </div>
    </div>
    <div class="row">
       <div class="input-field col s8">
-         <input data-selected-locale={ this.configData.locale } type="text" id="sort_locale" class="autocomplete" placeholder="Type to search for language"/>
+         <input data-selected-locale={ state.data.locale } type="text" id="sort_locale" class="autocomplete" placeholder="Type to search for language"/>
          <label for="sort_locale">Alphabetical order</label>
          <span class="helper-text">Select language to sort entries alphabetically in the entry list.</span>
       </div>
    </div>
    <div class="row">
       <div class="input-field col s6">
-         <input value={ this.configData.numberEntries} placeholder="" id="numberEntries" type="number" class=""/>
+         <input value={ state.data.numberEntries} placeholder="" id="numberEntries" type="number" class=""/>
          <label for="numberEntries">Number of entries to be shown in the entry list at once</label>
          <span class="helper-text">If your dictionary contains large entries (large XML files), it is recommended to reduce this number for quicker loading of entry list.</span>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
    <script>
       export default {
-         dictId: '',
-         configId: '',
-         configTitle: 'Headword list',
-         configData: {headwordAnnotationsType: 'simple', headwordAnnotations: []},
+         state: {
+            isLoading: true,
+            isSaving: false,
+            data: {
+               headwordAnnotationsType: 'simple',
+               headwordAnnotations: []
+            }
+         },
 
          changeAnnotation() {
             if ($('[name=hwannotype][value=advanced]').is(':checked')) {
@@ -89,83 +94,76 @@
          },
 
          onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            M.updateTextFields();
-            M.textareaAutoResize($('#advancedAnnotations'));
+            this.store.loadDictionaryConfig("titling")
+                  .done(response => {
+                     this.state.data = response.content;
+                     if (!this.state.data.numberEntries) this.state.data.numberEntries = 1000;
+                     if (!this.state.data.headwordAnnotationsType) this.state.data.headwordAnnotationsType = 'simple';
+                     if (!this.state.data.headwordAnnotations) this.state.data.headwordAnnotations = [];
+
+                     // fill locale list for autocomplete
+                     if (this.state.data.sort_locale && this.state.data.sort_locale != '') {
+                        $('#sort_locale').data('selected-locale', this.state.data.sort_locale);
+                     }
+                     var localeList = {};
+                     var localeData = {};
+                     var selected = '';
+                     this.state.data.locales.forEach(loc => {
+                        localeList[loc['lang']] = null;
+                        localeData[loc['lang']] = loc['code'];
+                        if (loc['code'] == this.state.data.locale) {
+                           selected = loc['lang'];
+                        }
+                     });
+                     $('#sort_locale').autocomplete({data: localeList});
+                     $('#sort_locale').data('locales', localeData);
+                     if (selected != '') {
+                        $('#sort_locale').val(selected);
+                     }
+                     $('#sort_locale').on('change', function() {
+                        var localeData = $(this).data('locales');
+                        $(this).data('selected-locale', localeData[$(this).val()]);
+                     });
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                     M.updateTextFields();
+                     M.textareaAutoResize($('#advancedAnnotations'));
+                  })
          },
 
          onUpdated() {
-            if (this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements) {
+            if (this.dictData.dictConfigs.xema && this.dictData.dictConfigs.xema.elements) {
                if ($('#headword option').length == 1) {
-                  Object.entries(this.props.dictConfigs.xema.elements).forEach(([key, info]) => {
+                  Object.entries(this.dictData.dictConfigs.xema.elements).forEach(([key, info]) => {
                      $('#headword').append('<option value="' + key + '">' + key + '</option>');
                   });
                }
                if ($('#headwordSorting option').length == 1) {
-                  Object.entries(this.props.dictConfigs.xema.elements).forEach(([key, info]) => {
+                  Object.entries(this.dictData.dictConfigs.xema.elements).forEach(([key, info]) => {
                      $('#headwordSorting').append('<option value="' + key + '">' + key + '</option>');
                   });
                }
                if ($('#headwordAnnotations option').length == 0) {
-                  Object.entries(this.props.dictConfigs.xema.elements).forEach(([key, info]) => {
-                     if (key != this.configData.headword) {
+                  Object.entries(this.dictData.dictConfigs.xema.elements).forEach(([key, info]) => {
+                     if (key != this.state.data.headword) {
                         $('#headwordAnnotations').append('<option value="' + key + '">' + key + '</option>');
                      }
                   });
                }
-               if (this.configData.headword != '') {
-                  $('#headword option[value='+this.configData.headword+']').attr('selected','selected');
+               if (this.state.data.headword != '') {
+                  $('#headword option[value='+this.state.data.headword+']').attr('selected','selected');
                }
-               if (this.configData.headwordSorting != '') {
-                  $('#headwordSorting option[value='+this.configData.headwordSorting+']').attr('selected','selected');
+               if (this.state.data.headwordSorting != '') {
+                  $('#headwordSorting option[value='+this.state.data.headwordSorting+']').attr('selected','selected');
                }
-               this.configData.headwordAnnotations.forEach(el => {
+               this.state.data.headwordAnnotations.forEach(el => {
                   $('#headwordAnnotations option[value='+el+']').attr('selected','selected');
                });
 
 
                $('select').formSelect();
             }
-         },
-
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.configData = response;
-               if (!this.configData.numberEntries) this.configData.numberEntries = 1000;
-               if (!this.configData.headwordAnnotationsType) this.configData.headwordAnnotationsType = 'simple';
-               if (!this.configData.headwordAnnotations) this.configData.headwordAnnotations = [];
-               M.updateTextFields();
-               M.textareaAutoResize($('#advancedAnnotations'));
-
-               // fill locale list for autocomplete
-               if (this.configData.sort_locale && this.configData.sort_locale != '') {
-                  $('#sort_locale').data('selected-locale', this.configData.sort_locale);
-               }
-               var localeList = {};
-               var localeData = {};
-               var selected = '';
-               this.configData.locales.forEach(loc => {
-                  localeList[loc['lang']] = null;
-                  localeData[loc['lang']] = loc['code'];
-                  if (loc['code'] == this.configData.locale) {
-                     selected = loc['lang'];
-                  }
-               });
-               $('#sort_locale').autocomplete({data: localeList});
-               $('#sort_locale').data('locales', localeData);
-               if (selected != '') {
-                  $('#sort_locale').val(selected);
-               }
-               $('#sort_locale').on('change', function() {
-                  var localeData = $(this).data('locales');
-                  $(this).data('selected-locale', localeData[$(this).val()]);
-               });
-               this.update();
-            });
          },
 
          getConfigData() {
@@ -187,9 +185,9 @@
          },
 
          saveData() {
-            console.log(this.getConfigData())
-            $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, this.getConfigData());
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("titling", this.getConfigData())
+                  .always(() => this.update({isSaving: false}))
          }
       }
    </script>

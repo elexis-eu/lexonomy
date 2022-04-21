@@ -1,5 +1,6 @@
 <dict-config-autonumber>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["autonumber", "Auto-numbering"]]}/>
    <h3>Auto-numbering of elements</h3>
    <div class="row">
       <p>If you need to number some of entry elements automatically, Lexonomy can do that for you. First, go to Entry structure and add element/attribute where you want to store the number. Eg. in element <tt>sense</tt> add attribute <tt>number</tt>. When you're ready, select element to number (eg. <tt>sense</tt>) and element/attribute to store numbering (eg. <tt>@number</tt>). Lexonomy will fill the numbers where missing.</p>
@@ -10,75 +11,76 @@
          </select>
          <label for="elements">Element to number</label>
       </div>
-      <div class="input-field col s4">
+      <div id="hasChildren" class="input-field col s4">
          <select id="children">
          </select>
          <label for="children">Add numbers to</label>
       </div>
-      <div class="col s3">
+      <div id="hasNoChildren" class="input-field col s4 grey-text" style="display: none; padding-top: 10px;">
+         element has no children
+      </div>
+      <div class="input-field col s3">
          <a class="btn waves-effect waves-light" onclick={ addNumbers } id="submit_button"><i class="material-icons right">add</i>Add numbers</a>
       </div>
    </div>
-   <div class="row" id="numberinfo" style="display:none">
-      <div class="col s10">
-         <div class="card red">
-            <div class="card-content white-text">
-            </div>
-         </div>
+   <div if={state.info} class="section">
+      <div class="message messageInfo">
+         {state.info}
       </div>
    </div>
    <script>
       export default {
-         dictId: '',
-         configId: '',
-         configTitle: 'Auto-numbering',
-         configData: {elements:[]},
-
-         onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            console.log(this.props);
+         state: {
+            isSaving: false,
+            info: ""
          },
 
          onUpdated() {
-            if (this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements) {
+            if (this.dictData.config.xema && this.dictData.config.xema.elements) {
                if ($('#elements option').length == 0) {
-                  Object.entries(this.props.dictConfigs.xema.elements).forEach(([key, info]) => {
-                     $('#elements').append('<option value="' + key + '">' + key + '</option>');
-                  });
+                  Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
+                     $('#elements').append('<option value="' + key + '">' + key + '</option>')
+                  })
+                  this.changeElem()
+               } else {
+                  $('select').formSelect()
                }
-               $('select').formSelect();
-               M.updateTextFields();
+               M.updateTextFields()
             }
          },
 
          changeElem() {
-            $("#children").find('option').remove();
-            var elem = $("#elements").val();
-            for(var atName in this.props.dictConfigs.xema.elements[elem]['attributes']){
-               $("#children").append("<option value='@"+atName+"'>@"+atName+"</option>");
+            $("#children").find('option').remove()
+            var elem = $("#elements").val()
+            for(var atName in this.dictData.config.xema.elements[elem]['attributes']){
+               $("#children").append("<option value='@"+atName+"'>@"+atName+"</option>")
             }
-            for(var child in this.props.dictConfigs.xema.elements[elem]['children']){
-               $("#children").append("<option value='"+this.props.dictConfigs.xema.elements[elem]['children'][child].name+"'>"+this.props.dictConfigs.xema.elements[elem]['children'][child].name+"</option>");
+            for(var child in this.dictData.config.xema.elements[elem]['children']){
+               $("#children").append("<option value='"+this.dictData.config.xema.elements[elem]['children'][child].name+"'>"+this.dictData.config.xema.elements[elem]['children'][child].name+"</option>")
             }
-            $('select').formSelect();
+            var hasChildren = !!this.dictData.config.xema.elements[elem]['children'].length
+            $("#submit_button").toggleClass("disabled", !hasChildren)
+            $("#hasChildren").toggle(hasChildren)
+            $("#hasNoChildren").toggle(!hasChildren)
+
+            $('select').formSelect()
          },
 
          addNumbers() {
-            var countElem = $("#elements").val();
-            var storeElem = $("#children").val();
-            if (countElem != "" && storeElem != null && storeElem != "") {
-               $("#numberinfo").show();
-               $("#numberinfo .card-content").html('<p>Auto numbering in progress</p>');
-               $.post(window.API_URL + this.dictId + "/autonumber.json", {"countElem": countElem, "storeElem": storeElem}, (response) => {
-                  if(!response.success) {
-                     $("#numberinfo .card-content").html('<p>Auto numbering failed</p>');
-                  } else {
-                     $("#numberinfo .card-content").html('<p>Auto-numbering finished, '+response.processed+' entries updated.</p>')
-                  }
-               });
+            var countElem = $("#elements").val()
+            var storeElem = $("#children").val()
+            if (countElem && storeElem) {
+               this.update({
+                  isSaving: true,
+                  info: ''
+               })
+               this.store.autonumberElements(countElem, storeElem)
+                     .done(response => {
+                        if(response.success) {
+                           this.update({info: 'Auto-numbering finished, ' + response.processed + ' entries updated.'})
+                        }
+                     })
+                     .always(() => this.update({isSaving: false}))
             }
          }
       }

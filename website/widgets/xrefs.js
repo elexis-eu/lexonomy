@@ -6,7 +6,7 @@ Xrefs.extendDocspec=function(docspec, xema) {
       if (linking[parName] != undefined) {
         docspec.elements[parName].caption = function(jsMe){
           var cap="";
-          cap="<span class='lexonomyXrefsCaption' onclick='Xonomy.notclick=true; Xrefs.linkBox(\""+jsMe.htmlID+"\")'>▼</span>";
+          cap="<button class='btn btn-secondary lexonomyXrefsCaption' onclick='Xonomy.notclick=true; Xrefs.linkBox(\""+jsMe.htmlID+"\")'>▼</button>";
           if(typeof(incaption)=="function") cap=incaption(jsMe)+cap;
           if(typeof(incaption)=="string") cap=incaption+cap;
           return cap;
@@ -29,7 +29,7 @@ Xrefs.linkBox=function(htmlID) {
   html += "</select><br/>";
   html += " target: ";
   html += "<div class='input-field'><input id='xreftarget' name='xreftarget' class='autocomplete'/></div>";
-  html += "<button onclick='Xrefs.makeLink(\""+htmlID+"\")'>Link</button>";
+  html += "<button class=\"btn\"onclick='Xrefs.makeLink(\""+htmlID+"\")'>Link</button>";
   html += "</div>";
   document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
@@ -43,20 +43,19 @@ Xrefs.linkBox=function(htmlID) {
 Xrefs.refreshLinks=function() {
   var xrefdict = $("[name=xrefdict]").val();
   $("[name=xreftarget]").empty();
-  if (xrefdict != "") {
+  if (xrefdict) {
     var xrefTarget = $("#xreftarget");
     var listData = {};
     var autocompleteData = {};
-    console.log("/"+xrefdict+"/linkablelist.json")
-    $.get("/"+xrefdict+"/linkablelist.json", (response) => {
+    $.get(Xonomy.baseUrl+xrefdict+"/linkablelist.json", (response) => {
       response.links.forEach(item => {
         var text = item.element + ": " + item.link + ((item.preview != "")? " (" + item.preview + ")":"");
         listData[text] = item;
         autocompleteData[text] = null
       });
       xrefTarget.autocomplete({
-        data: autocompleteData, 
-        limit: 10, 
+        data: autocompleteData,
+        limit: 10,
         onAutocomplete: function(txt) {
           var item = listData[txt];
           if (item) {
@@ -77,9 +76,10 @@ Xrefs.makeLink=function(htmlID) {
   var srcel = $("#"+htmlID).data('name');
   if (xrefel != undefined && xrefid != undefined && xrefel != "" && xrefid != "" && xrefdict != "" && srcid != undefined && srcel != undefined) {
     var srcdict = dictId;
+
     document.cookie = "linkPref=" + xrefdict + "; path=/" + srcdict;
     $("#"+htmlID+" > .tag.opening > .attributes")
-    $.get("/"+dictId+"/links/add", {source_el: srcel, source_id: srcid, target_dict: xrefdict, target_el: xrefel, target_id: xrefid}, function(json){
+    $.get(Xonomy.baseUrl+dictId+"/links/add", {source_el: srcel, source_id: srcid, target_dict: xrefdict, target_el: xrefel, target_id: xrefid}, function(json){
       if (json.success) {
         Screenful.status('Link created successfully.');
       } else {

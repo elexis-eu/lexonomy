@@ -1,15 +1,16 @@
 <dict-config-editing>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["editing", "Entry editor"]]}/>
    <h3>Entry editor</h3>
-   <div if={ (!this.configData._js || this.configData._js == "") && !this.override }>
+   <div if={ (!state.data._js || state.data._js == "") && !state.override }>
       <div class="input-field">
          <p>
             <label>
-               <input name="xonomyMode" id="xonomyMode_nerd" type="radio" class="with-gap" checked={ this.configData.xonomyMode == "nerd" } onchange={ changeInfo } />
+               <input name="xonomyMode" id="xonomyMode_nerd" type="radio" class="with-gap" checked={ state.data.xonomyMode == "nerd" } onchange={ changeInfo } />
                <span>Nerd mode</span>
             </label>
             <label style="margin-left: 30px;">
-               <input name="xonomyMode" id="xonomyMode_laic" type="radio" class="with-gap" checked={ this.configData.xonomyMode == "laic" } onchange={ changeInfo }/>
+               <input name="xonomyMode" id="xonomyMode_laic" type="radio" class="with-gap" checked={ state.data.xonomyMode == "laic" } onchange={ changeInfo }/>
                <span>Laic mode</span>
             </label>
          </p>
@@ -27,11 +28,11 @@
       <div class="input-field">
          <p>
             <label>
-               <input name="xonomyTextEditor" id="xonomyTextEditor_string" type="radio" class="with-gap" checked={ this.configData.xonomyTextEditor == "askString" } onchange={ changeInfo }/>
+               <input name="xonomyTextEditor" id="xonomyTextEditor_string" type="radio" class="with-gap" checked={ state.data.xonomyTextEditor == "askString" } onchange={ changeInfo }/>
                <span>Single line</span>
             </label>
             <label style="margin-left: 30px;">
-               <input name="xonomyTextEditor" id="xonomyTextEditor_longstring" type="radio" class="with-gap" checked={ this.configData.xonomyTextEditor == "askLongString" } onchange={ changeInfo }/>
+               <input name="xonomyTextEditor" id="xonomyTextEditor_longstring" type="radio" class="with-gap" checked={ state.data.xonomyTextEditor == "askLongString" } onchange={ changeInfo }/>
                <span>Multi line</span>
             </label>
             </p>
@@ -49,23 +50,23 @@
          </button>
       </div>
       <br><br>
-      <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+      <dict-config-buttons save-data={saveData}></dict-config-buttons>
    </div>
-   <div if={ (this.configData._js && this.configData._js != "") || this.override }>
-         <div>
+   <div if={ (state.data._js && state.data._js != "") || state.override }>
+      <div class="row">
+         <div class="input-field">
+            <textarea id="editor_js" class="materialize-textarea" placeholder="">{ state.data._js }</textarea>
             <label>JavaScript</label>
-            <div class="input-field">
-               <textarea id="editor_js" class="materialize-textarea" placeholder="">{ this.configData._js }</textarea>
-               <span class="helper-text">You can customize the editor by defining two functions in JavaScript: one that will render the HTML editor from the XML entry and one that will harvest the (edited) HTML back into XML. If you would like to see an example, <a onclick={ exampleJS }>click here to load a sample JavaScript code</a>.</span>
-            </div>
+            <span class="helper-text">You can customize the editor by defining two functions in JavaScript: one that will render the HTML editor from the XML entry and one that will harvest the (edited) HTML back into XML. If you would like to see an example, <a onclick={ exampleJS }>click here to load a sample JavaScript code</a>.</span>
          </div>
-         <div>
+      </div>
+      <div class="row">
+         <div class="input-field">
+            <textarea id="editor_css" class="materialize-textarea" placeholder="">{ state.data._css }</textarea>
             <label for="editor_css">CSS</label>
-            <div class="input-field">
-               <textarea id="editor_css" class="materialize-textarea" placeholder="">{ this.configData._css }</textarea>
-               <span class="helper-text">You can customize the editor look and feel by writing your own CSS styles. If you would like to see an example, <a onclick={ exampleCSS }>click here to load a sample CSS style</a>.</span>
-            </div>
+            <span class="helper-text">You can customize the editor look and feel by writing your own CSS styles. If you would like to see an example, <a onclick={ exampleCSS }>click here to load a sample CSS style</a>.</span>
          </div>
+      </div>
       <div class="buttons">
          <a class="btn btn-secondary waves-effect waves-light" onclick={backFromOverride} >back</a>
          <button class="btn waves-effect waves-light" onclick={ stopOverride } >Disable entry editor customizations <i class="material-icons right">edit</i>
@@ -82,15 +83,16 @@
 
    <script>
       export default {
-         dictId: '',
-         configId: '',
-         configTitle: 'Entry editor',
-         override: false,
-         configData: {
-            xonomyMode: "nerd",
-            xonomyTextEditor: "askString",
-            _js: "",
-            _css: ""
+         state: {
+            isLoading: true,
+            isSaving: false,
+            override: false,
+            data: {
+               xonomyMode: "nerd",
+               xonomyTextEditor: "askString",
+               _js: "",
+               _css: ""
+            }
          },
 
          changeInfo() {
@@ -111,20 +113,17 @@
          },
 
          startOverride() {
-            this.override = true;
-            this.update();
+            this.update({override: true});
          },
 
          stopOverride() {
-            this.override = false;
-            this.configData._js = '';
-            this.configData._css = '';
-            this.update();
+            this.state.data._js = '';
+            this.state.data._css = '';
+            this.update({override: false});
          },
 
          backFromOverride(){
-            this.override = false;
-            this.update();
+            this.update({override: false});
          },
 
          exampleJS() {
@@ -172,30 +171,22 @@ div.myEditor input {font-weight: bold}`
             );
             M.textareaAutoResize($('#editor_css'));
          },
-         onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            console.log(this.props);
-         },
 
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.configData = response;
-               console.log(this.configData)
-               if (response._js && response._js != "") {
-                  this.override = true;
-               }
-               this.update();
-               this.changeInfo();
-               M.updateTextFields();
-               if (this.override) {
-                  M.textareaAutoResize($('#editor_css'));
-                  M.textareaAutoResize($('#editor_js'));
-               }
-            });
+         onMounted() {
+            this.store.loadDictionaryConfig("editing")
+                  .done(response => {
+                     this.state.data = response.content
+                     this.state.override = !!response._js
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                     this.changeInfo()
+                     M.updateTextFields()
+                     if (this.state.override) {
+                        M.textareaAutoResize($('#editor_css'))
+                        M.textareaAutoResize($('#editor_js'))
+                     }
+                  })
          },
 
          getConfigData() {
@@ -211,7 +202,7 @@ div.myEditor input {font-weight: bold}`
             if ($("#xonomyTextEditor_longstring").is(":checked")) {
                newData.xonomyTextEditor = "askLongString";
             }
-            if (this.override) {
+            if (this.state.override) {
                newData._js = $('#editor_js').val();
                newData._css = $('#editor_css').val();
             }
@@ -219,9 +210,9 @@ div.myEditor input {font-weight: bold}`
          },
 
          saveData() {
-            console.log(this.getConfigData())
-            $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, this.getConfigData());
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("editing", this.getConfigData())
+                  .always(() => this.update({isSaving: false}))
          }
       }
    </script>

@@ -1,4 +1,8 @@
 <login>
+   <loading-overlay if={state.isLoggingIn} fullscreen=1/>
+   <div if={state.message} class="section message messageError">
+      {state.message}
+   </div>
    <div class="section">
       <div class="input-field">
          <input id="username" type="email" class="validate" value=""/>
@@ -8,7 +12,7 @@
          </small>
       </div>
       <div class="input-field">
-         <input id="password" type="password" onkeypress={ doLogin }/>
+         <input id="password" type="password" onkeyup={ onKeyUp }/>
          <label for="password">Password</label>
          <small>
             <a href="#forgot" tabindex="-1">Forgot password?</a>
@@ -18,8 +22,8 @@
          <i class="material-icons right">send</i>
       </button>
    </div>
-   <div class="section" if={ 'sketchengineLoginPage' in this.props.siteconfig && this.props.siteconfig.sketchengineLoginPage != "" }>
-      <a class="btn waves-effect waves-light" href={ this.props.siteconfig.sketchengineLoginPage }>Sign up or log in with
+   <div class="section" if={ dictData.siteconfig && dictData.siteconfig.sketchengineLoginPage }>
+      <a class="btn waves-effect waves-light" href={ dictData.siteconfig.sketchengineLoginPage + encodeURIComponent(window.location.href)}>Sign up or log in with &nbsp;
          <img class="skelogin" alt="Sketch Engine" title="Sketch Engine" src="img/logo_ske_white.png"/>
          <i class="material-icons right">send</i>
       </a>
@@ -39,9 +43,28 @@
 
    <script>
       export default {
-         doLogin(event) {
-            if ((event.target.id == "username" || event.target.id == "password") && event.keyCode != 13) return false;
-            this.props.accountOps('login');
+         state: {
+            isLoggingIn: false,
+            message: ""
+         },
+
+         onKeyUp(evt){
+            evt.keyCode == 13 && this.doLogin()
+         },
+
+         doLogin() {
+            let username = $('#username').val()
+            let password = $('#password').val()
+            if(username && password){
+               this.update({isLoggingIn: true})
+               this.auth.login(username, password)
+                     .always(response =>{
+                        this.update({
+                           isLoggingIn: false,
+                           message: response.success ? "" : "Incorrect username or password."
+                        })
+                     })
+            }
          }
       }
    </script>

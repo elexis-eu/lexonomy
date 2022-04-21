@@ -1,6 +1,7 @@
 var Xonomy={
 	lang: "", //"en"|"de"|fr"| ...
-	mode: "nerd", //"nerd"|"laic"
+	mode: "nerd", //"nerd"|"laic",
+	baseUrl: "/"
 };
 Xonomy.setMode=function(mode) {
 	if(mode=="nerd" || mode=="laic") Xonomy.mode=mode;
@@ -519,8 +520,8 @@ Xonomy.render=function(data, editor, docSpec) { //renders the contents of an edi
 
 	if(docSpec.allowLayby){
 		var laybyHtml="<div class='layby closed empty' onclick='if($(this).hasClass(\"closed\")) Xonomy.openLayby()' ondragover='Xonomy.dragOver(event)' ondragleave='Xonomy.dragOut(event)' ondrop='Xonomy.drop(event)''>";
-		laybyHtml+="<span class='button closer' onclick='Xonomy.closeLayby();'>&nbsp;</span>";
-		laybyHtml+="<span class='button purger' onclick='Xonomy.emptyLayby()'>&nbsp;</span>";
+		laybyHtml+="<button class='btn btn-flat' onclick='Xonomy.closeLayby();'><i class='material-icons'>keyboard_arrow_right</i></button>";
+		laybyHtml+="<button class='btn btn-flat right' onclick='Xonomy.emptyLayby()'><i class='material-icons'>delete</i></button>";
 		laybyHtml+="<div class='content'></div>";
 		laybyHtml+="<div class='message'>"+Xonomy.textByLang(docSpec.laybyMessage)+"</div>";
 		laybyHtml+="</div>";
@@ -1013,7 +1014,7 @@ Xonomy.askString=function(defaultString, askerParameter, jsMe) {
 	var html="";
 	html+="<form onsubmit='Xonomy.answer(this.val.value); return false'>";
 		html+="<input name='val' class='textbox focusme' style='width: "+width+"px;' value='"+Xonomy.xmlEscape(defaultString)+"' onkeyup='Xonomy.notKeyUp=true'/>";
-		html+=" <input type='submit' value='OK'>";
+		html+=" <input class='btn btn-primary' type='submit' value='OK'>";
 	html+="</form>";
 	return html;
 };
@@ -1022,7 +1023,7 @@ Xonomy.askLongString=function(defaultString, askerParameter, jsMe) {
 	var html="";
 	html+="<form onsubmit='Xonomy.answer(this.val.value); return false'>";
 		html+="<textarea name='val' class='textbox focusme' spellcheck='false' style='width: "+width+"px; height: 150px;'>"+Xonomy.xmlEscape(defaultString)+"</textarea>";
-		html+="<div class='submitline'><input type='submit' value='OK'></div>";
+		html+="<div class='submitline'><input class='btn btn-primary' type='submit' value='OK'></div>";
 	html+="</form>";
 	return html;
 };
@@ -1037,7 +1038,7 @@ Xonomy.askOpenPicklist=function(defaultString, picklist) {
 		html+=Xonomy.pickerMenu(picklist, defaultString);
 		html+="<form class='undermenu' onsubmit='Xonomy.answer(this.val.value); return false'>";
 		html+="<input name='val' class='textbox focusme' value='"+(!isInPicklist ? Xonomy.xmlEscape(defaultString) : "")+"' onkeyup='Xonomy.notKeyUp=true'/>";
-		html+=" <input type='submit' value='OK'>";
+		html+=" <input class='btn btn-primary' type='submit' value='OK'>";
 		html+="</form>";
     return html;
 };
@@ -1046,8 +1047,8 @@ Xonomy.askRemote=function(defaultString, param, jsMe) {
 	if(param.searchUrl || param.createUrl) {
 		html+="<form class='overmenu' onsubmit='return Xonomy.remoteSearch(\""+Xonomy.xmlEscape(param.searchUrl, true)+"\", \""+Xonomy.xmlEscape(param.urlPlaceholder, true)+"\", \""+Xonomy.xmlEscape(Xonomy.jsEscape(defaultString))+"\")'>";
 		html+="<input name='val' class='textbox focusme' value=''/>";
-		if(param.searchUrl) html+=" <button class='buttonSearch' onclick='return Xonomy.remoteSearch(\""+Xonomy.xmlEscape(param.searchUrl, true)+"\", \""+Xonomy.xmlEscape(param.urlPlaceholder, true)+"\", \""+Xonomy.xmlEscape(Xonomy.jsEscape(defaultString))+"\")'>&nbsp;</button>";
-		if(param.createUrl) html+=" <button class='buttonCreate' onclick='return Xonomy.remoteCreate(\""+Xonomy.xmlEscape(param.createUrl, true)+"\", \""+Xonomy.xmlEscape( (param.searchUrl?param.searchUrl:param.url) , true)+"\", \""+Xonomy.xmlEscape(param.urlPlaceholder, true)+"\", \""+Xonomy.xmlEscape(Xonomy.jsEscape(defaultString))+"\")'>&nbsp;</button>";
+		if(param.searchUrl) html+=" <button class='btn buttonSearch' onclick='return Xonomy.remoteSearch(\""+Xonomy.xmlEscape(param.searchUrl, true)+"\", \""+Xonomy.xmlEscape(param.urlPlaceholder, true)+"\", \""+Xonomy.xmlEscape(Xonomy.jsEscape(defaultString))+"\")'>&nbsp;</button>";
+		if(param.createUrl) html+=" <button class='btn buttonCreate' onclick='return Xonomy.remoteCreate(\""+Xonomy.xmlEscape(param.createUrl, true)+"\", \""+Xonomy.xmlEscape( (param.searchUrl?param.searchUrl:param.url) , true)+"\", \""+Xonomy.xmlEscape(param.urlPlaceholder, true)+"\", \""+Xonomy.xmlEscape(Xonomy.jsEscape(defaultString))+"\")'>&nbsp;</button>";
 		html+="</form>";
 	}
 	html+=Xonomy.wyc(param.url, function(picklist){
@@ -1685,7 +1686,9 @@ Xonomy.startKeyNav=function(keyboardEventCatcher, scrollableContainer){
 	$scrollableContainer=$(scrollableContainer); if(!scrollableContainer) $scrollableContainer=$keyboardEventCatcher;
 	$keyboardEventCatcher.attr("tabindex", "0");
 	$keyboardEventCatcher.on("keydown", Xonomy.key);
-	$(document).on("keydown", function(e) { if([32, 37, 38, 39, 40].indexOf(e.keyCode)>-1 && $("input:focus, select:focus, textarea:focus").length==0) e.preventDefault(); }); //prevent default browser scrolling on arrow keys
+	$(document).on("keydown", function(e) {
+		if([32, 37, 38, 39, 40].indexOf(e.keyCode)>-1 && $("input:focus, select:focus, textarea:focus").length==0) e.preventDefault();
+	}); //prevent default browser scrolling on arrow keys
 	Xonomy.keyboardEventCatcher=$keyboardEventCatcher;
 	Xonomy.scrollableContainer=$scrollableContainer;
 };

@@ -1,13 +1,11 @@
 <dict-config-links>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["links", "Linking"]]}/>
    <h3>Manual linking between entries</h3>
    <div>
       <p>Elements listed here can be used as target of cross-reference link. For each element, specify unique identifier in the form of placeholders <tt>'%(element)'</tt>. Eg. element <tt>entry</tt> can have identifier <tt>%(lemma)-%(pos)</tt>, element <tt>sense</tt> can have identifier <tt>%(lemma)-%(number)</tt>. Optionally, specify element you want to show as preview when selecting links.</p>
-      <div if={isLoading} class="center-align grey-text">
-         <h3>loading elements...</h3>
-      </div>
-      <template if={!isLoading}>
-         <table if={configData.elements.length}>
+      <template if={!state.isLoading}>
+         <table if={state.data.elements.length}>
             <thead>
                <tr>
                   <th>Linking element</th>
@@ -17,7 +15,7 @@
                </tr>
             </thead>
             <tbody>
-               <tr each={ (element, idx) in configData.elements } idx={ idx }>
+               <tr each={ (element, idx) in state.data.elements } idx={ idx }>
                   <td>
                      <div class="input-field">
                         <select linkelement={element.linkElement}></select>
@@ -42,7 +40,7 @@
             </tbody>
          </table>
          <div class="buttons">
-            <button class="btn {unusedElements.length ? '' : 'disabled'}" onclick={ doAddEl }>
+            <button class="btn {state.unusedElements.length ? '' : 'disabled'}" onclick={ doAddEl }>
                add element
                <i class="material-icons right">add</i>
             </button>
@@ -63,15 +61,20 @@
             <label for="otherdict">Other dictionary code</label>
          </div>
          <div class="input-field inlineBlock" style="max-width: 400px;">
-            <input type="text" id="otherdict" oninput={ checkOtherDict }/>
+            <input type="text" id="otherdict"/>
          </div>
          <div class="input-field inlineBlock">
-            <button class="btn waves-effect waves-light" id="naisc_link" onclick={ startLinking } data-bgjob="" disabled style="margin-left: 10px;">Checking status, wait...</button>
+            <button id="naisc_link" class="btn waves-effect waves-light {state.isLinking || state.isChecking ? 'disabled' : ''}" onclick={ startLinking } style="margin-left: 10px;">Start linking</button>
+         </div>
+      </div>
+      <div if={state.info} class="section">
+         <div class="message messageInfo">
+            <raw-html content={state.info}></raw-html>
          </div>
       </div>
    </div>
    <br>
-   <a href="#{dictId}/config" class="btn btn-secondary btn-flat">Back</a>
+   <a href="#{dictData.dictId}/config" class="btn btn-secondary btn-flat">Back</a>
 
    <style>
       tbody tr{
@@ -90,39 +93,50 @@
 
    <script>
       export default {
-         isLoading: true,
-         dictId: '',
-         configId: '',
-         configTitle: 'Linking',
-         configData: {elements:[]},
-         unusedElements: [],
+         state: {
+            isLoading: true,
+            isSaving: false,
+            isLinking: false,
+            isChecking: true,
+            unusedElements: [],
+            data: {elements: []},
+            info: "",
+            checkDelay: 1000
+         },
 
          doDeleteEl(element) {
-            this.configData.elements = this.configData.elements.filter(val => val.linkElement != element);
+            this.state.data.elements = this.state.data.elements.filter(val => val.linkElement != element)
             this.update()
          },
 
          doAddEl(event) {
-            this.configData.elements.push({linkElement: this.unusedElements[0], identifier: "", preview: ""});
-            this.update();
+            this.state.data.elements.push({
+               linkElement: this.state.unusedElements[0],
+               identifier: "", preview: ""
+            })
+            this.update()
          },
 
          onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            M.updateTextFields();
-            console.log(this.props);
+            this.store.loadDictionaryConfig("links")
+                  .done(response => {
+                     this.state.data = {elements: Object.values(response.content)}
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                  })
 
             //check NAISC status
-            $.get(window.API_URL + this.dictId + "/linking.json", (response) => {
-               if (response.bgjob != -1) {
-                  $("#naisc_link").html("Linking to '" + response.otherdictID + "' already in progress, please wait...");
-               } else {
-                  $("#naisc_link").html("Start linking");
-               }
-            });
+            this.store.linkingCheckIfRunning()
+                  .done(response => {
+                     if (response.bgjob != -1) {
+                        this.state.info = "Linking to '" + response.otherdictID + "' already in progress, please wait..."
+                        this.waitForLinking(response.otherdictID, response.bgjob)
+                     }
+                  })
+                  .always(() => {
+                     this.update({isChecking: false})
+                  })
          },
 
          onBeforeUpdate(){
@@ -130,95 +144,100 @@
          },
 
          onUpdated() {
-            if (this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements) {
+            if (this.dictData.config.xema && this.dictData.config.xema.elements) {
                $("select").each(function(idx, el){
                   var $select = $(el)
-                  var instance = M.FormSelect.getInstance(el);
+                  var instance = M.FormSelect.getInstance(el)
                   $select.off("change", this.onElementChange)
                   instance && instance.destroy()
                   $select.empty()
                   var key = $select.attr("linkelement")
-                  $select.append(`<option value="${key}" selected}>${key}</option>`);
-                  this.unusedElements.forEach(key => {
-                     $select.append(`<option value="${key}">${key}</option>`);
-                  });
+                  $select.append(`<option value="${key}" selected}>${key}</option>`)
+                  this.state.unusedElements.forEach(key => {
+                     $select.append(`<option value="${key}">${key}</option>`)
+                  })
                   $('select').formSelect()
-                     .on("change", this.onElementChange);
+                     .on("change", this.onElementChange)
                }.bind(this))
             }
          },
 
          onElementChange(evt){
             var idx = $(evt.target).closest("tr").attr("idx")
-            this.configData.elements[idx].linkElement = $(evt.target).find("option:selected").attr("value")
+            this.state.data.elements[idx].linkElement = $(evt.target).find("option:selected").attr("value")
             this.update()
          },
 
          onItemChange(evt){
             var idx = $(evt.target).closest("tr").attr("idx")
-            this.configData.elements[idx][evt.target.name] = evt.target.value
+            this.state.data.elements[idx][evt.target.name] = evt.target.value
          },
 
          refreshUnusedElements(){
-            var savedElements = this.configData.elements.map(e => e.linkElement)
-            this.unusedElements = Object.keys(this.props.dictConfigs.xema.elements).filter(el => {
+            var savedElements = this.state.data.elements.map(e => e.linkElement)
+            this.state.unusedElements = Object.keys(this.dictData.config.xema.elements).filter(el => {
                return !savedElements.includes(el)
             })
          },
 
-         checkOtherDict() {
-            $("#naisc_link").prop("disabled", $("#otherdict").val().length == 0);
-         },
-
          startLinking() {
-            var otherdict = $("#otherdict").val();
-            $("#naisc_link").html("Initiating linking ...");
-            $("#naisc_link").prop("disabled", true);
-            $.get(window.API_URL + this.dictId + "/linknaisc.json", {"otherdictID": otherdict}).done(function(data) {
-               $("#naisc_link").html("Linking in progress, please wait...");
-               $("#naisc_link").data("bgjob", data["bgjob"]);
-            });
-            this.waitForLinking(otherdict, this.dictId);
-         },
-
-         waitForLinking(otherdict, dictId) {
-            var naiscTimer = setInterval(checkNaisc, 1000);
-            function checkNaisc() {
-               var jobid = $("#naisc_link").data("bgjob");
-               if (jobid != "") {
-                  $.get(window.API_URL + dictId + "/naiscprogress.json", {"otherdictID": otherdict, "jobid": jobid}).done(function(data) {
-                     if (data["status"] == "finished") {
-                        clearInterval(naiscTimer);
-                        $("#naisc_link").html("Linking done. <a href='#/" + this.dictId + "/links'>See results.</a>");
-                        $("#naisc_link").data("bgjob", "");
-                     } else if (data["status"] == "failed") {
-                        clearInterval(naiscTimer);
-                        $("#naisc_link").html("Linking failed :(");
-                        $("#naisc_link").data("bgjob", "");
-                     }
-                  });
-               }
+            var otherdictID = $("#otherdict").val()
+            if(otherdictID){
+               this.update({
+                  isLinking: true,
+                  info: "Initiating linking..."
+               })
+               this.store.startLinking($("#otherdict").val())
+                     .done(response => {
+                        this.update({
+                           info: "Linking in progress, please wait...",
+                           checkDelay: 1000
+                        })
+                        this.waitForLinking(otherdictID, response.bgjob)
+                     })
+                     .fail(() => {
+                        this.update({
+                           isLinking: false,
+                           info: "Linking failed."
+                        })
+                     })
             }
          },
 
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.isLoading = false
-               this.configData = {elements:[]}
-               for (var key in response) {
-                  this.configData.elements.push(response[key]);
-               }
-               this.update();
-            });
+         waitForLinking(otherdictID, jobID) {
+            this.store.linkingGetProgress(otherdictID, jobID)
+                  .done(response => {
+                     if (response.status == "finished") {
+                        this.update({
+                           isLinking: false,
+                           info: "Linking done. <a href='#/" + this.dictData.dictId + "/links'>See results.</a>"
+                        })
+                     } else if (response.status == "failed") {
+                        this.update({
+                           isLinking: false,
+                           info: "Linking failed"
+                        })
+                     } else {
+                        this.state.checkDelay = this.state.checkDelay < 60000 ? this.state.checkDelay + 2000 : 60000
+                        setTimeout(this.waitForLinking.bind(this, otherdictID, jobID), this.state.checkDelay)
+                     }
+                  })
+                  .fail(() => {
+                     this.update({
+                        isLinking: false,
+                        info: "Linking failed"
+                     })
+                  })
          },
 
          saveData() {
             var data = {}
-            this.configData.elements.forEach(item => {
+            this.state.data.elements.forEach(item => {
                data[item.linkElement] = item
             })
-            $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, data);
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("links", data)
+                  .always(() => this.update({isSaving: false}))
          }
       }
    </script>

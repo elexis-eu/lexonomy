@@ -1,11 +1,9 @@
 <dict-config-users>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["users", "Users"]]}/>
    <h3>Users</h3>
-   <div if={isLoading} class="center-align grey-text">
-      <h3>Loading users...</h3>
-   </div>
-   <template if={!isLoading}>
-      <div if={!configData.users.length} class="grey-text center-align">
+   <template if={!state.isLoading}>
+      <div if={!state.data.users.length} class="grey-text center-align">
          <h4>No users</h4>
          <br>
          <button class="btn btn-primary" onclick={doAddUser}>
@@ -14,12 +12,12 @@
          </button>
          <br><br><br><br>
          <div class="buttons" style="justify-content: center;">
-            <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+            <dict-config-buttons save-data={saveData}></dict-config-buttons>
          </div>
       </div>
       <div>
 
-      <div if={configData.users.length}>
+      <div if={state.data.users.length}>
          <table>
             <thead>
                <tr style="border-bottom: none;">
@@ -37,7 +35,7 @@
                </tr>
             </thead>
             <tbody>
-               <tr each={ (user, idx) in configData.users } no-reorder key={user.id}>
+               <tr each={ (user, idx) in state.data.users } no-reorder key={user.id}>
                   <td>
                      <span if={user.isEditable}>
                         <input id="new-email" type="email" class="validate" oninput={onEmailInput.bind(this, idx)} style="max-width: 300px;">
@@ -86,7 +84,7 @@
             </button>
          </div>
          <br><br>
-         <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+         <dict-config-buttons save-data={saveData}></dict-config-buttons>
          <div id="userConfigError"></div>
       </div>
    </template>
@@ -103,30 +101,31 @@
          color: red;
       }
    </style>
+
    <script>
       export default {
-         isLoading: true,
-         dictId: '',
-         configId: '',
-         configTitle: 'Users',
-         configData: {users:[]},
+         state: {
+            isLoading: true,
+            isSaving: false,
+            data: {users: []}
+         },
 
          onEmailInput(idx, evt){
-            this.configData.users[idx].email = evt.target.value
+            this.state.data.users[idx].email = evt.target.value
          },
 
          onPermissionChange(idx, evt){
-            this.configData.users[idx][evt.target.name] = evt.target.checked
+            this.state.data.users[idx][evt.target.name] = evt.target.checked
          },
 
          doDeleteUser(idx) {
-            this.configData.users.splice(idx, 1);
+            this.state.data.users.splice(idx, 1);
             this.update()
          },
 
          doAddUser(event) {
-            this.configData.users.push({
-               id: this.configData.users.length,
+            this.state.data.users.push({
+               id: this.state.data.users.length,
                email: "",
                canEdit: false,
                canConfig: false,
@@ -139,38 +138,30 @@
          },
 
          onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            console.log(this.props);
-         },
-
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.isLoading = false;
-               this.configData = {users:[]}
-               let id = 0
-               for (var key in response) {
-                  var info = response[key];
-                  info.email = key;
-                  info.id = id
-                  id++
-                  this.configData.users.push(info);
-               }
-               this.update();
-            });
+            this.store.loadDictionaryConfig("users")
+                  .done(response => {
+                     this.state.data = {users:[]}
+                     let id = 0
+                     for (var key in response.content) {
+                        var info = response.content[key]
+                        info.email = key
+                        info.id = id
+                        id++
+                        this.state.data.users.push(info)
+                     }
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                  })
          },
 
          saveData() {
-            if (Object.values(this.configData.users).find(row => row.canConfig) == undefined) {
+            if (Object.values(this.state.data.users).find(row => row.canConfig) == undefined) {
                $('#userConfigError').html('At least one user must have <i>Configure</i> permission.');
             } else {
                $('#userConfigError').html('');
-               $('#submit_button').html('Saving...');
                let data = {}
-               this.configData.users.forEach(u => {
+               this.state.data.users.forEach(u => {
                   data[u.email] = {
                      canEdit: u.canEdit,
                      canConfig: u.canConfig,
@@ -178,7 +169,9 @@
                      canUpload: u.canUpload
                   }
                })
-               this.props.saveConfigData(this.configId, data);
+               this.update({isSaving: true})
+               this.store.updateDictionaryConfig(this.configId, data)
+                     .always(() => this.update({isSaving: false}))
             }
          }
       }
