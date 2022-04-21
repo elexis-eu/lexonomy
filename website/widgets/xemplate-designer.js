@@ -9,12 +9,13 @@ XemplateDesigner.start=function(xema, xemplate, dictID){ //the editor can be an 
   XemplateDesigner.dictID = dictID;
 	if(typeof(editor)=="string") editor=document.getElementById(editor);
 	var $editor=$("#editor").addClass("designer");
-	$editor.append("<div class='list'></div><div class='details narrow'></div><div class='preview'></div>");
-  XemaDesigner.renderElement=XemplateDesigner.renderElement;
-  XemaDesigner.renderAttribute=XemplateDesigner.renderAttribute;
+	// $editor.append("<div class='list'></div><div class='details narrow'></div><div class='preview'></div>");
+  // XemaDesigner.renderElement=XemplateDesigner.renderElement;
+  // XemaDesigner.renderAttribute=XemplateDesigner.renderAttribute;
+  // Render XML structure
 	XemaDesigner.listNodes();
 	XemaDesigner.selectElement(xema.root);
-	XemplateDesigner.renderPreview();
+	// XemplateDesigner.renderPreview();
 };
 XemplateDesigner.onchange=function(){
 	XemplateDesigner.refreshPreview();

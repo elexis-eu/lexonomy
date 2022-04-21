@@ -1,0 +1,269 @@
+<display-styles>
+  <div>
+    <div if={this.shouldRenderStyle(style.type)} each={style in possibleStyles}>
+      <label for={style.type}>{style.title}</label>
+      <select name={style.type} id={style.type}>
+        <option value="">Select option</option>
+        <option each={option in style.values} value={option.value}>{option.label}</option>
+      </select>
+    </div>
+  </div>
+  <script>
+    export default {
+      possibleStyles: [
+        {
+          type: "captioning",
+          title: "Caption display",
+          values: [
+            {
+              value: "replace",
+              label: "Show caption instead of value"
+            },
+            {
+              value: "mouseover",
+              label: "Show caption on mouse-over"
+            },
+          ]
+        },
+        {
+          type: "interactivity",
+          title: "Interactivity",
+          values: [
+            {
+              value: "xref",
+              label: "Clickable cross-reference"
+            },
+            {
+              value: "xlink",
+              label: "External URL link"
+            },
+          ]
+        },
+        {
+          type: "innerPunc",
+          title: "Inner punctuation",
+          values: [
+            {
+              value: "roundBrackets",
+              label: "Round brackets"
+            },
+            {
+              value: "squareBrackets",
+              label: "Square brackets"
+            },
+            {
+              value: "curlyBrackets",
+              label: "Curly brackets"
+            },
+            {
+              value: "comma",
+              label: "Comma"
+            },
+            {
+              value: "semicolon",
+              label: "Semicolon"
+            },
+            {
+              value: "colon",
+              label: "Colon"
+            },
+          ]
+        },
+        {
+          type: "textsize",
+          title: "Text size",
+          values: [
+            {
+              value: "smaller",
+              label: "Smaller"
+            },
+            {
+              value: "bigger",
+              label: "Bigger"
+            },
+          ]
+        },
+        {
+          type: "weight",
+          title: "Text weight",
+          values: [
+            {
+              value: "bold",
+              label: "Bold"
+            },
+          ]
+        },
+        {
+          type: "slant",
+          title: "Text slant",
+          values: [
+            {
+              value: "italic",
+              label: "Italic"
+            },
+          ]
+        },
+        {
+          type: "color",
+          title: "Text color",
+          values: [
+            {
+              value: "red",
+              label: "Red"
+            },
+            {
+              value: "blue",
+              label: "Blue"
+            },
+            {
+              value: "green",
+              label: "Green"
+            },
+            {
+              value: "grey",
+              label: "Grey"
+            },
+          ]
+        },
+        {
+          type: "outerPunc",
+          title: "Outer punctuation",
+          values: [
+            {
+              value: "roundBrackets",
+              label: "Round brackets"
+            },
+            {
+              value: "squareBrackets",
+              label: "Square brackets"
+            },
+            {
+              value: "curlyBrackets",
+              label: "Curly brackets"
+            },
+            {
+              value: "comma",
+              label: "Comma"
+            },
+            {
+              value: "semicolon",
+              label: "Semicolon"
+            },
+            {
+              value: "colon",
+              label: "Colon"
+            },
+          ]
+        },
+        {
+          type: "background",
+          title: "Background color",
+          values: [
+            {
+              value: "yellow",
+              label: "Yellow"
+            },
+            {
+              value: "blue",
+              label: "Blue"
+            },
+            {
+              value: "grey",
+              label: "Grey"
+            },
+          ]
+        },
+        {
+          type: "border",
+          title: "Box border",
+          values: [
+            {
+              value: "dotted",
+              label: "Dotted"
+            },
+            {
+              value: "solid",
+              label: "Solid"
+            },
+            {
+              value: "thick",
+              label: "Thick"
+            },
+          ]
+        },
+        {
+          type: "gutter",
+          title: "Indentation and bulleting",
+          values: [
+            {
+              value: "disk",
+              label: "Round bullet"
+            },
+            {
+              value: "square",
+              label: "Square bullet"
+            },
+            {
+              value: "diamond",
+              label: "Diamond bullet"
+            },
+            {
+              value: "arrow",
+              label: "Arrow bullet"
+            },
+            {
+              value: "indent",
+              label: "Indent"
+            },
+            {
+              value: "handing",
+              label: "Hanging indent"
+            },
+            {
+              value: "sensenum0",
+              label: "Sense number I, II, III..."
+            },
+            {
+              value: "sensenum1",
+              label: "Sense number 1, 2, 3..."
+            },
+            {
+              value: "sensenum2",
+              label: "Sense number a, b, c..."
+            },
+            {
+              value: "sensenum3",
+              label: "Sense number i, ii, iii..."
+            },
+          ]
+        },
+        {
+          type: "separation",
+          title: "Separation from other content",
+          values: [
+            {
+              value: "space",
+              label: "Whitespace"
+            },
+          ]
+        },
+      ],
+      onMounted() {
+        console.log("helooo")
+      },
+      onUpdated() {
+        console.log("Updated")
+      },
+      shouldRenderStyle(style) {
+        if (!XemaDesigner.xema) {
+          return
+        }
+        if ((style == "separation" || style == "gutter") && XemaDesigner.xema.root == this.props.elementName) return false
+        if ((style == "innerPunc" || style == "weight" || style == "slant" || style == "colour" || style == "textsize") && (XemaDesigner.xema.elements[this.props.elementName].filling == "chd" || XemaDesigner.xema.elements[this.props.elementName].filling == "med")) return false
+        if ((style == "captioning") && XemaDesigner.xema.elements[this.props.elementName].filling != "lst") return false
+        return true
+      }
+    }
+  </script>
+
+</display-styles>

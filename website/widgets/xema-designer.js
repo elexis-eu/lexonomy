@@ -139,7 +139,10 @@ XemaDesigner.resizeBlinders=function($blinder){
 XemaDesigner.selectElement=function(elName){
 	$(".designer .list *").removeClass("current");
 	$(".designer .list .element").each(function(){if($(this).data("elName")==elName) $(this).addClass("current")});
-	XemaDesigner.renderElement(elName);
+	// XemaDesigner.renderElement(elName);
+  const event = new CustomEvent("selectedXMLElement", {detail: {elementName: elName}})
+  document.dispatchEvent(event)
+//  Emmit selected event
 };
 XemaDesigner.selectAttribute=function(elName, atName){
 	$(".designer .list *").removeClass("current");
