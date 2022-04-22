@@ -1,9 +1,21 @@
-<display-styles>
+<display-styles class="display-styles">
   <div>
-    <div if={this.shouldRenderStyle(style.type)} each={style in possibleStyles}>
+    <label>Visibility</label>
+    <div class="switch">
+      <label>
+        Off
+        <input type="checkbox">
+        <span class="lever"></span>
+        On
+      </label>
+    </div>
+  </div>
+  <div class="break"/>
+  <div>
+    <div each={style in possibleStyles} if={this.shouldRenderStyle(style.type)}>
       <label for={style.type}>{style.title}</label>
-      <select name={style.type} id={style.type}>
-        <option value="">Select option</option>
+      <select id={style.type} name={style.type} class="input-field col s12">
+        <option value="" disabled selected>Select option</option>
         <option each={option in style.values} value={option.value}>{option.label}</option>
       </select>
     </div>
@@ -22,7 +34,7 @@
             {
               value: "mouseover",
               label: "Show caption on mouse-over"
-            },
+            }
           ]
         },
         {
@@ -36,7 +48,7 @@
             {
               value: "xlink",
               label: "External URL link"
-            },
+            }
           ]
         },
         {
@@ -66,7 +78,7 @@
             {
               value: "colon",
               label: "Colon"
-            },
+            }
           ]
         },
         {
@@ -80,7 +92,7 @@
             {
               value: "bigger",
               label: "Bigger"
-            },
+            }
           ]
         },
         {
@@ -90,7 +102,7 @@
             {
               value: "bold",
               label: "Bold"
-            },
+            }
           ]
         },
         {
@@ -100,7 +112,7 @@
             {
               value: "italic",
               label: "Italic"
-            },
+            }
           ]
         },
         {
@@ -122,7 +134,7 @@
             {
               value: "grey",
               label: "Grey"
-            },
+            }
           ]
         },
         {
@@ -152,7 +164,7 @@
             {
               value: "colon",
               label: "Colon"
-            },
+            }
           ]
         },
         {
@@ -170,7 +182,7 @@
             {
               value: "grey",
               label: "Grey"
-            },
+            }
           ]
         },
         {
@@ -188,7 +200,7 @@
             {
               value: "thick",
               label: "Thick"
-            },
+            }
           ]
         },
         {
@@ -234,7 +246,7 @@
             {
               value: "sensenum3",
               label: "Sense number i, ii, iii..."
-            },
+            }
           ]
         },
         {
@@ -244,14 +256,23 @@
             {
               value: "space",
               label: "Whitespace"
-            },
+            }
           ]
-        },
+        }
+      ],
+      editorConfigOptions: [
+
       ],
       onMounted() {
+        $(document).ready(function(){
+          $('select').formSelect();
+        });
         console.log("helooo")
       },
       onUpdated() {
+        $(document).ready(function(){
+          $('select').formSelect();
+        });
         console.log("Updated")
       },
       shouldRenderStyle(style) {
@@ -265,5 +286,13 @@
       }
     }
   </script>
+
+  <style>
+    .break {
+      width: 100%;
+      margin: 15px 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
 
 </display-styles>
