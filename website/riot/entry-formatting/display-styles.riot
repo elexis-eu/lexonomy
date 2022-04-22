@@ -276,7 +276,7 @@
         console.log("Updated")
       },
       shouldRenderStyle(style) {
-        if (!XemaDesigner.xema) {
+        if (!XemaDesigner.xema || !XemaDesigner.xema.elements[this.props.elementName]) {
           return
         }
         if ((style == "separation" || style == "gutter") && XemaDesigner.xema.root == this.props.elementName) return false
