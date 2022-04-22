@@ -2,7 +2,7 @@
 var state = {
   entry: {
     entryId: null,
-    selectedId: null,
+    mode: null,
     dictId: null,
     dictConfigs: null,
     userAccess: null,
