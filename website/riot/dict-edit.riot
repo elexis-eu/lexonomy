@@ -1,7 +1,11 @@
 <dict-edit>
-   <loading-overlay if={dictData.isDictlistLoading}/>
+   <loading-overlay if={dictData.isDictlistLoading || dictData.isDictionaryLoading}/>
    <dict-nav links={[["edit", "Edit"]]}/>
-   <h3 class="header">{ dictData.title }</h3>
+   <h3 class="header">
+      { dictData.title }
+      <span if={dictData.entryCount}
+            class="totalEntries">total {dictData.entryCount} entries</span>
+   </h3>
    <template if={dictData.isDictionaryLoaded && !dictData.isDictlistLoading}>
       <div if={ dictData.doctypes.length > 1 }
             class="doctypes">
@@ -33,6 +37,10 @@
                      <option value="wordstart">contains a word that starts like this</option>
                      <option value="substring">contains this sequence of characters</option>
                   </select>
+               </div>
+               <div if={dictData.entryCount > dictData.entryList.length}
+                     class="entriesCountInfo">
+                  Showing {dictData.entryList.length} of {dictData.entryCount} entries.
                </div>
                <div class="entry-list collection">
                   <div each={ (entry, idx) in dictData.entryList }
@@ -85,6 +93,12 @@
       #dictEditContainer{
          display: flex;
       }
+      .totalEntries{
+         font-size: 14px;
+         color: #b8b8b8;
+         margin-left: 20px;
+         text-transform: none;
+      }
       ul.select-dropdown,
       ul.dropdown-content {
          width: 200% !important;
@@ -125,6 +139,10 @@
       }
       .filterForm > .select-wrapper{
          flex: 2;
+      }
+      .entriesCountInfo{
+         font-size: 14px;
+         color: #b8b8b8;
       }
       .collection-item{
          position: relative;
@@ -234,11 +252,14 @@
          },
 
          onDocumentClick(evt){
-            let inComponent = $(".entry-list")[0].contains(evt.target)
-            if(inComponent || inComponent != this.state.focused){
-               this.state.focused = inComponent
-               this.state.cursorPosition = inComponent ? $(evt.target).closest(".collection-item").data("idx") + 1 : null
-               this.updateCursor()
+            let entryList = $(".entry-list")[0]
+            if(entryList){
+               let inComponent = entryList.contains(evt.target)
+               if(inComponent || inComponent != this.state.focused){
+                  this.state.focused = inComponent
+                  this.state.cursorPosition = inComponent ? $(evt.target).closest(".collection-item").data("idx") + 1 : null
+                  this.updateCursor()
+               }
             }
          },
 
