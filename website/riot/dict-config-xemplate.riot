@@ -3,14 +3,16 @@
                    configTitle={ configTitle }/>
   <h3>Entry formatting</h3>
   <div
-    if={ (!this.configData._xsl || this.configData._xsl == "") && (!this.configData._css || this.configData._css == "") && !this.override }>
-    <div id="editor" class="designer" style="display: flex">
-      <div id="rendered-xml-structure" class="render-xml-structure list" style="position: static">
+    if={ (!this.configData._xsl || this.configData._xsl == "") && (!this.configData._css || this.configData._css == "") && !this.override }
+  >
+    <div style="display: flex">
+      <div id="editor" class="designer" style="width: 30%">
+        <div id="rendered-xml-structure" class="render-xml-structure list" style="position: static; width: 100% !important">
+        </div>
       </div>
       <display-styles elementName={elementName}></display-styles>
 
     </div>
-
     <!--      <div class="row designer" id="editor">-->
     <!--      </div>-->
     <div class="row">
