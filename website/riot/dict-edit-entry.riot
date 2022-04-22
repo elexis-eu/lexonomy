@@ -2,14 +2,15 @@
    <div class="row editorContainer">
       <div class="xonomy-envelope">
          <div id="toolbar" class="buttons"></div>
-         <div id="container" class="empty"></div>
+         <div style="font-size: 40px;text-align: center;padding-top: 20vh;position: absolute;left: 0;top: 40px;right: 0;pointer-events: none;">empty</div>
+         <div id="container" class="empty"><h3>empty</h3></div>
          <div id="history" style="display: none"></div>
          <div id="waiter" style="display: none"></div>
          <div id="statusbar">
             <div class="alertmessage yellow">
                <span class="text">(ALERT)</span>
-               <span class="right clickable">
-                  <i class="material-icons" onclick={()=>{$(".alertmessage").hide()}}>close</i>
+               <span class="right clickable closeIcon">
+                  <i class="material-icons" onclick={onAlertCloseClick}>close</i>
                </span>
             </div>
             <span class="statusmessage"></span>
@@ -23,17 +24,25 @@
          margin-bottom: 0;
       }
       .editorContainer #toolbar{
-         padding-top: 1px;
-         height: 45px;
+         /*padding-top: 1px;
+         height: 45px;*/
          box-shadow: none;
          border-bottom: 1px solid #d9d9d8;
-         padding-bottom: 15px;
+         /*padding-bottom: 15px;*/
       }
       .editorContainer #container{
-         min-height: 50vh;
+         /*min-height: 50vh;
          padding: 15px;
-         outline: none;
+         outline: none;*/
+          /* opacity: 0; */
+          z-index: 5;
+          background-color: white;
+         transition-delay: 1s;
       }
+       .editorContainer #container.empty{
+         transition: opacity 0.1s;
+         opacity: 0;
+       }
       .editorContainer #container #editor.laic{
          padding-left: 30px;
       }
@@ -46,13 +55,13 @@
          border-left: 1px solid #d9d9d8;
          background-color: #f2f2f2;
       }
-      .editorContainer #statusbar{
+      /*.editorContainer #statusbar{
          position: absolute;
-         /*background-color: #f2f2f2;*/
+         background-color: #f2f2f2;
          background-color: #fff;
          box-shadow: none;
          border-top: 1px solid #d9d9d8;
-      }
+      }*/
       .xonomy div.modeSwitcher{
          position: absolute;
          bottom: 26px;
@@ -240,6 +249,10 @@
                   Screenful.Editor[this.dictData.mode](null,this.dictData.entryId);
                }
             }
+         },
+
+         onAlertCloseClick(){
+            $(".alertmessage").hide()
          },
 
          onListChange(){

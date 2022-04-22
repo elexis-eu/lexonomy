@@ -61,7 +61,7 @@
                   <li data-flag="">
                      <i class="material-icons" style="color: grey">label_outline</i>
                      <div>no flag</div>
-                     <div class="right flagKey">esc</div>
+                     <div class="right flagKey">delete</div>
                   </li>
                   <li each={flag in dictData.config.flagging.flags}
                         data-flag={flag.name}>
@@ -120,6 +120,12 @@
          display: flex;
          gap: 10px
       }
+      .filterForm > input{
+         flex: 1;
+      }
+      .filterForm > .select-wrapper{
+         flex: 2;
+      }
       .collection-item{
          position: relative;
          display: flex;
@@ -165,10 +171,6 @@
       .collection-item.focused{
          background-color: #eceff1;
       }
-      .collection-item .flag{
-         cursor: pointer;
-      }
-
    </style>
 
    <script>
@@ -256,8 +258,8 @@
                      this.store.changeEntry(this.dictData.entryList[this.state.cursorPosition - 1].id)
                   }
                }
-            } else if(this.state.cursorPosition){
-               if(evt.keyCode == 27){
+            } else if(this.dictData.config.flagging.flags.length && this.state.cursorPosition){
+               if(evt.keyCode == 46){
                   this.store.setEntryFlag(this.dictData.entryList[this.state.cursorPosition - 1].id, '')
                } else if(this.dictData.config.flagging.flags.map(f => f.key).includes(evt.key)){
                   let flag = this.dictData.config.flagging.flags.find(f => f.key == evt.key)

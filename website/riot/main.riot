@@ -36,11 +36,11 @@
                     ["store", "dictionaryChanged", "update"]],
 
          onCheckingAuthChange(){
+            this.update()
             if(!this.authData.authorized){
                route("#/")
             } else {
                this.store.loadDictlist()
-               this.update()
             }
          },
 
