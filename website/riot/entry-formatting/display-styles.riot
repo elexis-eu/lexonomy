@@ -138,28 +138,28 @@
         }
         const structureConfig = this.props.structureConfig
 
-        if ((style == "separation" || style == "gutter")
+        if ((style === "separation" || style === "gutter")
           && structureConfig.root == this.elementName) {
           return false
         }
         if (
-          (style == "innerPunc"
-            || style == "weight"
-            || style == "slant"
-            || style == "colour"
-            || style == "textsize"
+          (style === "innerPunc"
+            || style === "weight"
+            || style === "slant"
+            || style === "colour"
+            || style === "textsize"
           ) && (
             !structureConfig.elements[this.elementName]
-            || structureConfig.elements[this.elementName].filling == "chd"
-            || structureConfig.elements[this.elementName].filling == "med"
+            || structureConfig.elements[this.elementName].filling === "chd"
+            || structureConfig.elements[this.elementName].filling === "med"
           )
         ) {
           return false
         }
         if (
-          (style == "captioning")
+          (style === "captioning")
           && (!structureConfig.elements[this.elementName]
-            || structureConfig.elements[this.elementName].filling != "lst")
+            || structureConfig.elements[this.elementName].filling !== "lst")
         ) {
           return false
         }
