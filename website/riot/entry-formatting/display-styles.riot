@@ -1,24 +1,27 @@
-<display-styles
-  class="display-styles">
-  <div>
-    <label>Visibility</label>
-    <div class="switch">
-      <label>
-        Off
-        <input id="shown" type="checkbox" onchange={sendData} checked={state.elementData.shown}>
-        <span class="lever"></span>
-        On
-      </label>
+<display-styles>
+  <div class="display-styles">
+    <div>
+      <div each={setting in possibleToggles} class="toggle-input">
+        <label>{setting.label}</label>
+        <div class="switch">
+          <label>
+            Off
+            <input id={setting.type} type="checkbox" onchange={sendData} checked={state.elementData[setting.type] === true}>
+            <span class="lever"></span>
+            On
+          </label>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="break"/>
-  <div>
-    <div each={style in possibleStyles} if={this.shouldRenderStyle(style.type)}>
-      <label for={style.type}>{style.title}</label>
-      <select id={style.type} name={style.type} value={state.elementData[style.type]} required onchange={sendData} style="display: block">
-        <option selected={state.elementData[style.type] == null} value="">Select option</option>
-        <option each={option in style.values} value={option.value} selected={option.value === state.elementData[style.type]}>{option.label}</option>
-      </select>
+    <div class="break"/>
+    <div>
+      <div each={style in possibleStyles} if={this.shouldRenderStyle(style.type)} class="select-input">
+        <label for={style.type}>{style.title}</label>
+        <select id={style.type} name={style.type} value={state.elementData[style.type]} required onchange={sendData} style="display: block">
+          <option selected={state.elementData[style.type] == null} value="">Select option</option>
+          <option each={option in style.values} value={option.value} selected={option.value === state.elementData[style.type]}>{option.label}</option>
+        </select>
+      </div>
     </div>
   </div>
   <script>
@@ -29,6 +32,9 @@
       state: {
         elementData: {
           shown: false,
+          enablePositionChange: false,
+          enableCopying: false,
+          displayType: null,
           captioning: null,
           interactivity: null,
           innerPunc: null,
@@ -40,7 +46,7 @@
           background: null,
           border: null,
           gutter: null,
-          separation: null
+          separation: null,
         }
       },
       editorConfigOptions: [],
@@ -91,6 +97,7 @@
           }
           this.state.elementData[key] = value
         }
+        console.log(this.state.elementData)
       },
 
       shouldRenderStyle(style) {
@@ -114,7 +121,74 @@
         return true
       },
 
+      possibleToggles: [
+        {
+          type: "shown",
+          label: "Visibility"
+        },
+        {
+          type: "enablePositionChange",
+          label: "Enable reordering of elements of same type"
+        },
+        {
+          type: "enableCopying",
+          label: "Enable making copies of element"
+        }
+      ],
+
       possibleStyles: [
+        {
+          type: "displayType",
+          title: "Display type of element",
+          values: [
+            {
+              value: "popup",
+              label: "Popup on click"
+            },
+            {
+              value: "inline",
+              label: "Display in parent element"
+            }
+          ]
+        },
+        {
+          type: "valueType",
+          title: "Value type",
+          values: [
+            {
+              value: "read-only",
+              label: "Read-only"
+            },
+            {
+              value: "text-input",
+              label: "Singleline text input"
+            },
+            {
+              value: "textarea-input",
+              label: "Multiline text input"
+            },
+            {
+              value: "dropdown",
+              label: "Dropdown"
+            },
+            {
+              value: "media",
+              label: "Media browser"
+            },
+            {
+              value: "text-input-with-markup",
+              label: "Text input with markup"
+            },
+            {
+              value: "id-link",
+              label: "Id to another element"
+            },
+            {
+              value: "number-input",
+              label: "Number input?"
+            }
+          ]
+        },
         {
           type: "captioning",
           title: "Caption display",
@@ -356,10 +430,19 @@
   </script>
 
   <style>
+    .display-styles {
+      margin: 0 8px;
+    }
     .break {
       width: 100%;
       margin: 15px 0;
       border-bottom: 1px solid #eee;
+    }
+    .toggle-input {
+      margin: 16px 0;
+    }
+    .select-input {
+      margin: 8px 0;
     }
     .display-styles > select option {
       color: black;
