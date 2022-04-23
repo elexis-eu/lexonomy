@@ -1,10 +1,11 @@
-<display-styles class="display-styles">
+<display-styles
+  class="display-styles">
   <div>
     <label>Visibility</label>
     <div class="switch">
       <label>
         Off
-        <input type="checkbox">
+        <input id="shown" type="checkbox" onchange={sendData} checked={state.elementData.shown}>
         <span class="lever"></span>
         On
       </label>
@@ -14,14 +15,105 @@
   <div>
     <div each={style in possibleStyles} if={this.shouldRenderStyle(style.type)}>
       <label for={style.type}>{style.title}</label>
-      <select id={style.type} name={style.type} class="input-field col s12">
-        <option value="" disabled selected>Select option</option>
-        <option each={option in style.values} value={option.value}>{option.label}</option>
+      <select id={style.type} name={style.type} value={state.elementData[style.type]} required onchange={sendData} style="display: block">
+        <option selected={state.elementData[style.type] == null} value="">Select option</option>
+        <option each={option in style.values} value={option.value} selected={option.value === state.elementData[style.type]}>{option.label}</option>
       </select>
     </div>
   </div>
   <script>
     export default {
+      configData: null,
+      elementName: "",
+
+      state: {
+        elementData: {
+          shown: false,
+          captioning: null,
+          interactivity: null,
+          innerPunc: null,
+          textsize: null,
+          weight: null,
+          slant: null,
+          color: null,
+          outerPunc: null,
+          background: null,
+          border: null,
+          gutter: null,
+          separation: null
+        }
+      },
+      editorConfigOptions: [],
+      onMounted() {
+        this.setInitialData()
+      },
+      onBeforeUpdate(prop, state) {
+        if (this.props.elementName !== this.elementName) {
+          this.elementName = this.props.elementName
+          this.resetElementData()
+        }
+      },
+      onUpdated() {
+
+      },
+
+      sendData(event) {
+        let attribute = event.srcElement.id
+        let value = $("#" + attribute).val()
+        if (event.srcElement.type === "checkbox") {
+          value = !this.state.elementData[attribute]
+        }
+
+        this.state.elementData[attribute] = value
+        this.props.saveData(this.elementName, attribute, value)
+      },
+
+      setInitialData() {
+        this.props.loadConfigData(this.props.configId).then((response) => {
+          this.configData = response
+          this.resetElementData()
+          this.update()
+        })
+      },
+
+      resetElementData() {
+        if (!this.configData || !this.props.elementName) {
+          return
+        }
+        let existingData = this.configData[this.props.elementName]
+        if (!existingData) {
+          existingData = {}
+        }
+        for (const key of Object.keys(this.state.elementData)) {
+          let value = existingData[key] || null
+          if (this.props.elementConfigData[key] != null) {
+            value = this.props.elementConfigData[key]
+          }
+          this.state.elementData[key] = value
+        }
+      },
+
+      shouldRenderStyle(style) {
+        if (!this.props.structureConfig || !this.elementName) {
+          return
+        }
+        const structureConfig = this.props.structureConfig
+
+        if ((style == "separation" || style == "gutter")
+          && structureConfig.root == this.elementName) {
+          return false
+        }
+        if ((style == "innerPunc" || style == "weight" || style == "slant" || style == "colour" || style == "textsize")
+          && (structureConfig.elements[this.elementName].filling == "chd" || structureConfig.elements[this.elementName].filling == "med")) {
+          return false
+        }
+        if ((style == "captioning")
+          && structureConfig.elements[this.elementName].filling != "lst") {
+          return false
+        }
+        return true
+      },
+
       possibleStyles: [
         {
           type: "captioning",
@@ -259,31 +351,7 @@
             }
           ]
         }
-      ],
-      editorConfigOptions: [
-
-      ],
-      onMounted() {
-        $(document).ready(function(){
-          $('select').formSelect();
-        });
-        console.log("helooo")
-      },
-      onUpdated() {
-        $(document).ready(function(){
-          $('select').formSelect();
-        });
-        console.log("Updated")
-      },
-      shouldRenderStyle(style) {
-        if (!XemaDesigner.xema || !XemaDesigner.xema.elements[this.props.elementName]) {
-          return
-        }
-        if ((style == "separation" || style == "gutter") && XemaDesigner.xema.root == this.props.elementName) return false
-        if ((style == "innerPunc" || style == "weight" || style == "slant" || style == "colour" || style == "textsize") && (XemaDesigner.xema.elements[this.props.elementName].filling == "chd" || XemaDesigner.xema.elements[this.props.elementName].filling == "med")) return false
-        if ((style == "captioning") && XemaDesigner.xema.elements[this.props.elementName].filling != "lst") return false
-        return true
-      }
+      ]
     }
   </script>
 
@@ -292,6 +360,16 @@
       width: 100%;
       margin: 15px 0;
       border-bottom: 1px solid #eee;
+    }
+    .display-styles > select option {
+      color: black;
+    }
+    select option {
+      color: black;
+    }
+    select option:first-child,
+    select:invalid {
+      color: #aaa;
     }
   </style>
 

@@ -10,7 +10,16 @@
         <div id="rendered-xml-structure" class="render-xml-structure list" style="position: static; width: 100% !important">
         </div>
       </div>
-      <display-styles elementName={elementName}></display-styles>
+      <display-styles
+        if={this.elementName}
+        name="displayStylesComponent"
+        elementName={this.elementName}
+        elementConfigData={this.configData[elementName]}
+        structureConfig={this.props.dictConfigs.xema}
+        loadConfigData={this.props.loadConfigData}
+        configId={this.props.configId}
+        save-data={handleElementData}
+      />
 
     </div>
     <div class="row">
@@ -48,44 +57,24 @@
   </div>
   <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
 
-  <style>
-    #editor {
-      position: relative !important;
-      min-height: 1050px;
-    }
-
-    #editor .list {
-      width: 25% !important;
-    }
-
-    #editor .details {
-      left: 25% !important;
-      width: 35% !important;
-    }
-
-    #editor .preview {
-      left: 60% !important;
-      width: 40% !important;
-    }
-
-    #editor.designer input[type=radio] {
-      opacity: 1 !important;
-    }
-  </style>
-
   <script>
-    import {register } from 'riot'
-    import display_styles from "./entry-formatting/display-styles.riot"
-    register("display-styles", display_styles)
+    import displayStyles from "./entry-formatting/display-styles.riot"
 
     export default {
+      components: {
+        displayStyles
+      },
+
+      state: {
+
+      },
 
       dictId: '',
       configId: '',
       configTitle: 'Entry formatting',
       override: false,
       configData: {},
-      elementName: "",
+      elementName: null,
 
       startOverride() {
         this.override = true
@@ -127,11 +116,15 @@ div.myEntry span.myHeadword {font-weight: bold}
       onMounted() {
         this.dictId = this.props.dictId
         this.configId = this.props.configId
-        console.log('config dict ' + this.dictId + '-' + this.configId)
         this.props.loadDictDetail()
         this.fillConfigForm()
-        console.log(this.props)
         document.addEventListener("selectedXMLElement", this.handleSelectedXMLElement)
+      },
+
+      onUpdated() {
+        if (this.props.dictConfigs.xema && this.configData != {} && !this.override && !this.elementName) {
+          XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId)
+        }
       },
 
       async fillConfigForm() {
@@ -149,14 +142,6 @@ div.myEntry span.myHeadword {font-weight: bold}
         })
       },
 
-      onUpdated() {
-        if (this.props.dictConfigs.xema && this.configData != {} && !this.override) {
-          XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId)
-
-          // XemaDesigner.listNodes();
-        }
-      },
-
       getConfigData() {
         var newData = {}
         if (XemplateDesigner.xemplate) {
@@ -170,29 +155,46 @@ div.myEntry span.myHeadword {font-weight: bold}
       },
 
       handleSelectedXMLElement(event) {
-        this.elementName = event.detail.elementName
-        // console.log(elementName.detail)
-        let xmlStructure = this.props.dictConfigs.xema
-        let stylesData = XemplateDesigner.getElementXemplate(this.elementName)
-        this.renderedStyles = []
-        for (const style in Xematron.styles) {
-          this.renderedStyles.push(style)
+        if (this.elementName == event.detail.elementName) {
+          return
         }
+        this.elementName = event.detail.elementName
+        this.update()
       },
 
-      shouldRenderStyle(elementName, style) {
-        if ((style == "separation" || style == "gutter") && XemaDesigner.xema.root == elementName) return false
-        if ((style == "innerPunc" || style == "weight" || style == "slant" || style == "colour" || style == "textsize") && (XemaDesigner.xema.elements[elementName].filling == "chd" || XemaDesigner.xema.elements[elementName].filling == "med")) return false
-        if ((style == "captioning") && XemaDesigner.xema.elements[elementName].filling != "lst") return false
-        return true
+      handleElementData(elementName, attribute, value) {
+        this.configData[elementName][attribute] = value
       },
 
       saveData() {
-        console.log(this.getConfigData())
         $('#submit_button').html('Saving...')
-        this.props.saveConfigData(this.configId, this.getConfigData())
+        this.props.saveConfigData(this.configId, this.configData)
       }
     }
   </script>
 
+  <style>
+    #editor {
+      position: relative !important;
+      min-height: 1050px;
+    }
+
+    #editor .list {
+      width: 25% !important;
+    }
+
+    #editor .details {
+      left: 25% !important;
+      width: 35% !important;
+    }
+
+    #editor .preview {
+      left: 60% !important;
+      width: 40% !important;
+    }
+
+    #editor.designer input[type=radio] {
+      opacity: 1 !important;
+    }
+  </style>
 </dict-config-xemplate>
