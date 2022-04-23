@@ -1,12 +1,23 @@
 <display-styles>
   <div class="display-styles">
     <div>
-      <div each={setting in possibleToggles} class="toggle-input">
+      <h4>
+        Configuration for {elementName}
+      </h4>
+      <div
+        each={setting in possibleToggles}
+        class="toggle-input"
+      >
         <label>{setting.label}</label>
         <div class="switch">
           <label>
             Off
-            <input id={setting.type} type="checkbox" onchange={sendData} checked={state.elementData[setting.type] === true}>
+            <input
+              id={setting.type}
+              type="checkbox"
+              onchange={sendData}
+              checked={state.elementData[setting.type] === true}
+            >
             <span class="lever"></span>
             On
           </label>
@@ -15,11 +26,33 @@
     </div>
     <div class="break"/>
     <div>
-      <div each={style in possibleStyles} if={this.shouldRenderStyle(style.type)} class="select-input">
+      <div
+        each={style in possibleStyles}
+        if={this.shouldRenderStyle(style.type)}
+        class="select-input"
+      >
         <label for={style.type}>{style.title}</label>
-        <select id={style.type} name={style.type} value={state.elementData[style.type]} required onchange={sendData} style="display: block">
-          <option selected={state.elementData[style.type] == null} value="">Select option</option>
-          <option each={option in style.values} value={option.value} selected={option.value === state.elementData[style.type]}>{option.label}</option>
+        <select
+          id={style.type}
+          name={style.type}
+          value={state.elementData[style.type]}
+          required
+          onchange={sendData}
+          style="display: block"
+        >
+          <option
+            selected={state.elementData[style.type] == null}
+            value=""
+          >
+            Select option
+          </option>
+          <option
+            each={option in style.values}
+            value={option.value}
+            selected={option.value === state.elementData[style.type]}
+          >
+            {option.label}
+          </option>
         </select>
       </div>
     </div>
@@ -46,7 +79,7 @@
           background: null,
           border: null,
           gutter: null,
-          separation: null,
+          separation: null
         }
       },
       editorConfigOptions: [],
@@ -83,6 +116,7 @@
       },
 
       resetElementData() {
+        console.log(this.configData, this.props.elementName)
         if (!this.configData || !this.props.elementName) {
           return
         }
@@ -102,7 +136,7 @@
 
       shouldRenderStyle(style) {
         if (!this.props.structureConfig || !this.elementName) {
-          return
+          return false
         }
         const structureConfig = this.props.structureConfig
 
@@ -110,12 +144,25 @@
           && structureConfig.root == this.elementName) {
           return false
         }
-        if ((style == "innerPunc" || style == "weight" || style == "slant" || style == "colour" || style == "textsize")
-          && (structureConfig.elements[this.elementName].filling == "chd" || structureConfig.elements[this.elementName].filling == "med")) {
+        if (
+          (style == "innerPunc"
+            || style == "weight"
+            || style == "slant"
+            || style == "colour"
+            || style == "textsize"
+          ) && (
+            !structureConfig.elements[this.elementName]
+            || structureConfig.elements[this.elementName].filling == "chd"
+            || structureConfig.elements[this.elementName].filling == "med"
+          )
+        ) {
           return false
         }
-        if ((style == "captioning")
-          && structureConfig.elements[this.elementName].filling != "lst") {
+        if (
+          (style == "captioning")
+          && (!structureConfig.elements[this.elementName]
+            || structureConfig.elements[this.elementName].filling != "lst")
+        ) {
           return false
         }
         return true
@@ -433,23 +480,29 @@
     .display-styles {
       margin: 0 8px;
     }
+
     .break {
       width: 100%;
       margin: 15px 0;
       border-bottom: 1px solid #eee;
     }
+
     .toggle-input {
       margin: 16px 0;
     }
+
     .select-input {
       margin: 8px 0;
     }
+
     .display-styles > select option {
       color: black;
     }
+
     select option {
       color: black;
     }
+
     select option:first-child,
     select:invalid {
       color: #aaa;
