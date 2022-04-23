@@ -148,6 +148,9 @@ XemaDesigner.selectAttribute=function(elName, atName){
 	$(".designer .list *").removeClass("current");
 	$(".designer .list .attribute").each(function(){if($(this).data("elName")==elName && $(this).data("atName")==atName) $(this).addClass("current")});
 	XemaDesigner.renderAttribute(elName, atName);
+//  Emmit selected event
+  const event = new CustomEvent("selectedXMLElement", {detail: {elementName: elName}})
+  document.dispatchEvent(event)
 };
 
 XemaDesigner.renderElement=function(elName){
