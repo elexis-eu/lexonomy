@@ -1,4 +1,5 @@
 <template>
+<!--  <div v-if="state.entry.dictConfigs && state.entry.dictConfigs.xemplate">-->
   <div v-if="state.entry.editorConfig">
     <ComponentGeneratorComponent
       :children="preparedDataForEntry"
@@ -34,6 +35,11 @@ export default {
   },
   computed: {
     preparedDataForEntry() {
+      // if (!this.state.entry.dictConfigs) {
+      //   return []
+      // }
+      // return [this.state.entry.dictConfigs.xemplate]
+
       console.log(this.state.entry.editorConfig)
       return [this.state.entry.editorConfig]
     }
