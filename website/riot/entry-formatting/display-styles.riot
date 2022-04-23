@@ -116,7 +116,6 @@
       },
 
       resetElementData() {
-        console.log(this.configData, this.props.elementName)
         if (!this.configData || !this.props.elementName) {
           return
         }
@@ -131,7 +130,6 @@
           }
           this.state.elementData[key] = value
         }
-        console.log(this.state.elementData)
       },
 
       shouldRenderStyle(style) {
