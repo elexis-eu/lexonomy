@@ -75,7 +75,7 @@ export default {
 
 <style scoped>
 .popup {
-  border: 1px solid #eee;
+  /*border: 1px solid #eee;*/
 }
 
 .modal {
