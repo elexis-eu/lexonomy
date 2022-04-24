@@ -4,10 +4,6 @@
         <label :for="elementName">{{elementName}}:</label>
         <input :name="elementName" v-model="values[0]">
     </section>
-      <section v-if="elementData.shown && values[1]" class="text-input">
-          <label :for="elementName + '-2'">{{elementName}}:</label>
-          <input :name="elementName + '-2'" v-model="values[1]">
-      </section>
   </div>
 </template>
 
