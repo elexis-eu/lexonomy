@@ -13,6 +13,6 @@ export default {
         "media": "MediaComponent",
         "text-input-with-markup": "TextInputWithMarkupComponent"
       }
-      this.valueComponent = displayTypeToComponentMap[this.elementData.valueType]
+      this.valueComponent = displayTypeToComponentMap[this.elementData.valueRenderType]
   }
 }
