@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section v-if="elementData.shown">
+    <section v-if="elementData.shown && content._text">
 <!--      <p>Read-only component</p>-->
       <p> {{ elementName }}: {{content._text}}</p>
     </section>
