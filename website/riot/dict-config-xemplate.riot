@@ -86,7 +86,7 @@
         delete this.configData._xsl
         delete this.configData._css
         this.update()
-        XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId)
+        XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId, true)
       },
 
       exampleXsl() {
@@ -123,7 +123,8 @@ div.myEntry span.myHeadword {font-weight: bold}
 
       onUpdated() {
         if (this.props.dictConfigs.xema && this.configData != {} && !this.override && !this.elementName) {
-          XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId)
+          XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId, true)
+
         }
       },
 

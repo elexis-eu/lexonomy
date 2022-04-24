@@ -2,20 +2,26 @@ var XemplateDesigner={};
 XemplateDesigner.xemplate=null;
 XemplateDesigner.dictID = null;
 
-XemplateDesigner.start=function(xema, xemplate, dictID){ //the editor can be an HTML element, or the string ID of one.
+
+XemplateDesigner.start=function(xema, xemplate, dictID, useRiot = false){ //the editor can be an HTML element, or the string ID of one.
+  console.log(xema, xemplate, dictID, useRiot)
 	XemaDesigner.xema=xema;
 	XemplateDesigner.xema=xema;
   XemplateDesigner.xemplate=xemplate;
   XemplateDesigner.dictID = dictID;
 	if(typeof(editor)=="string") editor=document.getElementById(editor);
 	var $editor=$("#editor").addClass("designer");
-	// $editor.append("<div class='list'></div><div class='details narrow'></div><div class='preview'></div>");
-  // XemaDesigner.renderElement=XemplateDesigner.renderElement;
-  // XemaDesigner.renderAttribute=XemplateDesigner.renderAttribute;
+  if (!useRiot) {
+    $editor.append("<div class='list'></div><div class='details narrow'></div><div class='preview'></div>");
+    XemaDesigner.renderElement = XemplateDesigner.renderElement;
+    XemaDesigner.renderAttribute = XemplateDesigner.renderAttribute;
+  }
   // Render XML structure
 	XemaDesigner.listNodes();
 	XemaDesigner.selectElement(xema.root);
-	// XemplateDesigner.renderPreview();
+  if (!useRiot) {
+    XemplateDesigner.renderPreview();
+  }
 };
 XemplateDesigner.onchange=function(){
 	XemplateDesigner.refreshPreview();
