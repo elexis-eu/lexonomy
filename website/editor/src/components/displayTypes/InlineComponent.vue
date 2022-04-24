@@ -1,9 +1,12 @@
 <template>
   <div>
-      <section v-if="elementData.show">
-<!--          <p>inline component</p>-->
-          <p> {{elementName}}</p>
+      <section v-if="elementData.shown">
       </section>
+      <component :is="valueComponent"
+                 :elementEditorConfig="elementData"
+                 :elementName="elementName"
+                 :elementData="elementData"
+                 :content="content"/>
       <ComponentGeneratorComponent
               :children="children"
               :elementEditorConfig="elementData"
@@ -16,12 +19,16 @@
 <script>
 
 import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
+import valueDisplayMixin from "@/shared-resources/mixins/valueDisplayMixin"
 
 export default {
   name: "InlineComponent",
   components: {
     ComponentGeneratorComponent
   },
+  mixins: [
+    valueDisplayMixin
+  ],
   props: {
     children: Array,
     elementData: Object,

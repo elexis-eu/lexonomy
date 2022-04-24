@@ -159,60 +159,6 @@
           "link to another entry?" // sometimes id is passed which is a reference to a different element
         ]
         //What happends if element isn't in structure
-        let editorConfig = {
-          entry: {
-            show: true,
-            displayType: "inline",
-            // add ability to add additional element
-            children: [
-              {
-                headword: {
-                  show: true,
-                  // displayType: "read-only"
-                  displayType: "text-input"
-                }
-              },
-              {
-                partOfSpeech: {
-                  show: true,
-                  displayType: "read-only"
-                }
-              },
-              {
-                sense: {
-                  show: true,
-                  displayType: "popup",
-                  enablePositionChange: true,
-                  enableCopying: true,
-                  children: [
-                    {
-                      definition: {
-                        show: true,
-                        displayType: "text-input"
-                      }
-                    },
-                    {
-                      example: {
-                        show: true,
-                        displayType: "text-input",
-                        enablePositionChange: true,
-                        enableCopying: true,
-                        children: [
-                          {
-                            h: {
-                              show: true,
-                              displayType: "read-only"
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
         editor.bus.$emit("updateEntry", {
           entryId: this.entryId,
           mode: this.mode,
@@ -220,8 +166,7 @@
           dictConfigs: this.props.dictConfigs,
           userAccess: this.props.userAccess,
           userInfo: this.props.userInfo,
-          userDicts: this.userDicts,
-          editorConfig: editorConfig
+          userDicts: this.userDicts
 
         })
       }

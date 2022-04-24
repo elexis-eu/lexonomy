@@ -1,24 +1,15 @@
 <template>
   <div>
-    <section v-if="elementData.show">
+    <section v-if="elementData.shown">
 <!--      <p>Read-only component</p>-->
       <p> {{ elementName }}: {{content._text}}</p>
     </section>
-    <ComponentGeneratorComponent
-      :children="children"
-      :content="content"
-      :elementEditorConfig="elementData"
-      :elementName="elementName"
-    />
   </div>
 </template>
 
 <script>
-import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
-
 export default {
   name: "ReadOnlyComponent",
-  components: {ComponentGeneratorComponent},
   props: {
     children: Array,
     elementData: Object,

@@ -1,16 +1,10 @@
 <template>
   <div>
-    <section class="text-input" v-if="elementData.show">
+    <section class="text-input" v-if="elementData.shown">
         <label :for="elementName">{{elementName}}:</label>
         <input :name="elementName" v-model="values[0]">
     </section>
-      <ComponentGeneratorComponent
-              :children="children"
-              :elementEditorConfig="elementData"
-              :elementName="elementName"
-              :content="content"
-      />
-      <section v-if="elementData.show && values[1]" class="text-input">
+      <section v-if="elementData.shown && values[1]" class="text-input">
           <label :for="elementName + '-2'">{{elementName}}:</label>
           <input :name="elementName + '-2'" v-model="values[1]">
       </section>
@@ -19,14 +13,11 @@
 
 <script>
 
-import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
 export default {
   name: "TextInputComponent",
   components: {
-    ComponentGeneratorComponent
   },
   props: {
-    children: Array,
     elementData: Object,
     elementName: String,
     content: {

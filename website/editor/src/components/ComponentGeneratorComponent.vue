@@ -62,27 +62,31 @@ export default {
   },
   methods: {
     loadNewData(XMLContent) {
-      console.log("")
-      console.log(`loadNewData for ${this.elementName}:`)
-      console.log("Content:", XMLContent)
-      // console.log("Children:", this.children)
-      console.log("ElementEditorData", this.elementEditorConfig)
+      // console.log("")
+      // console.log(`loadNewData for ${this.elementName}:`)
+      // console.log("Content:", XMLContent)
+      // // console.log("Children:", this.children)
+      // console.log("ElementEditorData", this.elementEditorConfig)
       this.renderedChildren = []
       if(!this.children) {
         return
       }
-      this.children.forEach(element => {
+      let entry = this.state.entry
+
+      this.children.forEach(child => {
+        // Get element name
+        let elementName = child.name
+
         // Calculate component to render
-        let componentName = this.getComponentFromElementName(element)
-        //Extract element name
-        let elementName = Object.keys(element)[0]
+        let componentName = this.getComponentFromElementName(elementName)
+
         //Extract element data
-        let elementData = Object.values(element)[0]
+        let elementData = entry.dictConfigs.xemplate[elementName]
 
-        // Extract children from editorConfig
-        let children = elementData.children
+        //  Get element children
+        let children = entry.dictConfigs.xema.elements[elementName].children
 
-        //  Get XML content for current content
+        //  Get XML content for current element instance
         let content = {}
         for (const [key, value] of Object.entries(XMLContent)) {
           if(key == elementName) {
@@ -118,9 +122,10 @@ export default {
       })
     },
 
-    getComponentFromElementName(elementObject) {
-      let elementData = Object.values(elementObject)[0]
-      return this.displayTypeToComponentMap[elementData.displayType]
+    getComponentFromElementName(elementName) {
+      const elementConfig = this.state.entry.dictConfigs.xemplate[elementName]
+      let type = elementConfig.displayType || "inline"
+      return this.displayTypeToComponentMap[type]
     }
   }
 }
