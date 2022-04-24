@@ -6,8 +6,11 @@
                  :elementEditorConfig="elementData"
                  :elementName="elementName"
                  :elementData="elementData"
-                 :content="content"/>
+                 :content="content"
+                 @hide-children="hideChildren"
+      />
       <ComponentGeneratorComponent
+              v-if="showChildren"
               :children="children"
               :elementEditorConfig="elementData"
               :elementName="elementName"
@@ -39,8 +42,18 @@ export default {
     },
     childrenContent: Object
   },
+  data () {
+    return {
+      showChildren: true
+    }
+  },
   mounted() {
     // console.log(this.children, "InlineComponent")
+  },
+  methods: {
+    hideChildren() {
+      this.showChildren = false
+    }
   }
 }
 </script>
