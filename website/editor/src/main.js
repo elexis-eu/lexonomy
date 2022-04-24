@@ -8,6 +8,7 @@ import DropdownComponent from "@/components/displayTypes/DropdownComponent"
 import MediaComponent from "@/components/displayTypes/MediaComponent"
 import TextInputComponent from "@/components/displayTypes/TextInputComponent"
 import TextAreaInputComponent from "@/components/displayTypes/TextAreaInputComponent"
+import TextInputWithMarkupComponent from "@/components/displayTypes/TextInputWithMarkupComponent"
 
 Vue.config.productionTip = false
 const bus = new Vue()
@@ -19,6 +20,7 @@ Vue.component("DropdownComponent", DropdownComponent)
 Vue.component("MediaComponent", MediaComponent)
 Vue.component("TextInputComponent", TextInputComponent)
 Vue.component("TextAreaInputComponent", TextAreaInputComponent)
+Vue.component("TextInputWithMarkupComponent", TextInputWithMarkupComponent)
 Vue.mixin({
   data: () => {
     return {
