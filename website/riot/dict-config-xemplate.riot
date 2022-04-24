@@ -7,13 +7,15 @@
   >
     <div style="display: flex">
       <div id="editor" class="designer" style="width: 30%">
-        <div id="rendered-xml-structure" class="render-xml-structure list" style="position: static; width: 100% !important; border-right: none">
+        <div id="rendered-xml-structure" class="render-xml-structure list"
+             style="position: static; width: 100% !important; border-right: none">
         </div>
       </div>
       <display-styles
         if={this.elementName}
         name="displayStylesComponent"
         elementName={this.elementName}
+        attributeName={attributeName}
         elementConfigData={this.configData[elementName]}
         structureConfig={this.props.dictConfigs.xema}
         loadConfigData={this.props.loadConfigData}
@@ -65,9 +67,7 @@
         displayStyles
       },
 
-      state: {
-
-      },
+      state: {},
 
       dictId: '',
       configId: '',
@@ -75,6 +75,7 @@
       override: false,
       configData: {},
       elementName: null,
+      attributeName: null,
 
       startOverride() {
         this.override = true
@@ -156,15 +157,28 @@ div.myEntry span.myHeadword {font-weight: bold}
       },
 
       handleSelectedXMLElement(event) {
-        if (this.elementName == event.detail.elementName) {
+        if (this.elementName === event.detail.elementName && this.attributeName === event.detail.attributeName) {
           return
         }
         this.elementName = event.detail.elementName
+        this.attributeName = event.detail.attributeName || null
         this.update()
       },
 
-      handleElementData(elementName, attribute, value) {
-        this.configData[elementName][attribute] = value
+      handleElementData(elementName, attributeName, attribute, value) {
+        if (attributeName) {
+          const elementAttributes = this.configData[elementName].attributes
+          if (elementAttributes) {
+            elementAttributes[attributeName][attribute] = value
+          } else {
+            elementAttributes.attributes = {[attribute]: value}
+          }
+        } else {
+          if (!this.configData[elementName]) {
+            this.configData[elementName] = {}
+          }
+          this.configData[elementName][attribute] = value
+        }
       },
 
       saveData() {

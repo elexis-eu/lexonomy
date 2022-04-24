@@ -4,7 +4,24 @@
       <h4>
         Configuration for {elementName}
       </h4>
+      <div class="toggle-input">
+        <label>Visibility</label>
+        <div class="switch">
+          <label>
+            Off
+            <input
+              id="shown"
+              type="checkbox"
+              onchange={toggleVisibility}
+              checked={state.elementData.shown === true}
+            >
+            <span class="lever"></span>
+            On
+          </label>
+        </div>
+      </div>
       <div
+        if={state.elementData.shown}
         each={setting in possibleToggles}
         class="toggle-input"
       >
@@ -25,7 +42,7 @@
       </div>
     </div>
     <div class="break"/>
-    <div>
+    <div if={state.elementData.shown}>
       <div
         each={style in possibleStyles}
         if={this.shouldRenderStyle(style.type)}
@@ -61,6 +78,7 @@
     export default {
       configData: null,
       elementName: "",
+      attributeName: null,
 
       state: {
         elementData: {
@@ -87,15 +105,21 @@
         this.setInitialData()
       },
       onBeforeUpdate(prop, state) {
-        if (this.props.elementName !== this.elementName) {
+        if (this.props.elementName !== this.elementName || this.props.attributeName !== this.attributeName) {
           this.elementName = this.props.elementName
+          this.attributeName = this.props.attributeName
           this.resetElementData()
         }
       },
       onUpdated() {
 
       },
+      toggleVisibility() {
+        this.state.elementData.shown = !this.state.elementData.shown
+        this.props.saveData(this.elementName, this.attributeName, "shown", this.state.elementData.shown)
+        this.update()
 
+      },
       sendData(event) {
         let attribute = event.srcElement.id
         let value = $("#" + attribute).val()
@@ -104,7 +128,7 @@
         }
 
         this.state.elementData[attribute] = value
-        this.props.saveData(this.elementName, attribute, value)
+        this.props.saveData(this.elementName, this.attributeName, attribute, value)
       },
 
       setInitialData() {
@@ -119,14 +143,22 @@
         if (!this.configData || !this.props.elementName) {
           return
         }
-        let existingData = this.configData[this.props.elementName]
+        let existingData = this.configData[this.elementName]
+        let elementConfigData = this.props.elementConfigData
+        if (this.attributeName) {
+          existingData = existingData.attributes && existingData.attributes[this.attributeName]
+          elementConfigData = elementConfigData.attributes && elementConfigData.attributes[this.attributeName]
+        }
         if (!existingData) {
           existingData = {}
         }
+        if (!elementConfigData) {
+          elementConfigData = {}
+        }
         for (const key of Object.keys(this.state.elementData)) {
           let value = existingData[key] || null
-          if (this.props.elementConfigData[key] != null) {
-            value = this.props.elementConfigData[key]
+          if (elementConfigData[key] != null) {
+            value = elementConfigData[key]
           }
           this.state.elementData[key] = value
         }
@@ -167,10 +199,6 @@
       },
 
       possibleToggles: [
-        {
-          type: "shown",
-          label: "Visibility"
-        },
         {
           type: "enablePositionChange",
           label: "Enable reordering of elements of same type"
