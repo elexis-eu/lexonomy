@@ -31,6 +31,11 @@ export default {
     let structureConfig = this.state.entry.dictConfigs.xema.elements[this.elementName]
     this.options = structureConfig.values
     this.value = this.content._text
+  },
+  mounted() {
+    var elems = document.querySelectorAll('select');
+    // eslint-disable-next-line no-undef
+    M.FormSelect.init(elems, {});
   }
 }
 </script>
@@ -45,8 +50,4 @@ export default {
   margin-right: 8px;
 }
 
-select {
-  display: block;
-  width: auto;
-}
 </style>
