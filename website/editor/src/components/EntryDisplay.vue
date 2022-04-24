@@ -1,17 +1,9 @@
 <template>
-<!--  <div v-if="state.entry.dictConfigs && state.entry.dictConfigs.xemplate">-->
-  <div v-if="state.entry.editorConfig">
+    <div v-if="state.entry.dictConfigs && state.entry.dictConfigs.xemplate">
     <ComponentGeneratorComponent
       :children="preparedDataForEntry"
       :content="content"
     />
-
-<!--      <component v-for="(elementData, element) in state.entry.editorConfig"-->
-<!--                 :key="element"-->
-<!--                 :is="getComponentFromElementName({[element]: elementData})"-->
-<!--                 v-bind="getPropsForElement({[element]: elementData})"-->
-<!--                 @createAdditionalElements="createAdditionalElements($event)"-->
-<!--      />-->
   </div>
 </template>
 
@@ -35,15 +27,16 @@ export default {
   },
   computed: {
     preparedDataForEntry() {
-      // if (!this.state.entry.dictConfigs) {
-      //   return []
-      // }
-      // return [this.state.entry.dictConfigs.xemplate]
-
-      console.log(this.state.entry.editorConfig)
-      return [this.state.entry.editorConfig]
+      if (!this.state.entry.dictConfigs) {
+        return []
+      }
+      return [{
+        max: 1,
+        min: 1,
+        name: this.state.entry.dictConfigs.xema.root
+      }]
     }
-  },
+  }
 }
 </script>
 
