@@ -220,7 +220,7 @@
    <script>
       export default {
          bindings: [["store", "dictlistLoadingChanged", "update"],
-                    ["store", "entrylistChanged", "entryListChanged"],
+                    ["store", "entrylistChanged", "update"],
                     ["store", "entrylistLoadingChanged", "update"],
                     ["store", "entryChanged", "update"]],
 
@@ -229,17 +229,6 @@
             size: 10,
             mousePos: null,
             cursorPosition: null
-         },
-
-         entryListChanged(){
-            this.update()
-            if(this.dictData.entryId){
-               let idx = this.dictData.entryList.findIndex(e => e.id == this.dictData.entryId)
-               if(idx != -1){
-                  this.state.cursorPosition = idx + 1
-                  this.updateCursor()
-               }
-            }
          },
 
          getFlagStyle(flag){
@@ -260,6 +249,7 @@
 
          onHeadwordLinkClick(entryId, evt){
             evt.preventDefault()
+            this.onDocumentClick(evt)
             this.store.changeEntry(entryId)
          },
 
@@ -304,7 +294,7 @@
 
          onDocumentClick(evt){
             let entryList = $(".entry-list")[0]
-            if(entryList){
+            if(entryList && evt.target.parentNode){ // no parent -> probably detached element by comoponent update()
                let inComponent = entryList.contains(evt.target)
                if(inComponent || inComponent != this.state.focused){
                   this.state.focused = inComponent
@@ -428,10 +418,25 @@
             $(".dictLeftCol").css("width", leftColWidth + distance + "px")
          },
 
+         setCursorByEntryId(){
+            if(this.dictData.entryId){
+               let idx = this.dictData.entryList.findIndex(e => e.id == this.dictData.entryId)
+               if(idx != -1){
+                  this.state.cursorPosition = idx + 1
+                  this.updateCursor()
+               }
+            }
+         },
+
          onMounted(){
             $('select').formSelect({dropdownOptions: {coverTrigger: false, constrainWidth: false}})
             document.addEventListener('click', this.onDocumentClick)
             document.addEventListener('keydown', this.onDocumentKeyDown)
+            if(this.dictData.isEntrylistLoaded){
+               this.setCursorByEntryId()
+            } else {
+               this.store.one("entrylistChanged", this.setCursorByEntryId.bind(this))
+            }
          },
 
          onBeforeUnmount(){
@@ -441,6 +446,7 @@
 
          onUpdated() {
             $('select').formSelect({dropdownOptions: {coverTrigger: false, constrainWidth: false}})
+            this.updateCursor()
          }
       }
    </script>
