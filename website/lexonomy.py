@@ -954,6 +954,13 @@ def linksdelete(dictID, linkID, user, dictDB, configs):
     res = ops.links_delete(dictID, linkID)
     return {"success": res}
 
+@get(siteconfig["rootPath"] + "<dictID>/links.json")
+@authDict([])
+def linksdict(dictID, user, dictDB, configs):
+    resto = ops.links_get(dictID, '', '', '', '', '')
+    resfrom = ops.links_get('', '', '', dictID, '', '')
+    return {"links": {"to": resto, "from": resfrom}}
+
 @get(siteconfig["rootPath"] + "<dictID>/links/from")
 @authDict([])
 def linksfrom(dictID, user, dictDB, configs):
