@@ -62,7 +62,7 @@ Screenful.Editor={
       }
       //$("<span id='idlabel'>ID</span>").appendTo($toolbar);
       $("<span style='line-height: 30px;'>ID</span>").appendTo($toolbar)
-  		$("<input id='idbox' type='text' style='width: 70px; height:30px;'/>").appendTo($toolbar).on("keyup", function(event){
+  		$("<input id='idbox' type='text' style='width: 4.4rem; height:1.8rem;'/>").appendTo($toolbar).on("keyup", function(event){
   			if(event.which==27) $("#idbox").val(Screenful.Editor.entryID);
   			if(event.which==13) {
           Screenful.Editor.open(event)

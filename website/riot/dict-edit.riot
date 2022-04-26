@@ -13,7 +13,7 @@
             <li each={ type in dictData.doctypes }
                   active={ type == dictData.doctype }
                   class="tab col s2">
-                  <a onclick={ doChangeDoctype.bind(this, type) }>{ type }</a>
+               <a onclick={ doChangeDoctype.bind(this, type) }>{ type }</a>
             </li>
          </ul>
       </div>
@@ -25,12 +25,15 @@
             </div>
             <template if={dictData.isEntrylistLoaded}>
                <div class="filterForm">
-                  <input type="text"
-                        id="searchBox"
-                        placeholder="search"
-                        class="input-field"
-                        onkeyup={ onKeyUp }
-                        style="width: 100px;"/>
+                  <span class="searchBox">
+                     <input type="text"
+                           id="searchBox"
+                           placeholder="search"
+                           class="input-field"
+                           onkeyup={ onKeyUp }/>
+                     <i onclick={onClearFilterClick}
+                        class="material-icons clearFilterIcon grey-text clickable">close</i>
+                  </span>
                   <select id="searchType">
                      <option value="start" selected>starts like this</option>
                      <option value="exact">is exactly</option>
@@ -45,7 +48,7 @@
                <div class="entry-list collection">
                   <div each={ (entry, idx) in dictData.entryList }
                         data-idx={idx}
-                        class="collection-item {entry.isSaving ? 'saving' : ''}"
+                        class="collection-item {entry.isSaving ? 'saving' : ''} {entry.id == dictData.entryId ? 'selected' : ''}"
                         onclick={onHeadwordClick.bind(this, entry.id)}>
                      <a href="#{dictData.dictId}/edit/{dictData.doctype}/{entry.id}/view"
                            class="headword-link {entry.id == dictData.entryId ? 'red-text' : ''}"
@@ -56,7 +59,7 @@
                            onclick={onOpenFlagMenuClick.bind(this, entry)}
                            class="flag {entry.flag[0] ? 'badge' : 'noFlag'}"
                            style={getFlagStyle(entry.flag[0])}>
-                        {entry.flag[0] || "no flag"}
+                        {store.getFlagLabel(entry.flag[0]) || "no flag"}
                      </span>
                   </div>
                   <div if={!dictData.entryList.length && !dictData.isEntrylistLoading} style="padding-top: 10vh;">
@@ -94,9 +97,9 @@
          display: flex;
       }
       .totalEntries{
-         font-size: 14px;
+         font-size: 0.85rem;
          color: #b8b8b8;
-         margin-left: 20px;
+         margin-left: 1.3rem;
          text-transform: none;
       }
       ul.select-dropdown,
@@ -134,23 +137,39 @@
          display: flex;
          gap: 10px
       }
-      .filterForm > input{
-         flex: 1;
-      }
-      .filterForm > .select-wrapper{
+      .filterForm .searchBox{
+         width: 100px;
+         position: relative;
          flex: 2;
       }
+      .filterForm .searchBox input{
+         padding-right: 27px;
+      }
+      .filterForm > .select-wrapper{
+         flex: 3;
+      }
+      .clearFilterIcon{
+         position: absolute;
+         right: 5px;
+         top: 11px;
+      }
       .entriesCountInfo{
-         font-size: 14px;
+         font-size: 0.85rem;
          color: #b8b8b8;
       }
       .collection-item{
          position: relative;
          display: flex;
          justify-content: space-between;
+         border-left: 5px solid white;
+      }
+      .collection-item.selected{
+         border-left-color: #000;
       }
       .collection-item .headword-link{
          text-decoration: none;
+         font-size: 1.2rem;
+         letter-spacing: 1px;
       }
       .collection-item .flag{
          cursor: pointer;
@@ -159,13 +178,16 @@
          font-family: monospace;
       }
       .collection-item .badge{
-         font-weight: 300;
-         font-size: 0.8rem;
+         font-weight: bold;
+         font-size: 1rem;
          color: #fff;
          border-radius: 2px;
-         border: 1px solid #b2b2b2;
+         box-shadow: 0 2px 2px 0 rgb(0 0 0 / 14%),
+            0 3px 1px -2px rgb(0 0 0 / 12%),
+            0 1px 5px 0 rgb(0 0 0 / 20%);
       }
       .collection-item .noFlag{
+         font-size: 1rem;
          color: grey;
       }
       .collection-item.saving::before{
@@ -187,7 +209,7 @@
          top: 50%;
          color: #6e6e6e;
          z-index: 501;
-         font-size: 20px;
+         font-size: 1.3rem;
          text-transform: uppercase;
       }
       .collection-item.focused{
@@ -198,14 +220,26 @@
    <script>
       export default {
          bindings: [["store", "dictlistLoadingChanged", "update"],
-                    ["store", "entrylistChanged", "update"],
+                    ["store", "entrylistChanged", "entryListChanged"],
                     ["store", "entrylistLoadingChanged", "update"],
                     ["store", "entryChanged", "update"]],
 
          state: {
             focused: false,
             size: 10,
-            mousePos: null
+            mousePos: null,
+            cursorPosition: null
+         },
+
+         entryListChanged(){
+            this.update()
+            if(this.dictData.entryId){
+               let idx = this.dictData.entryList.findIndex(e => e.id == this.dictData.entryId)
+               if(idx != -1){
+                  this.state.cursorPosition = idx + 1
+                  this.updateCursor()
+               }
+            }
          },
 
          getFlagStyle(flag){
@@ -227,6 +261,13 @@
          onHeadwordLinkClick(entryId, evt){
             evt.preventDefault()
             this.store.changeEntry(entryId)
+         },
+
+         onClearFilterClick(evt){
+            if($('#searchBox').val()){
+               $('#searchBox').val("")
+               this.search()
+            }
          },
 
          onKeyUp(evt) {
@@ -287,6 +328,7 @@
                } else if(evt.keyCode == 13){
                   if(this.state.cursorPosition){
                      this.store.changeEntry(this.dictData.entryList[this.state.cursorPosition - 1].id)
+                     this.updateCursor()
                   }
                }
             } else if(this.dictData.config.flagging.flags.length && this.state.cursorPosition){

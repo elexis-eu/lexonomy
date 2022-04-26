@@ -8,10 +8,10 @@
 /*override positioning of Xonomy's layby*/
 #container .xonomy > div.layby {top: 80px}
 
-#toolbar span.divider {font: inherit; border-left: 2px dotted #cccccc; padding: 2px 0px; margin: 3px 5px; min-height: 2em; display: inline-block; vertical-align: middle; }
+#toolbar span.divider {font: inherit; border-left: 2px dotted #cccccc; padding: 2px 0px; margin: 3px 5px; min-height: 1.5rem; display: inline-block; vertical-align: middle; }
 /*#toolbar span#idlabel {font: inherit; border-radius: 4px 0px 0px 4px; background-color: #eeeeee; color: #666666; text-shadow: 1px 1px 0px #ffffff; padding: 6px 10px 5px 10px; margin: 0px 5px; min-height: 1.3em; display: inline-block; vertical-align: middle; z-index: 1; position: relative; text-align: center;}*/
 /*#toolbar input#idbox {font: inherit; border: 1px inset #cccccc; border-radius: 4px; background-color: #ffffff; color: #333333; padding: 0px 35px 0px 50px; margin: 8px 5px; min-height: 1.3em; display: inline-block; width: 3em; vertical-align: middle; margin-left: -46px;}*/
-#toolbar .btn{height: 30px; line-height: 30px; padding: 0 12px;}
+#toolbar .btn{height: 1.8rem; line-height: 1.8rem; padding: 0 0.5rem;}
 
 #toolbar .buttons{gap: 7px;}
 @media screen and (max-width: 1300px){

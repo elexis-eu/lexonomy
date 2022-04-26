@@ -1,5 +1,6 @@
 html body{
     font-family: 'Roboto Condensed', sans-serif;
+    font-size: 16px;
 }
 .main{
     min-height: 100vh;
@@ -28,7 +29,7 @@ app-footer{
     height: 50px;
 }
 .nav-breadcrumbs .breadcrumb{
-    font-size: 14px;
+    font-size: 0.9rem;
 }
 .nav-breadcrumbs .breadcrumb:last-child{
     text-decoration: none;
@@ -351,6 +352,14 @@ nav a.sidenav-trigger i{
     line-height: 80px;
 }
 
+nav .brand-logo{
+    font-size: initial;
+}
+.sidenav-trigger{
+    color: #000;
+    text-decoration: none;
+}
+
 .secondary-content{
     color: #231f20;
 }
@@ -365,6 +374,81 @@ nav a.sidenav-trigger i{
 
 thead tr{
     border-bottom: 2px solid #000;
+}
+
+/* relative sizes  */
+
+.dropdown-content li>a,
+.dropdown-content li>span{
+    font-size: 1rem;
+    padding: 0.9rem 1rem;
+    line-height: 1.3rem;
+}
+
+.collection .collection-item{
+    line-height: 1.5rem;
+    padding: 0.5rem 1.1rem;
+}
+input:not([type]),
+input[type=text]:not(.browser-default),
+input[type=password]:not(.browser-default),
+input[type=email]:not(.browser-default),
+input[type=url]:not(.browser-default),
+input[type=time]:not(.browser-default),
+input[type=date]:not(.browser-default),
+input[type=datetime]:not(.browser-default),
+input[type=datetime-local]:not(.browser-default),
+input[type=tel]:not(.browser-default),
+input[type=number]:not(.browser-default),
+input[type=search]:not(.browser-default),
+textarea.materialize-textarea{
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+    font-size: 1rem;
+}
+.input-field>label:not(.label-icon){
+    -webkit-transform: translateY(-1.1rem) scale(1)!important;
+    transform: translateY(-1.1rem) scale(0.9)!important;
+}
+.input-field .helper-text{
+    font-size: 0.7rem;
+}
+.btn{
+    font-size: 0.9rem;
+    height: 2.25rem;
+    line-height: 2.25rem;
+}
+.btn:not(.btn-floating){
+    padding: 0 1rem;
+}
+.btn-floating{
+    width: 2.5rem;
+    height: 2.5rem;
+}
+.btn-floating i{
+    line-height: 2.5rem;
+}
+.chip{
+    height: 2rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgba(0,0,0,0.6);
+    line-height: 2rem;
+    padding: 0 0.7rem;
+    border-radius: 1rem;
+    background-color: #e4e4e4;
+    margin-bottom: 0.3rem;
+    margin-right: 0.3rem;
+}
+.chip .close{
+    font-size: 1rem;
+    line-height: 2rem;
+    padding-left: 0.5rem;
+}
+span.badge{
+    padding: 0 0.4rem;
+    line-height: 1.3rem;
+    height: 1.3rem;
 }
 
 
@@ -386,7 +470,7 @@ thead tr{
 .message{
     text-align: center;
     font-weight: bold;
-    padding: 10px 15px;
+    padding: 0.7rem 1rem;
     color: #fff;
 }
 
@@ -406,7 +490,7 @@ thead tr{
 .flagDropdown li{
     display: flex;
     min-width: 170px;
-    padding: 12px 15px;
+    padding: 0.7rem 1rem;
 }
 .flagDropdown li i{
     margin-right: 5px;

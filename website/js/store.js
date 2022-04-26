@@ -82,12 +82,21 @@ class StoreClass {
             })
    }
 
-   getFlagColor(flagName){
+   getFlag(flagName){
       if(flagName){
-         let flag = this.data.config.flagging.flags.find(f => f.name == flagName)
-         return flag ? flag.color : ''
+         return this.data.config.flagging.flags.find(f => f.name == flagName)
       }
-      return ''
+      return null
+   }
+
+   getFlagLabel(flagName){
+      let flag = this.getFlag(flagName)
+      return flag ? flag.label : ""
+   }
+
+   getFlagColor(flagName){
+      let flag = this.getFlag(flagName)
+      return flag ? flag.color : ""
    }
 
    getFlagTextColor(flagColor){
@@ -237,6 +246,15 @@ class StoreClass {
             .always(response => {
                this.data.isEntrylistLoading = false
                this.trigger("entrylistLoadingChanged")
+            })
+   }
+
+   loadEntryLinks(){
+      return $.ajax({
+         url: `${window.API_URL}${this.data.dictId}/entrylinks.json`
+      })
+            .fail(response => {
+               M.toast({html: "Entry links could not be loaded."})
             })
    }
 
