@@ -131,12 +131,7 @@ def home():
 
 @get(siteconfig["rootPath"] + "siteconfigread.json")
 def lexonomyconfig():
-    version = ""
-    if os.path.isfile("version.txt"):
-        with open("version.txt", "r") as version_file:
-            version = version_file.read()
     configData = {
-        "version": version,
         "licences": siteconfig['licences'],
         "baseUrl": siteconfig['baseUrl']
     }
