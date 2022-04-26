@@ -44,6 +44,7 @@ make libSqliteIcu.so
 %install
 make DESTDIR=$RPM_BUILD_ROOT INSTALLDIR=/opt/lexonomy/ install
 echo %{version} > $RPM_BUILD_ROOT/opt/lexonomy/website/version.txt
+sed -i -e 's/@VERSION@/%{version}/g' $RPM_BUILD_ROOT/opt/lexonomy/website/index.html
 mkdir -p $RPM_BUILD_ROOT/opt/lexonomy/data
 cp -p libSqliteIcu.so $RPM_BUILD_ROOT/opt/lexonomy/
 
