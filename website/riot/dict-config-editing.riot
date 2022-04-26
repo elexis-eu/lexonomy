@@ -55,8 +55,11 @@
    <div if={ (state.data._js && state.data._js != "") || state.override }>
       <div class="row">
          <div class="input-field">
-            <textarea id="editor_js" class="materialize-textarea" placeholder="">{ state.data._js }</textarea>
-            <label>JavaScript</label>
+            <div id="codeStatus"></div>
+            <textarea id="editor_js" class="materialize-textarea" placeholder="" oninput={checkJSCode}>{ state.data._js }</textarea>
+            <label>
+               JavaScript
+            </label>
             <span class="helper-text">You can customize the editor by defining two functions in JavaScript: one that will render the HTML editor from the XML entry and one that will harvest the (edited) HTML back into XML. If you would like to see an example, <a onclick={ exampleJS }>click here to load a sample JavaScript code</a>.</span>
          </div>
       </div>
@@ -80,6 +83,22 @@
       <br><br>
    </div>
 
+   <style>
+      textarea{
+         min-height: 30vh;
+      }
+      #editor_js{
+         padding-top: 25px;
+      }
+      #codeStatus{
+         top: 1px;
+         position: absolute;
+         right: 1px;
+         left: 1px;
+         background-color: whitesmoke;
+         padding: 3px 8px;
+      }
+   </style>
 
    <script>
       export default {
@@ -176,7 +195,7 @@ div.myEditor input {font-weight: bold}`
             this.store.loadDictionaryConfig("editing")
                   .done(response => {
                      this.state.data = response.content
-                     this.state.override = !!response._js
+                     this.state.override = !!response.content._js
                   })
                   .always(() => {
                      this.update({isLoading: false})
@@ -185,6 +204,7 @@ div.myEditor input {font-weight: bold}`
                      if (this.state.override) {
                         M.textareaAutoResize($('#editor_css'))
                         M.textareaAutoResize($('#editor_js'))
+                        this.checkJSCode()
                      }
                   })
          },
@@ -207,6 +227,18 @@ div.myEditor input {font-weight: bold}`
                newData._css = $('#editor_css').val();
             }
             return newData;
+         },
+
+         checkJSCode(evt){
+            let isOk = false
+            let err = ""
+            try{
+               new Function("return " + $("#editor_js").val())()
+               isOk = true
+            } catch(e){
+               err = e.toString().split('\n')[0]
+            }
+            $("#codeStatus").html(isOk ? `<b class="green-text">valid</b>` : `<b class="red-text">invalid</b><span class="grey-text right">${err}</span>`)
          },
 
          saveData() {

@@ -90,6 +90,17 @@ class StoreClass {
       return ''
    }
 
+   getFlagTextColor(flagColor){
+      let tmp = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(flagColor);
+      if(tmp){
+         let red = parseInt(tmp[1], 16)
+         let green = parseInt(tmp[2], 16)
+         let blue = parseInt(tmp[3], 16)
+         return (red * 0.299 + green * 0.587 + blue * 0.114) > 186 ? "#000000" : "#ffffff"
+      }
+      return "#000000"
+   }
+
    resetDictionary(){
       Object.assign(this.data, {
          isDictionaryLoading: false,

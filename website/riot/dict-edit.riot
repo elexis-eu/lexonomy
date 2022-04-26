@@ -55,7 +55,7 @@
                      <span if={dictData.config.flagging.flags.length}
                            onclick={onOpenFlagMenuClick.bind(this, entry)}
                            class="flag {entry.flag[0] ? 'badge' : 'noFlag'}"
-                           style="background-color: {store.getFlagColor(entry.flag[0]) || 'initial'}">
+                           style={getFlagStyle(entry.flag[0])}>
                         {entry.flag[0] || "no flag"}
                      </span>
                   </div>
@@ -149,6 +149,9 @@
          display: flex;
          justify-content: space-between;
       }
+      .collection-item .headword-link{
+         text-decoration: none;
+      }
       .collection-item .flag{
          cursor: pointer;
       }
@@ -160,6 +163,7 @@
          font-size: 0.8rem;
          color: #fff;
          border-radius: 2px;
+         border: 1px solid #b2b2b2;
       }
       .collection-item .noFlag{
          color: grey;
@@ -202,6 +206,12 @@
             focused: false,
             size: 10,
             mousePos: null
+         },
+
+         getFlagStyle(flag){
+            let bgColor = this.store.getFlagColor(flag) || 'initial'
+            let color = this.store.getFlagTextColor(bgColor)
+            return `color: ${color}; background-color: ${bgColor}`
          },
 
          search() {

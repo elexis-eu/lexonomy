@@ -44,10 +44,10 @@
                      <input type="text" value={ flag.label } placeholder="label" class="flag-label"/>
                   </td>
                   <td>
-                     <input type="text" value={ flag.color } placeholder="color"  class="flag-color" id="flag-color{index}" style="background-color: {flag.color}"/>
+                     <input type="text" value={ flag.color } placeholder="color"  class="flag-color" id="flag-color{index}" style="color: {store.getFlagTextColor(flag.color)};background-color: {flag.color}"/>
                   </td>
                   <td>
-                     <a class="btn btn-floating delete-el" onclick={ doDeleteEl.bind(this, index) }>
+                     <a class="btn btn-flat" onclick={ doDeleteEl.bind(this, index) }>
                         <i class="material-icons">delete</i>
                      </a>
                   </td>
@@ -74,9 +74,6 @@
    <dict-config-buttons save-data={saveData} show-save={state.data.flags.length}></dict-config-buttons>
 
    <style>
-      .delete-el {
-         float: right;
-      }
       tr{
          border-bottom: none;
       }
@@ -105,12 +102,17 @@
          },
 
          addColor() {
-            $('.flag-color').each(function() {
-               var cid = $(this)[0].id
+            $('.flag-color').each(function(idx, elem) {
+               var cid = $(elem)[0].id
                $('#' + cid).colorpicker().on('changeColor', function(ev) {
-                  $(this).css('background-color',ev.color.toHex())
-               })
-            })
+                  let bgColor = ev.color.toHex()
+                  let color = this.store.getFlagTextColor(bgColor)
+                  $(elem).css({
+                     'background-color': bgColor,
+                     'color': color
+                  })
+               }.bind(this))
+            }.bind(this))
          },
 
          onMounted() {

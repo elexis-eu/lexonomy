@@ -15,6 +15,7 @@
             <span class="statusmessage"></span>
          </div>
       </div>
+      <div id="editorStyle"></div>
    </div>
 
    <style>
@@ -98,14 +99,17 @@
                //ske_username = this.authData.ske_username;
                //ske_apiKey = this.authData.ske_apiKey;
 
-               if (editing["_js"]) {
-                  var customizeEditor = editing["_js"];
-                  var usingOwnEditor = customizeEditor.editor && customizeEditor.harvester;
-               } else {
-                  var customizeEditor = null;
-                  var usingOwnEditor = false;
+               var customizeEditor = "";
+               var usingOwnEditor = false;
+               if (editing._js) {
+                  try{
+                     customizeEditor = new Function("return " + editing._js)();
+                     usingOwnEditor = customizeEditor.editor && customizeEditor.harvester;
+                  } catch(e){
+                     M.toast({html: "Invalid custom editor code."})
+                  }
                }
-
+               $("#editorStyle").html(editing._css ? `<style>${editing._css}</style>` : '')
                if (!xemplate[xema.root]) xemplate[xema.root] = {shown: false};
                if (xemplate[xema.root].shown == "false") xemplate[xema.root].shown = false;
                Screenful.Editor.viewer=null;
@@ -138,7 +142,7 @@
                      var docSpec = struct2Xonomy(xmlStructure);
                      newXml = initialDocument(xmlStructure);
                   } else {
-                     var docSpec = Xematron.xema2docspec(xema, editing["xonomyTextEditor"]);
+                     var docSpec = Xematron.xema2docspec(xema, editing.xonomyTextEditor);
                   }
                   if (!newXml) {
                      newXml = Xematron.xema2xml(xema);
@@ -155,7 +159,7 @@
                      docSpec.allowLayby=true;
                      docSpec.laybyMessage="This is your temporary lay-by for entry fragments. You can drag and drop XML elements here.";
                   }
-                  Xonomy.setMode(Cookies.get("xonomyMode_" + this.dictData.dictId) || editing["xonomyMode"]);
+                  Xonomy.setMode(Cookies.get("xonomyMode_" + this.dictData.dictId) || editing.xonomyMode);
                   Xrefs.extendDocspec(docSpec, xema);
                   Ske.extendDocspec(docSpec, xema);
                   Kontext.extendDocspec(docSpec, xema);
