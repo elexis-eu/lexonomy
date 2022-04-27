@@ -100,7 +100,6 @@
       },
 
       onMounted() {
-        this.getEditorFromDevServer()
         this.dictId = this.props.dictId
         this.doctype = this.props.doctype
         this.doctypes = this.props.doctypes
@@ -116,64 +115,7 @@
         this.entryId = this.props.entryId
         console.log('list edit dict update' + this.dictId + this.doctype + this.props.entryId)
         $('select').formSelect({dropdownOptions: {coverTrigger: false, constrainWidth: false}})
-        //$('select').siblings('input').attr("data-constrainwidth", false);
-        console.log(this.doctypes)
-
-        if (window.editor) {
-          this.sendEntryToEditor()
-        } else {
-          this.waitingForEditor = true
-        }
       },
-      getEditorFromDevServer() {
-        window.addEventListener("message", (event) => {
-          if (event.data) {
-            switch (event.data.event) {
-              case "editorReady":
-                this.editorReady = event.data.data && event.data.data.ready
-                if (this.waitingForEditor) {
-                  this.sendEntryToEditor()
-                  this.waitingForEditor = false
-                }
-            }
-          }
-        })
-
-        fetch('http://localhost:8081/js/chunk-vendors.js').then(r => r.text()).then(vendorContent => {
-          const newScript = document.createElement("script")
-          newScript.append(document.createTextNode(vendorContent))
-          document.querySelector('body').appendChild(newScript)
-          fetch('http://localhost:8081/js/app.js').then(r => r.text()).then(content => {
-            const newScript = document.createElement("script")
-            newScript.append(document.createTextNode(content))
-            document.querySelector('body').appendChild(newScript)
-          })
-        })
-      },
-      sendEntryToEditor() {
-        let types = [
-          "popup",
-          "inline",
-          "read-only",
-          "text-input",
-          "textarea-input",
-          "dropdown",
-          "media",
-          "text-input-with-markup", //example is what we're looking at
-          "link to another entry?" // sometimes id is passed which is a reference to a different element
-        ]
-        //What happends if element isn't in structure
-        editor.bus.$emit("updateEntry", {
-          entryId: this.entryId,
-          mode: this.mode,
-          dictId: this.dictId,
-          dictConfigs: this.props.dictConfigs,
-          userAccess: this.props.userAccess,
-          userInfo: this.props.userInfo,
-          userDicts: this.userDicts
-
-        })
-      }
     }
   </script>
 
