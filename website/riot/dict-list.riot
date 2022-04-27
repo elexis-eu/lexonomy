@@ -4,10 +4,12 @@
       <div if={dictData.dictlist.length}>
          <h3>your dictionaries</h3>
          <ul class="collection">
-            <li each={ dict in dictData.dictlist } class="collection-item ">
+            <li each={ dict in dictData.dictlist }
+                  class="collection-item ">
                <div>
                   <a href="#/{ dict.id }">{ dict.title }</a>
-                  <span if={ dict.lang } class="dict-lang">{ dict.lang }</span>
+                  <span if={ dict.lang }
+                        class="dict-lang">{ dict.lang }</span>
                   <span class="dict-lang grey-text">{ dict.size } entries</span>
                   <a if={ dict.currentUserCanDelete }
                         class="secondary-content clickable"
@@ -36,18 +38,21 @@
                </div>
             </li>
          </ul>
-         <a href="#/make" class="btn waves-effect waves-light">
+         <a href="#/make"
+               class="btn waves-effect waves-light">
             <i class="material-icons left">add</i>
             create new dictionary
          </a>
       </div>
-      <div if={!dictData.dictlist.length} class="grey-text center-align">
+      <div if={!dictData.dictlist.length}
+            class="grey-text center-align">
          <h3>no dictionaries</h3>
          <div>
             You have no dictionary yet. Create one using button below.
          </div>
          <br>
-         <a href="#/make" class="btn waves-effect waves-light">
+         <a href="#/make"
+               class="btn waves-effect waves-light">
             <i class="material-icons left">add</i>
             create new dictionary
          </a>
@@ -72,11 +77,11 @@
          },
 
          doEditDict(dictId) {
-            route(dictId + "/edit");
+            route(dictId + "/edit")
          },
 
          doConfigDict(dictId) {
-            route(dictId + "/config");
+            route(dictId + "/config")
          },
 
          doCloneDict(dictId) {

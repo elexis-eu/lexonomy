@@ -122,15 +122,6 @@
 
    <script>
       export default {
-
-         /*onMounted() {
-            this.store.on("siteconfigChanged", this.update.bind(this))
-         },
-
-         onBeforeUnount() {
-            this.store.off("siteconfigChanged", this.update.bind(this))
-         },*/
-
          listLang() {
             var json = $("#input_listLang").val();
             $.ajax("/api/listLang", {method: "POST", contentType: "application/json", data: json, processData: false, dataType: "json"}).done(function(data){

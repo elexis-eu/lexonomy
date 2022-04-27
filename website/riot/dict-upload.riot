@@ -2,23 +2,29 @@
    <loading-overlay if={state.isUploading}/>
    <dict-nav links={[["upload", "Upload"]]}/>
    <h3>Upload</h3>
-   <div class="file-field input-field buttons" style="max-width: 700px;">
+   <div class="file-field input-field buttons"
+         style="max-width: 700px;">
       <div class="btn">
          <span>Choose XML file</span>
-         <input type="file" id="file">
+         <input type="file"
+               id="file">
       </div>
       <div class="file-path-wrapper">
-         <input class="file-path validate" type="text">
+         <input class="file-path validate"
+               type="text">
       </div>
       <div>
-         <a class="waves-effect waves-light btn btn-primary {state.isUploading || state.isImporting ? 'disabled' : ''}" onclick={ doUpload } id="startButton">
+         <a class="waves-effect waves-light btn btn-primary {state.isUploading || state.isImporting ? 'disabled' : ''}"
+               onclick={ doUpload }
+               id="startButton">
             <i class="material-icons left">file_upload</i>Upload file
          </a>
       </div>
    </div>
    <div>
       <label>
-         <input type="checkbox" id="purge" />
+         <input type="checkbox"
+               id="purge" />
          <span>Purge dictionary before upload</span>
       </label>
    </div>
@@ -27,10 +33,12 @@
 
    <template if={state.infoMessage || state.errorMessage}>
       <h5>Progress</h5>
-      <div if={state.infoMessage} classs="message messageInfo">
+      <div if={state.infoMessage}
+            classs="message messageInfo">
          <raw-html content={state.infoMessage}></raw-html>
       </div>
-      <div if={state.errorMessage} class="message messageError">
+      <div if={state.errorMessage}
+            class="message messageError">
          <raw-html content={state.errorMessage}></raw-html>
       </div>
    </template>
@@ -46,10 +54,10 @@
          },
 
          doUpload() {
-            var fd = new FormData();
+            var fd = new FormData()
             var files = $('#file')[0].files[0];
-            fd.append('myfile', files);
-            if ($('#purge').is(':checked')) fd.append('purge', 'on');
+            fd.append('myfile', files)
+            if ($('#purge').is(':checked')) fd.append('purge', 'on')
             this.update({
                isUploading: true,
                errorMessage: "",
@@ -58,7 +66,7 @@
             this.store.uploadXML(fd)
                   .done((response) => {
                         if (response.success) {
-                           this.startImport(response.file, response.uploadStart);
+                           this.startImport(response.file, response.uploadStart)
                         } else {
                            this.update({infoMessage: 'Error while uploading file'})
                         }

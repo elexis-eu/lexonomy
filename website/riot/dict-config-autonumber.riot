@@ -7,27 +7,35 @@
    </div>
    <div class="row">
       <div class="input-field col s4">
-         <select id="elements" onchange={ changeElem }>
-         </select>
+         <select id="elements"
+               onchange={ changeElem }></select>
          <label for="elements">Element to number</label>
       </div>
-      <div id="hasChildren" class="input-field col s4">
-         <select id="children">
-         </select>
+      <div id="hasChildren"
+            class="input-field col s4">
+         <select id="children"></select>
          <label for="children">Add numbers to</label>
       </div>
-      <div id="hasNoChildren" class="input-field col s4 grey-text" style="display: none; padding-top: 10px;">
+      <div id="hasNoChildren"
+            class="input-field col s4 grey-text"
+            style="display: none; padding-top: 10px;">
          element has no children
       </div>
       <div class="input-field col s3">
-         <a class="btn waves-effect waves-light" onclick={ addNumbers } id="submit_button"><i class="material-icons right">add</i>Add numbers</a>
+         <a class="btn waves-effect waves-light"
+               onclick={ addNumbers }
+               id="submit_button">
+            <i class="material-icons right">add</i>Add numbers
+         </a>
       </div>
    </div>
-   <div if={state.info} class="section">
+   <div if={state.info}
+         class="section">
       <div class="message messageInfo">
          {state.info}
       </div>
    </div>
+
    <script>
       export default {
          state: {

@@ -3,15 +3,18 @@
    <dict-nav links={[["config", "Configure"], ["users", "Users"]]}/>
    <h3>Users</h3>
    <template if={!state.isLoading}>
-      <div if={!state.data.users.length} class="grey-text center-align">
+      <div if={!state.data.users.length}
+            class="grey-text center-align">
          <h4>No users</h4>
          <br>
-         <button class="btn btn-primary" onclick={doAddUser}>
+         <button class="btn btn-primary"
+               onclick={doAddUser}>
             <i class="material-icons right">add</i>
             Add new user
          </button>
          <br><br><br><br>
-         <div class="buttons" style="justify-content: center;">
+         <div class="buttons"
+               style="justify-content: center;">
             <dict-config-buttons save-data={saveData}></dict-config-buttons>
          </div>
       </div>
@@ -35,10 +38,16 @@
                </tr>
             </thead>
             <tbody>
-               <tr each={ (user, idx) in state.data.users } no-reorder key={user.id}>
+               <tr each={ (user, idx) in state.data.users }
+                     no-reorder
+                     key={user.id}>
                   <td>
                      <span if={user.isEditable}>
-                        <input id="new-email" type="email" class="validate" oninput={onEmailInput.bind(this, idx)} style="max-width: 300px;">
+                        <input id="new-email"
+                              type="email"
+                              class="validate"
+                              oninput={onEmailInput.bind(this, idx)}
+                              style="max-width: 300px;">
                      </span>
                      <span if={!user.isEditable}>
                         { user.email }
@@ -46,30 +55,43 @@
                   </td>
                   <td>
                      <label>
-                        <input type="checkbox" name="canEdit" checked={ user.canEdit } onchange={onPermissionChange.bind(this, idx)}/>
+                        <input type="checkbox"
+                              name="canEdit"
+                              checked={ user.canEdit }
+                              onchange={onPermissionChange.bind(this, idx)}/>
                         <span></span>
                      </label>
                   </td>
                   <td>
                      <label>
-                        <input type="checkbox" name="canConfig" checked={ user.canConfig } onchange={onPermissionChange.bind(this, idx)}/>
+                        <input type="checkbox"
+                              name="canConfig"
+                              checked={ user.canConfig }
+                              onchange={onPermissionChange.bind(this, idx)}/>
                         <span></span>
                      </label>
                   </td>
                   <td>
                      <label>
-                        <input type="checkbox" name="canDownload" checked={ user.canDownload } onchange={onPermissionChange.bind(this, idx)}/>
+                        <input type="checkbox"
+                              name="canDownload"
+                              checked={ user.canDownload }
+                              onchange={onPermissionChange.bind(this, idx)}/>
                         <span></span>
                      </label>
                   </td>
                   <td>
                      <label>
-                        <input type="checkbox" name="canEdit" checked={ user.canUpload } onchange={onPermissionChange.bind(this, idx)}/>
+                        <input type="checkbox"
+                              name="canEdit"
+                              checked={ user.canUpload }
+                              onchange={onPermissionChange.bind(this, idx)}/>
                         <span></span>
                      </label>
                   </td>
                   <td>
-                     <a class="btn btn-floating delete-user" onclick={ doDeleteUser.bind(this, idx) }>
+                     <a class="btn btn-floating delete-user"
+                           onclick={ doDeleteUser.bind(this, idx) }>
                         <i class="material-icons">delete</i>
                      </a>
                   </td>
@@ -78,7 +100,8 @@
          </table>
          <br>
          <div>
-            <button class="btn" onclick={doAddUser}>
+            <button class="btn"
+                  onclick={doAddUser}>
                <i class="material-icons right">add</i>
                Add new user
             </button>
@@ -119,7 +142,7 @@
          },
 
          doDeleteUser(idx) {
-            this.state.data.users.splice(idx, 1);
+            this.state.data.users.splice(idx, 1)
             this.update()
          },
 
@@ -132,8 +155,8 @@
                canDownload: false,
                canUpload: false,
                isEditable: true
-            });
-            this.update();
+            })
+            this.update()
             $('table input[type="email"]', this.root).last().focus()
          },
 
@@ -157,9 +180,9 @@
 
          saveData() {
             if (Object.values(this.state.data.users).find(row => row.canConfig) == undefined) {
-               $('#userConfigError').html('At least one user must have <i>Configure</i> permission.');
+               $('#userConfigError').html('At least one user must have <i>Configure</i> permission.')
             } else {
-               $('#userConfigError').html('');
+               $('#userConfigError').html('')
                let data = {}
                this.state.data.users.forEach(u => {
                   data[u.email] = {

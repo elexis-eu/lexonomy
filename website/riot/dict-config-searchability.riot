@@ -23,7 +23,8 @@
       </div>
    </div>
    <br><br>
-   <dict-config-buttons save-data={saveData} dict-id={dictId} show-save={state.hasElements}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData}
+         show-save={state.hasElements}></dict-config-buttons>
 
    <script>
       export default {
@@ -35,7 +36,9 @@
          },
 
          onBeforeMount() {
-            this.state.hasElements = this.dictData.config.xema && this.dictData.config.xema.elements && Object.keys(this.dictData.config.xema.elements).length
+            this.state.hasElements = this.dictData.config.xema
+                  && this.dictData.config.xema.elements
+                  && Object.keys(this.dictData.config.xema.elements).length
          },
 
          onMounted() {

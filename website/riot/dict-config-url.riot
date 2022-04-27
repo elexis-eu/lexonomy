@@ -14,36 +14,49 @@
          <div style="display: flex; align-items: baseline;">
             <span id="baseUrl">https://www.lexonomy.eu/</span>
             <span>
-               <input id="url" type="text" class="validate inlineBlock" required minlength="5" pattern="[a-zA-Z0-9\-_]*" style="max-width: 300px;"/>
+               <input id="url"
+                     type="text"
+                     class="validate inlineBlock"
+                     required
+                     minlength="5"
+                     pattern="[a-zA-Z0-9\-_]*"
+                     style="max-width: 300px;"/>
             </span>
          </div>
-         <div class="input-field" style="margin-top: 0;">
+         <div class="input-field"
+               style="margin-top: 0;">
             <span class="helper-text">This will be your dictionary's address on the web. You will be able to change this later. Allowed: letters, numbers, - and _</span>
          </div>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData} label="Change"></dict-config-buttons>
+   <dict-config-buttons save-data={saveData}
+         label="Change"></dict-config-buttons>
    <br>
    <div>
-      <span id="error" style="display:none">This URL is already taken.</span>
-      <span id="success" style="display:none">Your dictionary has been moved to a new URL. <a href="" id="newlink">Go to new dictionary URL</a>.</span>
+      <span id="error"
+            style="display:none">This URL is already taken.</span>
+      <span id="success"
+            style="display:none">
+         Your dictionary has been moved to a new URL.
+         <a href="" id="newlink">Go to new dictionary URL</a>.
+      </span>
    </div>
 
    <script>
       export default {
          saveData() {
             this.update({isSaving: true})
-            var newurl = $('#url').val();
+            var newurl = $('#url').val()
             if (newurl != "" && $('#url').hasClass('valid')) {
                $.post(window.API_URL + this.dictData.dictId + "/move.json", {url: newurl}, (response) => {
                   if (response.success) {
-                     $('#success').show();
-                     $('#newlink').attr('href', '#/' + newurl);
+                     $('#success').show()
+                     $('#newlink').attr('href', '#/' + newurl)
                   } else {
-                     $('#error').show();
+                     $('#error').show()
                   }
                   this.update({isSaving: false})
-               });
+               })
             }
          }
       }

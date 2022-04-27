@@ -4,33 +4,50 @@
    <template if={!dictData.isDictionaryLoading}>
       <h3 class="header">
          { dictData.title }
-         <div class="buttons right" style="margin-top: 5px;">
-            <a if={dictData.userAccess.canEdit} href="#/{dictData.dictId}/edit" class="btn">edit</a>
-            <a if={dictData.userAccess.canConfig} href="#/{dictData.dictId}/config" class="btn">config</a>
-            <a if={dictData.userAccess.canUpload} href="#/{dictData.dictId}/upload" class="btn">upload</a>
-            <a if={dictData.userAccess.canDownload} href="#/{dictData.dictId}/download" class="btn">download</a>
-            <a href="#/{dictData.dictId}/links" class="btn">links</a>
+         <div class="buttons right"
+               style="margin-top: 5px;">
+            <a if={dictData.userAccess.canEdit}
+                  href="#/{dictData.dictId}/edit"
+                  class="btn">edit</a>
+            <a if={dictData.userAccess.canConfig}
+                  href="#/{dictData.dictId}/config"
+                  class="btn">config</a>
+            <a if={dictData.userAccess.canUpload}
+                  href="#/{dictData.dictId}/upload"
+                  class="btn">upload</a>
+            <a if={dictData.userAccess.canDownload}
+                  href="#/{dictData.dictId}/download"
+                  class="btn">download</a>
+            <a href="#/{dictData.dictId}/links"
+                  class="btn">links</a>
          </div>
       </h3>
       <p class="blurb">
          <raw-html content={dictData.blurb}></raw-html>
       </p>
 
-      <div if={ dictData.public } class="section">
+      <div if={ dictData.public }
+            class="section">
          <br>
          <div class="divider"></div>
-         <a class="btn btn-floating waves-effect waves-light right" onclick={ onReloadExamplesClick } style="margin-top: 15px;"><i class="material-icons">refresh</i></a>
+         <a class="btn btn-floating waves-effect waves-light right"
+               onclick={ onReloadExamplesClick }
+               style="margin-top: 15px;"><i class="material-icons">refresh</i></a>
          <h5 style="margin-left: 8px;">Examples</h5>
-         <div if={dictData.isDictionaryExamplesLoading} class="grey-text" style="min-height: 20px; margin: 15px 10px;">
+         <div if={dictData.isDictionaryExamplesLoading}
+               class="grey-text"
+               style="min-height: 20px; margin: 15px 10px;">
             Loading...
          </div>
-         <ul class="random-entries s10" if={ !dictData.isDictionaryExamplesLoading && dictData.dictionaryExamples }>
+         <ul if={ !dictData.isDictionaryExamplesLoading && dictData.dictionaryExamples }
+               class="random-entries s10" >
             <li each={ entry in dictData.dictionaryExamples }>
                <a href="#/{ dictData.dictId }/{ entry.id }">{ entry.titlePlain }</a>
             </li>
          </ul>
          <div class="divider"></div>
-         <div class="section right" style="opacity: .5;">
+         <div class="section right"
+               style="opacity: .5;">
             { dictData.licence }
          </div>
       </div>

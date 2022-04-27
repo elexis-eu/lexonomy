@@ -6,11 +6,14 @@
       <div class="divider"></div>
       <div class="row">
          <div class="col s9">
-            <entry-view is="entry-view" dict-id={ dictData.dictId } entry-id={ props.entryId }></entry-view>
+            <entry-view is="entry-view"
+                  dict-id={ dictData.dictId }
+                  entry-id={ props.entryId }></entry-view>
          </div>
          <div class="col s3">
             <ul class="nabes">
-               <li each={ entry in state.moreEntries} active={entry.id == props.entryId}>
+               <li each={ entry in state.moreEntries}
+                     active={entry.id == props.entryId}>
                   <a href="#/{ dictData.dictId }/{ entry.id }">{ entry.titlePlain }</a>
                </li>
             </ul>
@@ -39,18 +42,18 @@
                if (response.nabes) {
                   this.update({more: response.nabes})
                }
-            });
+            })
          },
 
          onMounted() {
-            this.state.entryId = this.props.entryId;
-            this.loadMoreEntries();
+            this.state.entryId = this.props.entryId
+            this.loadMoreEntries()
          },
 
          onUpdated() {
             if (this.state.entryId != this.props.entryId) {
-               this.state.entryId = this.props.entryId;
-               this.loadMoreEntries();
+               this.state.entryId = this.props.entryId
+               this.loadMoreEntries()
             }
          }
       }

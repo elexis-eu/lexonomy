@@ -1,54 +1,58 @@
 <open-dict-list>
-   <h4>
-      Open dictionaries
-   </h4>
+   <h4>Open dictionaries</h4>
    <loading-overlay if={state.isLoading}></loading-overlay>
    <div if={!state.isLoading}>
       <div>
-         <div class="input-field" style="display: inline-block; margin-right: 40px;">
+         <div class="input-field"
+               style="display: inline-block; margin-right: 40px;">
            <i class="material-icons prefix grey-text">search</i>
-           <input id="search" type="text" oninput={onSearchInput} style="width: 200px;">
+           <input id="search"
+               type="text"
+               oninput={onSearchInput}
+               style="width: 200px;">
            <label for="search">Find</label>
          </div>
-         <div class="input-field" style="display: inline-block;">
+         <div class="input-field"
+               style="display: inline-block;">
             <i class="material-icons prefix grey-text">translate</i>
-            <select id="languageSelect" style="width: 200px;">
+            <select id="languageSelect"
+                  style="width: 200px;">
                <option value="">All languages</option>
-               <option each={language in state.languageList} value={language}>{language}</option>
+               <option each={language in state.languageList}
+                     value={language}>{language}</option>
             </select>
             <label>Language</label>
          </div>
       </div>
-      <div if={!state.visibleDicts.length} class="center" style="margin: 20vh auto;">
+      <div if={!state.visibleDicts.length}
+            class="center"
+            style="margin: 20vh auto;">
          <h3 class="grey-text lighten-2">Nothing found</h3>
       </div>
-      <table if={state.visibleDicts.length} class="striped highlight" style="margin: 0 15px;">
+      <table if={state.visibleDicts.length}
+            class="striped highlight"
+            style="margin: 0 15px;">
          <thead>
-            <th>
-               Title
-            </th>
-            <th>
-               Language
-            </th>
-            <th>
-               Size
-            </th>
-            <th>
-               Author
-            </th>
-            <th>
-               Licence
-            </th>
+            <th>Title</th>
+            <th>Language</th>
+            <th>Size</th>
+            <th>Author</th>
+            <th>Licence</th>
          </thead>
          <tbody>
-            <tr each={(row, idx) in state.visibleDicts} id="r_{idx}">
+            <tr each={(row, idx) in state.visibleDicts}
+                  id="r_{idx}">
                <td>
                   <a href="#/{row.id}">
                      <span id="t_{idx}">
                         {row.title}
                      </span>
                   </a>
-                  <a if={ row.isAdmin } href="#/{ row.id }/edit" title="edit dictionary"><i class="material-icons">edit</i></a>
+                  <a if={ row.isAdmin }
+                        href="#/{ row.id }/edit"
+                        title="edit dictionary">
+                     <i class="material-icons">edit</i>
+                  </a>
                </td>
                <td>
                   <span id="l_{idx}">
@@ -145,13 +149,13 @@
             this.state.visibleDicts.forEach((c, idx) => {
                row = this.$(`#r_${idx}`)
                if(row){
-                  el = this.$(`#t_${idx}`);
+                  el = this.$(`#t_${idx}`)
                   el.innerHTML = c.h_title ? c.h_title : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
-                  el = this.$(`#l_${idx}`);
+                  el = this.$(`#l_${idx}`)
                   el.innerHTML = c.h_lang ? c.h_lang : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
-                  el = this.$(`#a_${idx}`);
+                  el = this.$(`#a_${idx}`)
                   el.innerHTML = c.h_author ? c.h_author : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
-                  el = this.$(`#i_${idx}`);
+                  el = this.$(`#i_${idx}`)
                   el.innerHTML = c.h_licence ? c.h_licence : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
                }
             }, this)

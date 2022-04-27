@@ -6,28 +6,47 @@
       <form>
          <div class="row">
             <div class="input-field">
-               <input value={ state.data.title } placeholder="My Dictionary" id="ident_title" type="text" class="validate" style="width:300px" />
+               <input value={ state.data.title }
+                     placeholder="My Dictionary"
+                     id="ident_title"
+                     type="text"
+                     class="validate"
+                     style="width:300px" />
                <label for="ident_title">Dictionary name</label>
                <span class="helper-text">A human-readable title for your dictionary, such as <i>My Esperanto Dictionary</i>.</span>
             </div>
          </div>
          <div class="row">
             <div class="input-field">
-               <textarea id="ident_blurb" class="materialize-textarea" placeholder="Yet another Lexonomy dictionary." rows="3">{ state.data.blurb }</textarea>
+               <textarea id="ident_blurb"
+                     class="materialize-textarea"
+                     placeholder="Yet another Lexonomy dictionary."
+                     rows="3">{ state.data.blurb }</textarea>
                <label for="ident_blurb">Dictionary description</label>
-               <span class="helper-text">This will appear on your dictionary's home page. You can leave it blank if you prefer.<br/>You can use <a href='https://daringfireball.net/projects/markdown/' target='_blank'>Markdown</a> here.</span>
+               <span class="helper-text">
+                  This will appear on your dictionary's home page. You can leave it blank if you prefer.<br/>You can use <a href='https://daringfireball.net/projects/markdown/' target='_blank'>Markdown</a> here.
+               </span>
             </div>
          </div>
          <div class="row">
             <div class="input-field">
-               <input value={ state.data.lang } type="text" id="ident_lang" class="autocomplete" placeholder="Type to search for language, or write your custom info" style="width:300px">
+               <input value={ state.data.lang }
+                     type="text"
+                     id="ident_lang"
+                     class="autocomplete"
+                     placeholder="Type to search for language, or write your custom info"
+                     style="width:300px">
                <label for="ident_lang">Main language</label>
                <span class="helper-text">Language of dictionary entries, used to sort dictionaries on your home page. You can select language from the list, or write down your own.</span>
             </div>
          </div>
          <div class="row">
             <div class="input-field">
-               <input value={ state.data.handle } placeholder="URL" id="ident_handle" type="text" class="validate"/>
+               <input value={ state.data.handle }
+                     placeholder="URL"
+                     id="ident_handle"
+                     type="text"
+                     class="validate"/>
                <label for="ident_title">Metadata from CLARIN repository</label>
                <span class="helper-text">Link to metadata recorded in CLARIN repository, provide URL to 'handle' link, eg. <tt>http://hdl.handle.net/11356/1094</tt>.</span>
             </div>
@@ -47,18 +66,18 @@
          onMounted() {
             this.store.loadDictionaryConfig("ident")
                   .done(response => {
-                     this.state.data = response.content;
+                     this.state.data = response.content
                   })
                   .always(() => {
-                     this.update({isLoading: false});
-                     M.updateTextFields();
-                     M.textareaAutoResize($('#ident_blurb'));
+                     this.update({isLoading: false})
+                     M.updateTextFields()
+                     M.textareaAutoResize($('#ident_blurb'))
                      if(this.state.data.langs){
-                        var langs_data = {};
+                        var langs_data = {}
                         this.state.data.langs.forEach(lang => {
-                           langs_data[lang['lang']] = null;
-                        });
-                        $('#ident_lang').autocomplete({data: langs_data});
+                           langs_data[lang['lang']] = null
+                        })
+                        $('#ident_lang').autocomplete({data: langs_data})
                      }
                   })
          },

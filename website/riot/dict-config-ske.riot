@@ -3,15 +3,19 @@
    <dict-nav links={[["config", "Configure"], ["ske", "Sketch Engine connection"]]}/>
    <h3>Sketch Engine connection</h3>
    <div class="row">
-   <div class="input-field">
-    <input value={ state.data.kex.url } placeholder="" id="kex_url" type="text" class=""/>
+      <div class="input-field">
+         <input value={ state.data.kex.url }
+            id="kex_url"
+            type="text" />
          <label for="kex_url">Sketch Engine URL</label>
-         <span class="helper-text">The URL of the Sketch Engine installation where external links should point. Defaults to <tt>https://app.sketchengine.eu</tt>. Do not change this unless you are using a local installation of Sketch Engine.</span>
+            <span class="helper-text">The URL of the Sketch Engine installation where external links should point. Defaults to <tt>https://app.sketchengine.eu</tt>. Do not change this unless you are using a local installation of Sketch Engine.</span>
       </div>
    </div>
    <div class="row">
-  <div class="input-field">
-    <input value={ state.data.kex.apiurl } placeholder="" id="kex_apiurl" type="text" class=""/>
+      <div class="input-field">
+         <input value={ state.data.kex.apiurl }
+               id="kex_apiurl"
+               type="text" />
          <label for="kex_apiurl">Sketch Engine API URL</label>
          <span class="helper-text">The path to the <tt>run.cgi</tt> API script in Sketch Engine. Defaults to <tt>https://api.sketchengine.eu/bonito/run.cgi</tt>. Do not change this unless you are using a local installation of Sketch Engine.</span>
       </div>
@@ -19,30 +23,39 @@
    <template if={ authData.ske_username && authData.ske_apiKey && authData.ske_username != "" && authData.ske_apiKey != "" }>
       <div class="row">
          <div class="input-field">
-            <input data-selected-corpus={ state.data.kex.corpus } type="text" id="kex_corpus" class="autocomplete" placeholder="Retrieving available corpora from Sketch Engine, please wait...">
+            <input data-selected-corpus={ state.data.kex.corpus }
+                  type="text"
+                  id="kex_corpus"
+                  class="autocomplete"
+                  placeholder="Retrieving available corpora from Sketch Engine, please wait...">
             <label for="kex_corpus">Corpus name</label>
             <span class="helper-text">Select a Sketch Engine corpus from the list of corpora available to you.</span>
-            <span class="helper-text" id="corpusInfo" style="display: none"></span>
+            <span class="helper-text"
+                  id="corpusInfo"
+                  style="display: none"></span>
          </div>
       </div>
       <div class="row">
          <div class="input-field">
-            <input value={ state.data.kex.concquery} placeholder="" id="kex_concquery" type="text" class=""/>
+            <input value={ state.data.kex.concquery}
+                  id="kex_concquery"
+                  type="text" />
             <label for="kex_concquery">Concordance query</label>
             <span class="helper-text">The CQL query that will be used to obtain concordance from Sketch Engine. You can use placeholders for elements in the form of '%(element)', e.g. '[lemma="%(headword)"]'. If left empty the 'simple' query type will be used as configured for the respective corpus. Please note that you cannot use CQL syntax with default attribute because it is not specified.</span>
          </div>
       </div>
       <div class="row">
          <div class="input-field">
-            <input value={ state.data.kex.concsampling} placeholder="" id="kex_concsampling" type="number" class=""/>
+            <input value={ state.data.kex.concsampling}
+                  id="kex_concsampling"
+                  type="number" />
             <label for="kex_concsampling">Sample size</label>
             <span class="helper-text">Whether to apply automatic sampling of the concordance. Any non-zero value means to automatically create a random sample of that size.</span>
          </div>
       </div>
       <div class="row">
          <div class="input-field">
-            <select id="kex_searchElements" multiple>
-            </select>
+            <select id="kex_searchElements" multiple></select>
             <label for="kex_searchElements">Additional search elements</label>
             <span class="helper-text">You can select any textual elements here whose content you would like to search for in Sketch Engine. A menu will be displayed next to all these elements like for the root entry element.</span>
          </div>
@@ -67,7 +80,9 @@
    </div>
    <div class="row">
       <div class="input-field">
-         <textarea id="xampl_template" class="materialize-textarea" placeholder="XML template">{ state.data.xampl.template }</textarea>
+         <textarea id="xampl_template"
+               class="materialize-textarea"
+               placeholder="XML template">{ state.data.xampl.template }</textarea>
          <label for="xampl_template">XML template</label>
          <span class="helper-text">This is the XML that will be inserted into your entries with each corpus example. The actual text will be where the placeholder <tt>$text</tt> is.</span>
       </div>
@@ -95,7 +110,9 @@
    </div>
    <div class="row">
       <div class="input-field">
-         <textarea id="collx_template" class="materialize-textarea" placeholder="XML template">{ state.data.collx.template }</textarea>
+         <textarea id="collx_template"
+               class="materialize-textarea"
+               placeholder="XML template">{ state.data.collx.template }</textarea>
          <label for="collx_template">XML template</label>
          <span class="helper-text">This is the XML that will be inserted into your entries with each collocation. The actual text will be where the placeholder <tt>$text</tt> is.</span>
       </div>
@@ -114,7 +131,9 @@
    </div>
    <div class="row">
       <div class="input-field">
-         <textarea id="thes_template" class="materialize-textarea" placeholder="XML template">{ state.data.thes.template }</textarea>
+         <textarea id="thes_template"
+               class="materialize-textarea"
+               placeholder="XML template">{ state.data.thes.template }</textarea>
          <label for="thes_template">XML template</label>
          <span class="helper-text">This is the XML that will be inserted into your entries with each thesaurus item. The actual text will be where the placeholder <tt>$text</tt> is.</span>
       </div>
@@ -133,7 +152,9 @@
    </div>
    <div class="row">
       <div class="input-field">
-         <textarea id="defo_template" class="materialize-textarea" placeholder="XML template">{ state.data.defo.template }</textarea>
+         <textarea id="defo_template"
+               class="materialize-textarea"
+               placeholder="XML template">{ state.data.defo.template }</textarea>
          <label for="defo_template">XML template</label>
          <span class="helper-text">This is the XML that will be inserted into your entries with each definition. The actual text will be where the placeholder <tt>$text</tt> is.</span>
       </div>
@@ -155,7 +176,12 @@
             isLoading: true,
             isSaving: false,
             data: {
-               kex: {url: 'https://app.sketchengine.eu', apiurl: 'https://api.sketchengine.eu/bonito/run.cgi', concsampling: 0, searchElements: []},
+               kex: {
+                  url: 'https://app.sketchengine.eu',
+                  apiurl: 'https://api.sketchengine.eu/bonito/run.cgi',
+                  concsampling: 0,
+                  searchElements: []
+               },
                xampl: {container: '', template: '', markup: ''},
                collx: {container: '', template: ''},
                defo: {container: '', template: ''},

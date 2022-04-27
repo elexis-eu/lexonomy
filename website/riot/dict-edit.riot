@@ -62,7 +62,8 @@
                         {store.getFlagLabel(entry.flag[0]) || "no flag"}
                      </span>
                   </div>
-                  <div if={!dictData.entryList.length && !dictData.isEntrylistLoading} style="padding-top: 10vh;">
+                  <div if={!dictData.entryList.length && !dictData.isEntrylistLoading}
+                        style="padding-top: 10vh;">
                      <h4 class="grey-text center-align">No entries</h4>
                   </div>
                </div>
@@ -70,21 +71,23 @@
                      id="flagDropdown"
                      class="dropdown-content flagDropdown">
                   <li data-flag="">
-                     <i class="material-icons" style="color: grey">label_outline</i>
+                     <i class="material-icons"
+                           style="color: grey">label_outline</i>
                      <div>no flag</div>
                      <div class="right flagKey">delete</div>
                   </li>
                   <li each={flag in dictData.config.flagging.flags}
                         data-flag={flag.name}>
-                     <i class="material-icons" style="color: {flag.color}">label</i>
+                     <i class="material-icons"
+                           style="color: {flag.color}">label</i>
                      <div>{flag.label}</div>
                      <div class="right flagKey">{flag.key}</div>
                   </li>
                </ul>
             </template>
          </div>
-         <div class="resizeHandle" onmousedown={onResizeHandleMouseDown}>
-         </div>
+         <div class="resizeHandle"
+               onmousedown={onResizeHandleMouseDown}></div>
          <div class="dictRightCol">
             <dict-edit-entry></dict-entry-edit>
          </div>
@@ -334,14 +337,14 @@
 
          onResizeHandleMouseDown(evt){
             this.state.mousePos = evt.x
-            document.addEventListener("mouseup", this.onDocumentMouseUp, false);
-            document.addEventListener("mousemove", this.resizeColumn, false);
+            document.addEventListener("mouseup", this.onDocumentMouseUp, false)
+            document.addEventListener("mousemove", this.resizeColumn, false)
             $("body").css("user-select", "none")
          },
 
          onDocumentMouseUp(){
-            document.removeEventListener("mousemove", this.resizeColumn, false);
-            document.removeEventListener("mouseup", this.onDocumentMouseUp, false);
+            document.removeEventListener("mousemove", this.resizeColumn, false)
+            document.removeEventListener("mouseup", this.onDocumentMouseUp, false)
             $("body").css("user-select", "")
          },
 
@@ -356,8 +359,8 @@
                      if(this.dictData.entryList.length){
                         this.store.changeEntry(this.dictData.entryList[0].id)
                      } else {
-                        $("#container").html("").addClass("empty");
-                        Screenful.Editor.updateToolbar();
+                        $("#container").html("").addClass("empty")
+                        Screenful.Editor.updateToolbar()
                      }
                   })
                this.update()

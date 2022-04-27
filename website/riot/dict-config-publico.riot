@@ -96,13 +96,13 @@
 
          refreshLicenceInfo(){
             var url = $('#publico_licence option:selected').data('url')
-            $('#publico_licence_info .helper-text').html('More information about this licence: <a target="_blank" href="' + url + '">' + url + "</a>.");
+            $('#publico_licence_info .helper-text').html('More information about this licence: <a target="_blank" href="' + url + '">' + url + "</a>.")
          },
 
          onUpdated(){
             $('#publico_licence').formSelect()
                   .off("change")
-                  .on('change', this.refreshLicenceInfo.bind(this));;
+                  .on('change', this.refreshLicenceInfo.bind(this))
             this.refreshLicenceInfo()
          },
 

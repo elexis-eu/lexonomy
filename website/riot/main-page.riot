@@ -1,32 +1,37 @@
 <main-page>
    <div if={ authData.authorized }>
       <template if={ dictData.siteconfig.consent && dictData.siteconfig.consent.terms && !authData.consent }>
-         <user-consent></user-consent>
+         <user-consent/>
       </template>
       <template if={ !dictData.siteconfig.consent || !dictData.siteconfig.consent.terms || authData.consent }>
          <dict-list if={props.mainSubPage != 'new' && props.mainSubPage != 'userprofile'}></dict-list>
          <dict-new if={props.mainSubPage == 'new'}></dict-new>
-         <userprofile if={props.mainSubPage == 'userprofile'} user-info={ authData }></userprofile>
+         <userprofile if={props.mainSubPage == 'userprofile'}
+               user-info={ authData }></userprofile>
       </template>
    </div>
-   <div if={ !authData.authorized } class="row">
+   <div if={ !authData.authorized }
+         class="row">
       <div class="col m7 s12">
-         <welcome></welcome>
+         <welcome/>
       </div>
       <div class="col m5 s12">
          <login if={props.mainSubPage == 'login'}></login>
          <register if={props.mainSubPage == 'register'}></register>
          <register-password if={props.mainSubPage == 'registerPassword'}></register-password>
          <forgot if={props.mainSubPage == 'forgot'}></forgot>
-         <forgot-password if={props.mainSubPage == 'forgotPassword'} token={props.token}></forgot-password>
+         <forgot-password if={props.mainSubPage == 'forgotPassword'}
+               token={props.token}></forgot-password>
       </div>
    </div>
 
-   <div class="divider" style="margin-top: 50px;"></div>
-   <div class="section" style="opacity: 0.6;">
+   <div class="divider"
+         style="margin-top: 50px;"></div>
+   <div class="section"
+         style="opacity: 0.6;">
       <h5>Reference</h5>
          <p>Měchura, M. B. (2017) ‘<a href="docs/elex2017.pdf">Introducing Lexonomy: an open-source dictionary writing and publishing system</a>’ in <i>Electronic Lexicography in the 21st Century: Lexicography from Scratch. Proceedings of the eLex 2017 conference, 19-21 September 2017, Leiden, The Netherlands.</i><br/>
-         <span class="">If you are referring to Lexonomy from an academic publication, it is recommended that you cite this paper.</span>
+         <span >If you are referring to Lexonomy from an academic publication, it is recommended that you cite this paper.</span>
       </p>
    </div>
 
