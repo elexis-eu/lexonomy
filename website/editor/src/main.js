@@ -29,8 +29,16 @@ Vue.mixin({
     }
   }
 })
-window.editor = new Vue({
-  el: "#app",
-  components: {App},
-  template: "<App/>"
-})
+
+
+window.mountGraphicalEditor = function () {
+  let element = "editor"
+  if (!document.getElementById("editor")) {
+    element = "container"
+  }
+  window.editor = new Vue({
+    components: {App},
+    template: "<App/>"
+  })
+  window.editor.$mount("#"+element)
+}
