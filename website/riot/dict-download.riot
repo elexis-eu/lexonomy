@@ -2,11 +2,18 @@
    <dict-nav links={[["download", "download"]]}/>
    <h3>Download</h3>
    <div class="input-field">
-      <a class="waves-effect waves-light btn btn-primary download-link" target="_blank" href="{window.API_URL}/{ dictData.dictId }/download.xml"><i class="material-icons left">file_download</i>Download { dictData.dictId }.xml</a>
+      <a class="waves-effect waves-light btn btn-primary download-link"
+            target="_blank"
+            href="{window.API_URL}/{ dictData.dictId }/download.xml">
+         <i class="material-icons left">file_download</i>
+         Download { dictData.dictId }.xml
+      </a>
    </div>
    <div>
       <label>
-         <input type="checkbox" class="noAttributes" name="noAttributes" />
+         <input type="checkbox"
+               class="noAttributes"
+               name="noAttributes" />
          <span>XML without Lexonomy attributes</span>
       </label>
    </div>

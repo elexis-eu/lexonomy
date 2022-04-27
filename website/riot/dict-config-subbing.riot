@@ -7,13 +7,16 @@
          <label>
             Selected subentries
          </label>
-         <div if={!state.data.elements.length} class="grey-text">
+         <div if={!state.data.elements.length}
+               class="grey-text">
             <i>no subentry element selected</i>
          </div>
          <div if={state.data.elements.length}>
-            <div each={ element in state.data.elements } class="chip">
+            <div each={ element in state.data.elements }
+                  class="chip">
                { element }
-               <i class="close material-icons" onclick={onRemoveElementClick.bind(this, element)}>close</i>
+               <i class="close material-icons"
+                     onclick={onRemoveElementClick.bind(this, element)}>close</i>
             </div>
             <br>
          </div>
@@ -22,10 +25,12 @@
       <template if={selectOptions.length}>
          <label for="new-element">Add subentry element</label>
          <div class="input-field">
-            <div class="buttons" style="max-width: 500px;">
-               <select id="new-element">
-               </select>
-               <a class="btn" onclick={ doAddEl } style="margin-top: 4px;">
+            <div class="buttons"
+                  style="max-width: 500px;">
+               <select id="new-element"></select>
+               <a class="btn"
+                     onclick={ doAddEl }
+                     style="margin-top: 4px;">
                   add
                   <i class="material-icons right">add</i>
                </a>
@@ -42,18 +47,18 @@
          state: {
             isLoading: true,
             isSaving: false,
-            data: {elements:[]}
+            data: {elements: []}
          },
 
          onRemoveElementClick(el, evt) {
             evt.stopPropagation()
-            this.state.data.elements = this.state.data.elements.filter(val => val != el);
+            this.state.data.elements = this.state.data.elements.filter(val => val != el)
             this.update()
          },
 
          doAddEl(event) {
-            this.state.data.elements.push($('#new-element').val());
-            this.update();
+            this.state.data.elements.push($('#new-element').val())
+            this.update()
          },
 
          onMounted() {
@@ -76,13 +81,13 @@
             if (this.dictData.config.xema && this.dictData.config.xema.elements) {
                var $select = $('select')
                if(this.selectOptions.length && $select.length){
-                  var instance = M.FormSelect.getInstance($select);
+                  var instance = M.FormSelect.getInstance($select)
                   instance && instance.destroy()
                   $select.empty()
                   this.selectOptions.forEach(key => {
-                     $('#new-element').append('<option value="' + key + '">' + key + '</option>');
-                  });
-                  $select.formSelect();
+                     $('#new-element').append('<option value="' + key + '">' + key + '</option>')
+                  })
+                  $select.formSelect()
                }
             }
          },

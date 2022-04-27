@@ -15,7 +15,8 @@
                </tr>
             </thead>
             <tbody>
-               <tr each={ (element, idx) in state.data.elements } idx={ idx }>
+               <tr each={ (element, idx) in state.data.elements }
+                     idx={ idx }>
                   <td>
                      <div class="input-field">
                         <select linkelement={element.linkElement}></select>
@@ -23,16 +24,24 @@
                   </td>
                   <td>
                      <div class="input-field">
-                        <input type="text" value={ element.identifier } name="identifier" onchange={onItemChange} />
+                        <input type="text"
+                              value={ element.identifier }
+                              name="identifier"
+                              onchange={onItemChange} />
                      </div>
                   </td>
                   <td>
                      <div class="input-field">
-                        <input type="text" value={ element.preview } name="preview" onchange={onItemChange}/>
+                        <input type="text"
+                              value={ element.preview }
+                              name="preview"
+                              onchange={onItemChange}/>
                      </div>
                   </td>
                   <td>
-                     <a class="btn btn-floating right" data-element={ element.linkElement } onclick={ doDeleteEl.bind(this, element.linkElement) }>
+                     <a class="btn btn-floating right"
+                           data-element={ element.linkElement }
+                           onclick={ doDeleteEl.bind(this, element.linkElement) }>
                         <i class="material-icons">delete</i>
                      </a>
                   </td>
@@ -40,7 +49,8 @@
             </tbody>
          </table>
          <div class="buttons">
-            <button class="btn {state.unusedElements.length ? '' : 'disabled'}" onclick={ doAddEl }>
+            <button class="btn {state.unusedElements.length ? '' : 'disabled'}"
+                  onclick={ doAddEl }>
                add element
                <i class="material-icons right">add</i>
             </button>
@@ -60,21 +70,28 @@
          <div>
             <label for="otherdict">Other dictionary code</label>
          </div>
-         <div class="input-field inlineBlock" style="max-width: 400px;">
-            <input type="text" id="otherdict"/>
+         <div class="input-field inlineBlock"
+               style="max-width: 400px;">
+            <input type="text"
+                  id="otherdict"/>
          </div>
          <div class="input-field inlineBlock">
-            <button id="naisc_link" class="btn waves-effect waves-light {state.isLinking || state.isChecking ? 'disabled' : ''}" onclick={ startLinking } style="margin-left: 10px;">Start linking</button>
+            <button id="naisc_link"
+                  class="btn waves-effect waves-light {state.isLinking || state.isChecking ? 'disabled' : ''}"
+                  onclick={ startLinking }
+                  style="margin-left: 10px;">Start linking</button>
          </div>
       </div>
-      <div if={state.info} class="section">
+      <div if={state.info}
+            class="section">
          <div class="message messageInfo">
             <raw-html content={state.info}></raw-html>
          </div>
       </div>
    </div>
    <br>
-   <a href="#{dictData.dictId}/config" class="btn btn-secondary btn-flat">Back</a>
+   <a href="#{dictData.dictId}/config"
+         class="btn btn-secondary btn-flat">Back</a>
 
    <style>
       tbody tr{

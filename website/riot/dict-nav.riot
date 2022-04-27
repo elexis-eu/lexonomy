@@ -3,7 +3,8 @@
       <div class="nav-wrapper">
          <a href="#/"
                class="breadcrumb">Dictionaries</a>
-         <a if={dictData.dictId} href="#/{dictData.dictId}"
+         <a if={dictData.dictId}
+               href="#/{dictData.dictId}"
                class="breadcrumb">{dictData.title}</a>
          <a if={props.links && props.links.length}
                each={(link, idx) in props.links}

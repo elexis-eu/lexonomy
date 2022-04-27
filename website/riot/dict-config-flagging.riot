@@ -3,10 +3,12 @@
    <dict-nav links={[["config", "Configure"], ["flagging", "Entry flags"]]}/>
    <h3>Entry flags</h3>
    <template if={!state.isLoading}>
-      <div if={!state.data.flags.length} class="center-align grey-text">
+      <div if={!state.data.flags.length}
+            class="center-align grey-text">
          <h3>no entry flags</h3>
          <br>
-         <a class="btn btn-primary waves-effect waves-light" onclick={ doAddEl }>
+         <a class="btn btn-primary waves-effect waves-light"
+               onclick={ doAddEl }>
             add flag
             <i class="material-icons right">add</i>
          </a>
@@ -16,38 +18,45 @@
          <table>
             <thead>
                <tr>
-                  <th>
-                     Keyboard shortcut
-                  </th>
-                  <th>
-                     Value
-                  </th>
-                  <th>
-                     Label
-                  </th>
-                  <th>
-                     Color
-                  </th>
-                  <th>
-                  </th>
+                  <th>Keyboard shortcut</th>
+                  <th>Value</th>
+                  <th>Label</th>
+                  <th>Color</th>
+                  <th></th>
                </tr>
             </thead>
             <tbody>
-               <tr each={ (flag, index) in state.data.flags } class="flag-info">
+               <tr each={ (flag, index) in state.data.flags }
+                     class="flag-info">
                   <td>
-                     <input type="text" value={ flag.key } placeholder="key" class="flag-key"/>
+                     <input type="text"
+                           value={ flag.key }
+                           placeholder="key"
+                           class="flag-key"/>
                   </td>
                   <td>
-                     <input type="text" value={ flag.name } placeholder="value" class="flag-name"/>
+                     <input type="text"
+                           value={ flag.name }
+                           placeholder="value"
+                           class="flag-name"/>
                   </td>
                   <td>
-                     <input type="text" value={ flag.label } placeholder="label" class="flag-label"/>
+                     <input type="text"
+                           value={ flag.label }
+                           placeholder="label"
+                           class="flag-label"/>
                   </td>
                   <td>
-                     <input type="text" value={ flag.color } placeholder="color"  class="flag-color" id="flag-color{index}" style="color: {store.getFlagTextColor(flag.color)};background-color: {flag.color}"/>
+                     <input type="text"
+                           value={ flag.color }
+                           placeholder="color"
+                           class="flag-color"
+                           id="flag-color{index}"
+                           style="color: {store.getFlagTextColor(flag.color)};background-color: {flag.color}"/>
                   </td>
                   <td>
-                     <a class="btn btn-flat" onclick={ doDeleteEl.bind(this, index) }>
+                     <a class="btn btn-flat"
+                           onclick={ doDeleteEl.bind(this, index) }>
                         <i class="material-icons">delete</i>
                      </a>
                   </td>
@@ -55,23 +64,25 @@
             </tbody>
          </table>
          <div>
-            <a class="btn waves-effect waves-light" onclick={ doAddEl }>
+            <a class="btn waves-effect waves-light"
+                  onclick={ doAddEl }>
                add flag
                <i class="material-icons right">add</i>
             </a>
          </div>
          <br>
          <br>
-         <div class="input-field" style="max-width: 400px;">
-            <select id="flag-element">
-            </select>
+         <div class="input-field"
+               style="max-width: 400px;">
+            <select id="flag-element"></select>
             <label for="flag-element">Flag element</label>
             <span class="helper-text">Select the element which the flags should be put into.</span>
          </div>
       </template>
    </template>
    <br><br>
-   <dict-config-buttons save-data={saveData} show-save={state.data.flags.length}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData}
+         show-save={state.data.flags.length}></dict-config-buttons>
 
    <style>
       tr{

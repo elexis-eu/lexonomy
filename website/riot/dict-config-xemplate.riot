@@ -3,11 +3,14 @@
    <dict-nav links={[["config", "Configure"], ["xemplate", "Entry formatting"]]}/>
    <h3>Entry formatting</h3>
    <div if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
-      <div class="row designer" id="editor">
-      </div>
+      <div class="row designer"
+            id="editor"></div>
       <div class="row">
          <div class="col s10">
-            <button class="btn waves-effect waves-light" onclick={ startOverride } >Use your own stylesheet <i class="material-icons right">edit</i>
+            <button class="btn waves-effect waves-light"
+                  onclick={ startOverride } >
+               Use your own stylesheet
+               <i class="material-icons right">edit</i>
             </button>
          </div>
       </div>
@@ -15,22 +18,31 @@
    <div if={ (state.data._xsl && state.data._xsl != "") || (state.data._css && state.data._css != "") || state.override }>
       <div class="row">
          <div class="input-field col s10">
-            <textarea id="editor_xsl" class="materialize-textarea" placeholder="">{ state.data._xsl }</textarea>
+            <textarea id="editor_xsl"
+                  class="materialize-textarea">{ state.data._xsl }</textarea>
             <label for="editor_xsl">XSL</label>
-            <span class="helper-text">Custom XSL stylesheet. If you would like to see an example, <a onclick={ exampleXsl }>click here to load a sample XSL</a>.</span>
+            <span class="helper-text">Custom XSL stylesheet. If you would like to see an example,
+               <a onclick={ exampleXsl }>click here to load a sample XSL</a>.
+            </span>
          </div>
       </div>
       <div class="row">
          <div class="input-field col s10">
-            <textarea id="editor_css" class="materialize-textarea" placeholder="">{ state.data._css }</textarea>
+            <textarea id="editor_css"
+                  class="materialize-textarea">{ state.data._css }</textarea>
             <label for="editor_css">CSS</label>
-            <span class="helper-text">Custom CSS stylesheet. If you would like to see an example, <a onclick={ exampleCss }>click here to load a sample CSS</a>.</span>
+            <span class="helper-text">Custom CSS stylesheet. If you would like to see an example,
+               <a onclick={ exampleCss }>click here to load a sample CSS</a>.
+            </span>
          </div>
       </div>
 
       <div class="row">
          <div class="col s10">
-            <button class="btn waves-effect waves-light" onclick={ stopOverride } >Stop using your own stylesheet <i class="material-icons right">edit</i>
+            <button class="btn waves-effect waves-light"
+                  onclick={ stopOverride } >
+               Stop using your own stylesheet
+               <i class="material-icons right">edit</i>
             </button>
          </div>
       </div>
@@ -68,14 +80,14 @@
          },
 
          startOverride() {
-            this.update({override: true});
+            this.update({override: true})
          },
 
          stopOverride() {
-            delete this.state.data._xsl;
-            delete this.state.data._css;
-            this.update({override: false});
-            XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId);
+            delete this.state.data._xsl
+            delete this.state.data._css
+            this.update({override: false})
+            XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId)
          },
 
          exampleXsl() {
@@ -88,18 +100,18 @@
       <span class='myHeadword'><xsl:apply-templates/></span>
    </xsl:template>
 </xsl:stylesheet>
-`);
-            M.textareaAutoResize($('#editor_xsl'));
-            M.updateTextFields();
+`)
+            M.textareaAutoResize($('#editor_xsl'))
+            M.updateTextFields()
          },
 
          exampleCss() {
             $('#editor_css').val(
 `div.myEntry {font-family: serif; font-size: 1.25em}
 div.myEntry span.myHeadword {font-weight: bold}
-`);
-            M.textareaAutoResize($('#editor_css'));
-            M.updateTextFields();
+`)
+            M.textareaAutoResize($('#editor_css'))
+            M.updateTextFields()
          },
 
          onMounted() {
@@ -111,29 +123,29 @@ div.myEntry span.myHeadword {font-weight: bold}
                   .always(() => {
                      this.update({isLoading: false})
                      if(this.state.override){
-                        M.updateTextFields();
-                        M.textareaAutoResize($('#editor_css'));
-                        M.textareaAutoResize($('#editor_xsl'));
+                        M.updateTextFields()
+                        M.textareaAutoResize($('#editor_css'))
+                        M.textareaAutoResize($('#editor_xsl'))
                      }
                   })
          },
 
          onUpdated() {
             if (this.dictData.dictConfigs.xema && this.state.data != {} && !this.state.override) {
-               XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId);
+               XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId)
             }
          },
 
          getConfigData() {
-            var newData = {};
+            var newData = {}
             if (XemplateDesigner.xemplate) {
-               newData = XemplateDesigner.xemplate;
+               newData = XemplateDesigner.xemplate
             }
             if (this.state.override) {
-               if ($('#editor_css').val() != "") newData._css = $('#editor_css').val();
-               if ($('#editor_xsl').val() != "") newData._xsl = $('#editor_xsl').val();
+               if ($('#editor_css').val() != "") newData._css = $('#editor_css').val()
+               if ($('#editor_xsl').val() != "") newData._xsl = $('#editor_xsl').val()
             }
-            return newData;
+            return newData
          },
 
          saveData() {

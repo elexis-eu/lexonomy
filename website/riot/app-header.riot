@@ -1,66 +1,148 @@
 <app-header>
-   <ul if={ authData.authorized && dictData.isDictionaryLoaded } id="dropdown-menu-dict" class="dropdown-content">
-      <li if={ dictData.userAccess && dictData.userAccess.canEdit }><a href="#/{ dictData.dictId }">View</a></li>
-      <li if={ dictData.userAccess && dictData.userAccess.canEdit }><a href="#/{ dictData.dictId }/edit">Edit</a></li>
-      <li if={ dictData.userAccess && dictData.userAccess.canConfig }><a href="#/{ dictData.dictId }/config">Configure</a></li>
-      <li if={ dictData.userAccess && dictData.userAccess.canDownload }><a href="#/{ dictData.dictId }/download">Download</a></li>
-      <li if={ dictData.userAccess && dictData.userAccess.canUpload }><a href="#/{ dictData.dictId }/upload">Upload</a></li>
-      <li if={ dictData.userAccess }><a href="#/{ dictData.dictId }/links">Links</a></li>
+   <ul if={ authData.authorized && dictData.isDictionaryLoaded && dictData.userAccess }
+         id="dropdown-menu-dict"
+         class="dropdown-content">
+      <li if={ dictData.userAccess.canEdit }>
+         <a href="#/{ dictData.dictId }">View</a>
+      </li>
+      <li if={ dictData.userAccess.canEdit }>
+         <a href="#/{ dictData.dictId }/edit">Edit</a>
+      </li>
+      <li if={ dictData.userAccess.canConfig }>
+         <a href="#/{ dictData.dictId }/config">Configure</a>
+      </li>
+      <li if={ dictData.userAccess.canDownload }>
+         <a href="#/{ dictData.dictId }/download">Download</a>
+      </li>
+      <li if={ dictData.userAccess.canUpload }>
+         <a href="#/{ dictData.dictId }/upload">Upload</a>
+      </li>
+      <li>
+         <a href="#/{ dictData.dictId }/links">Links</a>
+      </li>
    </ul>
-   <ul if={ !authData.authorized } id="dropdown-menu-anon" class="dropdown-content">
-      <li><a href="#/">Log in</a></li>
-      <li><a href="#/register">Get an account</a></li>
-      <li><a href="#/forgot">Forgot your password?</a></li>
+   <ul if={ !authData.authorized }
+         id="dropdown-menu-anon"
+         class="dropdown-content">
+      <li>
+         <a href="#/">Log in</a>
+      </li>
+      <li>
+         <a href="#/register">Get an account</a>
+      </li>
+      <li>
+         <a href="#/forgot">Forgot your password?</a>
+      </li>
    </ul>
-   <ul if={ authData.authorized } id="dropdown-menu-user" class="dropdown-content">
-      <li><a href="#/" onclick={ doLogout }>Log out</a></li>
-      <li><a href="#/userprofile">Your profile</a></li>
+   <ul if={ authData.authorized }
+         id="dropdown-menu-user"
+         class="dropdown-content">
+      <li>
+         <a href="#/"
+               onclick={ doLogout }>Log out</a>
+      </li>
+      <li>
+         <a href="#/userprofile">Your profile</a>
+      </li>
    </ul>
 
    <nav class="white">
       <div class="nav-wrapper">
-         <a href="#" class="brand-logo">
+         <a href="#"
+               class="brand-logo">
             <img class="site-logo" src="img/logo_50.png"/>
          </a>
          <span class="fontSize black-text right">
             <span style="font-size: 15px; position: relative; top: 2px;">A</span>
             <span style="font-size: 22px; margin-right: 10px;">A</span>
             <span class="fontSizeArrows">
-               <i class="material-icons clickable" onclick={onIncreaseFontSize}>arrow_drop_up</i>
-               <i class="material-icons clickable" onclick={onDecreaseFontSize}>arrow_drop_down</i>
+               <i class="material-icons clickable"
+                     onclick={onIncreaseFontSize}>arrow_drop_up</i>
+               <i class="material-icons clickable"
+                     onclick={onDecreaseFontSize}>arrow_drop_down</i>
             </span>
          </span>
-         <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+         <a href="#"
+               data-target="mobile-demo"
+               class="sidenav-trigger">
             <i class="material-icons">menu</i>
          </a>
-         <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li if={ authData.authorized && dictData.isDictionaryLoaded }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-dict">Dictionary<i class="material-icons right">arrow_drop_down</i></a></li>
-            <li if={ !authData.authorized }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-anon">anonymous user<i class="material-icons right">arrow_drop_down</i></a></li>
-            <li if={ authData.authorized }><a class="dropdown-trigger" href="#/" data-target="dropdown-menu-user">{authData.username}<i class="material-icons right">arrow_drop_down</i></a></li>
+         <ul id="nav-mobile"
+               class="right hide-on-med-and-down">
+            <li if={ authData.authorized && dictData.isDictionaryLoaded }>
+               <a class="dropdown-trigger"
+                     href="#/"
+                     data-target="dropdown-menu-dict">
+                  Dictionary
+                  <i class="material-icons right">arrow_drop_down</i>
+               </a>
+            </li>
+            <li if={ !authData.authorized }>
+               <a class="dropdown-trigger"
+                     href="#/"
+                     data-target="dropdown-menu-anon">
+                  anonymous user
+                  <i class="material-icons right">arrow_drop_down</i>
+               </a>
+            </li>
+            <li if={ authData.authorized }>
+               <a class="dropdown-trigger"
+                     href="#/"
+                     data-target="dropdown-menu-user">
+                  {authData.username}
+                  <i class="material-icons right">arrow_drop_down</i>
+               </a>
+            </li>
          </ul>
       </div>
    </nav>
 
    <ul class="sidenav">
-      <template if={ authData.authorized && dictData.isDictionaryLoaded } >
-         <li class="sideNavSection"><span>Dictionary</span></li>
-         <li if={ dictData.userAccess && dictData.userAccess.canEdit }><a href="#/{ dictData.dictId }">View</a></li>
-         <li if={ dictData.userAccess && dictData.userAccess.canEdit }><a href="#/{ dictData.dictId }/edit">Edit</a></li>
-         <li if={ dictData.userAccess && dictData.userAccess.canConfig }><a href="#/{ dictData.dictId }/config">Configure</a></li>
-         <li if={ dictData.userAccess && dictData.userAccess.canDownload }><a href="#/{ dictData.dictId }/download">Download</a></li>
-         <li if={ dictData.userAccess && dictData.userAccess.canUpload }><a href="#/{ dictData.dictId }/upload">Upload</a></li>
-         <li if={ dictData.userAccess }><a href="#/{ dictData.dictId }/links">Links</a></li>
+      <template if={ authData.authorized && dictData.isDictionaryLoaded && dictData.userAccess} >
+         <li class="sideNavSection">
+            <span>Dictionary</span>
+         </li>
+         <li if={ dictData.userAccess.canEdit }>
+            <a href="#/{ dictData.dictId }">View</a>
+         </li>
+         <li if={ dictData.userAccess.canEdit }>
+            <a href="#/{ dictData.dictId }/edit">Edit</a>
+         </li>
+         <li if={ dictData.userAccess.canConfig }>
+            <a href="#/{ dictData.dictId }/config">Configure</a>
+         </li>
+         <li if={ dictData.userAccess.canDownload }>
+            <a href="#/{ dictData.dictId }/download">Download</a>
+         </li>
+         <li if={ dictData.userAccess.canUpload }>
+            <a href="#/{ dictData.dictId }/upload">Upload</a>
+         </li>
+         <li>
+            <a href="#/{ dictData.dictId }/links">Links</a>
+         </li>
       </template>
       <template if={ !authData.authorized }>
-         <li><a href="#/">Log in</a></li>
-         <li><a href="#/register">Get an account</a></li>
-         <li><a href="#/forgot">Forgot your password?</a></li>
-
+         <li>
+            <a href="#/">Log in</a>
+         </li>
+         <li>
+            <a href="#/register">Get an account</a>
+         </li>
+         <li>
+            <a href="#/forgot">Forgot your password?</a>
+         </li>
       </template>
       <template if={ authData.authorized }>
-         <li class="sideNavSection"><span>User</span></li>
-         <li><a href="#/" onclick={ doLogout }>Log out</a></li>
-         <li><a href="#/userprofile">Your profile</a></li>
+         <li class="sideNavSection">
+            <span>User</span>
+         </li>
+         <li>
+            <a href="#/"
+                  onclick={ doLogout }>Log out</a>
+         </li>
+         <li>
+            <a href="#/userprofile">Your profile</a>
+         </li>
       </template>
    </ul>
 
@@ -142,7 +224,7 @@
             $(".dropdown-trigger").each((idx, el) => {
                $el = $(el)
                $el[0].M_Dropdown && $el[0].M_Dropdown.destroy()
-               $el.dropdown({coverTrigger: false, constrainWidth: false});
+               $el.dropdown({coverTrigger: false, constrainWidth: false})
             })
          },
 

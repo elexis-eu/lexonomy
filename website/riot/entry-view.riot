@@ -1,6 +1,6 @@
 <entry-view>
-   <div class="viewer" id="viewer">
-   </div>
+   <div class="viewer"
+         id="viewer"></div>
    <script>
       export default {
          entryId: '',
@@ -9,21 +9,21 @@
             if (this.dictData.dictId != '') {
                $.post(window.API_URL + this.dictData.dictId + "/entryread.json", {id: this.props.entryId}, (response) => {
                   if (response.success) {
-                     $('.viewer').html(response.contentHtml);
+                     $('.viewer').html(response.contentHtml)
                   }
-               });
+               })
             }
          },
 
          onMounted() {
-            this.entryId = this.props.entryId;
-            this.readEntry();
+            this.entryId = this.props.entryId
+            this.readEntry()
          },
 
          onUpdated() {
             if (this.entryId != this.props.entryId) {
-               this.entryId = this.props.entryId;
-               this.readEntry();
+               this.entryId = this.props.entryId
+               this.readEntry()
             }
          }
       }
