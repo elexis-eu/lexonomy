@@ -1,11 +1,12 @@
 var Xonomy={
 	lang: "", //"en"|"de"|fr"| ...
-	mode: "nerd", //"nerd"|"laic"
+	mode: "nerd", //"nerd"|"laic"|"graphical"
 };
 Xonomy.setMode=function(mode) {
-	if(mode=="nerd" || mode=="laic") Xonomy.mode=mode;
-	if(mode=="nerd") $(".xonomy").removeClass("laic").addClass("nerd");
-	if(mode=="laic") $(".xonomy").removeClass("nerd").addClass("laic");
+	if(["nerd", "laic", "graphical"].includes(mode)) Xonomy.mode=mode;
+	if(mode=="nerd") $(".xonomy").removeClass("laic").removeClass("graphical").addClass("nerd");
+	if(mode=="laic") $(".xonomy").removeClass("nerd").removeClass("graphical").addClass("laic");
+	if(mode=="graphical") $(".xonomy").removeClass("nerd").removeClass("laic").addClass("graphical");
 }
 
 Xonomy.jsEscape=function(str) {

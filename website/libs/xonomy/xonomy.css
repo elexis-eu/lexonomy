@@ -16,7 +16,7 @@
 .xonomy.laic .element > .children > .textnode .char.focused { }
 .xonomy.laic .element > .children > .textnode .char.focused > .selector { position: absolute; left: 0px; right: 0px; z-index: 2; background-color: #00cc00; height: 8px; bottom: -10px; }
 .xonomy.laic .element > .children > .textnode .char.focused > .selector > .inside { position: absolute; left: 0px; right: 0px; top: -2px; bottom: -1px; background-color: transparent; }
-
+.xonomy.graphical {display: none !important;}
 
 /*NERD MODE*/
 .xonomy.nerd { font-family: 'Roboto Mono', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans HK', 'Noto Naskh Arabic', monospace; font-size: 1rem; cursor: default; background-color: #ffffff;
