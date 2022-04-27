@@ -2,81 +2,85 @@
    <loading-overlay if={state.isLoading}></loading-overlay>
    <dict-nav links={[["links", "links"]]}/>
    <h3>Links</h3>
-   <div if={!state.isLoading}
-         each={dict in Object.values(state.dictionaries)}>
-      <div>
-         <h4 class="dictName">
-            {dict.title}
-            <i if={dict.blurb}
-                  class="material-icons clickable"
-                  onclick={openDictInfo.bind(this, dict)}>
-               info_outline
-            </i>
-            <a href="#/{dict.dictId}" class="btn right">open</a>
-         </h4>
+   <template if={!state.isLoading}>
+      <div if={!Object.values(state.dictionaries).length} class="grey-text">
+         <h4>No links</h4>
       </div>
-      <div class="dictLinks">
+      <div each={dict in Object.values(state.dictionaries)}>
          <div>
-            <h5 class="title">Outgoing links</h5>
-            <div if={!dict.to.length}>
-               <h6 class="grey-text">No links</h6>
-            </div>
-            <table if={dict.to.length}>
-               <tr each={link in dict.to}>
-                  <td>
-                     <a href="#/{dictData.dictId}/edit/entry/view/{link.source_entry}">
-                        {link.source_hw || link.source_id}
-                     </a>
-                  </td>
-                  <td class="grey-text">
-                     {link.source_hw ? ('(' + link.source_id + ')') : ''}
-                  </td>
-                  <td class="arrowCell">
-                     <i class="material-icons">arrow_forward</i>
-                  </td>
-                  <td>
-                     <a href="#/{link.target_dict}/edit/entry/view/{link.target_entry}">
-                        {link.target_hw || (link.target_el + ' ' + link.target_id)}
-                     </a>
-                  </td>
-                  <td class="grey-text">
-                     {link.target_hw ? (link.target_el + ' ' + link.target_id) : ''}
-                  </td>
-               </tr>
-            </table>
+            <h4 class="dictName">
+               {dict.title}
+               <i if={dict.blurb}
+                     class="material-icons clickable"
+                     onclick={openDictInfo.bind(this, dict)}>
+                  info_outline
+               </i>
+               <a href="#/{dict.dictId}" class="btn right">open</a>
+            </h4>
          </div>
-
-         <div>
-            <h5 class="title">Incoming links</h5>
-            <div if={!dict.from.length}>
+         <div class="dictLinks">
+            <div>
+               <h5 class="title">Outgoing links</h5>
+               <div if={!dict.to.length}>
                   <h6 class="grey-text">No links</h6>
                </div>
-            <table if={dict.from.length}>
-               <tr each={link in dict.from}>
-                  <td>
-                     <a href="#/{link.source_dict}/edit/entry/view/{link.source_entry}">
-                        {link.source_hw || (link.source_el + ' ' + link.source_id)}
-                     </a>
-                  </td>
-                  <td class="grey-text">
-                     {link.source_hw ? (link.source_el + ' ' + link.source_id) : ''}
-                  </td>
-                  <td style="padding: 0 20px;" class="grey-text">
-                     <i class="material-icons">arrow_forward</i>
-                  </td>
-                  <td>
-                     <a href="#/{dictData.dictId}/edit/entry/view/{link.target_entry}">
-                        {link.target_hw || link.target_id}
-                     </a>
-                  </td>
-                  <td class="grey-text">
-                     {link.target_hw ? ('(' + link.target_id + ')') : ''}
-                  </td>
-               </tr>
-            </table>
+               <table if={dict.to.length}>
+                  <tr each={link in dict.to}>
+                     <td>
+                        <a href="#/{dictData.dictId}/edit/entry/view/{link.source_entry}">
+                           {link.source_hw || link.source_id}
+                        </a>
+                     </td>
+                     <td class="grey-text">
+                        {link.source_hw ? ('(' + link.source_id + ')') : ''}
+                     </td>
+                     <td class="arrowCell">
+                        <i class="material-icons">arrow_forward</i>
+                     </td>
+                     <td>
+                        <a href="#/{link.target_dict}/edit/entry/view/{link.target_entry}">
+                           {link.target_hw || (link.target_el + ' ' + link.target_id)}
+                        </a>
+                     </td>
+                     <td class="grey-text">
+                        {link.target_hw ? (link.target_el + ' ' + link.target_id) : ''}
+                     </td>
+                  </tr>
+               </table>
+            </div>
+
+            <div>
+               <h5 class="title">Incoming links</h5>
+               <div if={!dict.from.length}>
+                     <h6 class="grey-text">No links</h6>
+                  </div>
+               <table if={dict.from.length}>
+                  <tr each={link in dict.from}>
+                     <td>
+                        <a href="#/{link.source_dict}/edit/entry/view/{link.source_entry}">
+                           {link.source_hw || (link.source_el + ' ' + link.source_id)}
+                        </a>
+                     </td>
+                     <td class="grey-text">
+                        {link.source_hw ? (link.source_el + ' ' + link.source_id) : ''}
+                     </td>
+                     <td style="padding: 0 20px;" class="grey-text">
+                        <i class="material-icons">arrow_forward</i>
+                     </td>
+                     <td>
+                        <a href="#/{dictData.dictId}/edit/entry/view/{link.target_entry}">
+                           {link.target_hw || link.target_id}
+                        </a>
+                     </td>
+                     <td class="grey-text">
+                        {link.target_hw ? ('(' + link.target_id + ')') : ''}
+                     </td>
+                  </tr>
+               </table>
+            </div>
          </div>
       </div>
-   </div>
+   </template>
    <div id="modalDictionary" class="modal">
       <div class="modal-content">
          <h4 id="modalTitle"></h4>
