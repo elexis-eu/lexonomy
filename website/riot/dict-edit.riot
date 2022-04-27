@@ -28,10 +28,15 @@
       </div>
     </div>
     <div class="col s9">
-      <!--         <dict-edit-entry entryId={ this.entryId } mode={ this.mode } dictId={ this.dictId } dictConfigs={ this.props.dictConfigs } userAccess={ this.props.userAccess } userInfo={ this.props.userInfo } userDicts={ this.userDicts }></dict-entry-edit>-->
-
-      <div id="app">
-      </div>
+      <dict-edit-entry
+        entryId={ this.entryId }
+        mode={ this.mode }
+        dictId={ this.dictId }
+        dictConfigs={ this.props.dictConfigs }
+        userAccess={ this.props.userAccess }
+        userInfo={ this.props.userInfo }
+        userDicts={ this.userDicts }
+      ></dict-edit-entry>
     </div>
   </div>
 
@@ -106,8 +111,7 @@
           this.userDicts = response.dicts
         })
       },
-
-      onUpdated() {
+      onBeforeUpdate() {
         this.doctypes = this.props.doctypes
         this.entryId = this.props.entryId
         console.log('list edit dict update' + this.dictId + this.doctype + this.props.entryId)

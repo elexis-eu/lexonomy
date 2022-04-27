@@ -326,15 +326,13 @@
                this.entryId = entryId;
                this.doctype = doctype;
                this.mode = mode;
+              this.content = 'dict-edit';
                $.get(window.API_URL + this.dictId + "/doctype.json", (response) => {
-                  console.log(response);
                   if (response.success && response.doctypes) {
                      this.doctypes = response.doctypes;
                      this.update();
                   }
                });
-               this.content = 'dict-edit';
-               this.update();
             });
             route('/*/edit/*', (dictId, doctype) => {
                console.log('edit ' + dictId + doctype)
