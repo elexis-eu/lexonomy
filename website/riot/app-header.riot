@@ -5,6 +5,7 @@
       <li if={ dictData.userAccess && dictData.userAccess.canConfig }><a href="#/{ dictData.dictId }/config">Configure</a></li>
       <li if={ dictData.userAccess && dictData.userAccess.canDownload }><a href="#/{ dictData.dictId }/download">Download</a></li>
       <li if={ dictData.userAccess && dictData.userAccess.canUpload }><a href="#/{ dictData.dictId }/upload">Upload</a></li>
+      <li if={ dictData.userAccess }><a href="#/{ dictData.dictId }/links">Links</a></li>
    </ul>
    <ul if={ !authData.authorized } id="dropdown-menu-anon" class="dropdown-content">
       <li><a href="#/">Log in</a></li>
@@ -48,6 +49,7 @@
          <li if={ dictData.userAccess && dictData.userAccess.canConfig }><a href="#/{ dictData.dictId }/config">Configure</a></li>
          <li if={ dictData.userAccess && dictData.userAccess.canDownload }><a href="#/{ dictData.dictId }/download">Download</a></li>
          <li if={ dictData.userAccess && dictData.userAccess.canUpload }><a href="#/{ dictData.dictId }/upload">Upload</a></li>
+         <li if={ dictData.userAccess }><a href="#/{ dictData.dictId }/links">Links</a></li>
       </template>
       <template if={ !authData.authorized }>
          <li><a href="#/">Log in</a></li>
@@ -109,17 +111,17 @@
          },
 
          onIncreaseFontSize(){
-            let size = parseInt($("html").css("font-size").replace("px", ""))
-            if(size < 22){
-               $("html").css("font-size", (size + 1) + "px")
+            let size = parseInt($("html").css("font-size").replace("px", "")) + 1
+            if(size <= 22){
+               $("html").css("font-size", size + "px")
                document.cookie = "fontSize=" + size
             }
          },
 
          onDecreaseFontSize(){
-            let size = parseInt($("html").css("font-size").replace("px", ""))
-            if(size > 14){
-               $("html").css("font-size", (size - 1) + "px")
+            let size = parseInt($("html").css("font-size").replace("px", "")) - 1
+            if(size >= 14){
+               $("html").css("font-size", size + "px")
                document.cookie = "fontSize=" + size
             }
          },

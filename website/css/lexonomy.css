@@ -1,6 +1,8 @@
+html{
+    font-size: 16px;
+}
 html body{
     font-family: 'Roboto Condensed', sans-serif;
-    font-size: 16px;
 }
 .main{
     min-height: 100vh;
@@ -83,7 +85,7 @@ h3{
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
-.btn{
+.btn:not(.btn-floating){
     border-radius: 0;
 }
 .btn:not(.btn-flat){

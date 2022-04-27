@@ -1,32 +1,177 @@
 <dict-links>
-   <dict-nav links={[["download", "download"]]}/>
-   <h3>Download</h3>
-   <div class="input-field">
-      <a class="waves-effect waves-light btn btn-primary download-link" target="_blank" href="{window.API_URL}/{ dictData.dictId }/download.xml"><i class="material-icons left">file_download</i>Download { dictData.dictId }.xml</a>
+   <loading-overlay if={state.isLoading}></loading-overlay>
+   <dict-nav links={[["links", "links"]]}/>
+   <h3>Links</h3>
+   <div if={!state.isLoading}
+         each={dict in Object.values(state.dictionaries)}>
+      <div>
+         <h4 class="dictName">
+            {dict.title}
+            <i if={dict.blurb}
+                  class="material-icons clickable"
+                  onclick={openDictInfo.bind(this, dict)}>
+               info_outline
+            </i>
+            <a href="#/{dict.dictId}" class="btn right">open</a>
+         </h4>
+      </div>
+      <div class="dictLinks">
+         <div>
+            <h5 class="title">Outgoing links</h5>
+            <div if={!dict.to.length}>
+               <h6 class="grey-text">No links</h6>
+            </div>
+            <table if={dict.to.length}>
+               <tr each={link in dict.to}>
+                  <td>
+                     <a href="#/{dictData.dictId}/edit/entry/view/{link.source_entry}">
+                        {link.source_hw || link.source_id}
+                     </a>
+                  </td>
+                  <td class="grey-text">
+                     {link.source_hw ? ('(' + link.source_id + ')') : ''}
+                  </td>
+                  <td class="arrowCell">
+                     <i class="material-icons">arrow_forward</i>
+                  </td>
+                  <td>
+                     <a href="#/{link.target_dict}/edit/entry/view/{link.target_entry}">
+                        {link.target_hw || (link.target_el + ' ' + link.target_id)}
+                     </a>
+                  </td>
+                  <td class="grey-text">
+                     {link.target_hw ? (link.target_el + ' ' + link.target_id) : ''}
+                  </td>
+               </tr>
+            </table>
+         </div>
+
+         <div>
+            <h5 class="title">Incoming links</h5>
+            <div if={!dict.from.length}>
+                  <h6 class="grey-text">No links</h6>
+               </div>
+            <table if={dict.from.length}>
+               <tr each={link in dict.from}>
+                  <td>
+                     <a href="#/{link.source_dict}/edit/entry/view/{link.source_entry}">
+                        {link.source_hw || (link.source_el + ' ' + link.source_id)}
+                     </a>
+                  </td>
+                  <td class="grey-text">
+                     {link.source_hw ? (link.source_el + ' ' + link.source_id) : ''}
+                  </td>
+                  <td style="padding: 0 20px;" class="grey-text">
+                     <i class="material-icons">arrow_forward</i>
+                  </td>
+                  <td>
+                     <a href="#/{dictData.dictId}/edit/entry/view/{link.target_entry}">
+                        {link.target_hw || link.target_id}
+                     </a>
+                  </td>
+                  <td class="grey-text">
+                     {link.target_hw ? ('(' + link.target_id + ')') : ''}
+                  </td>
+               </tr>
+            </table>
+         </div>
+      </div>
    </div>
-   <div>
-      <label>
-         <input type="checkbox" class="noAttributes" name="noAttributes" />
-         <span>XML without Lexonomy attributes</span>
-      </label>
+   <div id="modalDictionary" class="modal">
+      <div class="modal-content">
+         <h4 id="modalTitle"></h4>
+         <div id="modalContent">
+         </div>
+      </div>
+      <div class="modal-footer">
+         <a class="btn modal-close waves-effect waves-green">Close</a>
+      </div>
    </div>
-   <small class="helper-text">
-      If you want to import the XML file back to Lexonomy, you need Lexonomy attributes.
-   </small>
+
+   <style>
+      .dictName{
+         border-bottom: 1px solid #d9d9d8;
+      }
+      .dictName i{
+         margin-left: 10px;
+      }
+      .dictLinks{
+         display: flex;
+         column-gap: 6vw;
+         padding-left: 10px;
+      }
+      .arrowCell{
+         color: #cbcbcb ;
+         padding: 0 20px;
+      }
+   </style>
 
    <script>
       export default {
-         onMounted() {
-            $(document).ready(function() {
-               $('.noAttributes').change(function() {
-                  var href = $('.download-link').attr('href')
-                  if (this.checked) {
-                     $('.download-link').attr('href', href + '?clean=true')
-                  } else {
-                     $('.download-link').attr('href', href.replace('?clean=true', ''))
+         state: {
+            dictionaries: {},
+            isLoading: true
+         },
+
+         processLinks(links, direction){
+            links[direction].forEach(link => {
+               let dictId = direction == "from" ? link.source_dict : link.target_dict
+               if(!this.state.dictionaries[dictId]){
+                  this.state.dictionaries[dictId] = {
+                     dictId: dictId,
+                     from: [],
+                     to: []
                   }
-               })
+               }
+               this.state.dictionaries[dictId][direction].push(link)
             })
+         },
+
+         openDictInfo(dict){
+            $("#modalTitle").html(dict.title)
+            $("#modalContent").html(dict.blurb)
+            let instance = M.Modal.getInstance($("#modalDictionary"))
+            instance.open()
+         },
+
+         checkAllLoaded(){
+            let isLoading = Object.values(this.state.dictionaries).some(d => d.isLoading)
+            if(!isLoading){
+               this.update({isLoading: false})
+            }
+         },
+
+         onMounted() {
+            $('.modal').modal();
+            this.state.dictionaries = {}
+            this.store.loadDictionaryLinks()
+                  .done(response => {
+                     this.processLinks(response.links, "to")
+                     this.processLinks(response.links, "from")
+                     for(let dictId in this.state.dictionaries){
+                        if(dictId != this.dictData.dictId){
+                           this.state.dictionaries[dictId].isLoading = true
+                           this.store.loadDictionary(dictId)
+                                 .done(function(dictId, response) {
+                                    if(response.success){
+                                       Object.assign(this.state.dictionaries[dictId], {
+                                          title: response.publicInfo.title,
+                                          blurb: response.publicInfo.blurb,
+                                          isLoading: false
+                                       })
+                                    }
+                                 }.bind(this, dictId))
+                                 .always(this.checkAllLoaded.bind(this))
+                        } else {
+                           Object.assign(this.state.dictionaries[dictId], {
+                              isLoading: false,
+                              title: this.dictData.title,
+                              blurb: this.dictData.blurb
+                           })
+                        }
+                     }
+                     this.checkAllLoaded()
+                  })
          }
       }
    </script>

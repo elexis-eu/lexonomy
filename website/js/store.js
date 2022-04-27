@@ -26,7 +26,7 @@ class StoreClass {
          this.resetDictionary()
          this.data.dictId = dictId
          if(dictId){
-            this.loadDictionary()
+            this.loadActualDictionary()
          } else {
             this.trigger("dictionaryChanged")
          }
@@ -180,43 +180,49 @@ class StoreClass {
             .always(response => {})
    }
 
-   loadDictionary(){
+   loadActualDictionary(){
       if(!this.data.dictId || this.data.isDictionaryLoading){
          return
       }
       this.data.isDictionaryLoading = true
       this.data.isDictionaryLoaded = false
       this.trigger("isDictionaryLoadingChanged")
-      return $.ajax(`${window.API_URL}${this.data.dictId}/config.json`)
-         .done(response => {
-            if(response.success){
-               Object.assign(this.data, {
-                     config: response.configs,
-                     userAccess: response.userAccess,
-                     xemaOverride: false,
-                     xemplateOverride: false,
-                     editingOverride: false,
-                     userAccess: response.userAccess,
-                     dictConfigs: response.configs,
-                     doctype: response.doctype,
-                     doctypes: response.doctypes
-                  },
-                  response.publicInfo
-               )
-               this.data.isDictionaryLoaded = true
+      this.loadDictionary(this.data.dictId)
+            .done(response => {
+               if(response.success){
+                  Object.assign(this.data, {
+                        config: response.configs,
+                        userAccess: response.userAccess,
+                        xemaOverride: false,
+                        xemplateOverride: false,
+                        editingOverride: false,
+                        userAccess: response.userAccess,
+                        dictConfigs: response.configs,
+                        doctype: response.doctype,
+                        doctypes: response.doctypes
+                     },
+                     response.publicInfo
+                  )
+                  this.data.isDictionaryLoaded = true
+                  this.data.isDictionaryLoading = false
+                  this.trigger("dictionaryChanged")
+                  this.loadEntrylist()
+               }
+            })
+            .fail(response => {
                this.data.isDictionaryLoading = false
-               this.trigger("dictionaryChanged")
-               this.loadEntrylist()
-            }
-         })
-         .fail(response => {
-            this.data.isDictionaryLoading = false
-            M.toast({html: "Dictionary configuration could not be loaded."})
-            route("#/")
-         })
-         .always(response => {
-            this.trigger("isDictionaryLoadingChanged")
-         })
+               route("#/")
+            })
+            .always(response => {
+               this.trigger("isDictionaryLoadingChanged")
+            })
+   }
+
+   loadDictionary(dictId){
+      return $.ajax(`${window.API_URL}${dictId}/config.json`)
+            .fail(function(response) {
+               M.toast({html: `Could not load ${dictId} dictionary.`})
+            }.bind(this, dictId))
    }
 
    loadEntrylist(){
@@ -249,12 +255,12 @@ class StoreClass {
             })
    }
 
-   loadEntryLinks(){
+   loadDictionaryLinks(){
       return $.ajax({
-         url: `${window.API_URL}${this.data.dictId}/entrylinks.json`
+         url: `${window.API_URL}${this.data.dictId}/links.json`
       })
             .fail(response => {
-               M.toast({html: "Entry links could not be loaded."})
+               M.toast({html: "Dictionary links could not be loaded."})
             })
    }
 
@@ -286,7 +292,7 @@ class StoreClass {
          }
       })
             .done(response => {
-               this.loadDictionary(this.data.dictId)
+               this.loadActualDictionary()
                M.toast({html: "Saved"})
             })
             .fail(response => {

@@ -170,7 +170,7 @@
                   }
                })
                this.update({isSaving: true})
-               this.store.updateDictionaryConfig(this.configId, data)
+               this.store.updateDictionaryConfig('users', data)
                      .always(() => this.update({isSaving: false}))
             }
          }

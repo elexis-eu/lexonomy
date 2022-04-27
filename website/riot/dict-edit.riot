@@ -126,7 +126,6 @@
       .dictLeftCol{
          min-width: 200px;
          min-height: 50vh;
-         user-select: none;
          position: relative;
       }
       .dictRightCol{
@@ -337,11 +336,13 @@
             this.state.mousePos = evt.x
             document.addEventListener("mouseup", this.onDocumentMouseUp, false);
             document.addEventListener("mousemove", this.resizeColumn, false);
+            $("body").css("user-select", "none")
          },
 
          onDocumentMouseUp(){
             document.removeEventListener("mousemove", this.resizeColumn, false);
             document.removeEventListener("mouseup", this.onDocumentMouseUp, false);
+            $("body").css("user-select", "")
          },
 
          doChangeDoctype(newdoctype) {
