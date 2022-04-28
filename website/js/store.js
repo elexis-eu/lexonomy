@@ -237,7 +237,7 @@ class StoreClass {
          data: {
             searchtext: this.data.searchtext,
             modifier: this.data.modifier,
-            howmany: 100
+            howmany: this.data.dictConfigs.titling.numberEntries
          }
       })
             .done(response => {
