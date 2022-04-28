@@ -138,7 +138,7 @@ class StoreClass {
 
    loadSiteconfig(){
       this.data.isSiteconfigLoading = true
-      return $.ajax({url: `${window.API_URL}/siteconfigread.json`})
+      return $.ajax({url: `${window.API_URL}siteconfigread.json`})
             .done(response => {
                this.data.siteconfig = response
                //this.trigger("siteconfigChanged")
@@ -154,7 +154,7 @@ class StoreClass {
    loadDictlist(){
       this.data.isDictlistLoading = true
       this.trigger("dictlistLoadingChanged")
-      return $.ajax(`${window.API_URL}/userdicts.json`)
+      return $.ajax(`${window.API_URL}userdicts.json`)
             .done(response => {
                this.data.dictlist = response.dicts || []
                this.data.isDictlistLoaded = true
@@ -170,7 +170,7 @@ class StoreClass {
    }
 
    loadPublicDictionaryList(){
-      return $.ajax(`${window.API_URL}/publicdicts.json`)
+      return $.ajax(`${window.API_URL}publicdicts.json`)
             .done(response => {
                this.data.publicDictlist = response.entries || []
             })
