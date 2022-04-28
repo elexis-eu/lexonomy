@@ -1,6 +1,7 @@
 %global debug_package %{nil}
 %global __python %{__python3}
 %define __requires_exclude coffee
+%define _build_id_links none
 
 Name:		lexonomy
 Version:	0
