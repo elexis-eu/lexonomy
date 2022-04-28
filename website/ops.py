@@ -1202,7 +1202,7 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
         sqlc = "select count(*) as total from entries"
         cc = dictDB.execute(sqlc)
         rc = cc.fetchone()
-        if int(rc["total"]) > 1000:
+        if int(rc["total"]) > 2000:
             sqlf = "select * from entries order by sortkey limit 200"
             cf = dictDB.execute(sqlf)
             entries = []
