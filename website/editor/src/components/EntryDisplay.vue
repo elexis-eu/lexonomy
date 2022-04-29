@@ -2,7 +2,8 @@
     <div v-if="state.entry.dictConfigs && state.entry.dictConfigs.xemplate">
     <ComponentGeneratorComponent
       :children="preparedDataForEntry"
-      :content="content"
+      :content="dataStructure"
+      @input="handleContentUpdate"
     />
   </div>
 </template>
@@ -16,10 +17,6 @@ export default {
     ComponentGeneratorComponent
   },
   props: {
-    content: {
-      type: Object,
-      required: true
-    },
     contentHtml: {
       type: String,
       required: false
@@ -35,6 +32,27 @@ export default {
         min: 1,
         name: this.state.entry.dictConfigs.xema.root
       }]
+    }
+  },
+  data() {
+    return {
+      dataStructure: {}
+    }
+  },
+  created() {
+    this.dataStructure = this.state.entry.content
+    window.harvestGraphicalEditorData = this.getXmlData
+  },
+  methods: {
+    handleContentUpdate(data) {
+      console.log("In root:", data.content, this.state.entry.content)
+      this.dataStructure = data.content
+      // this.state.entry.content = data.content
+    },
+    getXmlData() {
+
+      console.log(this.dataStructure)
+      return ""
     }
   }
 }

@@ -6,15 +6,17 @@
                  :elementEditorConfig="elementData"
                  :elementName="elementName"
                  :elementData="elementData"
-                 :content="content"
+                 :content="calculatedContent"
                  @hide-children="hideChildren"
+                 @input="handleValueUpdate"
       />
       <ComponentGeneratorComponent
               v-if="showChildren"
               :children="children"
               :elementEditorConfig="elementData"
               :elementName="elementName"
-              :content="content"
+              :content="calculatedContent"
+              @input="handleValueUpdate"
       />
   </div>
 </template>
@@ -40,19 +42,30 @@ export default {
       type: [Object, Array],
       required: true
     },
-    childrenContent: Object
+    childrenContent: Object,
+    editorChildNumber: Number
+  },
+  computed: {
+    calculatedContent() {
+      return this.updatedContent || this.content
+    }
   },
   data () {
     return {
-      showChildren: true
+      showChildren: true,
+      updatedContent: null
     }
-  },
-  mounted() {
-    // console.log(this.children, "InlineComponent")
   },
   methods: {
     hideChildren() {
       this.showChildren = false
+    },
+    handleValueUpdate(data) {
+      let content = {...this.content, ...data.content}
+      this.$emit('input', {elementName: this.elementName, editorChildNumber: this.editorChildNumber, content: content})
+    },
+    updateContent(newContent) {
+      this.updatedContent = newContent
     }
   }
 }

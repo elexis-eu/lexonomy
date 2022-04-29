@@ -5,8 +5,9 @@
                :elementEditorConfig="elementData"
                :elementName="elementName"
                :elementData="elementData"
-               :content="content"
+               :content="calculatedContent"
                @hide-children="hideChildren"
+               @input="handleValueUpdate"
     />
 
     <div v-show="showPopup" class="modal" @click="closePopup">
@@ -16,16 +17,18 @@
                    :elementEditorConfig="elementData"
                    :elementName="elementName"
                    :elementData="elementData"
-                   :content="content"
+                   :content="calculatedContent"
                    @hide-children="hideChildren"
                    @click="openPopup"
+                   @input="handleValueUpdate"
         />
         <ComponentGeneratorComponent
           v-if="showChildren"
           :children="children"
           :elementEditorConfig="elementData"
           :elementName="elementName"
-          :content="content"
+          :content="calculatedContent"
+          @input="handleValueUpdate"
         />
       </div>
     </div>
@@ -51,12 +54,19 @@ export default {
     content: {
       type: [Object, Array],
       required: true
+    },
+    editorChildNumber: Number
+  },
+  computed: {
+    calculatedContent() {
+      return this.updatedContent || this.content
     }
   },
   data() {
     return {
       showPopup: false,
-      showChildren: true
+      showChildren: true,
+      updatedContent: null
     }
   },
   methods: {
@@ -68,6 +78,13 @@ export default {
     },
     hideChildren() {
       this.showChildren = false
+    },
+    handleValueUpdate(data) {
+      let content = {...this.content, ...data.content}
+      this.$emit('input', {elementName: this.elementName, editorChildNumber: this.editorChildNumber, content: content})
+    },
+    updateContent(newContent) {
+      this.updatedContent = newContent
     }
   }
 }

@@ -1,15 +1,11 @@
 <template>
   <div>
-    <!--    <component v-for="element in children"-->
-    <!--               :key="Object.keys(element)[0]"-->
-    <!--               :is="getComponentFromElementName(element)"-->
-    <!--               v-bind="getPropsForElement(element)"-->
-    <!--    />-->
-
     <component v-for="element in renderedChildren"
+               :ref="element.props.elementName + element.props.editorChildNumber"
                :key="element.props.elementName + '-' + Math.random()"
                :is="element.componentName"
                v-bind="element.props"
+               @input="handleChildUpdate"
     />
   </div>
 </template>
@@ -45,28 +41,37 @@ export default {
   watch: {
     content: {
       handler(newVal) {
-        console.log("Content changed")
-        this.loadNewData(newVal)
+        // Update only content of children to prevent re-rendering of whole structure
+        this.updateContentInChildren(newVal)
       },
       deep: true
     }
   },
   created() {
     //  create components from content
-
-    if(this.elementName === "sense") {
-      // eslint-disable-next-line no-debugger
-      // debugger
-    }
     this.loadNewData(this.content)
   },
   methods: {
+    updateContentInChildren(newContent) {
+      for (const [elementName, content] of Object.entries(newContent)) {
+        let foundChildren = this.renderedChildren.filter(child => {
+          return child.props.elementName === elementName
+        })
+        if (foundChildren.length > 0) {
+
+          if (Array.isArray(content)) {
+            content.forEach((contentInstance, index) => {
+              let childProps = foundChildren[index].props
+              this.$refs[childProps.elementName + childProps.editorChildNumber][0].updateContent(contentInstance)
+            })
+          } else {
+            let childProps = foundChildren[0].props
+            this.$refs[childProps.elementName + childProps.editorChildNumber][0].updateContent(content)
+          }
+        }
+      }
+    },
     loadNewData(XMLContent) {
-      // console.log("")
-      // console.log(`loadNewData for ${this.elementName}:`)
-      // console.log("Content:", XMLContent)
-      // // console.log("Children:", this.children)
-      // console.log("ElementEditorData", this.elementEditorConfig)
       this.renderedChildren = []
       if(!this.children) {
         return
@@ -87,39 +92,48 @@ export default {
         let children = entry.dictConfigs.xema.elements[elementName].children
 
         //  Get XML content for current element instance
-        let content = {}
-        for (const [key, value] of Object.entries(XMLContent)) {
-          if(key == elementName) {
-            content = value
-            break
-          }
-        }
+        let content = XMLContent[elementName] || {}
+
         // Decide if multiple instances need to be made and push children to array to be rendered
         if(Array.isArray(content)) {
-          for (const contentInstance of content) {
+          content.forEach((contentInstance, index) => {
+            // contentInstance._editorChildNumber = index
             this.renderedChildren.push({
               componentName: componentName,
               props: {
                 elementName: elementName,
                 children: children,
                 content: contentInstance,
-                elementData: elementData
+                elementData: elementData,
+                editorChildNumber: index
               }
             })
-          }
+          })
         } else {
+          // content._editorChildNumber = 0
           this.renderedChildren.push({
             componentName: componentName,
             props: {
               elementName: elementName,
               children: children,
               content: content,
-              elementData: elementData
+              elementData: elementData,
+              editorChildNumber: 0
             }
           })
         }
 
       })
+    },
+
+    handleChildUpdate(data) {
+      let content = Object.assign({}, this.content)
+      if (Array.isArray(content[data.elementName])) {
+        content[data.elementName][data.editorChildNumber] = data.content
+      } else {
+        content[data.elementName] = data.content
+      }
+      this.$emit("input", {content: content})
     },
 
     getComponentFromElementName(elementName) {

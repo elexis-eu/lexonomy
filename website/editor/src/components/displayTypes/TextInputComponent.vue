@@ -2,7 +2,7 @@
   <div>
     <section class="text-input" v-if="elementData.shown">
         <label :for="elementName">{{elementName}}:</label>
-        <input :name="elementName" v-model="values[0]">
+        <input :name="elementName" v-model="value">
     </section>
   </div>
 </template>
@@ -11,8 +11,6 @@
 
 export default {
   name: "TextInputComponent",
-  components: {
-  },
   props: {
     elementData: Object,
     elementName: String,
@@ -23,17 +21,23 @@ export default {
   },
   data() {
     return {
-      values: [],
+      value: "",
 
     }
   },
-  mounted() {
-    if (Array.isArray(this.content._text)) {
-      this.values = this.content._text
-    } else {
-      this.values.push(this.content._text)
+  watch: {
+    value(newVal) {
+      if (newVal === this.content._text) {
+        return
+      }
+      let content = Object.assign({}, this.content)
+      content._text = newVal
+      this.$emit('input', {elementName: this.elementName, content: content})
     }
-  }
+  },
+  mounted() {
+    this.value = this.content._text
+  },
 }
 </script>
 

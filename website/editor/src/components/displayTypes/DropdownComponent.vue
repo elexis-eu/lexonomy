@@ -27,6 +27,16 @@ export default {
       options: []
     }
   },
+  watch: {
+    value(newVal) {
+      if (newVal === this.content._text) {
+        return
+      }
+      let content = Object.assign({}, this.content)
+      content._text = newVal
+      this.$emit('input', {elementName: this.elementName, content: content})
+    }
+  },
   created() {
     let structureConfig = this.state.entry.dictConfigs.xema.elements[this.elementName]
     this.options = structureConfig.values
