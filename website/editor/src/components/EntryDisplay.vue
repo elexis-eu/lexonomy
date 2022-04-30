@@ -1,5 +1,5 @@
 <template>
-    <div v-if="state.entry.dictConfigs && state.entry.dictConfigs.xemplate">
+  <div v-if="state.entry.dictConfigs && state.entry.dictConfigs.xemplate">
     <ComponentGeneratorComponent
       :children="preparedDataForEntry"
       :content="dataStructure"
@@ -10,6 +10,7 @@
 
 <script>
 import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
+import {js2xml} from "xml-js"
 
 export default {
   name: "EntryDisplay",
@@ -45,14 +46,13 @@ export default {
   },
   methods: {
     handleContentUpdate(data) {
-      console.log("In root:", data.content, this.state.entry.content)
       this.dataStructure = data.content
-      // this.state.entry.content = data.content
     },
     getXmlData() {
-
-      console.log(this.dataStructure)
-      return ""
+      let structureCopy = Object.assign({}, this.dataStructure)
+      delete structureCopy.declaration
+      let data = js2xml(structureCopy, {compact: false})
+      return data
     }
   }
 }

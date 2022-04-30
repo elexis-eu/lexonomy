@@ -27,16 +27,16 @@ export default {
   },
   watch: {
     value(newVal) {
-      if (newVal === this.content._text) {
+      if (newVal === this.content.text) {
         return
       }
-      let content = Object.assign({}, this.content)
-      content._text = newVal
-      this.$emit('input', {elementName: this.elementName, content: content})
+      let elements = Object.assign({}, this.content)
+      elements.text = newVal
+      this.$emit('input', {elementName: this.elementName, elements: [elements]})
     }
   },
   mounted() {
-    this.value = this.content._text
+    this.value = this.content.text
   },
 }
 </script>

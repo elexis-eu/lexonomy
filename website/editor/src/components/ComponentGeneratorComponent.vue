@@ -73,7 +73,7 @@ export default {
     },
     loadNewData(XMLContent) {
       this.renderedChildren = []
-      if(!this.children) {
+      if (!this.children) {
         return
       }
       let entry = this.state.entry
@@ -92,10 +92,17 @@ export default {
         let children = entry.dictConfigs.xema.elements[elementName].children
 
         //  Get XML content for current element instance
-        let content = XMLContent[elementName] || {}
-
+        let content = [{}]
+        if (Array.isArray(XMLContent && XMLContent.elements)) {
+          content = XMLContent.elements.filter(element => {
+            return element.name === elementName
+          })
+          if (content.length === 0) {
+            content.push({})
+          }
+        }
         // Decide if multiple instances need to be made and push children to array to be rendered
-        if(Array.isArray(content)) {
+        if (Array.isArray(content)) {
           content.forEach((contentInstance, index) => {
             // contentInstance._editorChildNumber = index
             this.renderedChildren.push({
@@ -127,11 +134,18 @@ export default {
     },
 
     handleChildUpdate(data) {
+
+      // Update content without creating new content/elements
       let content = Object.assign({}, this.content)
-      if (Array.isArray(content[data.elementName])) {
-        content[data.elementName][data.editorChildNumber] = data.content
-      } else {
-        content[data.elementName] = data.content
+      let consecutiveNumber = 0
+      for (const i in content.elements) {
+        if (content.elements[i].name === data.elementName) {
+          if (consecutiveNumber === data.editorChildNumber) {
+            content.elements[i] = data.content
+            break
+          }
+          consecutiveNumber ++
+        }
       }
       this.$emit("input", {content: content})
     },
@@ -140,7 +154,7 @@ export default {
       const elementConfig = this.state.entry.dictConfigs.xemplate[elementName]
       let type = elementConfig.displayType || "inline"
       return this.displayTypeToComponentMap[type]
-    }
+    },
   }
 }
 </script>

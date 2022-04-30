@@ -1,8 +1,8 @@
 <template>
   <div>
-    <section v-if="elementData.shown && content._text">
+    <section v-if="elementData.shown && content.text">
 <!--      <p>Read-only component</p>-->
-      <p> {{ elementName }}: {{content._text}}</p>
+      <p> {{ elementName }}: {{content.text}}</p>
     </section>
   </div>
 </template>
@@ -15,7 +15,7 @@ export default {
     elementData: Object,
     elementName: String,
     content: {
-      type: Object,
+      type: [Object, Array],
       required: true
     }
   },

@@ -6,7 +6,7 @@
                  :elementEditorConfig="elementData"
                  :elementName="elementName"
                  :elementData="elementData"
-                 :content="calculatedContent"
+                 :content="componentData"
                  @hide-children="hideChildren"
                  @input="handleValueUpdate"
       />
@@ -16,7 +16,7 @@
               :elementEditorConfig="elementData"
               :elementName="elementName"
               :content="calculatedContent"
-              @input="handleValueUpdate"
+              @input="handleChildUpdate"
       />
   </div>
 </template>
@@ -48,7 +48,16 @@ export default {
   computed: {
     calculatedContent() {
       return this.updatedContent || this.content
-    }
+    },
+    componentData() {
+      if (this.elementData.valueRenderType === "text-input-with-markup") {
+        return this.calculatedContent.elements
+      }
+      let textElement = this.calculatedContent.elements && this.calculatedContent.elements.find(element => {
+        return element.type === "text" && !element.name
+      })
+      return textElement || {}
+    },
   },
   data () {
     return {
@@ -61,6 +70,10 @@ export default {
       this.showChildren = false
     },
     handleValueUpdate(data) {
+      let content = {...this.content, ...{elements: data.elements}}
+      this.$emit('input', {elementName: this.elementName, editorChildNumber: this.editorChildNumber, content: content})
+    },
+    handleChildUpdate(data) {
       let content = {...this.content, ...data.content}
       this.$emit('input', {elementName: this.elementName, editorChildNumber: this.editorChildNumber, content: content})
     },
