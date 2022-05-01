@@ -478,6 +478,10 @@ Screenful.Editor={
     $("#butSave .star").show();
     if($("#chkAutosave").prop("checked")) Screenful.Editor.save();
   },
+  resetChanged: function() {
+    Screenful.Editor.needsSaving=false;
+    $("#butSave .star").hide();
+  },
   history: function(){
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
       $("#container").css("right", ""); //remove room for xonomy layby
