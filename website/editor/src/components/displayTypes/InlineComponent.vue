@@ -1,23 +1,23 @@
 <template>
   <div>
-      <section v-if="elementData.shown">
-      </section>
-      <component :is="valueComponent"
-                 :elementEditorConfig="elementData"
-                 :elementName="elementName"
-                 :elementData="elementData"
-                 :content="componentData"
-                 @hide-children="hideChildren"
-                 @input="handleValueUpdate"
-      />
-      <ComponentGeneratorComponent
-              v-if="showChildren"
-              :children="children"
-              :elementEditorConfig="elementData"
-              :elementName="elementName"
-              :content="calculatedContent"
-              @input="handleChildUpdate"
-      />
+    <section v-if="elementData.shown">
+    </section>
+    <component :is="valueComponent"
+               :elementEditorConfig="elementData"
+               :elementName="elementName"
+               :elementData="elementData"
+               :content="componentData"
+               @hide-children="hideChildren"
+               @input="handleValueUpdate"
+    />
+    <ComponentGeneratorComponent
+      v-if="showChildren"
+      :children="children"
+      :elementEditorConfig="elementData"
+      :elementName="elementName"
+      :content="calculatedContent"
+      @input="handleChildUpdate"
+    />
   </div>
 </template>
 
@@ -25,6 +25,7 @@
 
 import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
 import valueDisplayMixin from "@/shared-resources/mixins/valueDisplayMixin"
+import {xml2js} from "xml-js"
 
 export default {
   name: "InlineComponent",
@@ -52,14 +53,19 @@ export default {
     componentData() {
       if (this.elementData.valueRenderType === "text-input-with-markup") {
         return this.calculatedContent.elements
+          || [
+            {text: "", type: "text"},
+            {name: this.state.entry.dictConfigs.xampl.markup, type: "element", elements: [{type: "text", text: ""}]},
+            {text: "", type: "text"}
+          ]
       }
       let textElement = this.calculatedContent.elements && this.calculatedContent.elements.find(element => {
         return element.type === "text" && !element.name
       })
-      return textElement || {}
-    },
+      return textElement || {text: "", type: "text"}
+    }
   },
-  data () {
+  data() {
     return {
       showChildren: true,
       updatedContent: null
@@ -69,8 +75,15 @@ export default {
     hideChildren() {
       this.showChildren = false
     },
+    createElementTemplate(elementName) {
+      return xml2js(`<${elementName}></${elementName}>`, {compact: false}).elements[0]
+    },
     handleValueUpdate(data) {
-      let content = {...this.content, ...{elements: data.elements}}
+      let content = Object.assign({}, this.calculatedContent)
+      if (Object.keys(content).length === 0) {
+        content = this.createElementTemplate(this.elementName)
+      }
+      content.elements = data.elements
       this.$emit('input', {elementName: this.elementName, editorChildNumber: this.editorChildNumber, content: content})
     },
     handleChildUpdate(data) {

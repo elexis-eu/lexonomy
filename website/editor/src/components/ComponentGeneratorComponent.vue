@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import {xml2js} from "xml-js"
+
 export default {
   name: "ComponentGeneratorComponent",
   props: {
@@ -53,23 +55,47 @@ export default {
   },
   methods: {
     updateContentInChildren(newContent) {
-      for (const [elementName, content] of Object.entries(newContent)) {
-        let foundChildren = this.renderedChildren.filter(child => {
-          return child.props.elementName === elementName
+      console.log(newContent)
+      for (let renderedChild of this.renderedChildren) {
+        let newContentForChild = newContent.elements.filter(element => {
+          return element.name === renderedChild.props.elementName
         })
-        if (foundChildren.length > 0) {
-
-          if (Array.isArray(content)) {
-            content.forEach((contentInstance, index) => {
-              let childProps = foundChildren[index].props
-              this.$refs[childProps.elementName + childProps.editorChildNumber][0].updateContent(contentInstance)
-            })
-          } else {
-            let childProps = foundChildren[0].props
-            this.$refs[childProps.elementName + childProps.editorChildNumber][0].updateContent(content)
-          }
+        // eslint-disable-next-line no-debugger
+        // debugger
+        if (newContentForChild.length === 0) {
+          continue
         }
+
+        let renderedChildRefs = this.$refs[renderedChild.props.elementName + renderedChild.props.editorChildNumber]
+        let renderedChildRef = (renderedChildRefs && renderedChildRefs[0]) || null
+
+        if (renderedChildRef && newContentForChild[renderedChild.props.editorChildNumber]) {
+          console.log("update child content", renderedChild, newContentForChild[renderedChild.props.editorChildNumber])
+          renderedChildRef.updateContent(newContentForChild[renderedChild.props.editorChildNumber])
+        }
+
       }
+
+
+
+      // for (const index in newContent.elements) {
+      //   let foundRenderedChildren = this.renderedChildren.filter(child => {
+      //     return child.props.elementName === newContent.elements[index].name
+      //   })
+      //   if (foundRenderedChildren.length > 0) {
+      //
+      //     // foundRenderedChildren.forEach((contentInstance, index) => {
+      //       // eslint-disable-next-line no-debugger
+      //       debugger
+      //       let childProps = foundRenderedChildren[index].props
+      //       if (this.$refs
+      //         && this.$refs[childProps.elementName + childProps.editorChildNumber]
+      //         && this.$refs[childProps.elementName + childProps.editorChildNumber][0]) {
+      //         this.$refs[childProps.elementName + childProps.editorChildNumber][0].updateContent(newContent.elements[index])
+      //       }
+      //     // })
+      //   }
+      // }
     },
     loadNewData(XMLContent) {
       this.renderedChildren = []
@@ -133,10 +159,26 @@ export default {
       })
     },
 
+    createElementTemplate(elementName) {
+      return xml2js(`<${elementName}></${elementName}>`, {compact: false}).elements
+    },
+
     handleChildUpdate(data) {
 
       // Update content without creating new content/elements
+      // eslint-disable-next-line no-debugger
+      // debugger
       let content = Object.assign({}, this.content)
+      if (!content.elements) {
+        content.elements = this.createElementTemplate(data.elementName)
+      } else if (!content.elements.find(el => {
+        return el.name === data.elementName
+      })) {
+        content.elements.push(data.content)
+        this.$emit("input", {content: content})
+        return
+      }
+
       let consecutiveNumber = 0
       for (const i in content.elements) {
         if (content.elements[i].name === data.elementName) {
@@ -144,7 +186,7 @@ export default {
             content.elements[i] = data.content
             break
           }
-          consecutiveNumber ++
+          consecutiveNumber++
         }
       }
       this.$emit("input", {content: content})
@@ -154,7 +196,7 @@ export default {
       const elementConfig = this.state.entry.dictConfigs.xemplate[elementName]
       let type = elementConfig.displayType || "inline"
       return this.displayTypeToComponentMap[type]
-    },
+    }
   }
 }
 </script>

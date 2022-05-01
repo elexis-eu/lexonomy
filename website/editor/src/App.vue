@@ -27,12 +27,9 @@ export default {
       if(!data) {
         return
       }
-      if(data.entryId !== "" && data.entryId !== this.state.entry.entryId) {
-        data.content = xml2js(data.content || "", {compact: false})
-        this.state.entry = {...this.state.entry, ...data}
-      } else {
-        console.log("entry same or invalid")
-      }
+
+      data.content = xml2js(data.content || "", {compact: false})
+      this.state.entry = {...this.state.entry, ...data}
     }
   }
 }

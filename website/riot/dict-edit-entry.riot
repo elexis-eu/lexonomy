@@ -162,7 +162,7 @@
                   if (window.editor._isVue) {
                     editor.$destroy()
                   }
-                  this.openGraphicalEditor()
+                  this.openGraphicalEditor(entry ? entry.content : newXml)
                   return
                 } else {
                   Xonomy.render((entry ? entry.content : newXml), div, docSpec)
@@ -256,11 +256,11 @@
         }
       },
 
-      openGraphicalEditor() {
+      openGraphicalEditor(entry) {
         if (!this.graphicalEditorLoaded) {
           if (this.graphicalEditorLoading) {
             setTimeout(() => {
-              this.openGraphicalEditor()
+              this.openGraphicalEditor(entry)
             }, 500)
           } else {
             this.loadGraphicalEditorDevServer()
@@ -273,7 +273,7 @@
             dictConfigs: this.props.dictConfigs,
             userAccess: this.props.userAccess,
             userInfo: this.props.userInfo,
-            content: this.content
+            content: entry || ""
           }
           window.mountGraphicalEditor()
         }

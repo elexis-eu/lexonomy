@@ -3,7 +3,7 @@
     <section class="text-input" v-if="elementData.shown">
       <label :for="elementName">{{ elementName }}:</label>
       <input v-if="values[0]" :name="elementName" v-model="values[0].text">
-      <span class="markup">{{ content[markupAttribute] && content[markupAttribute]._text }}</span>
+      <span class="markup">{{ markupText }}</span>
       <!--            <label :for="elementName + '-2'">{{elementName}}:</label>-->
       <input v-if="values[1]" :name="elementName + '-2'" v-model="values[1].text">
     </section>
@@ -54,6 +54,18 @@ export default {
     return {
       values: [],
       markupAttribute: null
+    }
+  },
+  computed: {
+    markupText() {
+      let markupElement = this.content.find(el => {
+        return el.name === this.markupAttribute
+      })
+      return (markupElement
+        && markupElement.elements
+        && markupElement.elements[0]
+        && markupElement.elements[0].text
+      ) || ""
     }
   },
   created() {
