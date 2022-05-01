@@ -43,7 +43,6 @@ export default {
   watch: {
     content: {
       handler(newVal) {
-        // Update only content of children to prevent re-rendering of whole structure
         this.updateContentInChildren(newVal)
       },
       deep: true
@@ -54,14 +53,12 @@ export default {
     this.loadNewData(this.content)
   },
   methods: {
+    // Update only content of children to prevent re-rendering of whole structure
     updateContentInChildren(newContent) {
-      console.log(newContent)
       for (let renderedChild of this.renderedChildren) {
         let newContentForChild = newContent.elements.filter(element => {
           return element.name === renderedChild.props.elementName
         })
-        // eslint-disable-next-line no-debugger
-        // debugger
         if (newContentForChild.length === 0) {
           continue
         }
@@ -70,52 +67,29 @@ export default {
         let renderedChildRef = (renderedChildRefs && renderedChildRefs[0]) || null
 
         if (renderedChildRef && newContentForChild[renderedChild.props.editorChildNumber]) {
-          console.log("update child content", renderedChild, newContentForChild[renderedChild.props.editorChildNumber])
           renderedChildRef.updateContent(newContentForChild[renderedChild.props.editorChildNumber])
         }
 
       }
-
-
-
-      // for (const index in newContent.elements) {
-      //   let foundRenderedChildren = this.renderedChildren.filter(child => {
-      //     return child.props.elementName === newContent.elements[index].name
-      //   })
-      //   if (foundRenderedChildren.length > 0) {
-      //
-      //     // foundRenderedChildren.forEach((contentInstance, index) => {
-      //       // eslint-disable-next-line no-debugger
-      //       debugger
-      //       let childProps = foundRenderedChildren[index].props
-      //       if (this.$refs
-      //         && this.$refs[childProps.elementName + childProps.editorChildNumber]
-      //         && this.$refs[childProps.elementName + childProps.editorChildNumber][0]) {
-      //         this.$refs[childProps.elementName + childProps.editorChildNumber][0].updateContent(newContent.elements[index])
-      //       }
-      //     // })
-      //   }
-      // }
     },
     loadNewData(XMLContent) {
       this.renderedChildren = []
       if (!this.children) {
         return
       }
-      let entry = this.state.entry
 
       this.children.forEach(child => {
         // Get element name
         let elementName = child.name
 
-        // Calculate component to render
+        //Extract element data and/or assign defaults
+        let elementData = this.getElementData(elementName)
+        this.state.entry.dictConfigs.xemplate[elementName] = elementData
+
+        // Calculate component name to render
+        // !!!MUST WAIT FOR NEW ELEMENT DATA TO SET!!!
         let componentName = this.getComponentFromElementName(elementName)
 
-        //Extract element data
-        let elementData = entry.dictConfigs.xemplate[elementName]
-
-        //  Get element children
-        let children = entry.dictConfigs.xema.elements[elementName].children
 
         //  Get XML content for current element instance
         let content = [{}]
@@ -124,18 +98,19 @@ export default {
             return element.name === elementName
           })
           if (content.length === 0) {
-            content.push({})
+            content = [{}]
           }
         }
+
         // Decide if multiple instances need to be made and push children to array to be rendered
         if (Array.isArray(content)) {
           content.forEach((contentInstance, index) => {
-            // contentInstance._editorChildNumber = index
+            // Add elements to render list
             this.renderedChildren.push({
               componentName: componentName,
               props: {
                 elementName: elementName,
-                children: children,
+                children: this.getElementChildren(elementName, contentInstance),
                 content: contentInstance,
                 elementData: elementData,
                 editorChildNumber: index
@@ -148,7 +123,7 @@ export default {
             componentName: componentName,
             props: {
               elementName: elementName,
-              children: children,
+              children: this.getElementChildren(elementName, content),
               content: content,
               elementData: elementData,
               editorChildNumber: 0
@@ -162,12 +137,53 @@ export default {
     createElementTemplate(elementName) {
       return xml2js(`<${elementName}></${elementName}>`, {compact: false}).elements
     },
+    getElementChildren(elementName, content) {
+      let elementInXema = this.state.entry.dictConfigs.xema.elements[elementName]
+      let children = elementInXema && elementInXema.children
+      if (content.elements) {
+        let elemntsInContent = content.elements.filter(el => !!el.name)
+        let differentElementsInXMLContent = elemntsInContent.map((value) => value.name).filter((value, index, _arr) => _arr.indexOf(value) === index).length;
+        if (!elementInXema || differentElementsInXMLContent !== (elementInXema.children && elementInXema.children.length) || 0) {
+          let artificialChildren = []
+          if (elemntsInContent) {
+            artificialChildren = elemntsInContent.map(element => {
+              return {min: 1, max: 1, name: element.name}
+            })
+          }
+          children = children || []
+          for (const child of artificialChildren) {
+            if (!children.find(el => el.name === child.name)) {
+              children.push(child)
+            }
+          }
+        }
+      }
+      return children
+    },
 
+    getElementData(elementName) {
+      let elementData = this.state.entry.dictConfigs.xemplate[elementName]
+      if (!elementData) {
+        elementData = {
+          shown: true,
+          displayType: "inline",
+          valueRenderType: "text-input"}
+      } else {
+        if (!("shown" in elementData)) {
+          elementData.shown = true
+        }
+        if (!("displayType" in elementData)) {
+          elementData.displayType = "inline"
+        }
+        if (!("valueRenderType" in elementData)) {
+          elementData.valueRenderType = "text-input"
+        }
+      }
+      return elementData
+    },
     handleChildUpdate(data) {
 
       // Update content without creating new content/elements
-      // eslint-disable-next-line no-debugger
-      // debugger
       let content = Object.assign({}, this.content)
       if (!content.elements) {
         content.elements = this.createElementTemplate(data.elementName)
@@ -194,7 +210,7 @@ export default {
 
     getComponentFromElementName(elementName) {
       const elementConfig = this.state.entry.dictConfigs.xemplate[elementName]
-      let type = elementConfig.displayType || "inline"
+      let type = (elementConfig && elementConfig.displayType) || "inline"
       return this.displayTypeToComponentMap[type]
     }
   }
