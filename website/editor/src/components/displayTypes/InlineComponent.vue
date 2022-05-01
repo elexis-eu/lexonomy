@@ -76,7 +76,7 @@ export default {
       this.showChildren = false
     },
     createElementTemplate(elementName) {
-      return xml2js(`<${elementName}></${elementName}>`, {compact: false}).elements[0]
+      return xml2js(`<${elementName}></${elementName}>`, this.state.xml2jsConfig).elements[0]
     },
     handleValueUpdate(data) {
       let content = Object.assign({}, this.calculatedContent)

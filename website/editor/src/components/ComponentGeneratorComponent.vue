@@ -135,7 +135,7 @@ export default {
     },
 
     createElementTemplate(elementName) {
-      return xml2js(`<${elementName}></${elementName}>`, {compact: false}).elements
+      return xml2js(`<${elementName}></${elementName}>`, this.state.xml2jsConfig).elements
     },
     getElementChildren(elementName, content) {
       let elementInXema = this.state.entry.dictConfigs.xema.elements[elementName]

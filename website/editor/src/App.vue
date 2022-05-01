@@ -27,8 +27,9 @@ export default {
       if(!data) {
         return
       }
-
-      data.content = xml2js(data.content || "", {compact: false})
+      // We want to make 2 separate copies of content so we can easily track dirty flag
+      this.state._initialContent = xml2js(data.content || "", this.state.xml2jsConfig)
+      data.content = xml2js(data.content || "", this.state.xml2jsConfig)
       this.state.entry = {...this.state.entry, ...data}
     }
   }

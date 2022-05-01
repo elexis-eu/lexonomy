@@ -9,7 +9,11 @@ var state = {
     editorConfig: null,
     content: {},
     contentHtml: null
-  }
+  },
+  xml2jsConfig: {
+    compact: false
+  },
+  _initialContent: null
 }
 export default {
   state: state
