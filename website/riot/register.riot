@@ -26,7 +26,7 @@
          <button class="btn waves-effect waves-light"
                name="login"
                id="loginButton"
-               onclick={ doSignUp }>Register
+               onclick={ doRegister }>Register
             <i class="material-icons right">send</i>
          </button>
       </div>
@@ -41,14 +41,14 @@
          },
 
          onKeyUp(evt){
-            evt.keyCode == 13 && this.doSignUp()
+            evt.keyCode == 13 && this.doRegister()
          },
 
-         doSignUp() {
+         doRegister() {
             let email = $("#email").val()
             if(email){
                this.update({isRegistering: true})
-               this.auth.forgotPassword(email)
+               this.auth.register(email)
                         .always(response => {
                            this.update({
                               messageSent: response.success,
