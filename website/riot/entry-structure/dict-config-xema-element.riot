@@ -1,0 +1,423 @@
+<dict-config-xema-element>
+
+    <!-- element name configuration -->
+    <div class="block">
+        <div class="title">Element</div>
+        
+        <input class="textbox tech elName" value={state.config.elementName} onkeypress={updateLocalData} data-path="config.elementName">
+        
+        <template if={state.config.elementName !== (props.config.elementName || props.elementId)}>
+            <button if={isValidXmlName(state.config.elementName)}
+                type="button" 
+                class="butRename iconAccept" 
+                onclick={applyLocalData} 
+            >
+                Rename
+            </button>
+            <button 
+                type="button" 
+                class="butRenameCancel iconCancel" 
+                onclick={resetLocalData} 
+                data-path="config.elementName"
+            >
+                Cancel renaming
+            </button>
+            <div if={!isValidXmlName(state.config.elementName)} class="warn">{state.config.elementName} is not a valid element name</div>
+        </template>
+    </div>
+
+
+    <!-- element attribute list & attribute selector -->
+    <div class="block">
+        <div class="title tight">Attributes</div>
+
+        <table>
+            <tr each={att in Object.entries(state.config.attributes).sort((a, b) => a[0].localeCompare(b[0]))}>
+                <td class="cell1" onclick={selectAttribute} data-name={att[0]}><span class="tech"><span class="ats">@</span><span class="att">{att[0]}</span></span></td>
+                <td class="cell2">
+                    <span>
+                        <label class="radio"><input type="radio" name={`optionality[${att[0]}]`} value="optional"   checked={att[1].optionality === "optional"} onchange={updateLocalData} data-apply data-path={`config.attributes.${att[0]}.optionality`}>optional</label>
+                        <label class="radio"><input type="radio" name={`optionality[${att[0]}]`} value="obligatory" checked={att[1].optionality === "obligatory"} onchange={updateLocalData} data-apply data-path={`config.attributes.${att[0]}.optionality`}>obligatory</label>
+                    </span>
+                </td>
+                <td class="cell9">
+                    <!-- TODO move attribute up/down in list. -->
+                    <!-- <button class="iconOnly iconArrowUp">&nbsp;</button>
+                    <button class="iconOnly iconArrowDown">&nbsp;</button> -->
+                    <button class="iconOnly iconCross" onclick={deleteLocalData} data-path={`config.attributes.${att[0]}`} data-apply>&nbsp;</button>
+                </td>
+            </tr>
+        </table>
+
+        <button 
+            if={!state.isAddingAttribute} 
+            class="butAtNewOpener iconAdd" 
+            onclick={beginNewAttribute} 
+        >
+            Add...
+        </button>
+
+        <template if={state.isAddingAttribute}>
+            <form onsubmit={saveNewAttribute}>
+                <input class="textbox tech atName txtAtNew" oninput={updateLocalData} data-path="newAttributeName" focus>
+                <button if={state.newAttributeName && isValidXmlName(state.newAttributeName)} class="butAtNew iconAccept" onclick={saveNewAttribute}>Add</button>
+                <button class="butAtNewCancel iconCancel" onclick={cancelNewAttribute}>Cancel</button>
+            </form>
+
+            <div class="warn errInvalidAtName" if={!isValidXmlName(state.newAttributeName)}>Cannot add, not a valid XML name.</div>
+            <div class="warn errAtNameExists" if={state.config.attributes[state.newAttributeName]}>Cannot add, such attribute already exists.</div>
+        </template>
+
+
+        
+    </div>
+
+    <!-- element content type selection -->
+    <div class="block">
+        <div class="title">Content</div>
+        <label class="radio">
+            <input type="radio" name="filling" value="chd" onchange={updateLocalData} data-apply data-path="config.filling" checked={state.config.filling === "chd"}>Child elements</label>
+        <label class="radio">
+            <input type="radio" name="filling" value="txt" onchange={updateLocalData} data-apply data-path="config.filling" checked={state.config.filling === "txt"}>Text</label>
+        <label class="radio">
+            <input type="radio" name="filling" value="inl" onchange={updateLocalData} data-apply data-path="config.filling" checked={state.config.filling === "inl"}>Text with markup</label>
+        <label class="radio">
+            <input type="radio" name="filling" value="lst" onchange={updateLocalData} data-apply data-path="config.filling" checked={state.config.filling === "lst"}>Value from list</label>
+        <label class="radio">
+            <input type="radio" name="filling" value="emp" onchange={updateLocalData} data-apply data-path="config.filling" checked={state.config.filling === "emp"}>Empty</label>
+        <label class="radio">
+            <input type="radio" name="filling" value="med" onchange={updateLocalData} data-apply data-path="config.filling" checked={state.config.filling === "med"}>Media</label>
+    </div>
+
+    <!-- child element selection/min-max/creation -->
+    <div class="block">
+        <div class="title tight">Child elements</div>
+        <table if={state.config.children.length}>
+            <tr each={(child, index) in state.computedChildren}>
+                <td class="cell1" onclick={selectElement} data-name={child.id}>
+                    <span class="tech">
+                        <span class="brak">&lt;</span>
+                        <span class="elm">{child.elementName}</span>
+                        <span class="brak">&gt;</span>
+                    </span>
+                </td>
+                <td class="cell2" style="white-space: nowrap;" >
+                    <label>min <input class="textbox min" type="number" value={child.min} onchange={updateLocalData} data-apply data-path={`config.children[${index}].min`}></label>
+                    <label>max <input class="textbox max" type="number" value={child.max} onchange={updateLocalData} data-apply data-path={`config.children[${index}].max`}></label>
+                    <!-- <button if={child.min !== props.config.children[index].min} class="change iconAccept" onclick={resetLocalData} data-path={`config.children[${index}].min`}>Change</button>
+                    <button if={child.max !== props.config.children[index].max} class="cancel iconCancel" onclick={resetLocalData} data-path={`config.children[${index}].max`}>Cancel</button> -->
+                
+                </td>
+                <td class="cell9">
+                    <!-- <button class="iconOnly iconArrowUp">&nbsp;</button>
+                    <button class="iconOnly iconArrowDown">&nbsp;</button> -->
+                    <button class="iconOnly iconCross" onclick={deleteLocalData} data-apply data-path={`config.children[${index}]`}>&nbsp;</button>
+                </td>
+
+                <td>
+                    <div>
+                        
+                        <!-- when child is also used elsewhere: make unique (need parent of child) -->
+                        <button if={child.isUsedElsewhere} onclick={makeUnique} data-name={child.id}>make&nbsp;unique</button>
+                        
+                        <!-- when child has similarly named elements elsewhere: allow replacing with those similar elements (need parent of child) -->
+                        <template if={child.hasNameSiblings}>
+                            Element {child.elementName} has different configurations: 
+                            <select data-name={child.id}>
+                                <option each={sibling in child.nameSiblings} value={sibling.id}>{sibling.parentElementName}/{sibling.elementName}</option>
+                            </select>
+                            <button onclick={replaceWithNameSibling} data-name={child.id}>use instead</button>
+                        </template>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <button if={!state.isAddingElement} class="butElNewOpener iconAdd" onclick={beginNewElement}>Add...</button>
+        <template if={state.isAddingElement}>
+            <input class="textbox tech elName txtElNew" value={state.newElementName} oninput={updateLocalData} data-path="newElementName">
+            <button if={state.newElementName && isValidXmlName(state.newElementName)} class="butElNew iconAccept" onclick={saveNewElement}>Add</button>
+            <button class="butElNewCancel iconCancel" onclick={cancelNewElement}>Cancel</button>
+            <div if={state.newElementName && !isValidXmlName(state.newElementName)} class="warn errInvalidElName">Cannot add, not a valid XML name.</div>
+        </template>
+    </div>
+
+    <style>
+
+    </style>
+    <script>
+
+        export default {
+            onBeforeMount() {
+                this.resetIfSelectedElementChanged();
+            },
+            onBeforeUpdate(prop, state) {
+                this.resetIfSelectedElementChanged()
+            },
+            resetIfSelectedElementChanged(forceReset) { // on different element selected in tree.
+                if (forceReset || (this.props.elementId && ((this.props.elementId !== this.state.elementId) || !this.state.config.elementName))) {
+                    this.state.elementId = this.props.elementId;
+                    this.state.config = JSON.parse(JSON.stringify({...this.props.config})); // deep clone.
+                    this.state.config.elementName = this.state.config.elementName || this.props.elementId;
+                    this.state.isAddingAttribute = false;
+                    this.state.newAttributeName = '';
+
+                    const xemaEntries = Object.entries(this.props.xema.elements).map(([id, config]) => ({
+                        ...config,
+                        id, 
+                        elementName: config.elementName || id
+                    }));
+
+                    // Do some preprocessing on this element's children
+                    // So we can easily see which children are also used elsewhere
+                    // and which children have similarly named children elsewhere
+                    this.state.computedChildren = this.state.config.children.map(({name, min, max}) => {
+                        const id = name;
+                        const elementName = this.props.xema.elements[name].elementName || id;
+                        // check if other elements (than this one) may contain this precise child
+                        const isUsedElsewhere = xemaEntries.some(e => e.children.some(c => c.name === id) && e.id !== this.props.elementId);
+                        // Find other elements with the same name as this child, that have a different ID
+                        // So in essence: different configs for the same element. 
+                        const nameSiblings = xemaEntries
+                            .filter(e => e.elementName === elementName && e.id !== id) // all with the same elementName but different ID
+                            .map(nameSibling => {
+                                const firstParent = xemaEntries.find(e => e.children.some(c => c.name === nameSibling.id));
+                                return {
+                                    ...nameSibling, 
+                                    parentElementName: firstParent ? firstParent.elementName : '[no parent]'
+                                }
+                            });
+                        const hasNameSiblings = nameSiblings.length > 0;
+                        return {
+                            id, elementName, isUsedElsewhere, hasNameSiblings, nameSiblings
+                        }
+                    });
+                }
+            },
+  
+            /** 
+             * Update a property in our local data copy. 
+             * The new value is event.target.value
+             * The parent data is also updated if either:
+             * 1. the triggering element has [data-apply] attribute.
+             * 2. the event is a keypress and the key is Enter.
+             */
+            updateLocalData(event) {
+                // data-path is a string representing a javascript property accessor. such as 'someObject.someProperty[someIndex]'
+                const path = event.target.getAttribute('data-path');
+                
+                const cur = this._setOrGetPath(this.state, path);
+                const next = this._setOrGetPath(this.state, path, event.target.value);
+                if (event.target.hasAttribute('data-apply') || event.keyCode === 13) this.applyLocalData();
+                else this.update();
+            },
+            /** Like updateLocalData, but delete the property instead. */
+            deleteLocalData(event) {
+                const path = event.target.getAttribute('data-path');
+                this._deletePath(this.state, path);
+                if (event.target.hasAttribute('data-apply')) this.applyLocalData();
+                else this.update();
+            },
+            /** Like updateLocalData, but reset to the (initial) value from our prop */
+            resetLocalData(event) {
+                const path = event.target.getAttribute('data-path');
+                this._setOrGetPath(this.state, path, this._setOrGetPath(this.props, path));
+                this.update();
+            },
+            /** Submit our local (changed) data to the parent component */
+            applyLocalData(event) {
+                // sanitize
+                const newConfig = JSON.parse(JSON.stringify(this.state.config));
+                if (!this.isValidXmlName(newConfig.elementName)) {
+                    newConfig.elementName = this.props.config.elementName || this.props.elementId; // not valid - reset to whatever it was prior to saving
+                }
+
+                this.props.applyLocalData(this.props.elementId, newConfig);
+            },
+
+            /** User is creating a new attribute */
+            beginNewAttribute(event) {
+                this.state.isAddingAttribute = true;
+                this.update();
+            },
+            /** User cancelend adding a new attribute */
+            cancelNewAttribute(event) {
+                this.state.isAddingAttribute = false;
+                this.update();
+            },
+            /** User commits new attribute */
+            saveNewAttribute(event) {
+                // sanity check.
+                if (!this.state.config.attributes[this.state.newAttributeName] && this.state.newAttributeName && this.isValidXmlName(this.state.newAttributeName)) {
+                    this.state.config.attributes[this.state.newAttributeName] = {
+                        optionality: 'optional',
+                        filling: 'txt',
+                        values: []
+                    }
+                    this.state.newAttributeName = '';
+                    this.state.isAddingAttribute = false;
+                    this.applyLocalData();
+                    this.update();
+                }
+            },
+
+            /** User is adding a new element child */
+            beginNewElement(event) {
+                this.state.isAddingElement = true;
+                this.update();
+            },
+            /** User canceled adding a new element child */
+            cancelNewElement(event) {
+                this.state.isAddingElement = false;
+                this.update();
+            },
+            /** User commits new element child */
+            saveNewElement(event) {
+                if (!this.isValidXmlName(this.state.newElementName)) {
+                    return; 
+                }
+                const idOfNewChild = this.state.newElementName;
+                if (!this.props.xema.elements[idOfNewChild]) { // doesn't exist (yet) - create!
+                    this.props.createElement(newId, {
+                        elementName: this.state.newElementName,
+                        filling: 'emp',
+                        children: [],
+                        values: [],
+                        attributes: {}
+                    });
+                }
+
+                this.state.newElementName = '';
+                this.state.isAddingElement = false;
+                this.state.config.children.push({name: idOfNewChild})
+                this.applyLocalData();
+            },
+
+            /** 
+             * For a child element of this element:
+             * if the child may also occur in other elements, make a local copy of the child.
+             * Essentially go from
+             * {
+             *    thisElement: { children: [{name: someChild}] },
+             *    someOtherElement: { children: [{name: someChild}] }, // same child!
+             * 
+             *    someChild: {...}
+             * }
+             * To: 
+             * {
+             *    thisElement: { children: [{name: someChildCopy}] },
+             *    someOtherElement: { children: [{name: someChild}] }, // now a different child!
+             * 
+             *    someChild: {...},
+             *    someChildCopy: {...}
+             * }
+             */
+            makeUnique(event) {
+                const currentChildId = event.target.getAttribute('data-name');
+                const currentChildConfig = JSON.parse(JSON.stringify(this.props.xema.elements[currentChildId]));
+                currentChildConfig.elementName = currentChildConfig.elementName || currentChildId; // make sure we set the element name, since the ID will change and so will no longer work as fallback.
+
+                // create a unique id for the clone by appending numbers
+                let n = 0;
+                let newChildId = currentChildId + n;
+                while (this.props.xema.elements[newChildId]) {
+                    newChildId = currentChildId + (++n);
+                }
+                
+                // now clone the child under the new id
+                this.props.createElement(newChildId, currentChildConfig);
+                // replace the current child with the new (unique) child.
+                this.state.config.children.forEach(c => {
+                    if (c.name == currentChildId) c.name = newChildId;
+                })
+                // and save!
+                this.applyLocalData(); // propagate to parent
+                this.resetIfSelectedElementChanged(true); // manually rerun computed/derived values
+                this.update(); // update DOM
+            },
+            /**
+             * The opposite of makeUnique
+             * Replace one of our children with another child that has the same elementName, but a different definition
+             * From: 
+             * {
+             *    thisElement: { children: [{name: someChildWithTheSameElementName}] },
+             *    someOtherElement: { children: [{name: someChild}] }, 
+             * 
+             *    someChild: { elementName: 'foo' },
+             *    someChildWithTheSameElementName: { elementName: 'foo' }
+             * }
+             * To: 
+             * {
+             *    thisElement: { children: [{name: someChild}] },
+             *    someOtherElement: { children: [{name: someChild}] }, 
+             * 
+             *    someChild: { elementName: 'foo' },
+             *    // someChildWithTheSameElementName is deleted because it became an orphan
+             * } 
+             */
+            replaceWithNameSibling(event) {
+                const childIdToReplace = event.target.getAttribute('data-name');
+                const childIdToReplaceWith = this.$(`select[data-name="${childIdToReplace}"]`).value; // this.$ is scope selector
+                if (!childIdToReplaceWith) return; // user should make a selection first.
+
+                const childHasOtherParents = Object.entries(this.props.xema.elements).some(([id, element]) => id !== this.props.elementId && element.children.some(c => c.name === childIdToReplace));
+                
+                // now replace
+                // first replace our own child with the chosen one
+                this.state.config.children.forEach(c => {
+                    if (c.name === childIdToReplace) c.name = childIdToReplaceWith;
+                });
+                
+                this.applyLocalData();
+                if (!childHasOtherParents) this.props.deleteElement(childIdToReplace);
+                this.resetIfSelectedElementChanged(true);
+                this.update();
+            },
+
+            /**
+             * Set or return the value at an arbitrary property path
+             * @param object any object 
+             * @param {string} path any path like "some.property.path[in].the.object"
+             * @param {any} [newValue] (optional) the new value to set to the property
+             */
+            _setOrGetPath() { 
+                const [object, path] = arguments;
+                // see if we actually got a new value to set, to differentiate between _setOrGet(state, path) and _setOrGet(state, path, undefined).
+                let newValue = undefined;
+                let newValueProvided = false;
+                if (arguments.length > 2) { 
+                    newValue = arguments[2];
+                    newValueProvided = true;
+                }
+
+                const pathParts = path.split(/[\.\[\]\'\"]/).filter(p => p);
+                const lastIndex = newValueProvided ? pathParts.pop() : undefined;
+                const v = pathParts.reduce((o, p) => o ? o[p] : undefined, object);
+                return newValueProvided ? v[lastIndex] = JSON.parse(JSON.stringify(newValue)) : v;
+            },
+            /** Delete the property at the path. If path points at an array entry, remove it in place. */
+            _deletePath(object, path) {
+                const pathParts = path.split(/[\.\[\]\'\"]/).filter(p => p);
+                const lastIndex = pathParts.pop();
+                const v = pathParts.reduce((o, p) => o ? o[p] : undefined, object);
+                if (Array.isArray(v)) v.splice(lastIndex, 1)
+                else delete v[lastIndex]
+            },
+
+            selectAttribute(event) {
+                // focus attribute
+                this.props.selectElementOrAttribute(this.props.elementId, event.currentTarget.getAttribute('data-name'));
+            },
+            selectElement(event) {
+                this.props.selectElementOrAttribute(event.currentTarget.getAttribute('data-name'), undefined);
+            },
+
+            isValidXmlName(str) {
+                if (!str) return false;
+                if (/[=\s\"\']/.test(str)) return false;
+                try { $.parseXML("<" + str + "/>"); } catch (err) { return false; }
+                return true;
+            }
+        }
+    </script>
+</dict-config-xema-element>

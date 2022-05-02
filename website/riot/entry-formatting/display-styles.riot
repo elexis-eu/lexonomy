@@ -147,7 +147,7 @@
         let existingData = this.configData[this.elementName]
         let elementConfigData = this.props.elementConfigData
         if (this.attributeName) {
-          existingData = existingData.attributes && existingData.attributes[this.attributeName]
+          existingData = existingData && existingData.attributes && existingData.attributes[this.attributeName]
           elementConfigData = elementConfigData.attributes && elementConfigData.attributes[this.attributeName]
         }
         if (!existingData) {

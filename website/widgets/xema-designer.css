@@ -1,88 +1,88 @@
-div#editor.designer { font-family: sans-serif; margin: 0 !important; padding: 0 !important; overflow: hidden; line-height: 1.3em; font-size: 0.9rem; position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; }
+#editor.designer { font-family: sans-serif; margin: 0 !important; padding: 0 !important; overflow: hidden; line-height: 1.3em; font-size: 0.9rem; position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; }
 
-div#editor.designer span.tech {font-family: monospace; font-size: 1rem;}
-div#editor.designer span.tech span.brak {color: #669acc;}
-div#editor.designer span.tech span.elm {color: #cc3333;}
-div#editor.designer span.tech span.ats {color: #999999;}
-div#editor.designer span.tech span.att {color: #ff4455;}
+#editor.designer .tech {font-family: monospace; font-size: 1rem;}
+#editor.designer .tech .brak {color: #669acc;}
+#editor.designer .tech .elm {color: #cc3333;}
+#editor.designer .tech .ats {color: #999999;}
+#editor.designer .tech .att {color: #ff4455;}
 
-div#editor.designer select { margin: 0px 0px 0px 0px; font: inherit; padding: 1px 2px; display: inline-block; vertical-align: middle; width: 100%; cursor: pointer;}
-div#editor.designer select option {padding: 4px 10px; color: #333333; }
-div#editor.designer select.none {color: #999999;}
-div#editor.designer input.textbox { margin: 0px 10px 0px 1px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 7px 10px 8px 10px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
-div#editor.designer input.textbox.tech {font-family: monospace; font-size: 1rem; }
-div#editor.designer input.textbox.elName {width: 20em; color: #cc3333;}
-div#editor.designer input.textbox.atName {width: 20em; color: #ff4455;}
-div#editor.designer button { background-position: 10px center; background-repeat: no-repeat; margin: 4px 10px 0px 1px; font: inherit; border-width: 0px; cursor: pointer; background-color: #ffffff; border-bottom: 1px solid #cccccc; color: #004f9b; padding: 7px 10px 6px 35px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
-div#editor.designer button:hover { background-color: #f7f9ea;}
-div#editor.designer button.iconOnly { border: 0px; padding: 5px 0px 5px 0px; background-position: center center; background-repeat: no-repeat; min-width: 30px; margin: 0px 0px 0px 10px; }
-div#editor.designer button.iconCancel { background-image: url(../furniture/cancel.png);}
-div#editor.designer button.iconCross { background-image: url(../furniture/cross.png);}
-div#editor.designer button.iconAccept { background-image: url(../furniture/accept.png);}
-div#editor.designer button.iconAdd { background-image: url(../furniture/add.png);}
-div#editor.designer button.iconArrowUp { background-image: url(../furniture/arrow_up.png);}
-div#editor.designer button.iconArrowDown { background-image: url(../furniture/arrow_down.png);}
-div#editor.designer label.radio { position: relative; top: -3px; }
-div#editor.designer label.radio input { position: relative; top: 3px;}
-div#editor.designer label {cursor: pointer; margin-right: 10px; white-space: nowrap;}
-div#editor.designer label:hover { background-color: #f7f9ea; padding: 5px 0px 5px 0px; }
-div#editor.designer label.big {font-weight: bold; font-size: 1rem;}
-div#editor.designer label.readonly {color: #999999; cursor: default;}
-div#editor.designer label.readonly:hover {background-color: transparent;}
+#editor.designer select { margin: 0px 0px 0px 0px; font: inherit; padding: 1px 2px; display: inline-block; vertical-align: middle; width: 100%; cursor: pointer;}
+#editor.designer select option {padding: 4px 10px; color: #333333; }
+#editor.designer select.none {color: #999999;}
+#editor.designer input.textbox { margin: 0px 10px 0px 1px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 7px 10px 8px 10px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
+#editor.designer input.textbox.tech {font-family: monospace; font-size: 1rem; }
+#editor.designer input.textbox.elName {width: 20em; color: #cc3333;}
+#editor.designer input.textbox.atName {width: 20em; color: #ff4455;}
+#editor.designer button { background-position: 10px center; background-repeat: no-repeat; margin: 4px 10px 0px 1px; font: inherit; border-width: 0px; cursor: pointer; background-color: #ffffff; border-bottom: 1px solid #cccccc; color: #004f9b; padding: 7px 10px 6px 35px; min-height: 1.3em; display: inline-block; vertical-align: middle;}
+#editor.designer button:hover { background-color: #f7f9ea;}
+#editor.designer button.iconOnly { border: 0px; padding: 5px 0px 5px 0px; background-position: center center; background-repeat: no-repeat; min-width: 30px; margin: 0px 0px 0px 10px; }
+#editor.designer button.iconCancel { background-image: url(../furniture/cancel.png);}
+#editor.designer button.iconCross { background-image: url(../furniture/cross.png);}
+#editor.designer button.iconAccept { background-image: url(../furniture/accept.png);}
+#editor.designer button.iconAdd { background-image: url(../furniture/add.png);}
+#editor.designer button.iconArrowUp { background-image: url(../furniture/arrow_up.png);}
+#editor.designer button.iconArrowDown { background-image: url(../furniture/arrow_down.png);}
+#editor.designer label.radio { position: relative; top: -3px; }
+#editor.designer label.radio input { position: relative; top: 3px;}
+#editor.designer label {cursor: pointer; margin-right: 10px; white-space: nowrap;}
+#editor.designer label:hover { background-color: #f7f9ea; padding: 5px 0px 5px 0px; }
+#editor.designer label.big {font-weight: bold; font-size: 1rem;}
+#editor.designer label.readonly {color: #999999; cursor: default;}
+#editor.designer label.readonly:hover {background-color: transparent;}
 
-div#editor.designer div.instro {margin: 5px 0px 10px 0px; color: #999999; }
-div#editor.designer div.instro.undercheck {margin-left: 32px; }
+#editor.designer .instro {margin: 5px 0px 10px 0px; color: #999999; }
+#editor.designer .instro.undercheck {margin-left: 32px; }
 
-div#editor.designer textarea.textbox { box-sizing: border-box; resize: vertical; height: 10em; margin: 0px 10px 0px 1px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 7px 10px 8px 10px; min-height: 1.3em; display: inline-block; vertical-align: middle; width: 100%; font-family: monospace; font-size: 1rem;}
+#editor.designer textarea.textbox { box-sizing: border-box; resize: vertical; height: 10em; margin: 0px 10px 0px 1px; font: inherit; border-width: 0px; border-radius: 4px; background-color: #ffffff; box-shadow: inset 0px 0px 2px #666666; padding: 7px 10px 8px 10px; min-height: 1.3em; display: inline-block; vertical-align: middle; width: 100%; font-family: monospace; font-size: 1rem;}
 
-div#editor.designer div.warn { background-image: url(../furniture/exclamation.png); background-repeat: no-repeat; background-position: left center; padding-left: 25px; color: #333333; margin-top: 10px; }
+#editor.designer .warn { background-image: url(../furniture/exclamation.png); background-repeat: no-repeat; background-position: left center; padding-left: 25px; color: #333333; margin-top: 10px; }
 
-div#editor.designer div.list { position: absolute; top: 0px; left: 0px; bottom: 0px; width: 30%; padding: 15px 0px; overflow-x: auto; overflow-y: auto; border-right: 1px solid #1e6bcf; }
-div#editor.designer div.list div.element { cursor: pointer; padding: 5px 5px; margin: 0px 15px 0px 25px; position: relative;}
-div#editor.designer div.list div.element.root { }
-div#editor.designer div.list div.attribute { cursor: pointer; padding: 5px 5px; margin: 0px 15px 0px 25px; position: relative; }
-div#editor.designer div.list div.clickable:hover { background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff; }
-div#editor.designer div.list div.clickable.current { background-color: rgb(153, 212, 255); border-radius: 2px; text-shadow: 1px 1px 0px #dddddd;}
-div#editor.designer div.list div.children {margin-left: 10px; padding-left: 5px; border-left: 1px dotted #cccccc; margin-top: -14px; padding-top: 14px;}
-div#editor.designer div.list div.container { position: relative; margin: 0px 0px 0px 10px; }
-div#editor.designer div.list div.horizontal { position: absolute; top: 15px; left: -15px; width: 50px; border-top: 1px dotted #cccccc;}
-div#editor.designer div.list div.children > div.blinder { position: absolute; left: 5px; width: 10px; bottom: 0px; background-color: #ffffff; top: 100px;}
-div#editor.designer div.list div.title:not(.container) { margin: 20px 0px 10px 15px; }
-div#editor.designer div.list div.title:not(.container) span { background-color: #eeeeee; padding: 7px 10px; color: #666666; text-shadow: 1px 1px 0px #ffffff; }
+#editor.designer .list { padding: 15px 0px; border-right: 1px solid #1e6bcf; }
+#editor.designer .list .element { cursor: pointer; padding: 5px 5px; margin: 0px 15px 0px 25px; position: relative;}
+#editor.designer .list .element.root { }
+#editor.designer .list .attribute { cursor: pointer; padding: 5px 5px; margin: 0px 15px 0px 25px; position: relative; }
+#editor.designer .list .clickable:hover { background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff; }
+#editor.designer .list .clickable.current { background-color: rgb(153, 212, 255); border-radius: 2px; text-shadow: 1px 1px 0px #dddddd;}
+#editor.designer .list .children {margin-left: 10px; padding-left: 5px; border-left: 1px dotted #cccccc; margin-top: -14px; padding-top: 14px;}
+#editor.designer .list .container { position: relative; margin: 0px 0px 0px 10px; }
+#editor.designer .list .horizontal { position: absolute; top: 15px; left: -15px; width: 50px; border-top: 1px dotted #cccccc;}
+#editor.designer .list .children > .blinder { position: absolute; left: 5px; width: 10px; bottom: 0px; background-color: #ffffff; top: 100px;}
+#editor.designer .list .title:not(.container) { margin: 20px 0px 10px 15px; }
+#editor.designer .list .title:not(.container) span { background-color: #eeeeee; padding: 7px 10px; color: #666666; text-shadow: 1px 1px 0px #ffffff; }
 
-div#editor.designer div.list div.container > div.horizontal span.plusminus {display: none;}
-div#editor.designer div.list div.container.hasChildren > div.horizontal span.plusminus { display: block; background-image: url(../furniture/minus.gif); width: 18px; height: 18px; background-position: center center; background-repeat: no-repeat; position: absolute; top: -9px; left: 17px; cursor: pointer; }
-div#editor.designer div.list div.container.hasChildren > div.horizontal span.plusminus:hover { background-color: #f7f9ea; }
-div#editor.designer div.list div.container.hasChildren.collapsed > div.horizontal span.plusminus { background-image: url(../furniture/plus.gif); }
-div#editor.designer div.list div.container.hasChildren.collapsed > div.children {display: none;}
+#editor.designer .list .container > .horizontal .plusminus {display: none;}
+#editor.designer .list .container.hasChildren > .horizontal .plusminus { display: block; background-image: url(../furniture/minus.gif); width: 18px; height: 18px; background-position: center center; background-repeat: no-repeat; position: absolute; top: -9px; left: 17px; cursor: pointer; }
+#editor.designer .list .container.hasChildren > .horizontal .plusminus:hover { background-color: #f7f9ea; }
+#editor.designer .list .container.hasChildren.collapsed > .horizontal .plusminus { background-image: url(../furniture/plus.gif); }
+#editor.designer .list .container.hasChildren.collapsed > .children {display: none;}
 
-div#editor.designer div.details { position: absolute; top: 0px; left: 30%; bottom: 0px; right: 0px; overflow-x: hidden; overflow-y: auto; padding: 5px 0px; }
-div#editor.designer div.details div.block { margin: 10px 15px; padding: 5px 0px 5px 0px;}
-div#editor.designer div.details div.block:first-child {padding-top: 0px;}
-div#editor.designer div.details div.block > div.title { background-color: #eeeeee; padding: 10px 10px; border-radius: 2px; margin-bottom: 10px; text-shadow: 1px 1px 0px #ffffff;}
-div#editor.designer div.details div.block > div.title.tight { margin-bottom: 5px; }
+#editor.designer .details { padding: 5px 0px; }
+#editor.designer .details .block { margin: 10px 15px; padding: 5px 0px 5px 0px;}
+#editor.designer .details .block:first-child {padding-top: 0px;}
+#editor.designer .details .block > .title { background-color: #eeeeee; padding: 10px 10px; border-radius: 2px; margin-bottom: 10px; text-shadow: 1px 1px 0px #ffffff;}
+#editor.designer .details .block > .title.tight { margin-bottom: 5px; }
 
-div#editor.designer table { width: 100%; margin: -5px 0px 5px 0px; border-spacing: 0px;}
-div#editor.designer table tr {  }
-div#editor.designer table tr td { border-bottom: 1px solid #dddddd; padding: 7px 20px 5px 0px; white-space: nowrap; }
-div#editor.designer table tr td div.caption {margin-left: 10px; white-space: nowrap;}
-div#editor.designer table tr td.cell9 { width: 100%; text-align: right; padding-right: 0px;}
-div#editor.designer table tr td span.tech { cursor: pointer; margin-left: 5px; }
-div#editor.designer table tr td span.tech:hover { background-color: #f7f9ea; padding: 5px; margin: 0px -5px 0px 0px; }
-div#editor.designer table tr td input.textbox {width: 2em; padding: 4px 5px 4px 5px; text-align: center; color: #033f8a; }
-div#editor.designer table tr td button {padding: 3px 5px 3px 35px; margin-top: 1px; text-align: center; color: #033f8a; }
-div#editor.designer input.textbox.val { font-family: monospace; font-size: 1rem; color: #0268cb; width: 8em; text-align: left; padding: 5px 10px 6px 10px;}
-div#editor.designer input.textbox.cap { color: #666666; width: 30em; text-align: left; padding: 7px 10px 8px 10px; }
+#editor.designer table { border-spacing: 0px; table-layout: fixed; }
+#editor.designer table tr {  }
+#editor.designer table tr td { border-bottom: 1px solid #dddddd; padding: 7px 20px 5px 0px; }
+#editor.designer table tr td .caption {margin-left: 10px; }
+#editor.designer table tr td.cell9 { text-align: right; padding-right: 0px;}
+#editor.designer table tr td .tech { cursor: pointer; margin-left: 5px; }
+#editor.designer table tr td .tech:hover { background-color: #f7f9ea; padding: 5px; margin: 0px -5px 0px 0px; }
+#editor.designer table tr td input.textbox {width: 2em; padding: 4px 5px 4px 5px; text-align: center; color: #033f8a; }
+#editor.designer table tr td button {padding: 3px 5px 3px 35px; margin-top: 1px; text-align: center; color: #033f8a; }
+#editor.designer input.textbox.val { font-family: monospace; font-size: 1rem; color: #0268cb; width: 8em; text-align: left; padding: 5px 10px 6px 10px;}
+#editor.designer input.textbox.cap { color: #666666; width: 30em; text-align: left; padding: 7px 10px 8px 10px; }
 
-div#editor.designer table tr:first-child td button.iconArrowUp { visibility: hidden;}
-div#editor.designer table tr:last-child td button.iconArrowDown { visibility: hidden;}
+#editor.designer table tr:first-child td button.iconArrowUp { visibility: hidden;}
+#editor.designer table tr:last-child td button.iconArrowDown { visibility: hidden;}
 
-div#editor.designer div.details.narrow {right: 40%;}
-div#editor.designer div.preview { position: absolute; top: 0px; left: 60%; bottom: 0px; right: 0px; overflow-x: hidden; overflow-y: auto; padding: 5px 0px; border-left: 1px solid #1e6bcf; background-color: #f6f6f6;}
-div#editor.designer div.preview div.block { margin: 10px 15px 0px 15px; padding: 5px 0px 5px 0px;}
-div#editor.designer div.preview div.block:first-child {padding-top: 0px;}
-div#editor.designer div.preview div.block > div.title { background-color: #dddddd; padding: 10px 10px; border-radius: 2px; margin-bottom: 10px; text-shadow: 1px 1px 0px #ffffff;}
-div#editor.designer div.preview div.block > div.title > span.reload {float: right; background-image: url(../furniture/arrow_refresh.png); background-position: left center; background-repeat: no-repeat; padding: 5px 0px 5px 25px; position: relative; top: -5px; cursor: pointer; color: #004f9b; }
-div#editor.designer div.preview div.block > div.title > span.reload:hover {color: #1969b6;}
-div#editor.designer div.preview div.viewer {padding: 0px 30px 30px 30px;}
-div#editor.designer div.preview div.noentries {padding: 0px 20px 20px 25px; color: #999999;}
+#editor.designer .details.narrow {right: 40%;}
+#editor.designer .preview { overflow-x: hidden; overflow-y: auto; padding: 5px 0px; border-left: 1px solid #1e6bcf; background-color: #f6f6f6;}
+#editor.designer .preview .block { margin: 10px 15px 0px 15px; padding: 5px 0px 5px 0px;}
+#editor.designer .preview .block:first-child {padding-top: 0px;}
+#editor.designer .preview .block > .title { background-color: #dddddd; padding: 10px 10px; border-radius: 2px; margin-bottom: 10px; text-shadow: 1px 1px 0px #ffffff;}
+#editor.designer .preview .block > .title > .reload {float: right; background-image: url(../furniture/arrow_refresh.png); background-position: left center; background-repeat: no-repeat; padding: 5px 0px 5px 25px; position: relative; top: -5px; cursor: pointer; color: #004f9b; }
+#editor.designer .preview .block > .title > .reload:hover {color: #1969b6;}
+#editor.designer .preview .viewer {padding: 0px 30px 30px 30px;}
+#editor.designer .preview .noentries {padding: 0px 20px 20px 25px; color: #999999;}

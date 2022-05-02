@@ -2,17 +2,22 @@
   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId }
                    configTitle={ configTitle }/>
   <h3>Entry formatting</h3>
-  <div
-    if={ (!this.configData._xsl || this.configData._xsl == "") && (!this.configData._css || this.configData._css == "") && !this.override }
-  >
+  <div if={ (!this.configData._xsl || this.configData._xsl == "") && (!this.configData._css || this.configData._css == "") && !this.override }>
     <div style="display: flex">
-      <div id="editor" class="designer" style="width: 30%">
-        <div id="rendered-xml-structure" class="render-xml-structure list"
-             style="position: static; width: 100% !important; border-right: none">
+      <!-- TODO fixup styles so we don't need this sillyness. -->
+      <div style="flex-basis: 0; width: auto; position: static; overflow: initial!important; margin-right: 15px;!important" id="editor" class="designer">
+        <div class="list">
+          <dict-config-element-in-tree each={root in state.roots} 
+            data={root} 
+            xema={props.dictConfigs.xema}
+            current-element={elementName}
+            current-attribute={attributeName}
+            selectElementOrAttribute={selectElementOrAttribute}
+          />
         </div>
       </div>
-      <display-styles
-        if={this.elementName}
+
+      <display-styles if={this.elementName}
         name="displayStylesComponent"
         elementName={this.elementName}
         attributeName={attributeName}
@@ -22,8 +27,8 @@
         configId={this.props.configId}
         save-data={handleElementData}
       />
-
     </div>
+
     <div class="row">
       <div class="col s10">
         <button class="btn waves-effect waves-light" onclick={ startOverride }>Use your own stylesheet <i
@@ -119,21 +124,22 @@ div.myEntry span.myHeadword {font-weight: bold}
         this.configId = this.props.configId
         this.props.loadDictDetail()
         this.fillConfigForm()
-        document.addEventListener("selectedXMLElement", this.handleSelectedXMLElement)
+        // document.addEventListener("selectedXMLElement", this.handleSelectedXMLElement)
       },
 
-      onUpdated() {
-        if (this.props.dictConfigs.xema && this.configData != {} && !this.override && !this.elementName) {
-          XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId, true)
-
-        }
+      onBeforeUpdate() {
+        const xema = (this.props.dictConfigs || {}).xema;
+        if (!xema || !xema.elements) return;
+        const roots = new Set(Object.keys(xema.elements));
+        Object.values(xema.elements).forEach(el => el.children.forEach(c => roots.delete(c.name)));
+        this.state.roots = [...roots].map(id => ({...xema.elements[id], id})); // add ID so tree renderer knows the id of every element
       },
 
       async fillConfigForm() {
         this.props.loadConfigData(this.configId).then((response) => {
           this.configData = response
-          if ((this.configData._xsl && this.configData._xsl != "") || (this.configData._css && this.configData._css != "")) {
-            this.override = true
+          this.override = !!(this.configData._xsl || this.configData._css);
+          if (this.override) {
             this.update()
             M.updateTextFields()
             M.textareaAutoResize($('#editor_css'))
@@ -156,12 +162,9 @@ div.myEntry span.myHeadword {font-weight: bold}
         return newData
       },
 
-      handleSelectedXMLElement(event) {
-        if (this.elementName === event.detail.elementName && this.attributeName === event.detail.attributeName) {
-          return
-        }
-        this.elementName = event.detail.elementName
-        this.attributeName = event.detail.attributeName || null
+      selectElementOrAttribute(elementId, attributeId) {
+        this.elementName = elementId;
+        this.attributeName = attributeId || null;
         this.update()
       },
 
@@ -189,24 +192,6 @@ div.myEntry span.myHeadword {font-weight: bold}
   </script>
 
   <style>
-    #editor {
-      position: relative !important;
-      min-height: 1050px;
-    }
-
-    #editor .list {
-      width: 25% !important;
-    }
-
-    #editor .details {
-      left: 25% !important;
-      width: 35% !important;
-    }
-
-    #editor .preview {
-      left: 60% !important;
-      width: 40% !important;
-    }
 
     #editor.designer input[type=radio] {
       opacity: 1 !important;

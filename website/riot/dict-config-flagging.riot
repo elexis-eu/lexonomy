@@ -140,7 +140,6 @@
 
          async fillConfigForm() {
             this.props.loadConfigData(this.configId).then((response)=>{
-               debugger
                this.configData = {flag_element: "", flags: []}
                if (response.flag_element && response.flag_element != "") {
                   this.configData = response;

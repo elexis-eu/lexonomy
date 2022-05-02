@@ -1,172 +1,192 @@
 <dict-config-xema>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
+   <dict-config-nav 
+      dictId={ props.dictId } 
+      dictTitle={ props.dictDetails.title } 
+      configId={ props.configId } 
+      configTitle={ configTitle }
+   />
+
    <h3>Entry structure</h3>
-   <div if={ (!this.configData._xonomyDocSpec || this.configData._xonomyDocSpec == "") && (!this.configData._dtd || this.configData._dtd == "") && !this.override }>
-      <div class="row">
-         <div id="editor" class="col s12">
+   <div if={ !state.xema }>Loading...</div>
+
+   <template if={state.xema}>
+
+      <div if={ !state.override } id="editor" class="editor designer">
+         <div class="list">
+            <dict-config-element-in-tree each={root in state.roots} 
+               data={root} 
+               xema={state.xema}
+               current-element={state.currentElement}
+               current-attribute={state.currentAttribute}
+               selectElementOrAttribute={selectElementOrAttribute}
+            />
+         </div>
+         <div class="details">
+            <dict-config-xema-element if={state.currentElement && !state.currentAttribute} 
+               elementId={state.currentElement} 
+               xema={state.xema}
+               config={state.xema.elements[state.currentElement]}
+               applyLocalData={onXemaElementUpdated}
+               createElement={onXemaElementUpdated}
+               selectElementOrAttribute={selectElementOrAttribute}
+               deleteElement={onXemaElementDeleted}
+            />
+   
+            <dict-config-xema-attribute if={state.currentElement && state.currentAttribute} 
+               elementId={state.currentElement} 
+               attributeId={state.currentAttribute} 
+               xema={state.xema}
+               config={state.xema.elements[state.currentElement].attributes[state.currentAttribute]}
+
+               applyLocalData={onXemaAttributeUpdated}
+               renameAttribute={onXemaAttributeRenamed}
+            />
          </div>
       </div>
-      <div class="row">
-         <div class="col s10">
-            <button class="btn waves-effect waves-light" onclick={ startOverride } >Use your own schema <i class="material-icons right">edit</i>
-            </button>
+   
+      <div if={ state.override }>
+         <div class="row">
+            <div class="col s10">
+               <p>To specify your custom Lexonomy schema use either <i>Xonomy Document Specification</i>, or <i>DTD</i>.</p>
+               <h5>Xonomy Document Specification</h5>
+               <p>A <a href="http://www.lexiconista.com/xonomy/" target="_blank">Xonomy Document Specification</a> is a JavaScript object which configures the Xonomy XML editor used in Lexonomy.</p>
+            </div>
          </div>
-      </div>
-   </div>
-   <div if={ (this.configData._xonomyDocSpec && this.configData._xonomyDocSpec != "") || (this.configData._dtd && this.configData._dtd != "") || this.override }>
-      <div class="row">
-         <div class="col s10">
-            <p>To specify your custom Lexonomy schema use either <i>Xonomy Document Specification</i>, or <i>DTD</i>.</p>
-            <h5>Xonomy Document Specification</h5>
-            <p>A <a href="http://www.lexiconista.com/xonomy/" target="_blank">Xonomy Document Specification</a> is a JavaScript object which configures the Xonomy XML editor used in Lexonomy.</p>
+         <div class="row">
+            <div class="input-field col s10">
+               <textarea id="editor_doc" class="materialize-textarea" placeholder="">{ state.xema._xonomyDocSpec || ""}</textarea>
+               <label for="editor_doc">Document specification</label>
+               <span class="helper-text">Xonomy Document Specification. If you would like to see an example, <a onclick={ exampleDoc }>click here to load a sample specification</a>.</span>
+            </div>
          </div>
-      </div>
-      <div class="row">
-         <div class="input-field col s10">
-            <textarea id="editor_doc" class="materialize-textarea" placeholder="">{ this.configData._xonomyDocSpec }</textarea>
-            <label for="editor_doc">Document specification</label>
-            <span class="helper-text">Xonomy Document Specification. If you would like to see an example, <a onclick={ exampleDoc }>click here to load a sample specification</a>.</span>
+         <div class="row">
+            <div class="input-field col s10">
+               <textarea id="editor_xml" class="materialize-textarea" placeholder="">{ state.xema._css || "" }</textarea>
+               <label for="editor_xml">Template for new entries</label>
+               <span class="helper-text">XML template for newly created entries. If you would like to see an example, <a onclick={ exampleXML }>click here to load a sample XML template</a>.</span>
+            </div>
          </div>
-      </div>
-      <div class="row">
-         <div class="input-field col s10">
-            <textarea id="editor_xml" class="materialize-textarea" placeholder="">{ this.configData._css }</textarea>
-            <label for="editor_xml">Template for new entries</label>
-            <span class="helper-text">XML template for newly created entries. If you would like to see an example, <a onclick={ exampleXML }>click here to load a sample XML template</a>.</span>
+         <div class="row">
+            <div class="col s10">
+               <h5>DTD (Document Type Defition)</h5>
+               <p><a href="https://en.wikipedia.org/wiki/Document_type_definition" target="_blank">Document Type Definitions</a> are a popular formalism for defining the structure of XML documents.</p>
+            </div>
          </div>
-      </div>
-      <div class="row">
-         <div class="col s10">
-            <h5>DTD (Document Type Defition)</h5>
-            <p><a href="https://en.wikipedia.org/wiki/Document_type_definition" target="_blank">Document Type Definitions</a> are a popular formalism for defining the structure of XML documents.</p>
-         </div>
-      </div>
-      <div class="row">
-         <div class="input-field col s10">
-            <textarea id="editor_dtd" class="materialize-textarea" placeholder="">{ this.configData._dtd }</textarea>
-            <label for="editor_dtd">Your DTD</label>
-            <span class="helper-text">If you would like to see an example, <a onclick={ exampleDTD }>click here to load a sample DTD</a>.</span>
+         <div class="row">
+            <div class="input-field col s10">
+               <textarea id="editor_dtd" class="materialize-textarea" placeholder="">{ state.xema._dtd || "" }</textarea>
+               <label for="editor_dtd">Your DTD</label>
+               <span class="helper-text">If you would like to see an example, <a onclick={ exampleDTD }>click here to load a sample DTD</a>.</span>
+            </div>
          </div>
       </div>
 
-      <div class="row">
-         <div class="col s10">
-            <button class="btn waves-effect waves-light" onclick={ stopOverride } >Stop using your own schema <i class="material-icons right">edit</i>
-            </button>
-         </div>
+      <div>
+         <button class="btn waves-effect waves-light" onclick={ toggleOverride } > {state.override ? 'Stop using your own schema' : 'Use your own schema' } <i class="material-icons right">edit</i></button>
       </div>
-   </div>
-   <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+      <dict-config-buttons save-data={saveData} dict-id={props.dictId}></dict-config-buttons>
+   </template>
 
    <style>
       #editor {
          position: relative !important;
          min-height: 750px;
+         display: flex;
+         flex-wrap: nowrap;
       }
-      #editor .list {
-         width: 25% !important;
-      }
-      #editor .details {
-         left: 25% !important;
-      }
+      #editor .details {flex-grow: 1;}
+
+      .editor .list { flex-basis: 0; }
+      
       #editor.designer input.textbox.cap {
          width: 15em !important;
       }
       #editor.designer input[type=radio] {
          opacity: 1 !important;
       }
+      dict-config-xema {
+         display: block;
+      }
    </style>
 
    <script>
       export default {
-         dictId: '',
-         configId: '',
+      /**
+       * @typedef {Object} XemaElementChild
+       * @property {number} min minimum number of occurances, 0 = optional
+       * @property {number|null} max maximum number of occurances, null = unbounded
+       * @property {string} name id of the element (note: NOT the element name per se)
+       */
+
+      /**
+       * @typedef {Object} XemaAttributeValue
+       * @property {string} value the value
+       * @property {string} caption the human-readable display name
+       */
+
+      /**
+       * @typedef {Object} XemaAttribute
+       * @property {'optional'|'obligatory'} optionality
+       * @property {'txt'|'lst'} filling - text for any text, lst if only a predefined set of values is allowed, which is defined in the values property
+       * @property {XemaAttributeValue[]} [values] (optional) list of values. Check filling property 
+       */
+
+      /**
+       * @typedef {Object} XemaElement
+       * @property {string} [elementName] the xml element name, use the key of this element in Xema.elements if not set.
+       * @property {'inl'|'txt'|'chd'|'emp'} filling inl = mixed text and elements, txt = text only, chd = element only, emp = empty (no children)
+       * @property {string[]} values list of options if this element can only have predefined values
+       * @property {XemaElementChild[]} children
+       * @property {Object.<string, XemaAttribute>} attributes
+       */
+
+      /**
+       * @typedef {Object} Xema
+       * @property {string} root the id of the root element
+       * @property {Object.<string, XemaElement>} elements
+      */
+
+
+
+         async onBeforeMount(props, state) {
+            this.state.xema = await this.props.loadConfigData(this.props.configId);
+            this.state.override = !!(this.state.xema._xonomyDocSpec || this.state.xema._dtd);
+            this.state.currentElement = this.state.xema.root;
+            this.state.currentAttribute = undefined;
+            this.update();
+            if (this.state.override) { // init text field resizing. wait until after update so they exist.
+               M.updateTextFields();
+               M.textareaAutoResize($('#editor_doc'));
+               M.textareaAutoResize($('#editor_xml'));
+               M.textareaAutoResize($('#editor_dtd'));
+            }
+         },
+
+         onBeforeUpdate() {
+            if (!this.state.xema) return;
+            const roots = new Set(Object.keys(this.state.xema.elements));
+            Object.values(this.state.xema.elements).forEach(/** @param {XemaElement} el */ el => el.children.forEach(c => roots.delete(c.name)));
+            this.state.roots = [...roots].map(id => ({...this.state.xema.elements[id], id})); // add ID so tree renderer knows the id of every element
+         },
+
          configTitle: 'Entry structure',
-         override: false,
-         configData: {},
-
-         startOverride() {
-            this.override = true;
+         
+         toggleOverride() {
+            this.state.override = !this.state.override;
+            if (!this.state.override) {
+               delete this.state.xema._xonomyDocSpec;
+               delete this.state.xema._dtd;
+               delete this.state.xema._newXml;
+            }
             this.update();
-         },
-
-         stopOverride() {
-            this.override = false;
-            delete this.configData._xonomyDocSpec;
-            delete this.configData._dtd;
-            delete this.configData._newXml;
-            this.update();
-            XemaDesigner.start(this.configData);
-         },
-
-         exampleDoc() {
-            $('#editor_doc').val(
-`{
-   elements: {
-      "entry": {},
-      "headword": {hasText: true}
-   }
-}`);
-            M.textareaAutoResize($('#editor_doc'));
-            M.updateTextFields();
-         },
-
-         exampleXML() {
-            $('#editor_xml').val(
-`<entry><headword></headword></entry>
-`);
-            M.textareaAutoResize($('#editor_xml'));
-            M.updateTextFields();
-         },
-
-         exampleDTD() {
-            $('#editor_dtd').val(
-`<!ELEMENT entry (headword)>
-<!ELEMENT headword (#PCDATA)>`);
-            M.textareaAutoResize($('#editor_dtd'));
-            M.updateTextFields();
-         },
-
-         onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            console.log(this.props);
-         },
-
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.configData = response;
-               if ((this.configData._xonomyDocSpec && this.configData._xonomyDocSpec != "") || (this.configData._dtd && this.configData._dtd != "")) {
-                  this.override = true;
-                  this.update();
-                  M.updateTextFields();
-                  M.textareaAutoResize($('#editor_doc'));
-                  M.textareaAutoResize($('#editor_xml'));
-                  M.textareaAutoResize($('#editor_dtd'));
-               } else {
-                  XemaDesigner.start(this.configData);
-               }
-               console.log(this.configData)
-            });
          },
 
          getConfigData() {
-            var newData = {};
-            if (XemaDesigner.xema.elements) {
-               for(var el in XemaDesigner.xema.elements){
-                  for(var prop in XemaDesigner.xema.elements[el]){
-                     if(prop.indexOf("_")==0) delete XemaDesigner.xema.elements[el][prop];
-                  }
-               }
-               newData = XemaDesigner.xema;
-            }
+            var newData = { ...this.state.xema }
             if (this.override) {
-               if ($('#editor_doc').val() != "") newData._xonomyDocSpec = $('#editor_doc').val();
-               if ($('#editor_xml').val() != "") newData._newXml = $('#editor_xml').val();
-               if ($('#editor_dtd').val() != "") newData._dtd = $('#editor_dtd').val();
+               if ($('#editor_doc').val()) newData._xonomyDocSpec = $('#editor_doc').val();
+               if ($('#editor_xml').val()) newData._newXml = $('#editor_xml').val();
+               if ($('#editor_dtd').val()) newData._dtd = $('#editor_dtd').val();
             }
             return newData;
          },
@@ -174,8 +194,50 @@
          saveData() {
             console.log(this.getConfigData())
             $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, this.getConfigData());
-         }
+            this.props.saveConfigData(this.props.configId, this.getConfigData());
+         },
+
+         selectElementOrAttribute(currentElement, currentAttribute) {
+            this.state.currentElement = currentElement;
+            this.state.currentAttribute = currentAttribute;
+            console.log(`Updating actives, ${this.state.currentElement} @${this.state.currentAttribute}`)
+            this.update();
+         },
+
+         onXemaElementUpdated(id, newConfig) {
+            this.state.xema.elements[id] = newConfig;
+            this.update();
+         },
+         onXemaElementDeleted(id) {
+            delete this.state.xema.elements[id];
+            this.update();
+         },
+
+         onXemaAttributeUpdated(newConfig) {
+            const el = this.state.xema.elements[this.state.currentElement];
+            el.attributes[this.state.currentAttribute] = newConfig;
+            this.update();
+         },
+         onXemaAttributeRenamed(newName) {
+            const el = this.state.xema.elements[this.state.currentElement];
+            el.attributes[newName] = el.attributes[this.state.currentAttribute];
+            delete el.attributes[this.state.currentAttribute];
+            this.state.currentAttribute = newName;
+            this.update();
+         },
+         
+         exampleDoc() {
+            this.state.xema._xonomyDocSpec = JSON.stringify({ elements: { "entry": {}, "headword": {hasText: true} }}, undefined, 2);
+            this.update();   
+         },
+         exampleXML() {
+            this.state.xema._xml = `<entry><headword></headword></entry>`;
+            this.update();
+         },
+         exampleDTD() {
+            this.state.xema._dtd = `<!ELEMENT entry (headword)>\n<!ELEMENT headword (#PCDATA)>`;
+            this.update;
+         },
       }
    </script>
 

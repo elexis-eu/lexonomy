@@ -1,0 +1,50 @@
+<dict-config-attribute-in-tree class="container">
+    <div class="horizontal"></div>
+
+    <div class={state.classes} onclick={selectElementOrAttribute}>
+        <span class="tech"><span class="ats">@</span><span class="att">{props.data.id}</span></span>
+    </div>
+
+    <style>
+        dict-config-attribute-in-tree {
+            position: relative;
+            display: inline-block;
+        }
+    </style>
+    <script>
+        export default {
+            // props: xema, current, data (xema attribute)
+
+            onBeforeMount(props, state) {
+                this.compute();
+            },
+            onMounted(props, state) {
+                // right after the component is mounted on the page
+            },
+            onBeforeUpdate(props, state) {
+                // allows recalculation of context data before the update
+                this.compute();
+                // console.log(`Updating attribute ${this.props.data.id} - active: ${this.props.currentElement} @${this.props.currentAttribute}`)
+            },
+            onUpdated(props, state) {
+                // right after the component template is updated after an update call
+            },
+            onBeforeUnmount(props, state) {
+                // before the component is removed
+            },
+            onUnmounted(props, state) {
+                // when the component is removed from the page
+            },
+
+            compute() {
+                this.state.classes = 
+                    'clickable attribute ' +
+                    // (this.state.hasChildren ? 'hasChildren ' : '') + 
+                    // (this.props.isRoot ? 'root ' : '') + 
+                    (this.props.currentAttribute === this.props.data.id && this.props.currentElement === this.props.parentElement.id ? 'current ' : '');
+            },
+            selectElementOrAttribute() {this.props.selectElementOrAttribute(this.props.parentElement.id, this.props.data.id)}
+
+        }
+    </script>
+</dict-config-attribute-in-tree>
