@@ -1036,6 +1036,20 @@ def publicentry(dictID, entryID):
     else:
         return redirect("/")
 
+@get(siteconfig["rootPath"]+"<dictID>/edit")
+def dictedit(dictID)
+    if ops.dictExists(dictID):
+        return redirect("/#" + dictID + '/edit')
+    else:
+        return redirect("/")
+
+@get(siteconfig["rootPath"]+"<dictID>/edit/<doctype>")
+def dicteditdoc(dictID, doctype):
+    if ops.dictExists(dictID):
+        return redirect("/#" + dictID + '/edit/' + doctype)
+    else:
+        return redirect("/")
+
 
 # ELEXIS REST API https://elexis-eu.github.io/elexis-rest/
 @get(siteconfig["rootPath"] + "dictionaries")
