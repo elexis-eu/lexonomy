@@ -8,12 +8,12 @@
          <div class="col s9">
             <entry-view is="entry-view"
                   dict-id={ dictData.dictId }
-                  entry-id={ props.entryId }></entry-view>
+                  entry-id={ dictData.entryId }></entry-view>
          </div>
          <div class="col s3">
             <ul class="nabes">
-               <li each={ entry in state.moreEntries}
-                     active={entry.id == props.entryId}>
+               <li each={ entry in state.more}
+                     active={entry.id == dictData.entryId}>
                   <a href="#/{ dictData.dictId }/{ entry.id }">{ entry.titlePlain }</a>
                </li>
             </ul>
@@ -32,13 +32,14 @@
 
    <script>
       export default {
+         bindings: [["store", "entryChanged", "update"]],
          state: {
             entryId: null,
             moreEntries: []
          },
 
          loadMoreEntries() {
-            $.get(window.API_URL + this.dictData.dictId + "/" + this.props.entryId + "/nabes.json", (response) => {
+            $.get(window.API_URL + this.dictData.dictId + "/" + this.dictData.entryId + "/nabes.json", (response) => {
                if (response.nabes) {
                   this.update({more: response.nabes})
                }
@@ -46,13 +47,15 @@
          },
 
          onMounted() {
-            this.state.entryId = this.props.entryId
-            this.loadMoreEntries()
+            this.state.entryId = this.dictData.entryId
+            if (this.dictData.entryId != null) {
+               this.loadMoreEntries()
+            }
          },
 
          onUpdated() {
-            if (this.state.entryId != this.props.entryId) {
-               this.state.entryId = this.props.entryId
+            if (this.state.entryId != this.dictData.entryId) {
+               this.state.entryId = this.dictData.entryId
                this.loadMoreEntries()
             }
          }

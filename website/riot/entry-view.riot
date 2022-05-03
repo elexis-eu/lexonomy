@@ -3,11 +3,12 @@
          id="viewer"></div>
    <script>
       export default {
+         bindings: [["store", "entryChanged", "update"]],
          entryId: '',
 
          readEntry() {
             if (this.dictData.dictId != '') {
-               $.post(window.API_URL + this.dictData.dictId + "/entryread.json", {id: this.props.entryId}, (response) => {
+               $.post(window.API_URL + this.dictData.dictId + "/entryread.json", {id: this.dictData.entryId}, (response) => {
                   if (response.success) {
                      $('.viewer').html(response.contentHtml)
                   }
@@ -16,13 +17,15 @@
          },
 
          onMounted() {
-            this.entryId = this.props.entryId
-            this.readEntry()
+            this.entryId = this.dictData.entryId
+            if (this.dictData.entryId != null) {
+               this.readEntry()
+            }
          },
 
          onUpdated() {
-            if (this.entryId != this.props.entryId) {
-               this.entryId = this.props.entryId
+            if (this.entryId != this.dictData.entryId) {
+               this.entryId = this.dictData.entryId
                this.readEntry()
             }
          }
