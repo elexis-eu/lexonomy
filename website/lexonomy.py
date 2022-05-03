@@ -1022,6 +1022,21 @@ def entrylinks(dictID, user, dictDB, configs):
     res = ops.getEntryLinks(dictDB, dictID, request.query.id)
     return {"links": res}
 
+@get(siteconfig["rootPath"]+"<dictID>")
+def publicdict(dictID):
+    if ops.dictExists(dictID):
+        return redirect("/#" + dictID)
+    else:
+        return redirect("/")
+
+@get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>")
+def publicentry(dictID, entryID):
+    if ops.dictExists(dictID):
+        return redirect("/#" + dictID + '/' + entryID)
+    else:
+        return redirect("/")
+
+
 # ELEXIS REST API https://elexis-eu.github.io/elexis-rest/
 @get(siteconfig["rootPath"] + "dictionaries")
 def elexlistdict():
