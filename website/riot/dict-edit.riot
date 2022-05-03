@@ -60,7 +60,7 @@
                            onclick={onOpenFlagMenuClick.bind(this, entry)}
                            class="flag {entry.flag && entry.flag[0] ? 'badge' : 'noFlag'}"
                            style={getFlagStyle(entry.flag ? entry.flag[0] : '')}>
-                        {store.getFlagLabel(entry.flag[0]) || "no flag"}
+                        {store.getFlagLabel(entry.flag && entry.flag[0]) || "no flag"}
                      </span>
                   </div>
                   <div if={!dictData.entryList.length && !dictData.isEntrylistLoading}
