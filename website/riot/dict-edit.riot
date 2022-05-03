@@ -58,8 +58,8 @@
                      </a>
                      <span if={dictData.config.flagging.flags.length}
                            onclick={onOpenFlagMenuClick.bind(this, entry)}
-                           class="flag {entry.flag[0] ? 'badge' : 'noFlag'}"
-                           style={getFlagStyle(entry.flag[0])}>
+                           class="flag {entry.flag && entry.flag[0] ? 'badge' : 'noFlag'}"
+                           style={getFlagStyle(entry.flag ? entry.flag[0] : '')}>
                         {store.getFlagLabel(entry.flag[0]) || "no flag"}
                      </span>
                   </div>

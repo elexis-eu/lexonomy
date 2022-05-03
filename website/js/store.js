@@ -17,8 +17,13 @@ class StoreClass {
       return this.data.dictlist.filter(d => d.id = dictId)
    }
 
-   open(dictId, doctype, entryId){
-
+   open(dictId, doctype, entryId, mode){
+      this.changeDictionary(dictId)
+      typeof doctype != "undefined" && this.changeDoctype(doctype)
+      typeof entryId != "undefined" && this.changeEntry(entryId)
+      if(mode){
+         this.data.mode = mode
+      }
    }
 
    changeDictionary(dictId){
@@ -207,6 +212,9 @@ class StoreClass {
                   this.data.isDictionaryLoading = false
                   this.trigger("dictionaryChanged")
                   this.loadEntrylist()
+               } else {
+                  this.data.isDictionaryLoading = false
+                  route("#/")
                }
             })
             .fail(response => {
@@ -220,6 +228,9 @@ class StoreClass {
 
    loadDictionary(dictId){
       return $.ajax(`${window.API_URL}${dictId}/config.json`)
+            .done(response => {
+               !response.success && M.toast({html: `Could not load ${dictId} dictionary.`})
+            })
             .fail(function(response) {
                M.toast({html: `Could not load ${dictId} dictionary.`})
             }.bind(this, dictId))
@@ -329,6 +340,10 @@ class StoreClass {
                this.data.dictlist = response.dicts
                M.toast({html: "Dictionary was cloned."})
                this.trigger("dictlistChanged")
+               this.changeDictionary(dictId)
+               this.one("dictionaryChanged", () => {
+                  route(dictId)
+               })
             })
             .fail(response => {
                M.toast({html: "Dictionary clone creation failed."})
@@ -370,6 +385,12 @@ class StoreClass {
          url: `${window.API_URL}${this.data.dictId}/import.json`,
          data: data
       })
+            .done(response => {
+               if(response.finished){
+                  this.loadDictlist()
+                  this.loadEntrylist()
+               }
+            })
    }
 
    reloadDictionaryExamples(){

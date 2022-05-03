@@ -1,5 +1,5 @@
 <dict-public>
-   <dict-nav/>
+   <dict-nav if={authData.authorized}/>
    <loading-overlay if={dictData.isDictionaryLoading}/>
    <template if={!dictData.isDictionaryLoading}>
       <h3 class="header">
@@ -18,7 +18,7 @@
             <a if={dictData.userAccess.canDownload}
                   href="#/{dictData.dictId}/download"
                   class="btn">download</a>
-            <a href="#/{dictData.dictId}/links"
+            <a if={authData.authorized} href="#/{dictData.dictId}/links"
                   class="btn">links</a>
          </div>
       </h3>
@@ -63,13 +63,19 @@
          bindings: [["store", "dictionaryChanged", "onDictionaryChanged"],
                     ["store", "isDictionaryExamplesLoading", "update"]],
 
+         reloadDictionaryExamples(){
+            if(this.dictData.public || this.authData.authorized){
+               this.store.reloadDictionaryExamples()
+            }
+         },
+
          onReloadExamplesClick(){
-            this.store.reloadDictionaryExamples()
+            this.reloadDictionaryExamples()
             this.update()
          },
 
          onDictionaryChanged(){
-            this.store.reloadDictionaryExamples()
+            this.reloadDictionaryExamples()
          }
       }
    </script>

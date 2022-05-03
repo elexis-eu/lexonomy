@@ -3,7 +3,7 @@
          id="viewer"></div>
    <script>
       export default {
-         bindings: [["store", "entryChanged", "update"]],
+         bindings: [["store", "entryChanged", "entryChanged"]],
          entryId: '',
 
          readEntry() {
@@ -17,17 +17,12 @@
          },
 
          onMounted() {
-            this.entryId = this.dictData.entryId
-            if (this.dictData.entryId != null) {
-               this.readEntry()
-            }
+            this.readEntry()
          },
 
-         onUpdated() {
-            if (this.entryId != this.dictData.entryId) {
-               this.entryId = this.dictData.entryId
-               this.readEntry()
-            }
+         entryChanged(){
+            this.readEntry()
+            this.update()
          }
       }
    </script>

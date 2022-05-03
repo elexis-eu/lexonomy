@@ -44,6 +44,8 @@ class AuthClass {
    }
 
    login(email, password){
+      this.data.isCheckingAuth = true
+      this.trigger("checkingAuthChanged")
       return $.ajax({
             url: `${window.API_URL}login.json`,
             method: 'POST',
@@ -61,6 +63,8 @@ class AuthClass {
                })
                .fail(response => {})
                .always(() => {
+                  this.data.isCheckingAuth = false
+                  this.trigger("checkingAuthChanged")
                })
    }
 

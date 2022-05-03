@@ -37,14 +37,35 @@
 
          onCheckingAuthChange(){
             this.update()
-            if(!this.authData.authorized){
-               route("#/")
-            } else {
+            if(this.authData.authorized){
                this.store.loadDictlist()
             }
          },
 
-         onMounted() {
+         goTo(content, subPage, storeParams, updateParams){
+            if(!this.authData.authorized && this.needAuthorization(content, subPage)){
+               this.update({
+                  subPage: 'login',
+                  content: 'main-page'
+               })
+            } else {
+               storeParams && this.store.open(...storeParams)
+               this.update(Object.assign({
+                  content: content,
+                  subPage: subPage || ''
+               }, updateParams || {}))
+            }
+         },
+
+         needAuthorization(content, subPage){
+            if(['e404', 'open-dict-list', 'dict-public', 'dict-public-entry'].includes(content)
+                  || content == 'main-page' && !['new', 'userprofile'].includes(subPage)){
+               return false
+            }
+            return true
+         },
+
+         onBeforeMount() {
             $.ajaxSetup({
                xhrFields: { withCredentials: true }
             })
@@ -52,120 +73,64 @@
             this.store.loadSiteconfig().always(this.update.bind(this))
 
             route('/api', () => {
-               this.update({
-                  subPage: '',
-                  content: 'api'
-               })
+               this.goTo.bind(this, 'api')
             })
             route('/e404', () => {
-               this.update({
-                  subPage: '',
-                  content: 'e404'
-               })
+               this.goTo('e404')
             })
             route('/opendictionaries', () => {
-               this.update({
-                  subPage: '',
-                  content: 'open-dict-list'
-               })
+               this.goTo('open-dict-list')
             })
             route('/docs/intro', () => {
-               this.update({
-                  subPage: '',
-                  content: 'docs-intro'
-               })
+               this.goTo('docs-intro')
             })
             route('/createaccount/*', (token) => {
-               this.update({
-                  subPage: 'registerPassword',
-                  content: 'main-page',
-                  token: token
-               })
+               this.goTo('main-page', 'registerPassword', '', {token: token})
             })
             route('/recoverpwd/*', (token) => {
-               this.update({
-                  subPage: 'forgotPassword',
-                  content: 'main-page',
-                  token: token
-               })
+               this.goTo('main-page', 'forgotPassword', '', {token: token})
             })
             route('/register', () => {
-               this.update({
-                  subPage: 'register',
-                  content: 'main-page'
-               })
+               this.goTo('main-page', 'register')
             })
             route('/forgot', () => {
-               this.update({
-                  subPage: 'forgot',
-                  content: 'main-page'
-               })
+               this.goTo('main-page', 'forgot')
             })
             route('/userprofile', () => {
-               this.update({
-                  subPage: 'userprofile',
-                  content: 'main-page'
-               })
+               this.goTo('main-page', 'userprofile')
             })
             route('/make', () => {
-               this.update({
-                  subPage: 'new',
-                  content: 'main-page'
-               })
+               this.goTo('main-page', 'new')
             })
             route('/*/edit', (dictId) => {
-               this.store.changeDictionary(dictId)
-               this.update({content: 'dict-edit'})
+               this.goTo('dict-edit', '', [dictId])
             })
             route('/*/edit/*/*/*', (dictId, doctype, entryId, mode) => {
-               this.store.changeDictionary(dictId)
-               this.store.changeEntry(entryId)
-               this.store.changeDoctype(doctype)
-               this.dictData.mode = mode
-               this.update({content: 'dict-edit'})
+               this.goTo('dict-edit', '', [dictId, doctype, entryId, mode])
             })
-            route('/*/edit/*', (dictId, doctype) => {
-               this.store.changeDictionary(dictId)
-               this.store.changeDoctype(doctype)
-               this.update({content: 'dict-edit'})
-            })
-            route('/*/([0-9]*)$', (dictId, entryId) => {
-               this.store.changeDictionary(dictId)
-               this.store.changeEntry(entryId)
-               this.update({content: 'dict-public-entry'})
+            route('/*/([0-9]+)$', (dictId, entryId) => {
+               this.goTo('dict-public-entry', '', [dictId, null, entryId])
             })
             route('/*/config/*', (dictId, configId) => {
-               this.store.changeDictionary(dictId)
-               this.update({
-                  content: 'dict-config-' + configId
-               })
+               this.goTo('dict-config-' + configId, '', [dictId])
             })
             route('/*/config', (dictId) => {
-               this.store.changeDictionary(dictId)
-               this.update({content: 'dict-config'})
+               this.goTo('dict-config', '', [dictId])
             })
-
             route('/*/links', (dictId) => {
-               this.store.changeDictionary(dictId)
-               this.update({content: 'dict-links'})
+               this.goTo('dict-links', '', [dictId])
             })
             route('/*/download', (dictId) => {
-               this.store.changeDictionary(dictId)
-               this.update({content: 'dict-download'})
+               this.goTo('dict-download', '', [dictId])
             })
             route('/*/upload', (dictId) => {
-               this.store.changeDictionary(dictId)
-               this.update({content: 'dict-upload'})
+               this.goTo('dict-upload', '', [dictId])
             })
             route('/*', (dictId) => {
-               this.store.changeDictionary(dictId)
-               this.update({content: 'dict-public'})
+               this.goTo('dict-public', '', [dictId])
             })
             route('/', () => {
-               this.update({
-                  subPage: 'login',
-                  content: 'main-page'
-               })
+               this.goTo('main-page', 'login')
             })
             route.start(true)
          }

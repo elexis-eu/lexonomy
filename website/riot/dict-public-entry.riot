@@ -1,15 +1,15 @@
 <dict-public-entry>
+   <loading-overlay if={state.isLoading}/>
    <h3 class="header">
-      <a href="#/{ dictData.dictId }">{ dictData.title }</a>
+      { dictData.title }
+      <a href="#/{ dictData.dictId }"
+            class="infoIcon">
+         <i class="material-icons">info</i>
+      </a>
    </h3>
    <template if={ dictData.public }>
       <div class="divider"></div>
       <div class="row">
-         <div class="col s9">
-            <entry-view is="entry-view"
-                  dict-id={ dictData.dictId }
-                  entry-id={ dictData.entryId }></entry-view>
-         </div>
          <div class="col s3">
             <ul class="nabes">
                <li each={ entry in state.more}
@@ -17,6 +17,9 @@
                   <a href="#/{ dictData.dictId }/{ entry.id }">{ entry.titlePlain }</a>
                </li>
             </ul>
+         </div>
+         <div class="col s9">
+            <entry-view/>
          </div>
       </div>
       <div class="divider"></div>
@@ -26,38 +29,38 @@
    </template>
 
    <style>
+      .infoIcon{margin-left: 1.5rem;}
+      .infoIcon a{font-size: 1.8rem;}
       .nabes li a:hover {text-decoration: underline;}
       .nabes li[active=active] a {background-color: #ffccbc;}
    </style>
 
    <script>
       export default {
-         bindings: [["store", "entryChanged", "update"]],
+         bindings: [["store", "entryChanged", "entryChanged"]],
          state: {
-            entryId: null,
-            moreEntries: []
+            isLoading: true,
+            more: []
          },
 
          loadMoreEntries() {
-            $.get(window.API_URL + this.dictData.dictId + "/" + this.dictData.entryId + "/nabes.json", (response) => {
-               if (response.nabes) {
-                  this.update({more: response.nabes})
-               }
-            })
+            this.update({isLoading: true})
+            if (this.dictData.entryId != null) {
+               $.get(window.API_URL + this.dictData.dictId + "/" + this.dictData.entryId + "/nabes.json", (response) => {
+                  if (response.nabes) {
+                     this.state.more = response.nabes
+                  }
+                  this.update({isLoading: false})
+               })
+            }
          },
 
          onMounted() {
-            this.state.entryId = this.dictData.entryId
-            if (this.dictData.entryId != null) {
-               this.loadMoreEntries()
-            }
+            this.loadMoreEntries()
          },
 
-         onUpdated() {
-            if (this.state.entryId != this.dictData.entryId) {
-               this.state.entryId = this.dictData.entryId
-               this.loadMoreEntries()
-            }
+         entryChanged(){
+            this.loadMoreEntries()
          }
       }
    </script>
