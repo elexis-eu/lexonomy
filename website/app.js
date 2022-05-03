@@ -49,6 +49,7 @@ import welcome from './riot/welcome.riot'
 import user_consent from './riot/user-consent.riot'
 import raw_html from './riot/raw-html.riot'
 import loading_overlay from './riot/loading-overlay.riot'
+import docs_intro from './riot/docs-intro.riot'
 
 riot_register('api', api)
 riot_register('dict-config-autonumber', dict_config_autonumber)
@@ -97,6 +98,7 @@ riot_register('welcome', welcome)
 riot_register('user-consent', user_consent)
 riot_register('raw-html', raw_html)
 riot_register('loading-overlay', loading_overlay)
+riot_register('docs-intro', docs_intro)
 
 
 component(App)(document.getElementById('root'))

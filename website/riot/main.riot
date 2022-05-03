@@ -69,6 +69,12 @@
                   content: 'open-dict-list'
                })
             })
+            route('/docs/intro', () => {
+               this.update({
+                  subPage: '',
+                  content: 'docs-intro'
+               })
+            })
             route('/createaccount/*', (token) => {
                this.update({
                   subPage: 'registerPassword',

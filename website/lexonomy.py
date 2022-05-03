@@ -1050,6 +1050,9 @@ def dicteditdoc(dictID, doctype):
     else:
         return redirect("/")
 
+@get(siteconfig["rootPath"]+"docs/intro")
+def docintro():
+    return redirect("/#docs/intro")
 
 # ELEXIS REST API https://elexis-eu.github.io/elexis-rest/
 @get(siteconfig["rootPath"] + "dictionaries")
