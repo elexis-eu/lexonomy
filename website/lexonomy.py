@@ -1037,7 +1037,7 @@ def publicentry(dictID, entryID):
         return redirect("/")
 
 @get(siteconfig["rootPath"]+"<dictID>/edit")
-def dictedit(dictID)
+def dictedit(dictID):
     if ops.dictExists(dictID):
         return redirect("/#" + dictID + '/edit')
     else:
