@@ -8,3 +8,6 @@ website/node_modules/*
 website/package-lock.json
 website/__pycache__/*
 website/config.js
+website/bundle.js
+website/bundle.static.js
+website/bundle.css
