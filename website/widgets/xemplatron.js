@@ -1,4 +1,4 @@
-var Xemplatron={};
+window.Xemplatron={};
 Xemplatron.xema=null;
 Xemplatron.xemplate=null;
 

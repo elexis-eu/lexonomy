@@ -1,4 +1,4 @@
-var Sub={};
+window.Sub={};
 Sub.htmID="";
 
 Sub.extendDocspec=function(docspec, xema){

@@ -1,4 +1,4 @@
-var Collx={};
+window.Collx={};
 Collx.change=function(){};
 
 Collx.render=function(div, json){

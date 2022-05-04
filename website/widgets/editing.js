@@ -1,4 +1,4 @@
-var Editing={};
+window.Editing={};
 
 Editing.wrapChange=function(){
     Editing.change();

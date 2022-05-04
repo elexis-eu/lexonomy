@@ -1,4 +1,4 @@
-var XemplateDesigner={};
+window.XemplateDesigner={};
 XemplateDesigner.xemplate=null;
 XemplateDesigner.dictID = null;
 

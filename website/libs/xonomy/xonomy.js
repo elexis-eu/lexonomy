@@ -1,4 +1,4 @@
-var Xonomy={
+window.Xonomy={
 	lang: "", //"en"|"de"|fr"| ...
 	mode: "nerd", //"nerd"|"laic",
 	baseUrl: "/"

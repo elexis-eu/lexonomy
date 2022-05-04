@@ -2,6 +2,9 @@ import riot from 'rollup-plugin-riot'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import { registerPreprocessor } from '@riotjs/compiler'
 import sass from 'node-sass'
+import css from "rollup-plugin-import-css"
+import { uglify } from "rollup-plugin-uglify"
+
 
 registerPreprocessor('css', 'scss', function(code, { options }) {
   const { file } = options
@@ -15,8 +18,9 @@ registerPreprocessor('css', 'scss', function(code, { options }) {
 })
 
 const options = {}
-export default {
+export default [{
   input: 'app.js',
+  context: "window",
   output: {
     file: 'bundle.js',
     format: 'iife',
@@ -24,6 +28,14 @@ export default {
   },
   plugins: [
     riot(options),
+    uglify(),
     nodeResolve()
   ]
-}
+},
+{
+  input: "app.css.js",
+  output: {
+    file: "bundle.css"
+  },
+  plugins: [ css() ]
+}]

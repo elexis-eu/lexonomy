@@ -65,8 +65,8 @@
 .xonomy.nerd .invisible { display: none; }
 
 .xonomy.nerd .attribute.shy { display: none; }
-.xonomy.nerd .rollouter { background-color: #eeeeee; border-radius: 10px; margin: 0px 4px; background-image: url(bullet_arrow_down.png); background-position: center center; background-repeat: no-repeat; padding: 0px 8px; height: 16px; cursor: pointer; }
-.xonomy.nerd .rollouter.rolledout { background-image: url(bullet_arrow_up.png);  }
+.xonomy.nerd .rollouter { background-color: #eeeeee; border-radius: 10px; margin: 0px 4px; background-image: url(./libs/xonomy/bullet_arrow_down.png); background-position: center center; background-repeat: no-repeat; padding: 0px 8px; height: 16px; cursor: pointer; }
+.xonomy.nerd .rollouter.rolledout { background-image: url(./libs/xonomy/bullet_arrow_up.png);  }
 .xonomy.nerd .rollouter:hover { background-color: #ffff99; }
 .xonomy.nerd .element > .tag.opening > .attributes.rolledout { display: block; padding: 0px 0px 5px 15px; border-left: 1px dotted #cccccc; margin: 0px 0px 0px 10px; }
 .xonomy.nerd .element > .tag.opening > .attributes.rolledout > .attribute { display: block; border: 0px; padding: 0px; margin: 0px; }
@@ -108,11 +108,11 @@
 .xonomy.nerd .element .children .textnode.empty .value:focus { background-color: #f2f2f2; }
 
 /*Plus-minus collapsor*/
-.xonomy.nerd .element > .connector > .plusminus { background-image: url(minus.gif); width: 9px; height: 9px; position: absolute; top: -5px; left: -5px; cursor: pointer; }
+.xonomy.nerd .element > .connector > .plusminus { background-image: url(./libs/xonomy/minus.gif); width: 9px; height: 9px; position: absolute; top: -5px; left: -5px; cursor: pointer; }
 .xonomy.nerd .element.hasText .element.oneliner .connector .plusminus { top: 4px; left: 4px; }
 
 /*Collapsed elements*/
-.xonomy.nerd .element.collapsed > .connector > .plusminus { background-image: url(plus.gif); }
+.xonomy.nerd .element.collapsed > .connector > .plusminus { background-image: url(./libs/xonomy/plus.gif); }
 .xonomy.nerd .element.collapsed > .children { display: none !important; }
 .xonomy.nerd .element.hasText .element.oneliner.collapsed > .tag { display: none; }
 
@@ -133,7 +133,7 @@
 .xonomy.nerd .element.hasText .element.uncollapsible .connector { display: none; }
 
 /*Drag handle*/
-.xonomy.nerd .connector > .draghandle { display: none; width: 9px; height: 13px; background-image: url(draghandle.gif); position: absolute; top: -7px; right: 2px; cursor: move; }
+.xonomy.nerd .connector > .draghandle { display: none; width: 9px; height: 13px; background-image: url(./libs/xonomy/draghandle.gif); position: absolute; top: -7px; right: 2px; cursor: move; }
 .xonomy.nerd .element.draggable > .connector > .draghandle { display: block; }
 .xonomy.nerd .element.readonly .element .draghandle { display: none; }
 .xonomy.nerd .element.hasText .element .connector .draghandle { display: none; }
@@ -162,7 +162,7 @@
 
 /*The exclamation mark that lets you know if there is a warning attached to an element or attribute*/
 .xonomy.nerd .warner { display: none; width: 16px; margin: 0px 1px 0px 1px; }
-.xonomy.nerd .warner .inside { position: absolute; bottom: -4px; left: 0px; background-image: url(exclamation.png); background-position: 0px 0px; width: 16px; height: 16px; cursor: pointer; }
+.xonomy.nerd .warner .inside { position: absolute; bottom: -4px; left: 0px; background-image: url(./libs/xonomy/exclamation.png); background-position: 0px 0px; width: 16px; height: 16px; cursor: pointer; }
 .xonomy.nerd .element.invalid > .tag > .warner { display: inline-block; }
 .xonomy.nerd .attribute.invalid > .warner { display: inline-block; }
 
@@ -182,7 +182,7 @@
 /*When the pop-up box functions as menu or picker*/
 #xonomyBubble.nerd #xonomyBubbleContent div.menu { margin: -5px; max-height: 250px; overflow-y: auto; white-space: nowrap; line-height: 1;}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem { padding: 8px 20px 7px 10px; border-top: 1px solid #dddddd; cursor: pointer; margin-top: -1px; background-color: #ffffff;}
-#xonomyBubble.nerd #xonomyBubbleContent div.menuItem div.menuLabel {margin: -8px -20px -7px -10px; padding: 8px 20px 7px 30px; background-color: #ffffff; background-image: url(plus.gif); background-position: 10px center; background-repeat: no-repeat; font-weight: bold;}
+#xonomyBubble.nerd #xonomyBubbleContent div.menuItem div.menuLabel {margin: -8px -20px -7px -10px; padding: 8px 20px 7px 30px; background-color: #ffffff; background-image: url(./libs/xonomy/plus.gif); background-position: 10px center; background-repeat: no-repeat; font-weight: bold;}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem div.menuLabel:hover {background-color: #ffffcc;}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem span.icon {display: inline-block; vertical-align: middle; width: 18px; }
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem span.icon img {max-height: 15px; max-width: 20px; display: inline-block;}
@@ -190,7 +190,7 @@
 #xonomyBubble.nerd #xonomyBubbleContent div.submenu { margin: 0px -20px -7px -10px; display: none; }
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem.expanded > div.submenu { display: block; }
 #xonomyBubble.nerd #xonomyBubbleContent div.submenu div.menuItem { padding-left: 30px; }
-#xonomyBubble.nerd #xonomyBubbleContent div.menuItem.expanded div.menuLabel {background-image: url(minus.gif);}
+#xonomyBubble.nerd #xonomyBubbleContent div.menuItem.expanded div.menuLabel {background-image: url(./libs/xonomy/minus.gif);}
 #xonomyBubble.nerd #xonomyBubbleContent div.menuItem.expanded > div.menuLabel {margin-bottom: 0px; padding-bottom: 7px;}
 #xonomyBubble.nerd #xonomyBubbleContent span.techno { font-family: 'Roboto Mono', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans HK', 'Noto Naskh Arabic', monospace; font-size: 0.85rem; }
 #xonomyBubble.nerd #xonomyBubbleContent span.techno span.punc {color: #669acc; }
@@ -215,8 +215,8 @@
 /*When the pop-up is a list of warnings*/
 #xonomyBubble.nerd #xonomyBubbleContent .warning { padding: 5px 10px; }
 
-#xonomyBubble.nerd button.buttonSearch { background-image: url(magnifier.png); background-position: center center; background-repeat: no-repeat; padding: 2px 15px; border-width: 1px; border-radius: 2px; }
-#xonomyBubble.nerd button.buttonCreate { background-image: url(add.png); background-position: center center; background-repeat: no-repeat; padding: 2px 15px; border-width: 1px; border-radius: 2px; }
+#xonomyBubble.nerd button.buttonSearch { background-image: url(./libs/xonomy/magnifier.png); background-position: center center; background-repeat: no-repeat; padding: 2px 15px; border-width: 1px; border-radius: 2px; }
+#xonomyBubble.nerd button.buttonCreate { background-image: url(./libs/xonomy/add.png); background-position: center center; background-repeat: no-repeat; padding: 2px 15px; border-width: 1px; border-radius: 2px; }
 
 
 /*LAIC MODE*/
@@ -255,12 +255,12 @@
 .xonomy.laic .element.oneliner .connector { position: relative; top: 0px;}
 
 /*Plus-minus collapsor*/
-.xonomy.laic .element > .connector > .plusminus { background-image: url(minus.gif); background-position: center center; background-repeat: no-repeat; width: 1rem; height: 1rem; background-color: #dddddd; position: absolute; top: 20px; left: -30px; cursor: pointer; }
+.xonomy.laic .element > .connector > .plusminus { background-image: url(./libs/xonomy/minus.gif); background-position: center center; background-repeat: no-repeat; width: 1rem; height: 1rem; background-color: #dddddd; position: absolute; top: 20px; left: -30px; cursor: pointer; }
 .xonomy.laic .element.oneliner > .connector > .plusminus { top: 1px; }
 .xonomy.laic .element.hasInlineMenu .element .connector > .plusminus { position: relative; top: auto; left: auto; display: inline-block; margin-right: 3px; }
 
 /*Collapsed elements*/
-.xonomy.laic .element.collapsed > .connector > .plusminus { background-image: url(plus.gif); }
+.xonomy.laic .element.collapsed > .connector > .plusminus { background-image: url(./libs/xonomy/plus.gif); }
 .xonomy.laic .element.collapsed > .children { display: none !important; }
 .xonomy.laic .element.hasText .element.oneliner.collapsed > .tag { display: none; }
 
@@ -330,7 +330,7 @@
 .xonomy.laic .element .children .textnode.empty:only-child .value {xpadding-right: 0.5em; border-bottom-width: 1px; }
 
 /*Drag handle*/
-.xonomy.laic .connector > .draghandle { display: none; width: 9px; height: 13px; background-image: url(draghandle.gif); position: absolute; top: 22px; right: 3px; cursor: move; }
+.xonomy.laic .connector > .draghandle { display: none; width: 9px; height: 13px; background-image: url(./libs/xonomy/draghandle.gif); position: absolute; top: 22px; right: 3px; cursor: move; }
 .xonomy.laic  .oneliner > .connector > .draghandle {  top: 3px; }
 .xonomy.laic .element.draggable > .connector > .draghandle { display: block; }
 .xonomy.laic .element.readonly .element .draghandle { display: none; }
@@ -360,7 +360,7 @@
 
 /*The exclamation mark that lets you know if there is a warning attached to an element or attribute*/
 .xonomy.laic .warner { display: none; width: 16px; margin: 0px 5px 0px 1px; }
-.xonomy.laic .warner .inside { position: absolute; bottom: -4px; left: 0px; background-image: url(exclamation.png); background-position: 0px 0px; width: 16px; height: 16px; cursor: pointer; }
+.xonomy.laic .warner .inside { position: absolute; bottom: -4px; left: 0px; background-image: url(./libs/xonomy/exclamation.png); background-position: 0px 0px; width: 16px; height: 16px; cursor: pointer; }
 .xonomy.laic .element.invalid > .tag > .warner { display: inline-block; }
 .xonomy.laic .attribute.invalid > .warner { display: inline-block; }
 
@@ -377,8 +377,8 @@
 .xonomy.laic .readonly .textnode .value:hover { background-color: transparent !important; }
 
 .xonomy.laic .attribute.shy { display: none; }
-.xonomy.laic .rollouter { background-color: #dddddd; border-radius: 0px; margin: 0px 4px; position: relative; top: 1px; background-image: url(bullet_arrow_down.png); background-position: center center; background-repeat: no-repeat; padding: 3px 16px; cursor: pointer; }
-.xonomy.laic .rollouter.rolledout { background-image: url(bullet_arrow_up.png); position: relative; left: -9px; }
+.xonomy.laic .rollouter { background-color: #dddddd; border-radius: 0px; margin: 0px 4px; position: relative; top: 1px; background-image: url(./libs/xonomy/bullet_arrow_down.png); background-position: center center; background-repeat: no-repeat; padding: 3px 16px; cursor: pointer; }
+.xonomy.laic .rollouter.rolledout { background-image: url(./libs/xonomy/bullet_arrow_up.png); position: relative; left: -9px; }
 .xonomy.laic .rollouter:hover { background-color: #ffff99; }
 .xonomy.laic .element > .tag.opening > .attributes.rolledout { display: block; padding: 0px 0px 5px 15px; border-left: 1px dotted #cccccc; margin: 0px 0px 0px 10px; line-height: 2em;}
 .xonomy.laic .element > .tag.opening > .attributes.rolledout > .attribute { display: block; border: 0px; padding: 0px; margin: 5px 0px; }
@@ -393,7 +393,7 @@
 /*When the pop-up box functions as menu or picker*/
 #xonomyBubble.laic #xonomyBubbleContent div.menu { margin: -10px; max-height: 250px; overflow-y: auto; white-space: nowrap; line-height: 1;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem { padding: 10px 20px 10px 10px; border-top: 1px solid #dddddd; cursor: pointer; margin-top: -1px; background-color: #ffffff;}
-#xonomyBubble.laic #xonomyBubbleContent div.menuItem div.menuLabel {margin: -8px -20px -7px -10px; padding: 8px 20px 7px 30px; background-color: #ffffff; background-image: url(plus.gif); background-position: 10px center; background-repeat: no-repeat; font-weight: bold;}
+#xonomyBubble.laic #xonomyBubbleContent div.menuItem div.menuLabel {margin: -8px -20px -7px -10px; padding: 8px 20px 7px 30px; background-color: #ffffff; background-image: url(./libs/xonomy/plus.gif); background-position: 10px center; background-repeat: no-repeat; font-weight: bold;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem div.menuLabel:hover {background-color: #f6f6f6;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem span.icon {display: inline-block; vertical-align: middle; width: 18px;}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem span.icon img {max-height: 15px; max-width: 20px; display: inline-block;}
@@ -401,7 +401,7 @@
 #xonomyBubble.laic #xonomyBubbleContent div.submenu { margin: 0px -20px -7px -10px; display: none; }
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem.expanded > div.submenu { display: block; }
 #xonomyBubble.laic #xonomyBubbleContent div.submenu div.menuItem { padding-left: 30px; }
-#xonomyBubble.laic #xonomyBubbleContent div.menuItem.expanded div.menuLabel {background-image: url(minus.gif);}
+#xonomyBubble.laic #xonomyBubbleContent div.menuItem.expanded div.menuLabel {background-image: url(./libs/xonomy/minus.gif);}
 #xonomyBubble.laic #xonomyBubbleContent div.menuItem.expanded > div.menuLabel {margin-bottom: 0px; padding-bottom: 7px;}
 #xonomyBubble.laic #xonomyBubbleContent .techno { font-family: 'Roboto Mono', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans HK', 'Noto Naskh Arabic', monospace; font-size: 0.75rem; color: #444444; }
 #xonomyBubble.laic #xonomyBubbleContent .techno span.atName { font-family: Verdana, sans-serif; font-weight: bold; color: #6385bf; }
@@ -425,20 +425,20 @@
 /*When the pop-up is a list of warnings*/
 #xonomyBubble.laic #xonomyBubbleContent .warning { padding: 5px 10px; }
 
-#xonomyBubble.laic button.buttonSearch { background-image: url(magnifier.png); background-position: center center; background-repeat: no-repeat; padding: 4px 15px; border-width: 1px; border-radius: 2px; }
-#xonomyBubble.laic button.buttonCreate { background-image: url(add.png); background-position: center center; background-repeat: no-repeat; padding: 4px 15px; border-width: 1px; border-radius: 2px; }
+#xonomyBubble.laic button.buttonSearch { background-image: url(./libs/xonomy/magnifier.png); background-position: center center; background-repeat: no-repeat; padding: 4px 15px; border-width: 1px; border-radius: 2px; }
+#xonomyBubble.laic button.buttonCreate { background-image: url(./libs/xonomy/add.png); background-position: center center; background-repeat: no-repeat; padding: 4px 15px; border-width: 1px; border-radius: 2px; }
 
 
-#xonomyBubble .wyc { display: inline-block; background-image: url(loader.gif); background-position: center center; background-repeat: no-repeat; width: 100%; height: 30px; margin: 5px 0px 0px 0px; }
-.xonomy .wyc { display: inline-block; background-image: url(loader.gif); background-position: center center; background-repeat: no-repeat; width: 30px; height: 10px; }
+#xonomyBubble .wyc { display: inline-block; background-image: url(./libs/xonomy/loader.gif); background-position: center center; background-repeat: no-repeat; width: 100%; height: 30px; margin: 5px 0px 0px 0px; }
+.xonomy .wyc { display: inline-block; background-image: url(./libs/xonomy/loader.gif); background-position: center center; background-repeat: no-repeat; width: 30px; height: 10px; }
 .xonomy .inlinecaption a { color: inherit; text-decoration: none; }
 .xonomy .inlinecaption a:hover {color: #2d4ea1;}
 
 .xonomy div.modeSwitcher { /*position: fixed;*/ bottom: 0px; left: 0px; width: 73px; height: 30px; background-color: #ffffff; cursor: pointer; border: 1px solid #cccccc; z-index: 12;}
 .xonomy.nerd div.modeSwitcher {}
 .xonomy.laic div.modeSwitcher {}
-.xonomy div.modeSwitcher span.nerd {display: inline-block; width: 35px; height: 28px; background-image: url(tag.png); background-position: center center; background-repeat: no-repeat; }
-.xonomy div.modeSwitcher span.laic {display: inline-block; width: 35px; height: 28px; background-image: url(sitemap.png); background-position: center center; background-repeat: no-repeat; }
+.xonomy div.modeSwitcher span.nerd {display: inline-block; width: 35px; height: 28px; background-image: url(./libs/xonomy/tag.png); background-position: center center; background-repeat: no-repeat; }
+.xonomy div.modeSwitcher span.laic {display: inline-block; width: 35px; height: 28px; background-image: url(./libs/xonomy/sitemap.png); background-position: center center; background-repeat: no-repeat; }
 .xonomy div.modeSwitcher span {background-color: #f3f3f3;}
 .xonomy div.modeSwitcher:hover {box-shadow: 0px 0px 1px #999999; }
 .xonomy.nerd div.modeSwitcher span.nerd {background-color: #fbeb93; }
@@ -449,8 +449,8 @@
 .xonomy div.layby.closed:hover {background-color: #f9f6dc;}
 .xonomy div.layby span.button {display: inline-block; width: 30px; height: 30px; background-position: center center; background-repeat: no-repeat; background-color: #ffffff; border: 1px solid #cccccc; cursor: pointer;}
 .xonomy div.layby span.button:hover {box-shadow: 0px 0px 1px #333333;}
-/*.xonomy div.layby span.closer {background-image: url(bullet_arrow_down.png);}
-.xonomy div.layby span.purger {background-image: url(bin_closed.png); float: right;}*/
+/*.xonomy div.layby span.closer {background-image: url(./libs/xonomy/bullet_arrow_down.png);}
+.xonomy div.layby span.purger {background-image: url(./libs/xonomy/bin_closed.png); float: right;}*/
 .xonomy div.layby.closed .btn { display: none; }
 /*.xonomy div.layby.closed span.closer { display: none; }
 .xonomy div.layby.closed span.purger { display: none; }*/

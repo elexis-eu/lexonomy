@@ -1,4 +1,4 @@
-var Gmedia = {};
+window.Gmedia = {};
 Gmedia.extendDocspec=function(docspec, xema) {
   if (gapi.apikey && gapi.cx) {
     for(var parName in xema.elements){

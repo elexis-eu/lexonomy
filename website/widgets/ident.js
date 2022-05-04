@@ -1,4 +1,4 @@
-var Ident={};
+window.Ident={};
 
 Ident.change=function(){};
 

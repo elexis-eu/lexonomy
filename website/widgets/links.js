@@ -1,4 +1,4 @@
-var Links={};
+window.Links={};
 Links.change=function(){};
 
 Links.render=function(div, json){

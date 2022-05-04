@@ -1,6 +1,6 @@
 #middlebox {max-width: 600px; padding: 10px; margin: 75px auto 50px auto; border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666; }
 
-#middlebox a.download {display: block; padding: 20px 0px 20px 60px; background-image: url(download.png); background-position: left+5px top+10px; background-repeat: no-repeat; text-decoration: none; color: var(--link);}
+#middlebox a.download {display: block; padding: 20px 0px 20px 60px; background-image: url(./furniture/download.png); background-position: left+5px top+10px; background-repeat: no-repeat; text-decoration: none; color: var(--link);}
 #middlebox a.download:hover {color: var(--link-hover); background-color: #f6f6f6;}
 
 #middlebox a.download span.explanation {display: block; color: #666666; font-size: .9em; margin-top: 5px;}

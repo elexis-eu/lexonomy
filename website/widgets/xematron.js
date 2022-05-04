@@ -1,4 +1,4 @@
-var Xematron={};
+window.Xematron={};
 
 //takes a xema, returns a Xonomy docSpec:
 Xematron.xema2docspec=function(xema, stringAsker){

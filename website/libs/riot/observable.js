@@ -53,7 +53,7 @@ const trigger = (callbacks, el) => (event, ...args) => {
   return el
 }
 
-const observable = function(el) { // eslint-disable-line
+window.observable = function(el) { // eslint-disable-line
   const callbacks = new Map()
   const methods = {on, off, one, trigger}
 

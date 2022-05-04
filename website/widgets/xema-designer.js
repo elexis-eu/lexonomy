@@ -1,4 +1,4 @@
-var XemaDesigner={};
+window.XemaDesigner={};
 XemaDesigner.onchange=function(){};
 XemaDesigner.isValidXmlName=function(str){
 	if(str=="") return false;

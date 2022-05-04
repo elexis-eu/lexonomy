@@ -1,7 +1,7 @@
-body {background-image: url(header-back.gif); background-position: right top; background-repeat: no-repeat; font-family: sans-serif; background-color: #ffffff; margin: 0; padding: 0; line-height: 1.3em; font-size: 1rem;}
+body {background-image: url(./furniture/header-back.gif); background-position: right top; background-repeat: no-repeat; font-family: sans-serif; background-color: #ffffff; margin: 0; padding: 0; line-height: 1.3em; font-size: 1rem;}
 
 #header {padding: 10px 10px; height: 38px;}
-#header a.sitehome {display: inline-block; width: 119px; height: 34px; background-image: url(lexonomy_logo_blue_on_transparent_with_bleed.png); background-size: 119px auto; margin-top: 5px; margin-left: 4px; position: relative;}
+#header a.sitehome {display: inline-block; width: 119px; height: 34px; background-image: url(./furniture/lexonomy_logo_blue_on_transparent_with_bleed.png); background-size: 119px auto; margin-top: 5px; margin-left: 4px; position: relative;}
 #headepx .sitehome:hover {top: -1px;}
 #header a.sitehome span.readonly { display: inline-block; color: #bd6c73; font-size: 0.75rem; line-height: 1em; padding: 10px 5px; position: absolute; top: -15px; left: 120px; white-space: nowrap; text-shadow: 1px 1px 0px #ffffff;}
 #header div.email {display: inline-block; position: absolute; top: 18px; right: 20px; color: #666666;}
@@ -32,7 +32,7 @@ body.entrypage #dictheader div.titleContainer span.dictTitle a.dictTitle {font-s
 @media (max-width: 800px) { body.entrypage #dictheader form.searchContainer {margin-top: 15px;} }
 #dictheader form.searchContainer span.searchbox {position: relative; display: inline-block; width: 90%; padding: 0px 10px; max-width: 400px; border: 1px inset #cccccc; box-shadow: 0px 0px 4px #999999; text-align: left;}
 #dictheader form.searchContainer span.searchbox input.searchbox {font: inherit; border: 0px; border-radius: 4px; background-color: #ffffff; color: #333333; font-size: 1rem; padding: 10px 0px 10px 0px; display: inline-block; vertical-align: middle; width: 100%; }
-#dictheader form.searchContainer span.searchbox input.submit {font: inherit; border-width: 0px; cursor: pointer; background-color: #ffffff; color: #004f9b; display: inline-block; font-size: 1rem; padding: 8px 0px; background-image: url(zoom.png); background-position: center center; background-repeat: no-repeat; position: absolute; right: 4px; top: 4px; width: 30px; }
+#dictheader form.searchContainer span.searchbox input.submit {font: inherit; border-width: 0px; cursor: pointer; background-color: #ffffff; color: #004f9b; display: inline-block; font-size: 1rem; padding: 8px 0px; background-image: url(./furniture/zoom.png); background-position: center center; background-repeat: no-repeat; position: absolute; right: 4px; top: 4px; width: 30px; }
 
 #dictblurb { font-size: 1rem; color: #333333; line-height: 1.75em; margin: 0px auto; max-width: 1000px;}
 #dictblurb.centered {text-align: center;}
@@ -50,9 +50,9 @@ body.entrypage #dictheader div.titleContainer span.dictTitle a.dictTitle {font-s
 #randoms > div.list > a:hover {background-color: #f7f9ea; text-shadow: 1px 1px 0px #ffffff;}
 #randoms > div.list > a:hover span.headword {color: rgb(0, 76, 131);}
 #randoms > div.randomizer {display: none; }
-#randoms.hasMore > div.randomizer {display: block; position: absolute; top: 0px; left: 45px; background-image: url(refresh-static.gif); width: 40px; height: 40px; background-position: center center; background-repeat: no-repeat; cursor: pointer;}
+#randoms.hasMore > div.randomizer {display: block; position: absolute; top: 0px; left: 45px; background-image: url(./furniture/refresh-static.gif); width: 40px; height: 40px; background-position: center center; background-repeat: no-repeat; cursor: pointer;}
 #randoms.hasMore > div.randomizer:hover {background-color: #f7f9ea;}
-#randoms.hasMore > div.randomizer.animated {background-image: url(refresh-animated.gif);}
+#randoms.hasMore > div.randomizer.animated {background-image: url(./furniture/refresh-animated.gif);}
 @media (max-width: 800px){
   #randoms.hasMore div.list {border-left: 0px; padding-left: 0px; margin-left: 0px; border-top: 1px solid #dddddd; padding-top: 10px; margin-top: 10px;}
   #randoms.hasMore > div.randomizer {display: block; position: relative; top: 0px; left: 0px;}
@@ -72,11 +72,11 @@ body.entrypage #dictheader div.titleContainer span.dictTitle a.dictTitle {font-s
 #sitefooter > div.right {float: right;}
 #sitefooter a {text-decoration: none; color: #09587e; }
 #sitefooter a:hover {color: #2c7fba; }
-#sitefooter a.github {display: block; width: 20px; height: 19px; background-image: url(github.png);}
+#sitefooter a.github {display: block; width: 20px; height: 19px; background-image: url(./furniture/github.png);}
 #sitefooter div.logolint {margin-top: 20px;}
 #sitefooter div.logolint a {display: inline-block; vertical-align: middle; margin-right: 20px;}
-#sitefooter div.logolint a.muni {background-image: url(logo_muni.png); background-size: cover; width: 127px; height: 60px;}
-#sitefooter div.logolint a.ske {background-image: url(logo_ske.png); background-size: cover; width: 105px; height: 39px;}
+#sitefooter div.logolint a.muni {background-image: url(./furniture/logo_muni.png); background-size: cover; width: 127px; height: 60px;}
+#sitefooter div.logolint a.ske {background-image: url(./furniture/logo_ske.png); background-size: cover; width: 105px; height: 39px;}
 
 #viewer {padding: 0px 0px !important; float: left; max-width: 930px; width: 100%}
 
@@ -119,8 +119,8 @@ div.welcome {font-size: 1.1rem; line-height: 1.5em; color: #666666; }
 div.welcome > div.intro {color: #333333;}
 div.welcome > div.point { margin: 20px 0px;}
 div.welcome > div.point > div.title {}
-div.welcome > div.point > div.title > a {font-weight: bold; background-image: url(signpost.png); background-position: 5px 0px; background-repeat: no-repeat; padding-left: 50px; display: block; min-height: 30px;}
-div.welcome > div.point > div.title > a:hover {background-image: url(signpost-on.png);}
+div.welcome > div.point > div.title > a {font-weight: bold; background-image: url(./furniture/signpost.png); background-position: 5px 0px; background-repeat: no-repeat; padding-left: 50px; display: block; min-height: 30px;}
+div.welcome > div.point > div.title > a:hover {background-image: url(./furniture/signpost-on.png);}
 div.welcome a {text-decoration: none; color: #09587e;}
 div.welcome a:hover {color: #2c7fba; }
 div.welcome > div.point > div.title > a > span.pdf {background-color: #bd6c73; color: #ffffff; padding: 2px 5px; font-size: 0.8rem; border-radius: 2px; position: relative; top: -2px;}
@@ -129,7 +129,7 @@ div.welcome > div.point > div.subtitle {margin: 20px 0px 0px 45px; background-co
 div.welcome > div.point > div.subblurb {margin: 0px 0px 0px 45px; background-color: #f3f3f3; border-radius: 0px 4px 4px 4px; padding: 15px 15px; text-shadow: 1px 1px 0px #ffffff; font-size: 0.95rem;}
 div.welcome > div.point > div.subblurb > div.add {margin-top: 10px; padding-top: 10px; border-top: 2px solid #ffffff; color: #999999; margin-left: -15px; margin-right: -15px; padding-left: 15px; padding-right: 15px;}
 
-div.usertop {background-image: url(user.png); background-position: left center; background-repeat: no-repeat; padding-left: 80px; min-height: 60px; margin-bottom: 20px;}
+div.usertop {background-image: url(./furniture/user.png); background-position: left center; background-repeat: no-repeat; padding-left: 80px; min-height: 60px; margin-bottom: 20px;}
 div.usertop a {text-decoration: none; color: #09587e;}
 div.usertop a:hover {color: #2c7fba; }
 div.usertop > div.title {font-size: 1.5rem; padding-top: 10px;}
@@ -155,7 +155,7 @@ div.error {background-color: #ffcdcc; color: #99004d; font-weight: bold; text-al
 div.yourdicts {font-size: 1.2rem; color: #666666; padding-bottom: 5px; border-bottom: 1px dotted #999999; margin-top: 40px;}
 div.nodicts {margin-top: 15px; color: #999999; margin-bottom: -3px;}
 div.createdict {margin-top: 15px; color: #999999;}
-div.createdict a {text-decoration: none; color: #09587e; background-image: url(lightning.png); background-position: left center; background-repeat: no-repeat; padding-left: 25px; display: inline-block; min-height: 16px;}
+div.createdict a {text-decoration: none; color: #09587e; background-image: url(./furniture/lightning.png); background-position: left center; background-repeat: no-repeat; padding-left: 25px; display: inline-block; min-height: 16px;}
 div.createdict a:hover {color: #2c7fba;}
 
 div.dict {margin-top: 13px;}
@@ -166,7 +166,7 @@ div.dict:hover a.dictAction {visibility: visible;}
 div.dict a.dictAction:hover {color: #2c7fba;}
 
 div.adminlink {margin-top: 15px; color: #999999;}
-div.adminlink a {text-decoration: none; color: #09587e; background-image: url(cog.png); background-position: left center; background-repeat: no-repeat; padding-left: 25px; display: inline-block; min-height: 16px; margin-right: 0.75em;}
+div.adminlink a {text-decoration: none; color: #09587e; background-image: url(./furniture/cog.png); background-position: left center; background-repeat: no-repeat; padding-left: 25px; display: inline-block; min-height: 16px; margin-right: 0.75em;}
 div.adminlink a:hover {color: #2c7fba;}
 
 body.doc div.markdown {max-width: 900px; margin-top: 70px; }
@@ -174,5 +174,5 @@ body.doc div.markdown {max-width: 900px; margin-top: 70px; }
   body.doc div.markdown {margin-top: 50px;}
 }
 
-div.readonly { text-align: center; padding: 115px 0px 0px 0px; background-image: url(maintenance.png); background-position: center top; background-repeat: no-repeat; line-height: 1.5em; color: #666666;}
+div.readonly { text-align: center; padding: 115px 0px 0px 0px; background-image: url(./furniture/maintenance.png); background-position: center top; background-repeat: no-repeat; line-height: 1.5em; color: #666666;}
 div.readonly div.readonlyTitle { color: #bd6c73; font-size: 1.25rem; margin-bottom: 0.75em;}

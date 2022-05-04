@@ -1,4 +1,4 @@
-var Flagging={};
+window.Flagging={};
 Flagging.change=function(){};
 
 function initColorPicker(elem, c) {

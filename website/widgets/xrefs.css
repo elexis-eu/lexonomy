@@ -1,4 +1,4 @@
-.xonomy .lexonomyXrefsCaption {line-height: 1;margin-right: 1px; white-space: nowrap;padding: 7px 10px 6px 40px;background-image: url(../furniture/link.png);background-position: 10px center;background-repeat: no-repeat;}
+.xonomy .lexonomyXrefsCaption {line-height: 1;margin-right: 1px; white-space: nowrap;padding: 7px 10px 6px 40px;background-image: url(./furniture/link.png);background-position: 10px center;background-repeat: no-repeat;}
 .xonomy.laic .lexonomyXrefsCaption {top: 0px; margin-right: 0px; margin-left: 10px;}
 .xonomy .readonly .lexonomyXrefsCaption {display: none;}
 .xonomy .lexonomyXrefsCaption:hover {color: #004f9b; }

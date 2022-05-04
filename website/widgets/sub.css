@@ -17,18 +17,18 @@ div.subbox {padding: 0px; width: 600px; height: 300px; position: relative;}
 div.subbox form.topbar {position: absolute; top: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }
 div.subbox div.bottombar {position: absolute; bottom: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }
 
-div.subbox form.topbar button.creator {float: right; background-image: url(../furniture/add.png); background-position: 10px center; background-repeat: no-repeat; padding: 5px 10px 5px 30px; border-width: 1px; border-radius: 2px; cursor: pointer; font-size:}
+div.subbox form.topbar button.creator {float: right; background-image: url(./furniture/add.png); background-position: 10px center; background-repeat: no-repeat; padding: 5px 10px 5px 30px; border-width: 1px; border-radius: 2px; cursor: pointer;}
 div.subbox form.topbar button.creator span.tech {font-family: monospace; font-size: 0.95em;}
 div.subbox form.topbar button.creator span.tech span.brak {color: #669acc;}
 div.subbox form.topbar button.creator span.tech span.elm {color: #cc3333;}
 div.subbox form.topbar button.creator span.tech span.ats {color: #999999;}
 div.subbox form.topbar button.creator span.tech span.att {color: #ff4455;}
 
-div.subbox input.sub {background-image: url(../furniture/favicon.png); background-position: center center; background-repeat: no-repeat; padding: 4px 0px 4px 0px; width: 40px; border-width: 1px; border-radius: 2px; cursor: pointer;}
-div.subbox button.insert {background-image: url(../furniture/add.png); background-position: 10px center; background-repeat: no-repeat; padding: 5px 10px 5px 30px; border-width: 1px; border-radius: 2px; cursor: pointer;}
+div.subbox input.sub {background-image: url(./furniture/favicon.png); background-position: center center; background-repeat: no-repeat; padding: 4px 0px 4px 0px; width: 40px; border-width: 1px; border-radius: 2px; cursor: pointer;}
+div.subbox button.insert {background-image: url(./furniture/add.png); background-position: 10px center; background-repeat: no-repeat; padding: 5px 10px 5px 30px; border-width: 1px; border-radius: 2px; cursor: pointer;}
 div.subbox button:hover {background-color: #eeeeee;}
 
-div.subbox div.waiter {position: absolute; top: 43px; left: 0px; right: 0px; bottom: 0px; background-color: #ffffff; background-image: url(../furniture/loader.gif); background-position: center center; background-repeat: no-repeat;}
+div.subbox div.waiter {position: absolute; top: 43px; left: 0px; right: 0px; bottom: 0px; background-color: #ffffff; background-image: url(./furniture/loader.gif); background-position: center center; background-repeat: no-repeat;}
 
 div.subbox div.choices {position: absolute; top: 43px; left: 0px; right: 0px; bottom: 45px; overflow-y: scroll; }
 div.subbox div.choices label {cursor: pointer; padding: 5px 5px; font-size: 0.9rem; display: block; position: relative;}

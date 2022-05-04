@@ -1,4 +1,4 @@
-var Screenful={
+window.Screenful={
   createEnvelope: function(scrollable){
     var html="<div id='envelope' class='"+(scrollable?"scrollable":"")+"'></div>";
     if(window.parent==window || (window.parent!=window && !window.parent.Screenful)) html+="<div id='statusbar'><span class='alertmessage'><span class='text'>(ALERT)</span> <span class='closeIcon'></span></span><span class='statusmessage'></span></div>";

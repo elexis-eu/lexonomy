@@ -1,4 +1,4 @@
-var Download={};
+window.Download={};
 
 Download.change=function(){};
 

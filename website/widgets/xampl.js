@@ -1,4 +1,4 @@
-var Xampl={};
+window.Xampl={};
 Xampl.change=function(){};
 
 Xampl.render=function(div, json){

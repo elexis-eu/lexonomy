@@ -1,8 +1,8 @@
 #middlebox {max-width: 600px; padding: 40px 30px; min-height: 100px; margin: 75px auto 50px auto; border: 1px solid var(--border); background-color: #ffffff; border-radius: 4px; box-shadow: 0px 0px 4px #666666;  }
 
 #middlebox div.message {margin-top: 0px; font-weight: bold; text-align: center;}
-#middlebox div.waiter {height: 125px; background-image: url(waiter-animated.gif); background-position: center center; background-repeat: no-repeat;}
-#middlebox div.waiter.finished {background-image: url(waiter-static.png);}
+#middlebox div.waiter {height: 125px; background-image: url(./furniture/waiter-animated.gif); background-position: center center; background-repeat: no-repeat;}
+#middlebox div.waiter.finished {background-image: url(./furniture/waiter-static.png);}
 #middlebox div.progressMessage { text-align: center; line-height: 1.75em;}
 
 #middlebox div.buttons {text-align: center; margin-top: 40px;}

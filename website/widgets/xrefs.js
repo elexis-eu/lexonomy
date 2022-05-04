@@ -1,4 +1,4 @@
-Xrefs={};
+window.Xrefs={};
 
 Xrefs.extendDocspec=function(docspec, xema) {
   if (Object.keys(linking).length) {

@@ -17,5 +17,5 @@
 
 .middlebox div.two div.message {text-align: center; margin: 20px 0px 30px 0px;}
 
-button.iconReload { background-image: url(../../furniture/arrow_refresh.png); padding: 7px 10px 6px 35px !important; background-position: 10px center; background-repeat: no-repeat;}
-button.iconCross { background-image: url(../../furniture/cross.png); padding: 7px 10px 6px 35px !important; background-position: 10px center; background-repeat: no-repeat;}
+button.iconReload { background-image: url(./furniture/arrow_refresh.png); padding: 7px 10px 6px 35px !important; background-position: 10px center; background-repeat: no-repeat;}
+button.iconCross { background-image: url(./furniture/cross.png); padding: 7px 10px 6px 35px !important; background-position: 10px center; background-repeat: no-repeat;}

@@ -1,7 +1,7 @@
-#header {padding: 10px 14px; height: 38px; border-bottom: 1px solid #1e6bcf; background-image: url(header-back.gif); background-position: right top; background-repeat: no-repeat;}
+#header {padding: 10px 14px; height: 38px; border-bottom: 1px solid #1e6bcf; background-image: url(./furniture/header-back.gif); background-position: right top; background-repeat: no-repeat;}
 #header * {vertical-align: middle;}
 #header a {text-decoration: none;}
-#header a.sitehome {display: inline-block; width: 119px; height: 34px; background-image: url(lexonomy_logo_blue_on_transparent_with_bleed.png); background-size: 119px auto; margin-top: 5px;}
+#header a.sitehome {display: inline-block; width: 119px; height: 34px; background-image: url(./furniture/lexonomy_logo_blue_on_transparent_with_bleed.png); background-size: 119px auto; margin-top: 5px;}
 #header a.sitehome:hover {position: relative; top: -1px;}
 #header a.dicTitle {display: inline-block; font-size: 20px; padding: 8px 10px; background-color: #4c9ed9; color: #ffffff; border-radius: 4px; }
 #header a.dicTitle:hover {box-shadow: 0px 0px 2px #999999; color: #eeeeee;}
@@ -17,7 +17,7 @@
 #header div.doctypes {height: 30px; position: absolute; top: 59px;}
 #header div.doctypes a.doctype {display: inline-block; height: 35px; float: left; margin-right: 10px; color: #999999}
 #header div.doctypes a.doctype:hover {color: #666666;}
-#header div.doctypes a.doctype.current {font-weight: bold; background-image: url(callout.gif); background-position: center bottom; background-repeat: no-repeat;}
+#header div.doctypes a.doctype.current {font-weight: bold; background-image: url(./furniture/callout.gif); background-position: center bottom; background-repeat: no-repeat;}
 #header div.doctypes.nerd a.doctype span.tech {font-family: monospace; font-size: 0.95em; position: relative; top: -1px; line-height: 1em; margin: 0px 0.25em; }
 #header div.doctypes.nerd a.doctype.current span.tech span.brak {color: #669acc;}
 #header div.doctypes.nerd a.doctype.current span.tech span.elm {color: #cc3333;}
@@ -29,7 +29,7 @@
 #pagebody {position: absolute; top: 59px; left: 0px; right: 0px; bottom: 0px; overflow-x: hidden; overflow-y: auto;}
 #pagebody.notop { top: 0px; }
 
-div.notification {max-width: 1200px; margin: 50px auto -50px auto; font-size: 1rem; background-image: url(error.png); background-position: 15px center; background-repeat: no-repeat; color: #c74d4d; text-shadow: 1px 1px 0px #ffffff; background-color: #eeeeee; padding: 20px 10px 20px 45px; border-radius: 4px; }
+div.notification {max-width: 1200px; margin: 50px auto -50px auto; font-size: 1rem; background-image: url(./furniture/error.png); background-position: 15px center; background-repeat: no-repeat; color: #c74d4d; text-shadow: 1px 1px 0px #ffffff; background-color: #eeeeee; padding: 20px 10px 20px 45px; border-radius: 4px; }
 div.notification a {text-decoration: none; color: #004f9b; font-weight: bold;}
 div.notification a:hover {color: #006ed7;}
 @media(max-width: 1300px) {div.notification {margin: 20px 20px 30px 20px;}}
@@ -39,8 +39,8 @@ div.notification a:hover {color: #006ed7;}
 div.signposts {float: left; margin-right: 20px; margin-bottom: 40px; }
 @media(max-width: 1300px) {div.signposts {margin-bottom: 20px;}}
 div.signposts div.title {border-bottom: 1px dotted #cccccc; padding: 0px 0px 15px 0px; margin: 0px 0px 20px 0px; font-size: 1.25rem; color: #666666; }
-div.signposts div.signpost {background-image: url(signpost.png); background-position: 0px 0px; background-repeat: no-repeat; min-height: 30px; margin: 0px 30px 20px 0px;  }
-div.signposts div.signpost:hover {background-image: url(signpost-on.png);}
+div.signposts div.signpost {background-image: url(./furniture/signpost.png); background-position: 0px 0px; background-repeat: no-repeat; min-height: 30px; margin: 0px 30px 20px 0px;  }
+div.signposts div.signpost:hover {background-image: url(./furniture/signpost-on.png);}
 div.signposts div.signpost a {display: inline-block; padding: 7px 10px 7px 40px; text-decoration: none; color: #004f9b}
 div.signposts div.signpost a:hover {color: #006ed7;}
 div.field > div.clear {clear: left;}
@@ -50,10 +50,10 @@ div.dangerzone > div.inside {max-width: 1200px; margin: 0px auto 0px auto; }
 @media(max-width: 1300px) {div.dangerzone {position: relative; bottom: auto; margin: 20px 20px;}}
 div.dangerzone a {text-decoration: none; color: #004f9b; display: inline-block; background-position: left center; background-repeat: no-repeat; padding-left: 25px; min-height: 16px; background-color: #ffffff; margin-right: 1em;}
 div.dangerzone a:hover {color: #006ed7;}
-div.dangerzone a.destroy {background-image: url(cross_bw.png); }
-div.dangerzone a.destroy:hover {background-image: url(cross.png);}
-div.dangerzone a.changeUrl {background-image: url(pencil_bw.png); }
-div.dangerzone a.changeUrl:hover {background-image: url(pencil.png);}
+div.dangerzone a.destroy {background-image: url(./furniture/cross_bw.png); }
+div.dangerzone a.destroy:hover {background-image: url(./furniture/cross.png);}
+div.dangerzone a.changeUrl {background-image: url(./furniture/pencil_bw.png); }
+div.dangerzone a.changeUrl:hover {background-image: url(./furniture/pencil.png);}
 
 #listbox div.entry {color: #666666; }
 #listbox div.entry span.headword {font-weight: bold; color: #000000; }

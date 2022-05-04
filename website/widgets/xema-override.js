@@ -1,4 +1,4 @@
-var XemaOverride={};
+window.XemaOverride={};
 XemaOverride.change=function(){};
 
 XemaOverride.render=function(div, json){

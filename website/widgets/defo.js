@@ -1,4 +1,4 @@
-var Defo={};
+window.Defo={};
 Defo.change=function(){};
 
 Defo.render=function(div, json){

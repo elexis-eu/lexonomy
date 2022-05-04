@@ -1,4 +1,4 @@
-var Oneclick={};
+window.Oneclick={};
 
 Oneclick.change=function(){};
 

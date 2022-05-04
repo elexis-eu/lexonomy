@@ -1,4 +1,4 @@
-var Titling={};
+window.Titling={};
 Titling.change=function(){};
 
 Titling.render=function(div, json){
@@ -92,7 +92,7 @@ Titling.render=function(div, json){
       }
     },
   });
-  
+
   $block.append("<div class='instro'>Select language to sort entries alphabetically in the entry list.</div>");
 
   var $numberEntries=$("<div class='block abc'></div>").appendTo($div);

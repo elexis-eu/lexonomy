@@ -1,4 +1,4 @@
-var Kex={};
+window.Kex={};
 
 Kex.change=function(){};
 

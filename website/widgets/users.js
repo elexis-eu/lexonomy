@@ -1,4 +1,4 @@
-var Users={};
+window.Users={};
 
 Users.change=function(){};
 

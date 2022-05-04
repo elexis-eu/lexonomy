@@ -18,11 +18,11 @@ body {font-family: 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans TC', 
 .xonomy-envelope button.mergeLeft { margin-left: -42px; }
 .xonomy-envelope button.disabled { color: #999999; cursor: not-allowed; }
 
-#statusbar span.wait { background-image: url(loader.gif); display: inline-block; width: 30px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 1em;}
-#statusbar span.warn { background-image: url(exclamation.png); display: inline-block; width: 16px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 0.75em;}
+#statusbar span.wait { background-image: url(./furniture/loader.gif); display: inline-block; width: 30px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 1em;}
+#statusbar span.warn { background-image: url(./furniture/exclamation.png); display: inline-block; width: 16px; height: 10px; background-repeat: no-repeat; background-position: left center; margin-right: 0.75em;}
 #statusbar .alertmessage { position: fixed; left: 0; top: 0; right: 0;display: none; color: black; font-weight: bold; padding: 2px 10px; min-height: 20px; text-align: center;}
 #statusbar .alertmessage .closeIcon{height: 18px;}
 #statusbar .alertmessage i{line-height: 18px;}
 #statusbar .statusmessage {padding: 5px;}
 
-.wyc { display: inline-block; background-image: url(loader.gif); background-position: center center; background-repeat: no-repeat; width: 30px; height: 10px; }
+.wyc { display: inline-block; background-image: url(./furniture/loader.gif); background-position: center center; background-repeat: no-repeat; width: 30px; height: 10px; }
