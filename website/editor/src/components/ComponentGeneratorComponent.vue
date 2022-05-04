@@ -113,7 +113,8 @@ export default {
                 children: this.getElementChildren(elementName, contentInstance),
                 content: contentInstance,
                 elementData: elementData,
-                editorChildNumber: index
+                editorChildNumber: index,
+                parentElementName: this.elementName
               }
             })
           })
@@ -126,7 +127,8 @@ export default {
               children: this.getElementChildren(elementName, content),
               content: content,
               elementData: elementData,
-              editorChildNumber: 0
+              editorChildNumber: 0,
+              parentElementName: this.elementName
             }
           })
         }

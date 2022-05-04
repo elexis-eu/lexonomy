@@ -25,8 +25,12 @@ export default {
   },
   watch: {
     dirty(newVal) {
-      // eslint-disable-next-line no-undef
-      (newVal) ? Screenful.Editor.changed() : Screenful.Editor.resetChanged()
+      try {
+        // eslint-disable-next-line no-undef
+        (newVal) ? Screenful.Editor.changed() : Screenful.Editor.resetChanged()
+      } catch (e) {
+        console.error(e)
+      }
     },
   },
   computed: {

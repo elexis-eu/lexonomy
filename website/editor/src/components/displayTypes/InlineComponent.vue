@@ -1,15 +1,20 @@
 <template>
-  <div>
-    <section v-if="elementData.shown">
+  <div class="inline-component" :style="configStyles">
+    <section class="content">
+      <ActionButtons
+        :elementName="elementName"
+        :elementEditorConfig="elementData"
+        :parentElementName="parentElementName"
+      />
+      <component :is="valueComponent"
+                 :elementEditorConfig="elementData"
+                 :elementName="elementName"
+                 :elementData="elementData"
+                 :content="componentData"
+                 @hide-children="hideChildren"
+                 @input="handleValueUpdate"
+      />
     </section>
-    <component :is="valueComponent"
-               :elementEditorConfig="elementData"
-               :elementName="elementName"
-               :elementData="elementData"
-               :content="componentData"
-               @hide-children="hideChildren"
-               @input="handleValueUpdate"
-    />
     <ComponentGeneratorComponent
       v-if="showChildren"
       :children="children"
@@ -26,10 +31,12 @@
 import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
 import valueDisplayMixin from "@/shared-resources/mixins/valueDisplayMixin"
 import {xml2js} from "xml-js"
+import ActionButtons from "@/components/ActionButtons"
 
 export default {
   name: "InlineComponent",
   components: {
+    ActionButtons,
     ComponentGeneratorComponent
   },
   mixins: [
@@ -39,6 +46,7 @@ export default {
     children: Array,
     elementData: Object,
     elementName: String,
+    parentElementName: String,
     content: {
       type: [Object, Array],
       required: true
@@ -47,6 +55,27 @@ export default {
     editorChildNumber: Number
   },
   computed: {
+    configStyles() {
+      let output = {}
+      for (const [style, value] of Object.entries(this.elementData)) {
+        switch (style) {
+          case "background":
+          case "color":
+            output[style] = value
+            break
+          case "border":
+            output.border = `1px ${value}`
+            break
+          case "slant":
+            output.fontStyle = value
+            break
+          case "weight":
+            output.fontWeight = value
+        }
+      }
+      return output
+
+    },
     calculatedContent() {
       return this.updatedContent || this.content
     },
@@ -98,5 +127,11 @@ export default {
 </script>
 
 <style scoped>
-
+.inline-component {
+    margin-bottom: 16px;
+    padding: 8px;
+}
+.content {
+  display: flex;
+}
 </style>
