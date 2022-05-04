@@ -20,7 +20,6 @@ registerPreprocessor('css', 'scss', function(code, { options }) {
 const options = {}
 export default [{
   input: 'app.js',
-  context: "window",
   output: {
     file: 'bundle.js',
     format: 'iife',
@@ -31,11 +30,21 @@ export default [{
     uglify(),
     nodeResolve()
   ]
-},
-{
+}, {
+  input: 'app.static.js',
+  context: "window",
+  output: {
+    file: 'bundle.static.js',
+    format: 'iife',
+    strict: false
+  }
+}, {
   input: "app.css.js",
   output: {
     file: "bundle.css"
   },
-  plugins: [ css() ]
+  plugins: [
+    css(),
+    nodeResolve()
+  ]
 }]

@@ -1,12 +1,5 @@
 import {register as riot_register, component} from 'riot'
 
-import './libs/riot/riot.min.js'
-import './libs/riot/route.min.js'
-import './libs/riot/observable.js'
-import './libs/jquery/jquery.min.js'
-import './libs/jquery/jquery-ui.min.js'
-import './libs/materialize/materialize.min.js'
-import './libs/materialize/materialize-colorpicker.min.js'
 import './js/store.js'
 import './js/auth.js'
 import './js/extend-riot.js'
