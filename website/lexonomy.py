@@ -728,6 +728,16 @@ def entrylist(dictID, doctype, user, dictDB, configs):
         total, entries, first = ops.listEntries(dictDB, dictID, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.howmany, request.forms.sortdesc, False)
         return {"success": True, "entries": entries, "total": total, "firstRun": first}
 
+@post(siteconfig["rootPath"]+"<dictID>/search.json")
+def publicsearch(dictID):
+    dictDB = ops.getDB(dictID)
+    configs = ops.readDictConfigs(dictDB)
+    if not configs["publico"]["public"]:
+        return {"success": False}
+    else:
+        total, entries, first = ops.listEntries(dictDB, dictID, configs, configs['xema']['root'], request.forms.searchtext)
+        return {"success": True, "entries": entries, "total": total}
+
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
 @authDict(["canConfig"])
 def configread(dictID, user, dictDB, configs):
