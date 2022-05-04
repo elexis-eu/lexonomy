@@ -340,9 +340,9 @@ class StoreClass {
                this.data.dictlist = response.dicts
                M.toast({html: "Dictionary was cloned."})
                this.trigger("dictlistChanged")
-               this.changeDictionary(dictId)
+               this.changeDictionary(response.dictID)
                this.one("dictionaryChanged", () => {
-                  route(dictId)
+                  route(response.dictID)
                })
             })
             .fail(response => {

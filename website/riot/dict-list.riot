@@ -87,8 +87,6 @@
          doCloneDict(dictId) {
             this.update({isLoading: true})
             this.store.cloneDictionary(dictId)
-                  .always(() => {this.update({isLoading: false})})
-
          },
 
          doDeleteDict(dictId) {
