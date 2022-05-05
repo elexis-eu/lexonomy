@@ -630,7 +630,9 @@ def getPublicDicts():
             cc = dictDB.execute("select count(*) as total from entries")
             size = cc.fetchone()["total"]
             configs = loadHandleMeta(configs)
-            dictinfo = {"id": r["id"], "title": r["title"], "author": re.sub(r"@.*","@...", list(configs["users"].keys())[0]), "lang": configs["ident"].get("lang"), "licence": configs["publico"]["licence"], "size": size}
+            dictinfo = {"id": r["id"], "title": r["title"], "author": "", "lang": configs["ident"].get("lang"), "licence": configs["publico"]["licence"], "size": size}
+            if len(list(configs["users"].keys())) > 0:
+                dictinfo["author"] = re.sub(r"@.*","@...", list(configs["users"].keys())[0])
             if configs["metadata"].get("dc.title"):
                 dictinfo["title"] = configs["metadata"]["dc.title"]
             if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
