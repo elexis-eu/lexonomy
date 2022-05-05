@@ -5,6 +5,12 @@
         :elementName="elementName"
         :elementEditorConfig="elementData"
         :parentElementName="parentElementName"
+        :numberOfElements="numberOfElements"
+        @move-element-down="moveElementDown"
+        @move-element-up="moveElementUp"
+        @add-element="createSibling"
+        @clone-element="cloneElement"
+        @remove-element="deleteElement"
       />
       <component :is="valueComponent"
                  :elementEditorConfig="elementData"
@@ -46,6 +52,7 @@ export default {
     elementData: Object,
     elementName: String,
     parentElementName: String,
+    numberOfElements: Number,
     content: {
       type: [Object, Array],
       required: true

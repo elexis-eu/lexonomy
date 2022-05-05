@@ -2,9 +2,11 @@
   <div v-if="!isRootElement" ref="actionButton" class="dropdown">
     <button @click="toggleDropdown">...</button>
     <div v-show="show" class="vue-dropdown-content">
-      <a @click="$emit('remove-element')">Remove {{ elementName }}</a>
+        <a v-if="elementEditorConfig.enableCopying" @click="$emit('move-element-down')">Move {{ elementName }} down</a>
+        <a v-if="elementEditorConfig.enableCopying" @click="$emit('move-element-up')">Move {{ elementName }} up</a>
       <a v-if="canAddElement" @click="$emit('add-element')">Create new {{ elementName }}</a>
       <a v-if="elementEditorConfig.enableCopying" @click="$emit('clone-element')">Duplicate {{ elementName }}</a>
+      <a v-if="canRemoveElement" @click="$emit('remove-element')">Remove selected {{ elementName }}</a>
     </div>
   </div>
 </template>
@@ -15,7 +17,8 @@ export default {
   props: {
     elementName: String,
     elementEditorConfig: Object,
-    parentElementName: String
+    parentElementName: String,
+    numberOfElements: Number
   },
   data() {
     return {
@@ -27,11 +30,14 @@ export default {
       return this.elementName === this.state.entry.dictConfigs.xema.root
     },
     canAddElement() {
-      let config = this.state.entry.dictConfigs.xema.elements[this.parentElementName].children[this.elementName]
-      console.log(config)
-      return true
-      // eslint-disable-next-line no-debugger
-      // debugger
+      let parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].children
+      let {max} = parentChildren.find(el => el.name === this.elementName)
+      return max === 0 || this.numberOfElements < max
+    },
+    canRemoveElement() {
+      let parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].children
+      let {min} = parentChildren.find(el => el.name === this.elementName)
+      return min === 0 || this.numberOfElements > min
     }
   },
   watch: {
@@ -51,7 +57,7 @@ export default {
       if (!this.$refs.actionButton.contains(event.target)) {
         this.toggleDropdown()
       }
-    },
+    }
   }
 }
 </script>

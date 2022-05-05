@@ -51,6 +51,22 @@ export default {
     },
     updateContent(newContent) {
       this.updatedContent = newContent
+    },
+    moveElementDown() {
+      this.$emit("move-element", {name: this.elementName, direction: -1, position: this.editorChildNumber})
+    },
+    moveElementUp() {
+      this.$emit("move-element", {name: this.elementName, direction: 1, position: this.editorChildNumber})
+    },
+    createSibling() {
+      console.log("createSibling")
+      this.$emit("create-element", {name: this.elementName})
+    },
+    deleteElement() {
+      this.$emit("delete-element", {name: this.elementName, position: this.editorChildNumber})
+    },
+    cloneElement() {
+      this.$emit("clone-element", {name: this.elementName, position: this.editorChildNumber})
     }
   }
 }

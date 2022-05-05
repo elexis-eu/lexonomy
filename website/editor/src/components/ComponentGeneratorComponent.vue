@@ -104,7 +104,6 @@ export default {
             content = [{}]
           }
         }
-
         // Decide if multiple instances need to be made and push children to array to be rendered
         if (Array.isArray(content)) {
           content.forEach((contentInstance, index) => {
@@ -117,7 +116,8 @@ export default {
                 content: contentInstance,
                 elementData: elementData,
                 editorChildNumber: index,
-                parentElementName: this.elementName
+                parentElementName: this.elementName,
+                numberOfElements: content.length
               }
             })
           })
@@ -131,7 +131,8 @@ export default {
               content: content,
               elementData: elementData,
               editorChildNumber: 0,
-              parentElementName: this.elementName
+              parentElementName: this.elementName,
+              numberOfElements: content.length
             }
           })
         }
