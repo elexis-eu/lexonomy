@@ -55,6 +55,9 @@ export default {
   methods: {
     // Update only content of children to prevent re-rendering of whole structure
     updateContentInChildren(newContent) {
+      if (!newContent || !newContent.elements) {
+        return
+      }
       for (let renderedChild of this.renderedChildren) {
         let newContentForChild = newContent.elements.filter(element => {
           return element.name === renderedChild.props.elementName

@@ -1,11 +1,17 @@
 <template>
   <div class="popup" v-if="elementData.shown">
-    <button @click="openPopup">Open {{elementName}}</button>
+    <button @click="openPopup">Open {{ elementName }}</button>
+
+    <ActionButtons
+      :elementName="elementName"
+      :elementEditorConfig="elementData"
+      :parentElementName="parentElementName"
+    />
     <component :is="valueComponent"
                :elementEditorConfig="elementData"
                :elementName="elementName"
                :elementData="elementData"
-               :content="calculatedContent"
+               :content="componentData"
                @hide-children="hideChildren"
                @input="handleValueUpdate"
     />
@@ -17,9 +23,8 @@
                    :elementEditorConfig="elementData"
                    :elementName="elementName"
                    :elementData="elementData"
-                   :content="calculatedContent"
+                   :content="componentData"
                    @hide-children="hideChildren"
-                   @click="openPopup"
                    @input="handleValueUpdate"
         />
         <ComponentGeneratorComponent
@@ -28,7 +33,7 @@
           :elementEditorConfig="elementData"
           :elementName="elementName"
           :content="calculatedContent"
-          @input="handleValueUpdate"
+          @input="handleChildUpdate"
         />
       </div>
     </div>
@@ -37,30 +42,28 @@
 
 <script>
 import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
-import valueDisplayMixin from "@/shared-resources/mixins/valueDisplayMixin"
+import ActionButtons from "@/components/ActionButtons"
+import layoutElementMixin from "@/shared-resources/mixins/layoutElementMixin"
 
 export default {
   name: "PopupComponent",
   components: {
-    ComponentGeneratorComponent
+    ComponentGeneratorComponent,
+    ActionButtons
   },
   mixins: [
-    valueDisplayMixin
+    layoutElementMixin
   ],
   props: {
     children: Array,
     elementData: Object,
     elementName: String,
+    parentElementName: String,
     content: {
       type: [Object, Array],
       required: true
     },
     editorChildNumber: Number
-  },
-  computed: {
-    calculatedContent() {
-      return this.updatedContent || this.content
-    }
   },
   data() {
     return {
@@ -75,16 +78,6 @@ export default {
     },
     closePopup() {
       this.showPopup = false
-    },
-    hideChildren() {
-      this.showChildren = false
-    },
-    handleValueUpdate(data) {
-      let content = {...this.content, ...data.content}
-      this.$emit('input', {elementName: this.elementName, editorChildNumber: this.editorChildNumber, content: content})
-    },
-    updateContent(newContent) {
-      this.updatedContent = newContent
     }
   }
 }
