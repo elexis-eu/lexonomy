@@ -27,6 +27,15 @@
 
    <div class="divider"
          style="margin-top: 50px;"></div>
+   <div if={ authData.authorized }
+         class="section"
+         style="opacity: 0.6;">
+      <h5>Resources</h5>
+      <ul class="resource-list-inline">
+         <li><a href="#/docs/intro">Gentle introduction to Lexonomy</a></li>
+         <li><a href="#/opendictionaries">Public dictionaries</a></li>
+      </ul>
+   </div>
    <div class="section"
          style="opacity: 0.6;">
       <h5>Reference</h5>
@@ -38,6 +47,16 @@
    <style>
       :host{
          margin-top: 20px;
+      }
+      .resource-list-inline {
+         padding-left: 0;
+         margin-left: -5px;
+         list-style: none;
+      }
+      .resource-list-inline > li {
+         display: inline-block;
+         padding-right: 5px;
+         padding-left: 5px;
       }
    </style>
 </main-page>
