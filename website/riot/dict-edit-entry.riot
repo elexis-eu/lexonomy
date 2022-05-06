@@ -95,6 +95,7 @@
                flagging = this.dictData.config.flagging;
                linking = this.dictData.config.linking;
                editing = this.dictData.config.editing;
+               gapi = this.dictData.config.gapi;
                dictId = this.dictId;
                userDicts = this.dictData.dictlist;
                ske_username = this.authData.ske_username;
@@ -121,11 +122,13 @@
                         entry.contentHtml = Xemplatron.xml2html(doc, xemplate, xema);
                      }
                      $(div).addClass("viewer").html(entry.contentHtml);
+                     Gmedia.addVoice(entry);
                      $(div).find("a.xref").on("click", function(e){
                         var text = $(e.delegateTarget).attr("data-text");
                         window.parent.$("#searchbox").val(text);
                         window.parent.Screenful.Navigator.list();
                      });
+
                   };
                }
                Screenful.Editor.editor = function (div, entry, uneditable) {
@@ -183,6 +186,7 @@
                      if (customizeEditor && customizeEditor.adjustDocSpec) customizeEditor.adjustDocSpec(docSpec);
                      Xonomy.render((entry ? entry.content : newXml), div, docSpec);
                      if(!Xonomy.keyNav) Xonomy.startKeyNav($("#container")[0], document.getElementById("container"));
+                     Gmedia.addVoice();
                   } else {
                      customizeEditor.editor(div, entry ? entry : {content: newXml, id: 0}, uneditable);
                   }

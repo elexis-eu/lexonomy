@@ -62,7 +62,7 @@ Gmedia.menuRoot=function(htmlID) {
 };
 
 Gmedia.addVoice=function(entry) {
-  if (usingOwnEditor === false && gapi.voicekey && gapi.voicekey != '' && gapi.voicelang != '') {
+  if (gapi.voicekey && gapi.voicekey != '' && gapi.voicelang != '') {
     if (entry) {
       var $xml = $($.parseXML(entry.content));
     } else {
@@ -76,8 +76,10 @@ Gmedia.addVoice=function(entry) {
   }
 }
 
-Gmedia.addVoicePublic=function(headword, apiKey, apiLang) {
-  if (headword != "" && apiKey != "" && apiLang != "") {
-      $('#viewer div:first span:first').after('<span class="voicetts"><audio id="voiceplayer" src="https://api.voicerss.org/?key='+apiKey+'&hl='+apiLang+'&src='+headword+'"/><span class="voicetts-icon"><img src="/furniture/speaker.png" onclick="document.getElementById(\'voiceplayer\').play()"></span></span>');
-  }
+Gmedia.addVoicePublic=function(entry, gapi, titling) {
+   var $xml = $($.parseXML(entry.content));
+   var headword = $xml.find(titling.headword).html();
+   if (headword != "" && gapi.voicekey && gapi.voicekey != '' && gapi.voicelang != '') {
+      $('#viewer div:first span:first').after('<span class="voicetts"><audio id="voiceplayer" src="https://api.voicerss.org/?key='+gapi.voicekey+'&hl='+gapi.voicelang+'&src='+headword+'"/><span class="voicetts-icon"><img src="/furniture/speaker.png" onclick="document.getElementById(\'voiceplayer\').play()"></span></span>');
+   }
 }

@@ -1,6 +1,17 @@
 <entry-view>
    <div class="viewer"
          id="viewer"></div>
+   <style>
+   .voicetts {
+      display: inline-block;
+      vertical-align: top;
+   }
+   .voicetts-icon img {
+      width: 30px;
+      cursor: pointer;
+      margin-left: 1em;
+   }
+   </style>
    <script>
       export default {
          bindings: [["store", "entryChanged", "entryChanged"]],
@@ -11,6 +22,7 @@
                $.post(window.API_URL + this.dictData.dictId + "/entryread.json", {id: this.dictData.entryId}, (response) => {
                   if (response.success) {
                      $('.viewer').html(response.contentHtml)
+                     Gmedia.addVoicePublic(response, this.dictData.config.gapi, this.dictData.config.titling);
                   }
                })
             }
