@@ -6,6 +6,10 @@
                :is="element.componentName"
                v-bind="element.props"
                @input="handleChildUpdate"
+               @create-element="createElement"
+               @move-element="moveElement"
+               @delete-element="deleteElement"
+               @clone-element="cloneElement"
     />
   </div>
 </template>
@@ -148,7 +152,7 @@ export default {
       let children = elementInXema && elementInXema.children
       if (content.elements) {
         let elemntsInContent = content.elements.filter(el => !!el.name)
-        let differentElementsInXMLContent = elemntsInContent.map((value) => value.name).filter((value, index, _arr) => _arr.indexOf(value) === index).length;
+        let differentElementsInXMLContent = elemntsInContent.map((value) => value.name).filter((value, index, _arr) => _arr.indexOf(value) === index).length
         if (!elementInXema || differentElementsInXMLContent !== (elementInXema.children && elementInXema.children.length) || 0) {
           let artificialChildren = []
           if (elemntsInContent) {
@@ -173,7 +177,8 @@ export default {
         elementData = {
           shown: true,
           displayType: "inline",
-          valueRenderType: "text-input"}
+          valueRenderType: "text-input"
+        }
       } else {
         if (!("shown" in elementData)) {
           elementData.shown = true
@@ -188,7 +193,6 @@ export default {
       return elementData
     },
     handleChildUpdate(data) {
-
       // Update content without creating new content/elements
       let content = Object.assign({}, this.content)
       if (!content.elements) {
@@ -202,14 +206,19 @@ export default {
       }
 
       let consecutiveNumber = 0
+      let contentUpdated = false
       for (const i in content.elements) {
         if (content.elements[i].name === data.elementName) {
           if (consecutiveNumber === data.editorChildNumber) {
+            contentUpdated = true
             content.elements[i] = data.content
             break
           }
           consecutiveNumber++
         }
+      }
+      if (!contentUpdated) {
+        this.appendElementAfterSameNameSiblings(data.elementName, content, data.content)
       }
       this.$emit("input", {content: content})
     },
@@ -218,6 +227,37 @@ export default {
       const elementConfig = this.state.entry.dictConfigs.xemplate[elementName]
       let type = (elementConfig && elementConfig.displayType) || "inline"
       return this.displayTypeToComponentMap[type]
+    },
+    createElement(data) {
+      let nextChildNumber = this.content.elements.filter(el => el.name === data.name).length
+      this.handleChildUpdate({
+        elementName: data.name,
+        editorChildNumber: nextChildNumber,
+        content: this.createElementTemplate(data.name)[0]
+      })
+    },
+    appendElementAfterSameNameSiblings(data, content, newContent) {
+      let elements = content.elements || []
+      let locationOfLastElement = elements.map(el => el.name).lastIndexOf(data.name)
+      if (locationOfLastElement >= 0) {
+
+        elements.splice(locationOfLastElement + 1, 0, newContent)
+      } else {
+        elements.push(newContent)
+      }
+      content.elements = elements
+      this.loadNewData(content)
+
+    },
+
+    moveElement() {
+
+    },
+    deleteElement() {
+
+    },
+    cloneElement() {
+
     }
   }
 }

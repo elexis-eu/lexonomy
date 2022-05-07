@@ -1,37 +1,39 @@
 <template>
-  <div class="popup" v-if="elementData.shown">
+  <div class="popup">
     <button @click="openPopup">Open {{ elementName }}</button>
-
-    <ActionButtons
-      :elementName="elementName"
-      :elementEditorConfig="elementData"
-      :parentElementName="parentElementName"
-      :numberOfElements="numberOfElements"
-      @move-element-down="moveElementDown"
-      @move-element-up="moveElementUp"
-      @add-element="createSibling"
-      @clone-element="cloneElement"
-      @remove-element="deleteElement"
-    />
-    <component :is="valueComponent"
-               :elementEditorConfig="elementData"
-               :elementName="elementName"
-               :elementData="elementData"
-               :content="componentData"
-               @hide-children="hideChildren"
-               @input="handleValueUpdate"
-    />
-
-    <div v-show="showPopup" class="modal" @click="closePopup">
-      <div class="modal-content" @click.stop="">
+    <section v-if="elementData.shown">
+      <ActionButtons
+        :elementName="elementName"
+        :elementEditorConfig="elementData"
+        :parentElementName="parentElementName"
+        :numberOfElements="numberOfElements"
+        @move-element-down="moveElementDown"
+        @move-element-up="moveElementUp"
+        @add-element="createSibling"
+        @clone-element="cloneElement"
+        @remove-element="deleteElement"
+      />
+      <component :is="valueComponent"
+                 :elementEditorConfig="elementData"
+                 :elementName="elementName"
+                 :elementData="elementData"
+                 :content="componentData"
+                 @hide-children="hideChildren"
+                 @input="handleValueUpdate"
+      />
+    </section>
+    <div v-if="showPopup" ref="wrapper" class="modal" @click="maybeClosePopup">
+      <div ref="modalContent" class="modal-content">
         <span class="close" @click="closePopup">&times;</span>
-        <component :is="valueComponent"
-                   :elementEditorConfig="elementData"
-                   :elementName="elementName"
-                   :elementData="elementData"
-                   :content="componentData"
-                   @hide-children="hideChildren"
-                   @input="handleValueUpdate"
+        <component
+          v-if="elementData.shown"
+          :is="valueComponent"
+          :elementEditorConfig="elementData"
+          :elementName="elementName"
+          :elementData="elementData"
+          :content="componentData"
+          @hide-children="hideChildren"
+          @input="handleValueUpdate"
         />
         <ComponentGeneratorComponent
           v-if="showChildren"
@@ -82,6 +84,11 @@ export default {
   methods: {
     openPopup() {
       this.showPopup = true
+    },
+    maybeClosePopup(event) {
+      if (event.target === this.$refs.wrapper) {
+        this.closePopup()
+      }
     },
     closePopup() {
       this.showPopup = false

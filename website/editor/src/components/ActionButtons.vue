@@ -4,7 +4,7 @@
     <div v-show="show" class="vue-dropdown-content">
         <a v-if="elementEditorConfig.enableCopying" @click="$emit('move-element-down')">Move {{ elementName }} down</a>
         <a v-if="elementEditorConfig.enableCopying" @click="$emit('move-element-up')">Move {{ elementName }} up</a>
-      <a v-if="canAddElement" @click="$emit('add-element')">Create new {{ elementName }}</a>
+      <a v-if="canAddElement" @click="addElement">Create new {{ elementName }}</a>
       <a v-if="elementEditorConfig.enableCopying" @click="$emit('clone-element')">Duplicate {{ elementName }}</a>
       <a v-if="canRemoveElement" @click="$emit('remove-element')">Remove selected {{ elementName }}</a>
     </div>
@@ -42,19 +42,26 @@ export default {
   },
   watch: {
     show(show) {
+      console.log("Watch show", show)
       if (show) {
-        document.addEventListener("click", this.watchForOutsideClick)
+        window.addEventListener("click", this.watchForOutsideClick)
       } else {
-        document.removeEventListener("click", this.watchForOutsideClick)
+        window.removeEventListener("click", this.watchForOutsideClick)
       }
     }
   },
   methods: {
+    addElement() {
+      this.toggleDropdown()
+      this.$nextTick(() => {
+        this.$emit('add-element')
+      })
+    },
     toggleDropdown() {
       this.show = !this.show
     },
     watchForOutsideClick(event) {
-      if (!this.$refs.actionButton.contains(event.target)) {
+      if (this.$refs.actionButton && !this.$refs.actionButton.contains(event.target)) {
         this.toggleDropdown()
       }
     }
