@@ -17,12 +17,13 @@
                  :elementName="elementName"
                  :elementData="elementData"
                  :content="componentData"
+                 :children="children"
                  @hide-children="hideChildren"
                  @input="handleValueUpdate"
       />
     </section>
     <ComponentGeneratorComponent
-      v-if="showChildren"
+      v-if="elementData.valueType !== 'text-input-with-markup'"
       :children="children"
       :elementEditorConfig="elementData"
       :elementName="elementName"

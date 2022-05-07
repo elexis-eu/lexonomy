@@ -9,11 +9,7 @@ export default {
     componentData() {
       if (this.elementData.valueRenderType === "text-input-with-markup") {
         return this.calculatedContent.elements
-          || [
-            {text: "", type: "text"},
-            {name: this.state.entry.dictConfigs.xampl.markup, type: "element", elements: [{type: "text", text: ""}]},
-            {text: "", type: "text"}
-          ]
+          || []
       }
       let textElement = this.calculatedContent.elements && this.calculatedContent.elements.find(element => {
         return element.type === "text" && !element.name
