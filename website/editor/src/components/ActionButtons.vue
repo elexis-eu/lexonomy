@@ -42,7 +42,6 @@ export default {
   },
   watch: {
     show(show) {
-      console.log("Watch show", show)
       if (show) {
         window.addEventListener("click", this.watchForOutsideClick)
       } else {
