@@ -2,11 +2,11 @@
   <div v-if="!isRootElement" ref="actionButton" class="dropdown">
     <button @click="toggleDropdown">...</button>
     <div v-show="show" class="vue-dropdown-content">
-        <a v-if="elementEditorConfig.enableCopying" @click="$emit('move-element-down')">Move {{ elementName }} down</a>
-        <a v-if="elementEditorConfig.enableCopying" @click="$emit('move-element-up')">Move {{ elementName }} up</a>
-      <a v-if="canAddElement" @click="addElement">Create new {{ elementName }}</a>
-      <a v-if="elementEditorConfig.enableCopying" @click="$emit('clone-element')">Duplicate {{ elementName }}</a>
-      <a v-if="canRemoveElement" @click="$emit('remove-element')">Remove selected {{ elementName }}</a>
+      <a v-if="canMoveElementDown" @click="triggerEvent('move-element-down')">Move {{ elementName }} down</a>
+      <a v-if="canMoveElementUp" @click="triggerEvent('move-element-up')">Move {{ elementName }} up</a>
+      <a v-if="canAddElement" @click="triggerEvent('add-element')">Create new {{ elementName }}</a>
+      <a v-if="canAddElement && elementEditorConfig.enableCopying" @click="triggerEvent('clone-element')">Duplicate {{ elementName }}</a>
+      <a v-if="canRemoveElement" @click="triggerEvent('remove-element')">Remove selected {{ elementName }}</a>
     </div>
   </div>
 </template>
@@ -18,7 +18,8 @@ export default {
     elementName: String,
     elementEditorConfig: Object,
     parentElementName: String,
-    numberOfElements: Number
+    numberOfElements: Number,
+    editorChildNumber: Number
   },
   data() {
     return {
@@ -38,6 +39,12 @@ export default {
       let parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].children
       let {min} = parentChildren.find(el => el.name === this.elementName)
       return min === 0 || this.numberOfElements > min
+    },
+    canMoveElementDown() {
+      return this.elementEditorConfig.enablePositionChange && this.editorChildNumber < this.numberOfElements - 1
+    },
+    canMoveElementUp() {
+      return this.elementEditorConfig.enablePositionChange && this.editorChildNumber > 0
     }
   },
   watch: {
@@ -50,10 +57,10 @@ export default {
     }
   },
   methods: {
-    addElement() {
+    triggerEvent(event) {
       this.toggleDropdown()
       this.$nextTick(() => {
-        this.$emit('add-element')
+        this.$emit(event)
       })
     },
     toggleDropdown() {
@@ -68,17 +75,18 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 button {
   background-color: #3498DB;
   color: white;
   font-size: 16px;
   border: none;
   cursor: pointer;
-}
 
-button:hover, button:focus {
-  background-color: #2980B9;
+  &:hover,
+  &:focus {
+    background-color: #2980B9;
+  }
 }
 
 .dropdown {
@@ -95,18 +103,17 @@ button:hover, button:focus {
   overflow: auto;
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
   z-index: 2;
-}
 
-.vue-dropdown-content a {
-  display: block;
-  padding: 12px 16px;
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
+  a {
+    display: block;
+    padding: 12px 16px;
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 
-.vue-dropdown-content a:hover {
-  background-color: #ddd;
+    &:hover {
+      background-color: #ddd;
+    }
+  }
 }
-
 </style>

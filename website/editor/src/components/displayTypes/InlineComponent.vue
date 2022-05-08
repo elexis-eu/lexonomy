@@ -4,6 +4,7 @@
       <ActionButtons
         :elementName="elementName"
         :elementEditorConfig="elementData"
+        :editorChildNumber="editorChildNumber"
         :parentElementName="parentElementName"
         :numberOfElements="numberOfElements"
         @move-element-down="moveElementDown"

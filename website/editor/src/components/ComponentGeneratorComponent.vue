@@ -1,15 +1,15 @@
 <template>
   <div>
-    <component v-for="element in renderedChildren"
+    <component v-for="(element, i) in renderedChildren"
                :ref="element.props.elementName + element.props.editorChildNumber"
-               :key="element.props.elementName + '-' + Math.random()"
+               :key="element.props.elementName + '-' + i"
                :is="element.componentName"
                v-bind="element.props"
                @input="handleChildUpdate"
                @create-element="createElement"
                @move-element="moveElement"
                @delete-element="deleteElement"
-               @clone-element="cloneElement"
+               @clone-element="createElement"
     />
   </div>
 </template>
@@ -62,7 +62,8 @@ export default {
       if (!newContent || !newContent.elements) {
         return
       }
-      for (let renderedChild of this.renderedChildren) {
+      for (let i in this.renderedChildren) {
+        let renderedChild = this.renderedChildren[i]
         let newContentForChild = newContent.elements.filter(element => {
           return element.name === renderedChild.props.elementName
         })
@@ -75,6 +76,9 @@ export default {
 
         if (renderedChildRef && newContentForChild[renderedChild.props.editorChildNumber]) {
           renderedChildRef.updateContent(newContentForChild[renderedChild.props.editorChildNumber])
+        }
+        if (renderedChildRef && !newContentForChild[renderedChild.props.editorChildNumber]) {
+          this.renderedChildren.splice(Number(i), 1)
         }
 
       }
@@ -228,14 +232,7 @@ export default {
       let type = (elementConfig && elementConfig.displayType) || "inline"
       return this.displayTypeToComponentMap[type]
     },
-    createElement(data) {
-      let nextChildNumber = this.content.elements.filter(el => el.name === data.name).length
-      this.handleChildUpdate({
-        elementName: data.name,
-        editorChildNumber: nextChildNumber,
-        content: this.createElementTemplate(data.name)[0]
-      })
-    },
+
     appendElementAfterSameNameSiblings(data, content, newContent) {
       let elements = content.elements || []
       let locationOfLastElement = elements.map(el => el.name).lastIndexOf(data.name)
@@ -250,14 +247,58 @@ export default {
 
     },
 
-    moveElement() {
-
+    createElement(data) {
+      let nextChildNumber = this.content.elements.filter(el => el.name === data.name).length
+      this.handleChildUpdate({
+        elementName: data.name,
+        editorChildNumber: nextChildNumber,
+        content: data.content || this.createElementTemplate(data.name)[0]
+      })
     },
-    deleteElement() {
 
+    moveElement({name, direction, position}) {
+      let elements = this.content.elements || []
+      if (!this.isNewPositionInBounds(elements, name, position, direction)) {
+        return
+      }
+      let elementToMoveIndex = this.getPositionOfElementInContent(name, position, this.content)
+
+      var element = elements[elementToMoveIndex]
+      elements.splice(elementToMoveIndex, 1)
+      elements.splice(elementToMoveIndex + direction, 0, element)
+
+      let content = Object.assign({}, this.content)
+      content.elements = elements
+      this.$emit("input", {content: content})
     },
-    cloneElement() {
+    deleteElement({name, position}) {
+      let elements = this.content.elements || []
+      let elementToDeleteIndex = this.getPositionOfElementInContent(name, position, this.content)
+      elements.splice(elementToDeleteIndex, 1)
 
+      let content = Object.assign({}, this.content)
+      content.elements = elements
+      this.$emit("input", {content: content})
+    },
+    isNewPositionInBounds(elements, elementName, position, direction) {
+      let newPosition = position + direction
+      let elementsLength = elements.filter(el => el.name === elementName).length
+      return newPosition >= 0 && newPosition < elementsLength
+    },
+    getPositionOfElementInContent(name, position, content) {
+      let elements = content.elements
+      let consecutiveNumber = 0
+      let elementToMoveIndex
+      for (const i in elements) {
+        if (elements[i].name === name) {
+          if (consecutiveNumber === position) {
+            elementToMoveIndex = i
+            break
+          }
+          consecutiveNumber++
+        }
+      }
+      return elementToMoveIndex
     }
   }
 }
