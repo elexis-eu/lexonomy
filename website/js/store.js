@@ -14,7 +14,7 @@ class StoreClass {
    }
 
    getDictionary(dictId){
-      return this.data.dictlist.filter(d => d.id = dictId)
+      return this.data.dictlist.find(d => d.id == dictId)
    }
 
    open(dictId, doctype, entryId, mode){
