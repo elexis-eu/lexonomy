@@ -735,7 +735,7 @@ def publicsearch(dictID):
     if not configs["publico"]["public"]:
         return {"success": False}
     else:
-        total, entries, first = ops.listEntries(dictDB, dictID, configs, configs['xema']['root'], request.forms.searchtext)
+        total, entries, first = ops.listEntries(dictDB, dictID, configs, configs['xema']['root'], request.forms.searchtext, request.forms.modifier, request.forms.howmany)
         return {"success": True, "entries": entries, "total": total}
 
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
