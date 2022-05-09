@@ -68,7 +68,7 @@ class AuthClass {
                })
    }
 
-   register(){
+   register(email){
       return $.ajax({
             url: `${window.API_URL}signup.json`,
             method: 'POST',
