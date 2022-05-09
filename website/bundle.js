@@ -2730,7 +2730,7 @@
       bindingTypes,
       getComponent
     ) => template(
-      '<header expr0="expr0" is="header" ref="header"></header><div expr1="expr1" class="grey-text center-align"></div><div expr2="expr2" class="container content row"></div><footer expr3="expr3" is="footer"></footer>',
+      '<header expr22="expr22" is="header" ref="header"></header><div expr23="expr23" class="grey-text center-align"></div><div expr24="expr24" class="container content row"></div><footer expr25="expr25" is="footer"></footer>',
       [
         {
           expressions: [
@@ -2780,14 +2780,14 @@
             }
           ],
 
-          redundantAttribute: 'expr0',
-          selector: '[expr0]'
+          redundantAttribute: 'expr22',
+          selector: '[expr22]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.checkingAuth,
-          redundantAttribute: 'expr1',
-          selector: '[expr1]',
+          redundantAttribute: 'expr23',
+          selector: '[expr23]',
 
           template: template(
             '<h3 style="margin-top: 20vh;">\n         loading...\n      </h3>',
@@ -2797,8 +2797,8 @@
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.checkingAuth,
-          redundantAttribute: 'expr2',
-          selector: '[expr2]',
+          redundantAttribute: 'expr24',
+          selector: '[expr24]',
 
           template: template(
             null,
@@ -2919,8 +2919,8 @@
             }
           ],
 
-          redundantAttribute: 'expr3',
-          selector: '[expr3]'
+          redundantAttribute: 'expr25',
+          selector: '[expr25]'
         }
       ]
     ),
@@ -3032,7 +3032,7 @@
       bindingTypes,
       getComponent
     ) => template(
-      '<div class="container"><h4>Lexonomy API documentation and test</h4><p>Lexonomy also supports <a href="https://elexis-eu.github.io/elexis-rest/">ELEXIS REST API</a> - calls <tt expr7="expr7"></tt>. Use your API key as <tt expr8="expr8"></tt>.</p><hr/><p>Following calls are Lexonomy API with specific information.</p><p expr9="expr9"><b>API URL:</b> </p><hr/><h5>List languages used in dictionaries</h5><p expr10="expr10"> </p><textarea id="input_listLang" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU"\n    }</textarea><button expr11="expr11">Post</button> and watch your console.\n    <hr/><h5>List all dictionaries metadata</h5><p expr12="expr12"> </p><textarea id="input_listDict" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU"\n    }</textarea><button expr13="expr13">Post</button> and watch your console.\n\t\t<hr/><h5>List dictionaries metadata for selected language</h5><p expr14="expr14"> </p><textarea id="input_listDict2" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "lang": "sl"\n    }</textarea><button expr15="expr15">Post</button> and watch your console.\n\t\t<hr/><h5>List dictionaries metadata for selected language, with links only</h5><p expr16="expr16"> </p><textarea id="input_listDict3" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "lang": "sl",\n      "withLinks": true\n    }</textarea><button expr17="expr17">Post</button> and watch your console.\n    <hr/><h5>Find links, from headword in language</h5><p expr18="expr18"> </p><textarea id="input_listLinks1" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "headword": "zopet",\n      "sourceLanguage": "sl"\n    }</textarea><button expr19="expr19">Post</button> and watch your console.\n\t\t<hr/><h5>Find links, headword with specific dictionary</h5><p expr20="expr20"> </p><textarea id="input_listLinks2" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "headword": "zopet",\n      "sourceLanguage": "sl",\n      "sourceDict": "elexis-zrcsazu-pletersnik"\n    }</textarea><button expr21="expr21">Post</button> and watch your console.\n\t\t<hr/><h5>Find links, headword to target language</h5><p expr22="expr22"> </p><textarea id="input_listLinks3" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "headword": "zopet",\n      "sourceLanguage": "sl",\n      "targetLanguage": "en"\n    }</textarea><button expr23="expr23">Post</button> and watch your console.\n\n    <h4>Lexonomy Push API documentation and test</h4><p expr24="expr24"><b>PUSH API URL:</b> </p><h5>Make a dictionary, TEI Lex0 format</h5><textarea id="input_makeDictTei" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "command": "makeDict",\n      "format": "teilex0",\n      "dictTitle": "My TEI Lex0 Dictionary",\n      "dictBlurb": "Yet another dictionary draft."\n    }</textarea><button expr25="expr25">Post</button> and watch your console.\n\t\t<h5>Create entries, TEI Lex0 format</h5><textarea id="input_createEntriesTei" style="font-size: 1rem; width: 100%; height: 9em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "command": "createEntries",\n      "format": "teilex0",\n      "dictID": "jakobrno",\n      "entryXmls": ["<entry><form type=\'lemma\'><orth>Earth</orth></form></entry>", "<entry><form type=\'lemma\'><orth>Mars</orth></form></entry>"]\n    }</textarea><button expr26="expr26">Post</button> and watch your console.\n\t\t<h5>Make a dictionary</h5><textarea id="input_makeDict" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "command": "makeDict",\n      "dictTitle": "My Pushy Dictionary",\n      "dictBlurb": "Yet another dictionary draft.",\n      "poses": ["n", "v", "adj", "adv"],\n      "labels": ["colloquial", "formal", "mostly plural", "Irish English", "vulgar"]\n    }</textarea><button expr27="expr27">Post</button> and watch your console.\n\t\t<h5>Create entries</h5><textarea id="input_createEntries" style="font-size: 1rem; width: 100%; height: 9em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "command": "createEntries",\n      "dictID": "jakobrno",\n      "entryXmls": ["<heslo/>", "<heslo/>"]\n    }</textarea><button expr28="expr28">Post</button> and watch your console.\n\n\n  </div>',
+      '<div class="container"><h4>Lexonomy API documentation and test</h4><p>Lexonomy also supports <a href="https://elexis-eu.github.io/elexis-rest/">ELEXIS REST API</a> - calls <tt expr0="expr0"></tt>. Use your API key as <tt expr1="expr1"></tt>.</p><hr/><p>Following calls are Lexonomy API with specific information.</p><p expr2="expr2"><b>API URL:</b> </p><hr/><h5>List languages used in dictionaries</h5><p expr3="expr3"> </p><textarea id="input_listLang" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU"\n    }</textarea><button expr4="expr4">Post</button> and watch your console.\n    <hr/><h5>List all dictionaries metadata</h5><p expr5="expr5"> </p><textarea id="input_listDict" style="font-size: 1rem; width: 100%; height: 5em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU"\n    }</textarea><button expr6="expr6">Post</button> and watch your console.\n\t\t<hr/><h5>List dictionaries metadata for selected language</h5><p expr7="expr7"> </p><textarea id="input_listDict2" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "lang": "sl"\n    }</textarea><button expr8="expr8">Post</button> and watch your console.\n\t\t<hr/><h5>List dictionaries metadata for selected language, with links only</h5><p expr9="expr9"> </p><textarea id="input_listDict3" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "lang": "sl",\n      "withLinks": true\n    }</textarea><button expr10="expr10">Post</button> and watch your console.\n    <hr/><h5>Find links, from headword in language</h5><p expr11="expr11"> </p><textarea id="input_listLinks1" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "headword": "zopet",\n      "sourceLanguage": "sl"\n    }</textarea><button expr12="expr12">Post</button> and watch your console.\n\t\t<hr/><h5>Find links, headword with specific dictionary</h5><p expr13="expr13"> </p><textarea id="input_listLinks2" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "headword": "zopet",\n      "sourceLanguage": "sl",\n      "sourceDict": "elexis-zrcsazu-pletersnik"\n    }</textarea><button expr14="expr14">Post</button> and watch your console.\n\t\t<hr/><h5>Find links, headword to target language</h5><p expr15="expr15"> </p><textarea id="input_listLinks3" style="font-size: 1rem; width: 100%; height: 7em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "headword": "zopet",\n      "sourceLanguage": "sl",\n      "targetLanguage": "en"\n    }</textarea><button expr16="expr16">Post</button> and watch your console.\n\n    <h4>Lexonomy Push API documentation and test</h4><p expr17="expr17"><b>PUSH API URL:</b> </p><h5>Make a dictionary, TEI Lex0 format</h5><textarea id="input_makeDictTei" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "command": "makeDict",\n      "format": "teilex0",\n      "dictTitle": "My TEI Lex0 Dictionary",\n      "dictBlurb": "Yet another dictionary draft."\n    }</textarea><button expr18="expr18">Post</button> and watch your console.\n\t\t<h5>Create entries, TEI Lex0 format</h5><textarea id="input_createEntriesTei" style="font-size: 1rem; width: 100%; height: 9em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "command": "createEntries",\n      "format": "teilex0",\n      "dictID": "jakobrno",\n      "entryXmls": ["<entry><form type=\'lemma\'><orth>Earth</orth></form></entry>", "<entry><form type=\'lemma\'><orth>Mars</orth></form></entry>"]\n    }</textarea><button expr19="expr19">Post</button> and watch your console.\n\t\t<h5>Make a dictionary</h5><textarea id="input_makeDict" style="font-size: 1rem; width: 100%; height: 11em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "command": "makeDict",\n      "dictTitle": "My Pushy Dictionary",\n      "dictBlurb": "Yet another dictionary draft.",\n      "poses": ["n", "v", "adj", "adv"],\n      "labels": ["colloquial", "formal", "mostly plural", "Irish English", "vulgar"]\n    }</textarea><button expr20="expr20">Post</button> and watch your console.\n\t\t<h5>Create entries</h5><textarea id="input_createEntries" style="font-size: 1rem; width: 100%; height: 9em; resize: vertical" spellcheck="false">{\n      "email": "rambousek@gmail.com",\n      "apikey": "I0BNKTQEZUI9ZBMUX7ABQG1A6LMKUZOU",\n      "command": "createEntries",\n      "dictID": "jakobrno",\n      "entryXmls": ["<heslo/>", "<heslo/>"]\n    }</textarea><button expr21="expr21">Post</button> and watch your console.\n\n\n  </div>',
       [
         {
           type: bindingTypes.TAG,
@@ -3048,8 +3048,8 @@
           ],
 
           attributes: [],
-          redundantAttribute: 'expr7',
-          selector: '[expr7]'
+          redundantAttribute: 'expr0',
+          selector: '[expr0]'
         },
         {
           type: bindingTypes.TAG,
@@ -3065,12 +3065,12 @@
           ],
 
           attributes: [],
-          redundantAttribute: 'expr8',
-          selector: '[expr8]'
+          redundantAttribute: 'expr1',
+          selector: '[expr1]'
         },
         {
-          redundantAttribute: 'expr9',
-          selector: '[expr9]',
+          redundantAttribute: 'expr2',
+          selector: '[expr2]',
 
           expressions: [
             {
@@ -3087,8 +3087,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr10',
-          selector: '[expr10]',
+          redundantAttribute: 'expr3',
+          selector: '[expr3]',
 
           expressions: [
             {
@@ -3106,8 +3106,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr11',
-          selector: '[expr11]',
+          redundantAttribute: 'expr4',
+          selector: '[expr4]',
 
           expressions: [
             {
@@ -3118,8 +3118,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr12',
-          selector: '[expr12]',
+          redundantAttribute: 'expr5',
+          selector: '[expr5]',
 
           expressions: [
             {
@@ -3137,8 +3137,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr13',
-          selector: '[expr13]',
+          redundantAttribute: 'expr6',
+          selector: '[expr6]',
 
           expressions: [
             {
@@ -3149,8 +3149,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr14',
-          selector: '[expr14]',
+          redundantAttribute: 'expr7',
+          selector: '[expr7]',
 
           expressions: [
             {
@@ -3168,8 +3168,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr15',
-          selector: '[expr15]',
+          redundantAttribute: 'expr8',
+          selector: '[expr8]',
 
           expressions: [
             {
@@ -3180,8 +3180,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr16',
-          selector: '[expr16]',
+          redundantAttribute: 'expr9',
+          selector: '[expr9]',
 
           expressions: [
             {
@@ -3199,8 +3199,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr17',
-          selector: '[expr17]',
+          redundantAttribute: 'expr10',
+          selector: '[expr10]',
 
           expressions: [
             {
@@ -3211,8 +3211,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr18',
-          selector: '[expr18]',
+          redundantAttribute: 'expr11',
+          selector: '[expr11]',
 
           expressions: [
             {
@@ -3230,8 +3230,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr19',
-          selector: '[expr19]',
+          redundantAttribute: 'expr12',
+          selector: '[expr12]',
 
           expressions: [
             {
@@ -3242,8 +3242,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr20',
-          selector: '[expr20]',
+          redundantAttribute: 'expr13',
+          selector: '[expr13]',
 
           expressions: [
             {
@@ -3261,8 +3261,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr21',
-          selector: '[expr21]',
+          redundantAttribute: 'expr14',
+          selector: '[expr14]',
 
           expressions: [
             {
@@ -3273,8 +3273,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr22',
-          selector: '[expr22]',
+          redundantAttribute: 'expr15',
+          selector: '[expr15]',
 
           expressions: [
             {
@@ -3292,8 +3292,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr23',
-          selector: '[expr23]',
+          redundantAttribute: 'expr16',
+          selector: '[expr16]',
 
           expressions: [
             {
@@ -3304,8 +3304,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr24',
-          selector: '[expr24]',
+          redundantAttribute: 'expr17',
+          selector: '[expr17]',
 
           expressions: [
             {
@@ -3322,8 +3322,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr25',
-          selector: '[expr25]',
+          redundantAttribute: 'expr18',
+          selector: '[expr18]',
 
           expressions: [
             {
@@ -3334,8 +3334,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr26',
-          selector: '[expr26]',
+          redundantAttribute: 'expr19',
+          selector: '[expr19]',
 
           expressions: [
             {
@@ -3346,8 +3346,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr27',
-          selector: '[expr27]',
+          redundantAttribute: 'expr20',
+          selector: '[expr20]',
 
           expressions: [
             {
@@ -3358,8 +3358,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr28',
-          selector: '[expr28]',
+          redundantAttribute: 'expr21',
+          selector: '[expr21]',
 
           expressions: [
             {
@@ -3439,7 +3439,7 @@
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr29="expr29"></dict-config-nav><h3>Auto-numbering of elements</h3><div class="row"><p>If you need to number some of entry elements automatically, Lexonomy can do that for you. First, go to Entry structure and add element/attribute where you want to store the number. Eg. in element <tt expr30="expr30"></tt> add attribute <tt expr31="expr31"></tt>. When you\'re ready, select element to number (eg. <tt expr32="expr32"></tt>) and element/attribute to store numbering (eg. <tt expr33="expr33"></tt>). Lexonomy will fill the numbers where missing.</p></div><div class="row"><div class="input-field col s4"><select expr34="expr34" id="elements"></select><label for="elements">Element to number</label></div><div class="input-field col s4"><select id="children"></select><label for="children">Add numbers to</label></div><div class="col s3"><a expr35="expr35" class="btn waves-effect waves-light" id="submit_button"><i class="material-icons right">add</i>Add numbers</a></div></div><div class="row" id="numberinfo" style="display:none"><div class="col s10"><div class="card red"><div class="card-content white-text"></div></div></div></div>',
+      '<dict-config-nav expr26="expr26"></dict-config-nav><h3>Auto-numbering of elements</h3><div class="row"><p>If you need to number some of entry elements automatically, Lexonomy can do that for you. First, go to Entry structure and add element/attribute where you want to store the number. Eg. in element <tt expr27="expr27"></tt> add attribute <tt expr28="expr28"></tt>. When you\'re ready, select element to number (eg. <tt expr29="expr29"></tt>) and element/attribute to store numbering (eg. <tt expr30="expr30"></tt>). Lexonomy will fill the numbers where missing.</p></div><div class="row"><div class="input-field col s4"><select expr31="expr31" id="elements"></select><label for="elements">Element to number</label></div><div class="input-field col s4"><select id="children"></select><label for="children">Add numbers to</label></div><div class="col s3"><a expr32="expr32" class="btn waves-effect waves-light" id="submit_button"><i class="material-icons right">add</i>Add numbers</a></div></div><div class="row" id="numberinfo" style="display:none"><div class="col s10"><div class="card red"><div class="card-content white-text"></div></div></div></div>',
       [
         {
           type: bindingTypes.TAG,
@@ -3470,8 +3470,8 @@
             }
           ],
 
-          redundantAttribute: 'expr29',
-          selector: '[expr29]'
+          redundantAttribute: 'expr26',
+          selector: '[expr26]'
         },
         {
           type: bindingTypes.TAG,
@@ -3487,8 +3487,8 @@
           ],
 
           attributes: [],
-          redundantAttribute: 'expr30',
-          selector: '[expr30]'
+          redundantAttribute: 'expr27',
+          selector: '[expr27]'
         },
         {
           type: bindingTypes.TAG,
@@ -3504,8 +3504,8 @@
           ],
 
           attributes: [],
-          redundantAttribute: 'expr31',
-          selector: '[expr31]'
+          redundantAttribute: 'expr28',
+          selector: '[expr28]'
         },
         {
           type: bindingTypes.TAG,
@@ -3521,8 +3521,8 @@
           ],
 
           attributes: [],
-          redundantAttribute: 'expr32',
-          selector: '[expr32]'
+          redundantAttribute: 'expr29',
+          selector: '[expr29]'
         },
         {
           type: bindingTypes.TAG,
@@ -3538,12 +3538,12 @@
           ],
 
           attributes: [],
-          redundantAttribute: 'expr33',
-          selector: '[expr33]'
+          redundantAttribute: 'expr30',
+          selector: '[expr30]'
         },
         {
-          redundantAttribute: 'expr34',
-          selector: '[expr34]',
+          redundantAttribute: 'expr31',
+          selector: '[expr31]',
 
           expressions: [
             {
@@ -3554,8 +3554,8 @@
           ]
         },
         {
-          redundantAttribute: 'expr35',
-          selector: '[expr35]',
+          redundantAttribute: 'expr32',
+          selector: '[expr32]',
 
           expressions: [
             {
@@ -3617,7 +3617,7 @@
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr4="expr4"></dict-config-nav><h3>Download settings</h3><div class="row"><div class="input-field"><textarea expr5="expr5" id="download_xslt" class="materialize-textarea"> </textarea><label for="download_xslt">XSLT transformation on download</label><span class="helper-text">You can use this functionality to automatically apply an XSLT transformation when the dictionary is downloaded. If you do not input valid XSLT here, no transformation will be applied.</span></div></div><dict-config-buttons expr6="expr6"></dict-config-buttons>',
+      '<dict-config-nav expr33="expr33"></dict-config-nav><h3>Download settings</h3><div class="row"><div class="input-field"><textarea expr34="expr34" id="download_xslt" class="materialize-textarea"> </textarea><label for="download_xslt">XSLT transformation on download</label><span class="helper-text">You can use this functionality to automatically apply an XSLT transformation when the dictionary is downloaded. If you do not input valid XSLT here, no transformation will be applied.</span></div></div><dict-config-buttons expr35="expr35"></dict-config-buttons>',
       [
         {
           type: bindingTypes.TAG,
@@ -3648,12 +3648,12 @@
             }
           ],
 
-          redundantAttribute: 'expr4',
-          selector: '[expr4]'
+          redundantAttribute: 'expr33',
+          selector: '[expr33]'
         },
         {
-          redundantAttribute: 'expr5',
-          selector: '[expr5]',
+          redundantAttribute: 'expr34',
+          selector: '[expr34]',
 
           expressions: [
             {
@@ -3682,8 +3682,8 @@
             }
           ],
 
-          redundantAttribute: 'expr6',
-          selector: '[expr6]'
+          redundantAttribute: 'expr35',
+          selector: '[expr35]'
         }
       ]
     ),
@@ -3855,7 +3855,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr57="expr57"></dict-config-nav><h3>Entry editor</h3><div expr58="expr58"></div><div expr66="expr66"></div>',
+      '<dict-config-nav expr36="expr36"></dict-config-nav><h3>Entry editor</h3><div expr37="expr37"></div><div expr45="expr45"></div>',
       [
         {
           type: bindingTypes.TAG,
@@ -3886,21 +3886,21 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr57',
-          selector: '[expr57]'
+          redundantAttribute: 'expr36',
+          selector: '[expr36]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => (!_scope.configData._js || _scope.configData._js == "") && !_scope.override,
-          redundantAttribute: 'expr58',
-          selector: '[expr58]',
+          redundantAttribute: 'expr37',
+          selector: '[expr37]',
 
           template: template(
-            '<div class="input-field"><p><label><input expr59="expr59" name="xonomyMode" id="xonomyMode_nerd" type="radio" class="with-gap"/><span>Nerd mode</span></label><label style="margin-left: 30px;"><input expr60="expr60" name="xonomyMode" id="xonomyMode_laic" type="radio" class="with-gap"/><span>Laic mode</span></label><label style="margin-left: 30px;"><input expr61="expr61" name="xonomyMode" id="xonomyMode_graphical" type="radio" class="with-gap"/><span>Graphical mode</span></label></p><span class="helper-text">Choose what the entry editor will look like.</span></div><div id="info_nerd" style="padding-left: 50px;"><p>When editing an entry in <b>nerd mode</b> the user sees the XML source code, angle brackets and all.<div class="instro"><img src="docs/mode-nerd.png" alt="Illustration"/></div><br/> Individual users can overide this setting by clicking an icon in the bottom-left corner of their screen.</p></div><div id="info_laic" style="padding-left: 50px;"><p>When editing an entry in <b>laic mode</b> the XML source code is hidden and the entry looks more like a bulleted list.<div class="instro"><img src="docs/mode-laic.png" alt="Illustration"/></div><br/> Individual users can overide this setting by clicking an icon in the bottom-left corner of their screen.</p></div><div id="info_graphical" style="padding-left: 50px;"><p>When editing an entry in <b>graphical mode</b> the XML source code is hidden and the entry uses settings configuration to display a more graphically friendly interface.\n          <div class="instro"><img src="docs/mode-laic.png" alt="Illustration"/></div></p></div><br/><div class="input-field"><p><label><input expr62="expr62" name="xonomyTextEditor" id="xonomyTextEditor_string" type="radio" class="with-gap"/><span>Single line</span></label><label style="margin-left: 30px;"><input expr63="expr63" name="xonomyTextEditor" id="xonomyTextEditor_longstring" type="radio" class="with-gap"/><span>Multi line</span></label></p><span class="helper-text">Choose the default text editor for node values.</span></div><div id="info_string" style="margin-left: 30px;"><p>When editing text in <b>single line mode</b> the user sees a smaller editor.<div class="instro"><img src="docs/text-editor-askstring.png" alt="Illustration"/></div></p></div><div id="info_longstring" style="margin-left: 30px;"><p>When editing text in <b>multi line mode</b> the user sees a full-fledged text editor.<div class="instro"><img src="docs/text-editor-asklongstring.png" alt="Illustration"/></div></p></div><div><br/><button expr64="expr64" class="btn waves-effect waves-light">Customize entry editor <i class="material-icons right">edit</i></button></div><br/><br/><dict-config-buttons expr65="expr65"></dict-config-buttons>',
+            '<div class="input-field"><p><label><input expr38="expr38" name="xonomyMode" id="xonomyMode_nerd" type="radio" class="with-gap"/><span>Nerd mode</span></label><label style="margin-left: 30px;"><input expr39="expr39" name="xonomyMode" id="xonomyMode_laic" type="radio" class="with-gap"/><span>Laic mode</span></label><label style="margin-left: 30px;"><input expr40="expr40" name="xonomyMode" id="xonomyMode_graphical" type="radio" class="with-gap"/><span>Graphical mode</span></label></p><span class="helper-text">Choose what the entry editor will look like.</span></div><div id="info_nerd" style="padding-left: 50px;"><p>When editing an entry in <b>nerd mode</b> the user sees the XML source code, angle brackets and all.<div class="instro"><img src="docs/mode-nerd.png" alt="Illustration"/></div><br/> Individual users can overide this setting by clicking an icon in the bottom-left corner of their screen.</p></div><div id="info_laic" style="padding-left: 50px;"><p>When editing an entry in <b>laic mode</b> the XML source code is hidden and the entry looks more like a bulleted list.<div class="instro"><img src="docs/mode-laic.png" alt="Illustration"/></div><br/> Individual users can overide this setting by clicking an icon in the bottom-left corner of their screen.</p></div><div id="info_graphical" style="padding-left: 50px;"><p>When editing an entry in <b>graphical mode</b> the XML source code is hidden and the entry uses settings configuration to display a more graphically friendly interface.\n          <div class="instro"><img src="docs/mode-laic.png" alt="Illustration"/></div></p></div><br/><div class="input-field"><p><label><input expr41="expr41" name="xonomyTextEditor" id="xonomyTextEditor_string" type="radio" class="with-gap"/><span>Single line</span></label><label style="margin-left: 30px;"><input expr42="expr42" name="xonomyTextEditor" id="xonomyTextEditor_longstring" type="radio" class="with-gap"/><span>Multi line</span></label></p><span class="helper-text">Choose the default text editor for node values.</span></div><div id="info_string" style="margin-left: 30px;"><p>When editing text in <b>single line mode</b> the user sees a smaller editor.<div class="instro"><img src="docs/text-editor-askstring.png" alt="Illustration"/></div></p></div><div id="info_longstring" style="margin-left: 30px;"><p>When editing text in <b>multi line mode</b> the user sees a full-fledged text editor.<div class="instro"><img src="docs/text-editor-asklongstring.png" alt="Illustration"/></div></p></div><div><br/><button expr43="expr43" class="btn waves-effect waves-light">Customize entry editor <i class="material-icons right">edit</i></button></div><br/><br/><dict-config-buttons expr44="expr44"></dict-config-buttons>',
             [
               {
-                redundantAttribute: 'expr59',
-                selector: '[expr59]',
+                redundantAttribute: 'expr38',
+                selector: '[expr38]',
 
                 expressions: [
                   {
@@ -3916,8 +3916,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr60',
-                selector: '[expr60]',
+                redundantAttribute: 'expr39',
+                selector: '[expr39]',
 
                 expressions: [
                   {
@@ -3933,8 +3933,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr61',
-                selector: '[expr61]',
+                redundantAttribute: 'expr40',
+                selector: '[expr40]',
 
                 expressions: [
                   {
@@ -3950,8 +3950,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr62',
-                selector: '[expr62]',
+                redundantAttribute: 'expr41',
+                selector: '[expr41]',
 
                 expressions: [
                   {
@@ -3967,8 +3967,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr63',
-                selector: '[expr63]',
+                redundantAttribute: 'expr42',
+                selector: '[expr42]',
 
                 expressions: [
                   {
@@ -3984,8 +3984,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr64',
-                selector: '[expr64]',
+                redundantAttribute: 'expr43',
+                selector: '[expr43]',
 
                 expressions: [
                   {
@@ -4014,8 +4014,8 @@ div.myEditor input {font-weight: bold}`
                   }
                 ],
 
-                redundantAttribute: 'expr65',
-                selector: '[expr65]'
+                redundantAttribute: 'expr44',
+                selector: '[expr44]'
               }
             ]
           )
@@ -4023,15 +4023,15 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => (_scope.configData._js && _scope.configData._js != "") || _scope.override,
-          redundantAttribute: 'expr66',
-          selector: '[expr66]',
+          redundantAttribute: 'expr45',
+          selector: '[expr45]',
 
           template: template(
-            '<div><label>JavaScript</label><div class="input-field"><textarea expr67="expr67" id="editor_js" class="materialize-textarea" placeholder> </textarea><span class="helper-text">You can customize the editor by defining two functions in JavaScript: one that will render the HTML editor from the XML entry and one that will harvest the (edited) HTML back into XML. If you would like to see an example, <a expr68="expr68">click here to load a sample JavaScript code</a>.</span></div></div><div><label for="editor_css">CSS</label><div class="input-field"><textarea expr69="expr69" id="editor_css" class="materialize-textarea" placeholder> </textarea><span class="helper-text">You can customize the editor look and feel by writing your own CSS styles. If you would like to see an example, <a expr70="expr70">click here to load a sample CSS style</a>.</span></div></div><div class="buttons"><a expr71="expr71" class="btn btn-secondary waves-effect waves-light">back</a><button expr72="expr72" class="btn waves-effect waves-light">Disable entry editor customizations <i class="material-icons right">edit</i></button><button expr73="expr73" class="btn waves-effect waves-light" id="submit_button">Save\n            <i class="material-icons right">save</i></button></div><br/><br/>',
+            '<div><label>JavaScript</label><div class="input-field"><textarea expr46="expr46" id="editor_js" class="materialize-textarea" placeholder> </textarea><span class="helper-text">You can customize the editor by defining two functions in JavaScript: one that will render the HTML editor from the XML entry and one that will harvest the (edited) HTML back into XML. If you would like to see an example, <a expr47="expr47">click here to load a sample JavaScript code</a>.</span></div></div><div><label for="editor_css">CSS</label><div class="input-field"><textarea expr48="expr48" id="editor_css" class="materialize-textarea" placeholder> </textarea><span class="helper-text">You can customize the editor look and feel by writing your own CSS styles. If you would like to see an example, <a expr49="expr49">click here to load a sample CSS style</a>.</span></div></div><div class="buttons"><a expr50="expr50" class="btn btn-secondary waves-effect waves-light">back</a><button expr51="expr51" class="btn waves-effect waves-light">Disable entry editor customizations <i class="material-icons right">edit</i></button><button expr52="expr52" class="btn waves-effect waves-light" id="submit_button">Save\n            <i class="material-icons right">save</i></button></div><br/><br/>',
             [
               {
-                redundantAttribute: 'expr67',
-                selector: '[expr67]',
+                redundantAttribute: 'expr46',
+                selector: '[expr46]',
 
                 expressions: [
                   {
@@ -4042,8 +4042,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr68',
-                selector: '[expr68]',
+                redundantAttribute: 'expr47',
+                selector: '[expr47]',
 
                 expressions: [
                   {
@@ -4054,8 +4054,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr69',
-                selector: '[expr69]',
+                redundantAttribute: 'expr48',
+                selector: '[expr48]',
 
                 expressions: [
                   {
@@ -4066,8 +4066,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr70',
-                selector: '[expr70]',
+                redundantAttribute: 'expr49',
+                selector: '[expr49]',
 
                 expressions: [
                   {
@@ -4078,8 +4078,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr71',
-                selector: '[expr71]',
+                redundantAttribute: 'expr50',
+                selector: '[expr50]',
 
                 expressions: [
                   {
@@ -4090,8 +4090,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr72',
-                selector: '[expr72]',
+                redundantAttribute: 'expr51',
+                selector: '[expr51]',
 
                 expressions: [
                   {
@@ -4102,8 +4102,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr73',
-                selector: '[expr73]',
+                redundantAttribute: 'expr52',
+                selector: '[expr52]',
 
                 expressions: [
                   {
@@ -4213,7 +4213,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr36="expr36"></dict-config-nav><h3>Entry flags</h3><div expr37="expr37" class="center-align grey-text"></div><template expr38="expr38"></template><br/><br/><dict-config-buttons expr49="expr49"></dict-config-buttons>',
+      '<dict-config-nav expr61="expr61"></dict-config-nav><h3>Entry flags</h3><div expr62="expr62" class="center-align grey-text"></div><template expr63="expr63"></template><br/><br/><dict-config-buttons expr74="expr74"></dict-config-buttons>',
       [
         {
           type: bindingTypes.TAG,
@@ -4244,14 +4244,14 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr36',
-          selector: '[expr36]'
+          redundantAttribute: 'expr61',
+          selector: '[expr61]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.isLoading,
-          redundantAttribute: 'expr37',
-          selector: '[expr37]',
+          redundantAttribute: 'expr62',
+          selector: '[expr62]',
 
           template: template(
             '<h3>Loading entry flags...</h3>',
@@ -4261,24 +4261,24 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isLoading,
-          redundantAttribute: 'expr38',
-          selector: '[expr38]',
+          redundantAttribute: 'expr63',
+          selector: '[expr63]',
 
           template: template(
-            '<div expr39="expr39" class="center-align grey-text"></div><template expr41="expr41"></template>',
+            '<div expr64="expr64" class="center-align grey-text"></div><template expr66="expr66"></template>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.configData.flags.length,
-                redundantAttribute: 'expr39',
-                selector: '[expr39]',
+                redundantAttribute: 'expr64',
+                selector: '[expr64]',
 
                 template: template(
-                  '<h3>no entry flags</h3><br/><a expr40="expr40" class="btn btn-primary waves-effect waves-light">\n            add flag\n            <i class="material-icons right">add</i></a>',
+                  '<h3>no entry flags</h3><br/><a expr65="expr65" class="btn btn-primary waves-effect waves-light">\n            add flag\n            <i class="material-icons right">add</i></a>',
                   [
                     {
-                      redundantAttribute: 'expr40',
-                      selector: '[expr40]',
+                      redundantAttribute: 'expr65',
+                      selector: '[expr65]',
 
                       expressions: [
                         {
@@ -4294,11 +4294,11 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.configData.flags.length,
-                redundantAttribute: 'expr41',
-                selector: '[expr41]',
+                redundantAttribute: 'expr66',
+                selector: '[expr66]',
 
                 template: template(
-                  '<table><thead><tr><th>\n                     Keyboard shortcut\n                  </th><th>\n                     Value\n                  </th><th>\n                     Label\n                  </th><th>\n                     Color\n                  </th><th></th></tr></thead><tbody><tr expr42="expr42" class="flag-info"></tr></tbody></table><div><a expr48="expr48" class="btn waves-effect waves-light">\n               add flag\n               <i class="material-icons right">add</i></a></div><br/><br/><div class="input-field" style="max-width: 400px;"><select id="flag-element"></select><label for="flag-element">Flag element</label><span class="helper-text">Select the element which the flags should be put into.</span></div>',
+                  '<table><thead><tr><th>\n                     Keyboard shortcut\n                  </th><th>\n                     Value\n                  </th><th>\n                     Label\n                  </th><th>\n                     Color\n                  </th><th></th></tr></thead><tbody><tr expr67="expr67" class="flag-info"></tr></tbody></table><div><a expr73="expr73" class="btn waves-effect waves-light">\n               add flag\n               <i class="material-icons right">add</i></a></div><br/><br/><div class="input-field" style="max-width: 400px;"><select id="flag-element"></select><label for="flag-element">Flag element</label><span class="helper-text">Select the element which the flags should be put into.</span></div>',
                   [
                     {
                       type: bindingTypes.EACH,
@@ -4306,11 +4306,11 @@ div.myEditor input {font-weight: bold}`
                       condition: null,
 
                       template: template(
-                        '<td><input expr43="expr43" type="text" placeholder="key" class="flag-key"/></td><td><input expr44="expr44" type="text" placeholder="value" class="flag-name"/></td><td><input expr45="expr45" type="text" placeholder="label" class="flag-label"/></td><td><input expr46="expr46" type="text" placeholder="color" class="flag-color"/></td><td><a expr47="expr47" class="btn btn-floating delete-el"><i class="material-icons">delete</i></a></td>',
+                        '<td><input expr68="expr68" type="text" placeholder="key" class="flag-key"/></td><td><input expr69="expr69" type="text" placeholder="value" class="flag-name"/></td><td><input expr70="expr70" type="text" placeholder="label" class="flag-label"/></td><td><input expr71="expr71" type="text" placeholder="color" class="flag-color"/></td><td><a expr72="expr72" class="btn btn-floating delete-el"><i class="material-icons">delete</i></a></td>',
                         [
                           {
-                            redundantAttribute: 'expr43',
-                            selector: '[expr43]',
+                            redundantAttribute: 'expr68',
+                            selector: '[expr68]',
 
                             expressions: [
                               {
@@ -4320,8 +4320,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr44',
-                            selector: '[expr44]',
+                            redundantAttribute: 'expr69',
+                            selector: '[expr69]',
 
                             expressions: [
                               {
@@ -4331,8 +4331,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr45',
-                            selector: '[expr45]',
+                            redundantAttribute: 'expr70',
+                            selector: '[expr70]',
 
                             expressions: [
                               {
@@ -4342,8 +4342,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr46',
-                            selector: '[expr46]',
+                            redundantAttribute: 'expr71',
+                            selector: '[expr71]',
 
                             expressions: [
                               {
@@ -4375,8 +4375,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr47',
-                            selector: '[expr47]',
+                            redundantAttribute: 'expr72',
+                            selector: '[expr72]',
 
                             expressions: [
                               {
@@ -4389,15 +4389,15 @@ div.myEditor input {font-weight: bold}`
                         ]
                       ),
 
-                      redundantAttribute: 'expr42',
-                      selector: '[expr42]',
+                      redundantAttribute: 'expr67',
+                      selector: '[expr67]',
                       itemName: 'flag',
                       indexName: 'index',
                       evaluate: _scope => _scope.configData.flags
                     },
                     {
-                      redundantAttribute: 'expr48',
-                      selector: '[expr48]',
+                      redundantAttribute: 'expr73',
+                      selector: '[expr73]',
 
                       expressions: [
                         {
@@ -4437,8 +4437,8 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr49',
-          selector: '[expr49]'
+          redundantAttribute: 'expr74',
+          selector: '[expr74]'
         }
       ]
     ),
@@ -4551,7 +4551,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr96="expr96"></dict-config-nav><h3>Multimedia API</h3><div class="row"><div class="input-field"><select id="img_licence" "><option value="any" selected>any licence</option><option value="comm">permits commercial use</option><option value="der">permits derivative works</option><option value="code">permits commercial and derivative use</option><option value="public">public domain</option></select><label>Image licence</label><span class="helper-text">Select licence type when searching for images.</span></div></div><div class="row"><div class="input-field"><input expr97="expr97" type="text" id="gapi_key"/><label>Google Custom Search API key</label><span class="helper-text">Insert your Google Custom Search API key to allow multimedia search.</span></div></div><div class="row"><div class="input-field"><input expr98="expr98" type="text" id="gapi_cx"/><label>Google Custom Search ID</label><span class="helper-text">Insert ID of your Custom Search - see <a href="https://developers.google.com/custom-search/v1/introduction">documentation</a>.</span></div></div><div class="row"><div class="input-field"><input expr99="expr99" type="text" id="pixabay_key"/><label>Pixabay API key</label><span class="helper-text">Insert your <a href="https://pixabay.com/api/docs/">Pixabay API key</a>.</span></div></div><div class="row"><div class="input-field"><input expr100="expr100" type="text" id="voice_key"/><label>VoiceRSS API key</label><span class="helper-text">Insert your <a href="http://www.voicerss.org/api/">VoiceRSS</a> API key to enable text-to-speech.</span></div></div><div class="row"><div class="input-field"><select id="voice_lang"><option value>.</option><option value="ar-eg">Arabic (Egypt)</option><option value="ar-sa">Arabic (Saudi Arabia)</option><option value="bg-bg">Bulgarian</option><option value="ca-es">Catalan</option><option value="zh-cn">Chinese (China)</option><option value="zh-hk">Chinese (Hong Kong)</option><option value="zh-tw">Chinese (Taiwan)</option><option value="hr-hr">Croatian</option><option value="cs-cz">Czech</option><option value="da-dk">Danish</option><option value="nl-be">Dutch (Belgium)</option><option value="nl-nl">Dutch (Netherlands)</option><option value="en-au">English (Australia)</option><option value="en-ca">English (Canada)</option><option value="en-gb">English (Great Britain)</option><option value="en-in">English (India)</option><option value="en-ie">English (Ireland)</option><option value="en-us">English (United States)</option><option value="fi-fi">Finnish</option><option value="fr-ca">French (Canada)</option><option value="fr-fr">French (France)</option><option value="fr-ch">French (Switzerland)</option><option value="de-at">German (Austria)</option><option value="de-de">German (Germany)</option><option value="de-ch">German (Switzerland)</option><option value="el-gr">Greek</option><option value="he-il">Hebrew</option><option value="hi-in">Hindi</option><option value="hu-hu">Hungarian</option><option value="id-id">Indonesian</option><option value="it-it">Italian</option><option value="ja-jp">Japanese</option><option value="ko-kr">Korean</option><option value="ms-my">Malay</option><option value="nb-no">Norwegian</option><option value="pl-pl">Polish</option><option value="pt-br">Portuguese (Brazil)</option><option value="pt-pt">Portuguese (Portugal)</option><option value="ro-ro">Romanian</option><option value="ru-ru">Russian</option><option value="sk-sk">Slovak</option><option value="sl-si">Slovenian</option><option value="es-mx">Spanish (Mexico)</option><option value="es-es">Spanish (Spain)</option><option value="sv-se">Swedish</option><option value="ta-in">Tamil</option><option value="th-th">Thai</option><option value="tr-tr">Turkish</option><option value="vi-vn">Vietnamese</option></select><label>VoiceRSS language</label></div></div><button expr101="expr101" class="btn waves-effect waves-light" id="submit_button">\n         Save\n         <i class="material-icons right">save</i></button><br/><br/><hr/><br/><div><h5>Auto download images to each entry</h5><p class="grey-text">If you want to add images to each entry automatically, Lexonomy can do that for you. First, go to Entry structure and add element with content type <i>media</i>. When you\'re ready, select element and number of images you want to add.</p><div style="display: flex; gap: 10px; vertical-align: middle;"><div style="max-width: 200px;"><div class="input-field"><select id="add_element"></select><label>Image element to add</label></div></div><div style="max-width: 150px;"><div class="input-field"><input type="number" id="add_number" value="3"/><label>Add X images</label></div></div><button expr102="expr102" class="btn waves-effect waves-light" id="addimages" data-bgjob style="margin-top: 28px;">Add images</button></div></div><div><p id="addinfo" style="display:none">...</p></div><br/><a expr103="expr103" class="btn btn-secondary btn-flat">Back</a>',
+      '<dict-config-nav expr53="expr53"></dict-config-nav><h3>Multimedia API</h3><div class="row"><div class="input-field"><select id="img_licence" "><option value="any" selected>any licence</option><option value="comm">permits commercial use</option><option value="der">permits derivative works</option><option value="code">permits commercial and derivative use</option><option value="public">public domain</option></select><label>Image licence</label><span class="helper-text">Select licence type when searching for images.</span></div></div><div class="row"><div class="input-field"><input expr54="expr54" type="text" id="gapi_key"/><label>Google Custom Search API key</label><span class="helper-text">Insert your Google Custom Search API key to allow multimedia search.</span></div></div><div class="row"><div class="input-field"><input expr55="expr55" type="text" id="gapi_cx"/><label>Google Custom Search ID</label><span class="helper-text">Insert ID of your Custom Search - see <a href="https://developers.google.com/custom-search/v1/introduction">documentation</a>.</span></div></div><div class="row"><div class="input-field"><input expr56="expr56" type="text" id="pixabay_key"/><label>Pixabay API key</label><span class="helper-text">Insert your <a href="https://pixabay.com/api/docs/">Pixabay API key</a>.</span></div></div><div class="row"><div class="input-field"><input expr57="expr57" type="text" id="voice_key"/><label>VoiceRSS API key</label><span class="helper-text">Insert your <a href="http://www.voicerss.org/api/">VoiceRSS</a> API key to enable text-to-speech.</span></div></div><div class="row"><div class="input-field"><select id="voice_lang"><option value>.</option><option value="ar-eg">Arabic (Egypt)</option><option value="ar-sa">Arabic (Saudi Arabia)</option><option value="bg-bg">Bulgarian</option><option value="ca-es">Catalan</option><option value="zh-cn">Chinese (China)</option><option value="zh-hk">Chinese (Hong Kong)</option><option value="zh-tw">Chinese (Taiwan)</option><option value="hr-hr">Croatian</option><option value="cs-cz">Czech</option><option value="da-dk">Danish</option><option value="nl-be">Dutch (Belgium)</option><option value="nl-nl">Dutch (Netherlands)</option><option value="en-au">English (Australia)</option><option value="en-ca">English (Canada)</option><option value="en-gb">English (Great Britain)</option><option value="en-in">English (India)</option><option value="en-ie">English (Ireland)</option><option value="en-us">English (United States)</option><option value="fi-fi">Finnish</option><option value="fr-ca">French (Canada)</option><option value="fr-fr">French (France)</option><option value="fr-ch">French (Switzerland)</option><option value="de-at">German (Austria)</option><option value="de-de">German (Germany)</option><option value="de-ch">German (Switzerland)</option><option value="el-gr">Greek</option><option value="he-il">Hebrew</option><option value="hi-in">Hindi</option><option value="hu-hu">Hungarian</option><option value="id-id">Indonesian</option><option value="it-it">Italian</option><option value="ja-jp">Japanese</option><option value="ko-kr">Korean</option><option value="ms-my">Malay</option><option value="nb-no">Norwegian</option><option value="pl-pl">Polish</option><option value="pt-br">Portuguese (Brazil)</option><option value="pt-pt">Portuguese (Portugal)</option><option value="ro-ro">Romanian</option><option value="ru-ru">Russian</option><option value="sk-sk">Slovak</option><option value="sl-si">Slovenian</option><option value="es-mx">Spanish (Mexico)</option><option value="es-es">Spanish (Spain)</option><option value="sv-se">Swedish</option><option value="ta-in">Tamil</option><option value="th-th">Thai</option><option value="tr-tr">Turkish</option><option value="vi-vn">Vietnamese</option></select><label>VoiceRSS language</label></div></div><button expr58="expr58" class="btn waves-effect waves-light" id="submit_button">\n         Save\n         <i class="material-icons right">save</i></button><br/><br/><hr/><br/><div><h5>Auto download images to each entry</h5><p class="grey-text">If you want to add images to each entry automatically, Lexonomy can do that for you. First, go to Entry structure and add element with content type <i>media</i>. When you\'re ready, select element and number of images you want to add.</p><div style="display: flex; gap: 10px; vertical-align: middle;"><div style="max-width: 200px;"><div class="input-field"><select id="add_element"></select><label>Image element to add</label></div></div><div style="max-width: 150px;"><div class="input-field"><input type="number" id="add_number" value="3"/><label>Add X images</label></div></div><button expr59="expr59" class="btn waves-effect waves-light" id="addimages" data-bgjob style="margin-top: 28px;">Add images</button></div></div><div><p id="addinfo" style="display:none">...</p></div><br/><a expr60="expr60" class="btn btn-secondary btn-flat">Back</a>',
       [
         {
           type: bindingTypes.TAG,
@@ -4582,12 +4582,12 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr96',
-          selector: '[expr96]'
+          redundantAttribute: 'expr53',
+          selector: '[expr53]'
         },
         {
-          redundantAttribute: 'expr97',
-          selector: '[expr97]',
+          redundantAttribute: 'expr54',
+          selector: '[expr54]',
 
           expressions: [
             {
@@ -4597,8 +4597,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr98',
-          selector: '[expr98]',
+          redundantAttribute: 'expr55',
+          selector: '[expr55]',
 
           expressions: [
             {
@@ -4608,8 +4608,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr99',
-          selector: '[expr99]',
+          redundantAttribute: 'expr56',
+          selector: '[expr56]',
 
           expressions: [
             {
@@ -4619,8 +4619,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr100',
-          selector: '[expr100]',
+          redundantAttribute: 'expr57',
+          selector: '[expr57]',
 
           expressions: [
             {
@@ -4630,8 +4630,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr101',
-          selector: '[expr101]',
+          redundantAttribute: 'expr58',
+          selector: '[expr58]',
 
           expressions: [
             {
@@ -4642,8 +4642,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr102',
-          selector: '[expr102]',
+          redundantAttribute: 'expr59',
+          selector: '[expr59]',
 
           expressions: [
             {
@@ -4654,8 +4654,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr103',
-          selector: '[expr103]',
+          redundantAttribute: 'expr60',
+          selector: '[expr60]',
 
           expressions: [
             {
@@ -4733,7 +4733,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr50="expr50"></dict-config-nav><h3>Description</h3><div><form><div class="row"><div class="input-field"><input expr51="expr51" placeholder="My Dictionary" id="ident_title" type="text" class="validate" style="width:300px"/><label for="ident_title">Dictionary name</label><span class="helper-text">A human-readable title for your dictionary, such as <i>My Esperanto Dictionary</i>.</span></div></div><div class="row"><div class="input-field"><textarea expr52="expr52" id="ident_blurb" class="materialize-textarea" placeholder="Yet another Lexonomy dictionary." rows="3"> </textarea><label for="ident_blurb">Dictionary description</label><span class="helper-text">This will appear on your dictionary\'s home page. You can leave it blank if you prefer.<br/>You can use <a href="https://daringfireball.net/projects/markdown/" target="_blank">Markdown</a> here.</span></div></div><div class="row"><div class="input-field"><input expr53="expr53" type="text" id="ident_lang" class="autocomplete" placeholder="Type to search for language, or write your custom info" style="width:300px"/><label for="ident_lang">Main language</label><span class="helper-text">Language of dictionary entries, used to sort dictionaries on your home page. You can select language from the list, or write down your own.</span></div></div><div class="row"><div class="input-field"><input expr54="expr54" placeholder="URL" id="ident_handle" type="text" class="validate"/><label for="ident_title">Metadata from CLARIN repository</label><span class="helper-text">Link to metadata recorded in CLARIN repository, provide URL to \'handle\' link, eg. <tt expr55="expr55"></tt>.</span></div></div><dict-config-buttons expr56="expr56"></dict-config-buttons></form></div>',
+      '<dict-config-nav expr75="expr75"></dict-config-nav><h3>Description</h3><div><form><div class="row"><div class="input-field"><input expr76="expr76" placeholder="My Dictionary" id="ident_title" type="text" class="validate" style="width:300px"/><label for="ident_title">Dictionary name</label><span class="helper-text">A human-readable title for your dictionary, such as <i>My Esperanto Dictionary</i>.</span></div></div><div class="row"><div class="input-field"><textarea expr77="expr77" id="ident_blurb" class="materialize-textarea" placeholder="Yet another Lexonomy dictionary." rows="3"> </textarea><label for="ident_blurb">Dictionary description</label><span class="helper-text">This will appear on your dictionary\'s home page. You can leave it blank if you prefer.<br/>You can use <a href="https://daringfireball.net/projects/markdown/" target="_blank">Markdown</a> here.</span></div></div><div class="row"><div class="input-field"><input expr78="expr78" type="text" id="ident_lang" class="autocomplete" placeholder="Type to search for language, or write your custom info" style="width:300px"/><label for="ident_lang">Main language</label><span class="helper-text">Language of dictionary entries, used to sort dictionaries on your home page. You can select language from the list, or write down your own.</span></div></div><div class="row"><div class="input-field"><input expr79="expr79" placeholder="URL" id="ident_handle" type="text" class="validate"/><label for="ident_title">Metadata from CLARIN repository</label><span class="helper-text">Link to metadata recorded in CLARIN repository, provide URL to \'handle\' link, eg. <tt expr80="expr80"></tt>.</span></div></div><dict-config-buttons expr81="expr81"></dict-config-buttons></form></div>',
       [
         {
           type: bindingTypes.TAG,
@@ -4764,12 +4764,12 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr50',
-          selector: '[expr50]'
+          redundantAttribute: 'expr75',
+          selector: '[expr75]'
         },
         {
-          redundantAttribute: 'expr51',
-          selector: '[expr51]',
+          redundantAttribute: 'expr76',
+          selector: '[expr76]',
 
           expressions: [
             {
@@ -4779,8 +4779,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr52',
-          selector: '[expr52]',
+          redundantAttribute: 'expr77',
+          selector: '[expr77]',
 
           expressions: [
             {
@@ -4791,8 +4791,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr53',
-          selector: '[expr53]',
+          redundantAttribute: 'expr78',
+          selector: '[expr78]',
 
           expressions: [
             {
@@ -4802,8 +4802,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr54',
-          selector: '[expr54]',
+          redundantAttribute: 'expr79',
+          selector: '[expr79]',
 
           expressions: [
             {
@@ -4826,8 +4826,8 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr55',
-          selector: '[expr55]'
+          redundantAttribute: 'expr80',
+          selector: '[expr80]'
         },
         {
           type: bindingTypes.TAG,
@@ -4848,8 +4848,8 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr56',
-          selector: '[expr56]'
+          redundantAttribute: 'expr81',
+          selector: '[expr81]'
         }
       ]
     ),
@@ -4991,7 +4991,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr104="expr104"></dict-config-nav><h3>KonText connection</h3><div class="row"><div class="input-field"><input expr105="expr105" placeholder id="kontext_url" type="text" class/><label for="kontext_url">KonText URL</label><span class="helper-text">The URL of the KonText installation where external links should point. Defaults to <tt expr106="expr106"></tt>. Do not change this unless you are using a local installation of KonText.</span></div></div><div class="row"><div class="input-field"><input expr107="expr107" type="text" id="corpus" class="autocomplete" placeholder="Retrieving available corpora from KonText, please wait..."/><label for="corpus">Corpus name</label><span class="helper-text">Select a Sketch Engine corpus from the list of corpora available to you.</span><span expr108="expr108" class="helper-text" id="corpusInfo"></span></div></div><div class="row"><div class="input-field"><input expr109="expr109" placeholder id="concquery" type="text" class/><label for="concquery">Concordance query</label><span class="helper-text">The CQL query that will be used to obtain concordance from KonText. You can use placeholders for elements in the form of \'%(element)\', e.g. \'[lemma="%(headword)"]\'. If left empty the \'simple\' query type will be used as configured for the respective corpus. Please note that you cannot use CQL syntax with default attribute because it is not specified.</span></div></div><div class="row"><div class="input-field"><select id="searchElements" multiple></select><label for="searchElements">Additional search elements</label><span class="helper-text">You can select any textual elements here whose content you would like to search for in KonText. A menu will be displayed next to all these elements like for the root entry element.</span></div></div><div class="row"><h4>Examples</h4></div><div class="row"><div class="input-field"><select id="container"><option value>(not set)</option></select><label for="container">Example container</label><span class="helper-text">Select the element which should wrap each individual example. When you pull example sentences automatically from a corpus, Lexonomy will insert one of these elements for each example sentence.</span></div></div><div class="row"><div class="input-field"><textarea expr110="expr110" id="template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each corpus example. The actual text will be where the placeholder <tt expr111="expr111"></tt> is.</span></div></div><div class="row"><div class="input-field"><select id="markup"><option value>(not set)</option></select><label for="markup">Headword mark-up</label><span class="helper-text">Select the element which should mark up the headword in inserted corpus examples. This setting is optional: if you make no selection, corpus examples will be inserted without mark-up.</span></div></div><dict-config-buttons expr112="expr112"></dict-config-buttons>',
+      '<dict-config-nav expr82="expr82"></dict-config-nav><h3>KonText connection</h3><div class="row"><div class="input-field"><input expr83="expr83" placeholder id="kontext_url" type="text" class/><label for="kontext_url">KonText URL</label><span class="helper-text">The URL of the KonText installation where external links should point. Defaults to <tt expr84="expr84"></tt>. Do not change this unless you are using a local installation of KonText.</span></div></div><div class="row"><div class="input-field"><input expr85="expr85" type="text" id="corpus" class="autocomplete" placeholder="Retrieving available corpora from KonText, please wait..."/><label for="corpus">Corpus name</label><span class="helper-text">Select a Sketch Engine corpus from the list of corpora available to you.</span><span expr86="expr86" class="helper-text" id="corpusInfo"></span></div></div><div class="row"><div class="input-field"><input expr87="expr87" placeholder id="concquery" type="text" class/><label for="concquery">Concordance query</label><span class="helper-text">The CQL query that will be used to obtain concordance from KonText. You can use placeholders for elements in the form of \'%(element)\', e.g. \'[lemma="%(headword)"]\'. If left empty the \'simple\' query type will be used as configured for the respective corpus. Please note that you cannot use CQL syntax with default attribute because it is not specified.</span></div></div><div class="row"><div class="input-field"><select id="searchElements" multiple></select><label for="searchElements">Additional search elements</label><span class="helper-text">You can select any textual elements here whose content you would like to search for in KonText. A menu will be displayed next to all these elements like for the root entry element.</span></div></div><div class="row"><h4>Examples</h4></div><div class="row"><div class="input-field"><select id="container"><option value>(not set)</option></select><label for="container">Example container</label><span class="helper-text">Select the element which should wrap each individual example. When you pull example sentences automatically from a corpus, Lexonomy will insert one of these elements for each example sentence.</span></div></div><div class="row"><div class="input-field"><textarea expr88="expr88" id="template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each corpus example. The actual text will be where the placeholder <tt expr89="expr89"></tt> is.</span></div></div><div class="row"><div class="input-field"><select id="markup"><option value>(not set)</option></select><label for="markup">Headword mark-up</label><span class="helper-text">Select the element which should mark up the headword in inserted corpus examples. This setting is optional: if you make no selection, corpus examples will be inserted without mark-up.</span></div></div><dict-config-buttons expr90="expr90"></dict-config-buttons>',
       [
         {
           type: bindingTypes.TAG,
@@ -5022,12 +5022,12 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr104',
-          selector: '[expr104]'
+          redundantAttribute: 'expr82',
+          selector: '[expr82]'
         },
         {
-          redundantAttribute: 'expr105',
-          selector: '[expr105]',
+          redundantAttribute: 'expr83',
+          selector: '[expr83]',
 
           expressions: [
             {
@@ -5050,12 +5050,12 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr106',
-          selector: '[expr106]'
+          redundantAttribute: 'expr84',
+          selector: '[expr84]'
         },
         {
-          redundantAttribute: 'expr107',
-          selector: '[expr107]',
+          redundantAttribute: 'expr85',
+          selector: '[expr85]',
 
           expressions: [
             {
@@ -5066,8 +5066,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr108',
-          selector: '[expr108]',
+          redundantAttribute: 'expr86',
+          selector: '[expr86]',
 
           expressions: [
             {
@@ -5078,8 +5078,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr109',
-          selector: '[expr109]',
+          redundantAttribute: 'expr87',
+          selector: '[expr87]',
 
           expressions: [
             {
@@ -5089,8 +5089,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr110',
-          selector: '[expr110]',
+          redundantAttribute: 'expr88',
+          selector: '[expr88]',
 
           expressions: [
             {
@@ -5114,8 +5114,8 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr111',
-          selector: '[expr111]'
+          redundantAttribute: 'expr89',
+          selector: '[expr89]'
         },
         {
           type: bindingTypes.TAG,
@@ -5136,8 +5136,8 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr112',
-          selector: '[expr112]'
+          redundantAttribute: 'expr90',
+          selector: '[expr90]'
         }
       ]
     ),
@@ -5287,7 +5287,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr74="expr74"></dict-config-nav><h3>Manual linking between entries</h3><div><p>Elements listed here can be used as target of cross-reference link. For each element, specify unique identifier in the form of placeholders <tt expr75="expr75"></tt>. Eg. element <tt expr76="expr76"></tt> can have identifier <tt expr77="expr77"></tt>, element <tt expr78="expr78"></tt> can have identifier <tt expr79="expr79"></tt>. Optionally, specify element you want to show as preview when selecting links.</p><div expr80="expr80" class="center-align grey-text"></div><template expr81="expr81"></template><br/><br/><div><h4>Automatic linking using NAISC</h4></div><div><div><label for="otherdict">Other dictionary code</label></div><div class="input-field inlineBlock" style="max-width: 400px;"><input expr90="expr90" type="text" id="otherdict"/></div><div class="input-field inlineBlock"><button expr91="expr91" class="btn waves-effect waves-light" id="naisc_link" data-bgjob disabled style="margin-left: 10px;">Checking status, wait...</button></div></div></div><br/><a expr92="expr92" class="btn btn-secondary btn-flat">Back</a>',
+      '<dict-config-nav expr94="expr94"></dict-config-nav><h3>Manual linking between entries</h3><div><p>Elements listed here can be used as target of cross-reference link. For each element, specify unique identifier in the form of placeholders <tt expr95="expr95"></tt>. Eg. element <tt expr96="expr96"></tt> can have identifier <tt expr97="expr97"></tt>, element <tt expr98="expr98"></tt> can have identifier <tt expr99="expr99"></tt>. Optionally, specify element you want to show as preview when selecting links.</p><div expr100="expr100" class="center-align grey-text"></div><template expr101="expr101"></template><br/><br/><div><h4>Automatic linking using NAISC</h4></div><div><div><label for="otherdict">Other dictionary code</label></div><div class="input-field inlineBlock" style="max-width: 400px;"><input expr110="expr110" type="text" id="otherdict"/></div><div class="input-field inlineBlock"><button expr111="expr111" class="btn waves-effect waves-light" id="naisc_link" data-bgjob disabled style="margin-left: 10px;">Checking status, wait...</button></div></div></div><br/><a expr112="expr112" class="btn btn-secondary btn-flat">Back</a>',
       [
         {
           type: bindingTypes.TAG,
@@ -5318,8 +5318,8 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr74',
-          selector: '[expr74]'
+          redundantAttribute: 'expr94',
+          selector: '[expr94]'
         },
         {
           type: bindingTypes.TAG,
@@ -5335,8 +5335,8 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr75',
-          selector: '[expr75]'
+          redundantAttribute: 'expr95',
+          selector: '[expr95]'
         },
         {
           type: bindingTypes.TAG,
@@ -5352,8 +5352,8 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr76',
-          selector: '[expr76]'
+          redundantAttribute: 'expr96',
+          selector: '[expr96]'
         },
         {
           type: bindingTypes.TAG,
@@ -5369,8 +5369,8 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr77',
-          selector: '[expr77]'
+          redundantAttribute: 'expr97',
+          selector: '[expr97]'
         },
         {
           type: bindingTypes.TAG,
@@ -5386,8 +5386,8 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr78',
-          selector: '[expr78]'
+          redundantAttribute: 'expr98',
+          selector: '[expr98]'
         },
         {
           type: bindingTypes.TAG,
@@ -5403,14 +5403,14 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr79',
-          selector: '[expr79]'
+          redundantAttribute: 'expr99',
+          selector: '[expr99]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.isLoading,
-          redundantAttribute: 'expr80',
-          selector: '[expr80]',
+          redundantAttribute: 'expr100',
+          selector: '[expr100]',
 
           template: template(
             '<h3>loading elements...</h3>',
@@ -5420,20 +5420,20 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isLoading,
-          redundantAttribute: 'expr81',
-          selector: '[expr81]',
+          redundantAttribute: 'expr101',
+          selector: '[expr101]',
 
           template: template(
-            '<table expr82="expr82"></table><div class="buttons"><button expr88="expr88">\n               add element\n               <i class="material-icons right">add</i></button><button expr89="expr89" class="btn waves-effect waves-light" id="submit_button">\n               Save\n               <i class="material-icons right">save</i></button></div>',
+            '<table expr102="expr102"></table><div class="buttons"><button expr108="expr108">\n               add element\n               <i class="material-icons right">add</i></button><button expr109="expr109" class="btn waves-effect waves-light" id="submit_button">\n               Save\n               <i class="material-icons right">save</i></button></div>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.configData.elements.length,
-                redundantAttribute: 'expr82',
-                selector: '[expr82]',
+                redundantAttribute: 'expr102',
+                selector: '[expr102]',
 
                 template: template(
-                  '<thead><tr><th>Linking element</th><th>Idenitifier</th><th>Preview</th><th></th></tr></thead><tbody><tr expr83="expr83"></tr></tbody>',
+                  '<thead><tr><th>Linking element</th><th>Idenitifier</th><th>Preview</th><th></th></tr></thead><tbody><tr expr103="expr103"></tr></tbody>',
                   [
                     {
                       type: bindingTypes.EACH,
@@ -5441,7 +5441,7 @@ div.myEditor input {font-weight: bold}`
                       condition: null,
 
                       template: template(
-                        '<td><div class="input-field"><select expr84="expr84"></select></div></td><td><div class="input-field"><input expr85="expr85" type="text" name="identifier"/></div></td><td><div class="input-field"><input expr86="expr86" type="text" name="preview"/></div></td><td><a expr87="expr87" class="btn btn-floating right"><i class="material-icons">delete</i></a></td>',
+                        '<td><div class="input-field"><select expr104="expr104"></select></div></td><td><div class="input-field"><input expr105="expr105" type="text" name="identifier"/></div></td><td><div class="input-field"><input expr106="expr106" type="text" name="preview"/></div></td><td><a expr107="expr107" class="btn btn-floating right"><i class="material-icons">delete</i></a></td>',
                         [
                           {
                             expressions: [
@@ -5453,8 +5453,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr84',
-                            selector: '[expr84]',
+                            redundantAttribute: 'expr104',
+                            selector: '[expr104]',
 
                             expressions: [
                               {
@@ -5465,8 +5465,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr85',
-                            selector: '[expr85]',
+                            redundantAttribute: 'expr105',
+                            selector: '[expr105]',
 
                             expressions: [
                               {
@@ -5481,8 +5481,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr86',
-                            selector: '[expr86]',
+                            redundantAttribute: 'expr106',
+                            selector: '[expr106]',
 
                             expressions: [
                               {
@@ -5497,8 +5497,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr87',
-                            selector: '[expr87]',
+                            redundantAttribute: 'expr107',
+                            selector: '[expr107]',
 
                             expressions: [
                               {
@@ -5516,8 +5516,8 @@ div.myEditor input {font-weight: bold}`
                         ]
                       ),
 
-                      redundantAttribute: 'expr83',
-                      selector: '[expr83]',
+                      redundantAttribute: 'expr103',
+                      selector: '[expr103]',
                       itemName: 'element',
                       indexName: 'idx',
                       evaluate: _scope => _scope.configData.elements
@@ -5526,8 +5526,8 @@ div.myEditor input {font-weight: bold}`
                 )
               },
               {
-                redundantAttribute: 'expr88',
-                selector: '[expr88]',
+                redundantAttribute: 'expr108',
+                selector: '[expr108]',
 
                 expressions: [
                   {
@@ -5549,8 +5549,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr89',
-                selector: '[expr89]',
+                redundantAttribute: 'expr109',
+                selector: '[expr109]',
 
                 expressions: [
                   {
@@ -5564,8 +5564,8 @@ div.myEditor input {font-weight: bold}`
           )
         },
         {
-          redundantAttribute: 'expr90',
-          selector: '[expr90]',
+          redundantAttribute: 'expr110',
+          selector: '[expr110]',
 
           expressions: [
             {
@@ -5576,8 +5576,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr91',
-          selector: '[expr91]',
+          redundantAttribute: 'expr111',
+          selector: '[expr111]',
 
           expressions: [
             {
@@ -5588,8 +5588,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr92',
-          selector: '[expr92]',
+          redundantAttribute: 'expr112',
+          selector: '[expr112]',
 
           expressions: [
             {
@@ -5622,11 +5622,11 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<nav class="nav-breadcrumbs"><div class="nav-wrapper"><a expr93="expr93" class="breadcrumb"> </a><a expr94="expr94" class="breadcrumb">Configure</a><a expr95="expr95" class="breadcrumb"></a></div></nav>',
+      '<nav class="nav-breadcrumbs"><div class="nav-wrapper"><a expr91="expr91" class="breadcrumb"> </a><a expr92="expr92" class="breadcrumb">Configure</a><a expr93="expr93" class="breadcrumb"></a></div></nav>',
       [
         {
-          redundantAttribute: 'expr93',
-          selector: '[expr93]',
+          redundantAttribute: 'expr91',
+          selector: '[expr91]',
 
           expressions: [
             {
@@ -5648,8 +5648,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr94',
-          selector: '[expr94]',
+          redundantAttribute: 'expr92',
+          selector: '[expr92]',
 
           expressions: [
             {
@@ -5669,8 +5669,8 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.configId,
-          redundantAttribute: 'expr95',
-          selector: '[expr95]',
+          redundantAttribute: 'expr93',
+          selector: '[expr93]',
 
           template: template(
             ' ',
@@ -5716,7 +5716,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<a expr113="expr113">\n      Back\n   </a><button expr114="expr114" class="btn waves-effect waves-light" id="submit_button"></button>',
+      '<a expr149="expr149">\n      Back\n   </a><button expr150="expr150" class="btn waves-effect waves-light" id="submit_button"></button>',
       [
         {
           expressions: [
@@ -5728,8 +5728,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr113',
-          selector: '[expr113]',
+          redundantAttribute: 'expr149',
+          selector: '[expr149]',
 
           expressions: [
             {
@@ -5760,8 +5760,8 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => typeof _scope.props.showSave == "undefined" ? true : _scope.props.showSave,
-          redundantAttribute: 'expr114',
-          selector: '[expr114]',
+          redundantAttribute: 'expr150',
+          selector: '[expr150]',
 
           template: template(
             ' <i class="material-icons right">save</i>',
@@ -5870,7 +5870,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr123="expr123"></dict-config-nav><h3>Publishing</h3><div expr124="expr124" class="center-align grey-text"></div><template expr125="expr125"></template>',
+      '<dict-config-nav expr113="expr113"></dict-config-nav><h3>Publishing</h3><div expr114="expr114" class="center-align grey-text"></div><template expr115="expr115"></template>',
       [
         {
           type: bindingTypes.TAG,
@@ -5901,14 +5901,14 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr123',
-          selector: '[expr123]'
+          redundantAttribute: 'expr113',
+          selector: '[expr113]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.isLoading,
-          redundantAttribute: 'expr124',
-          selector: '[expr124]',
+          redundantAttribute: 'expr114',
+          selector: '[expr114]',
 
           template: template(
             '<h3>Loading...</h3>',
@@ -5918,15 +5918,15 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isLoading,
-          redundantAttribute: 'expr125',
-          selector: '[expr125]',
+          redundantAttribute: 'expr115',
+          selector: '[expr115]',
 
           template: template(
-            '<div class="row"><div class="input-field"><p><label><input expr126="expr126" name="publico_public" type="radio" class="with-gap" value="0"/><span>Private</span></label><label style="margin-left: 30px;"><input expr127="expr127" name="publico_public" type="radio" class="with-gap" value="1"/><span>Public</span></label></p><span class="helper-text"><i>Private</i> means that the dictionary is not publicly viewable. <i>Public</i> means that the dictionary is publicly viewable.\n            </span></div></div><div expr128="expr128" class="row"></div><dict-config-buttons expr130="expr130"></dict-config-buttons>',
+            '<div class="row"><div class="input-field"><p><label><input expr116="expr116" name="publico_public" type="radio" class="with-gap" value="0"/><span>Private</span></label><label style="margin-left: 30px;"><input expr117="expr117" name="publico_public" type="radio" class="with-gap" value="1"/><span>Public</span></label></p><span class="helper-text"><i>Private</i> means that the dictionary is not publicly viewable. <i>Public</i> means that the dictionary is publicly viewable.\n            </span></div></div><div expr118="expr118" class="row"></div><dict-config-buttons expr120="expr120"></dict-config-buttons>',
             [
               {
-                redundantAttribute: 'expr126',
-                selector: '[expr126]',
+                redundantAttribute: 'expr116',
+                selector: '[expr116]',
 
                 expressions: [
                   {
@@ -5942,8 +5942,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr127',
-                selector: '[expr127]',
+                redundantAttribute: 'expr117',
+                selector: '[expr117]',
 
                 expressions: [
                   {
@@ -5961,11 +5961,11 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.configData.public,
-                redundantAttribute: 'expr128',
-                selector: '[expr128]',
+                redundantAttribute: 'expr118',
+                selector: '[expr118]',
 
                 template: template(
-                  '<div class="input-field" id="publico_licence_info" style="max-width: 500px;"><select id="publico_licence"><option expr129="expr129"></option></select><label>Licence</label><span class="helper-text"></span></div>',
+                  '<div class="input-field" id="publico_licence_info" style="max-width: 500px;"><select id="publico_licence"><option expr119="expr119"></option></select><label>Licence</label><span class="helper-text"></span></div>',
                   [
                     {
                       type: bindingTypes.EACH,
@@ -6002,8 +6002,8 @@ div.myEditor input {font-weight: bold}`
                         ]
                       ),
 
-                      redundantAttribute: 'expr129',
-                      selector: '[expr129]',
+                      redundantAttribute: 'expr119',
+                      selector: '[expr119]',
                       itemName: 'licence',
                       indexName: null,
                       evaluate: _scope => _scope.licences
@@ -6030,8 +6030,8 @@ div.myEditor input {font-weight: bold}`
                   }
                 ],
 
-                redundantAttribute: 'expr130',
-                selector: '[expr130]'
+                redundantAttribute: 'expr120',
+                selector: '[expr120]'
               }
             ]
           )
@@ -6096,7 +6096,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr115="expr115"></dict-config-nav><h3>Searching</h3><div expr116="expr116" class="center-align grey-text"></div><div expr117="expr117" class="center-align grey-text"></div><div expr118="expr118"></div><br/><br/><dict-config-buttons expr122="expr122"></dict-config-buttons>',
+      '<dict-config-nav expr141="expr141"></dict-config-nav><h3>Searching</h3><div expr142="expr142" class="center-align grey-text"></div><div expr143="expr143" class="center-align grey-text"></div><div expr144="expr144"></div><br/><br/><dict-config-buttons expr148="expr148"></dict-config-buttons>',
       [
         {
           type: bindingTypes.TAG,
@@ -6127,14 +6127,14 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr115',
-          selector: '[expr115]'
+          redundantAttribute: 'expr141',
+          selector: '[expr141]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.isLoading,
-          redundantAttribute: 'expr116',
-          selector: '[expr116]',
+          redundantAttribute: 'expr142',
+          selector: '[expr142]',
 
           template: template(
             '<h3>\n         loading searchable elements...\n      </h3>',
@@ -6144,8 +6144,8 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isLoading && !_scope.hasElements,
-          redundantAttribute: 'expr117',
-          selector: '[expr117]',
+          redundantAttribute: 'expr143',
+          selector: '[expr143]',
 
           template: template(
             '<h3>No elements found</h3>',
@@ -6155,11 +6155,11 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isLoading && _scope.hasElements,
-          redundantAttribute: 'expr118',
-          selector: '[expr118]',
+          redundantAttribute: 'expr144',
+          selector: '[expr144]',
 
           template: template(
-            '<label for="search-element">Searchable elements</label><div class="helper-text">\n         The contents of elements you select here will be searchable (in addition to each entry\'s headword).\n      </div><br/><div expr119="expr119"></div>',
+            '<label for="search-element">Searchable elements</label><div class="helper-text">\n         The contents of elements you select here will be searchable (in addition to each entry\'s headword).\n      </div><br/><div expr145="expr145"></div>',
             [
               {
                 type: bindingTypes.EACH,
@@ -6167,11 +6167,11 @@ div.myEditor input {font-weight: bold}`
                 condition: null,
 
                 template: template(
-                  '<label><input expr120="expr120" type="checkbox"/><span expr121="expr121"> </span></label>',
+                  '<label><input expr146="expr146" type="checkbox"/><span expr147="expr147"> </span></label>',
                   [
                     {
-                      redundantAttribute: 'expr120',
-                      selector: '[expr120]',
+                      redundantAttribute: 'expr146',
+                      selector: '[expr146]',
 
                       expressions: [
                         {
@@ -6191,8 +6191,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr121',
-                      selector: '[expr121]',
+                      redundantAttribute: 'expr147',
+                      selector: '[expr147]',
 
                       expressions: [
                         {
@@ -6205,8 +6205,8 @@ div.myEditor input {font-weight: bold}`
                   ]
                 ),
 
-                redundantAttribute: 'expr119',
-                selector: '[expr119]',
+                redundantAttribute: 'expr145',
+                selector: '[expr145]',
                 itemName: 'element',
                 indexName: null,
                 evaluate: _scope => Object.keys(_scope.props.dictConfigs.xema.elements)
@@ -6238,8 +6238,8 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr122',
-          selector: '[expr122]'
+          redundantAttribute: 'expr148',
+          selector: '[expr148]'
         }
       ]
     ),
@@ -6438,7 +6438,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr131="expr131"></dict-config-nav><h3>Sketch Engine connection</h3><div class="row"><div class="input-field"><input expr132="expr132" placeholder id="kex_url" type="text" class/><label for="kex_url">Sketch Engine URL</label><span class="helper-text">The URL of the Sketch Engine installation where external links should point. Defaults to <tt expr133="expr133"></tt>. Do not change this unless you are using a local installation of Sketch Engine.</span></div></div><div class="row"><div class="input-field"><input expr134="expr134" placeholder id="kex_apiurl" type="text" class/><label for="kex_apiurl">Sketch Engine API URL</label><span class="helper-text">The path to the <tt expr135="expr135"></tt> API script in Sketch Engine. Defaults to <tt expr136="expr136"></tt>. Do not change this unless you are using a local installation of Sketch Engine.</span></div></div><template expr137="expr137"></template><template expr141="expr141"></template><div class="row"><h4>Examples</h4></div><div class="row"><div class="input-field"><select id="xampl_container"><option value>(not set)</option></select><label for="xampl_container">Example container</label><span class="helper-text">Select the element which should wrap each individual example. When you pull example sentences automatically from a corpus, Lexonomy will insert one of these elements for each example sentence.</span></div></div><div class="row"><div class="input-field"><textarea expr142="expr142" id="xampl_template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="xampl_template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each corpus example. The actual text will be where the placeholder <tt expr143="expr143"></tt> is.</span></div></div><div class="row"><div class="input-field"><select id="xampl_markup"><option value>(not set)</option></select><label for="xampl_markup">Headword mark-up</label><span class="helper-text">Select the element which should mark up the headword in inserted corpus examples. This setting is optional: if you make no selection, corpus examples will be inserted without mark-up.</span></div></div><div class="row"><h4>Collocations</h4></div><div class="row"><div class="input-field"><select id="collx_container"><option value>(not set)</option></select><label for="collx_container">Collocation container</label><span class="helper-text">Select the element which should wrap each collocation (the collocate plus any other data). When you pull collocations automatically from a corpus, Lexonomy will insert one of these elements for each collocation.</span></div></div><div class="row"><div class="input-field"><textarea expr144="expr144" id="collx_template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="collx_template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each collocation. The actual text will be where the placeholder <tt expr145="expr145"></tt> is.</span></div></div><div class="row"><h4>Thesaurus items</h4></div><div class="row"><div class="input-field"><select id="thes_container"><option value>(not set)</option></select><label for="thes_container">Thesaurus item container</label><span class="helper-text">Select the element which should wrap each individual thesaurus item (a word). When you pull thesaurus items automatically from a corpus, Lexonomy will insert one of these elements for each thesaurus item.</span></div></div><div class="row"><div class="input-field"><textarea expr146="expr146" id="thes_template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="thes_template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each thesaurus item. The actual text will be where the placeholder <tt expr147="expr147"></tt> is.</span></div></div><div class="row"><h4>Definitions</h4></div><div class="row"><div class="input-field"><select id="defo_container"><option value>(not set)</option></select><label for="defo_container">Definition container</label><span class="helper-text">Select the element which should wrap each definition. When you pull definitions automatically from a corpus, Lexonomy will insert one of these elements for each definition.</span></div></div><div class="row"><div class="input-field"><textarea expr148="expr148" id="defo_template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="defo_template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each definition. The actual text will be where the placeholder <tt expr149="expr149"></tt> is.</span></div></div><dict-config-buttons expr150="expr150"></dict-config-buttons>',
+      '<dict-config-nav expr121="expr121"></dict-config-nav><h3>Sketch Engine connection</h3><div class="row"><div class="input-field"><input expr122="expr122" placeholder id="kex_url" type="text" class/><label for="kex_url">Sketch Engine URL</label><span class="helper-text">The URL of the Sketch Engine installation where external links should point. Defaults to <tt expr123="expr123"></tt>. Do not change this unless you are using a local installation of Sketch Engine.</span></div></div><div class="row"><div class="input-field"><input expr124="expr124" placeholder id="kex_apiurl" type="text" class/><label for="kex_apiurl">Sketch Engine API URL</label><span class="helper-text">The path to the <tt expr125="expr125"></tt> API script in Sketch Engine. Defaults to <tt expr126="expr126"></tt>. Do not change this unless you are using a local installation of Sketch Engine.</span></div></div><template expr127="expr127"></template><template expr131="expr131"></template><div class="row"><h4>Examples</h4></div><div class="row"><div class="input-field"><select id="xampl_container"><option value>(not set)</option></select><label for="xampl_container">Example container</label><span class="helper-text">Select the element which should wrap each individual example. When you pull example sentences automatically from a corpus, Lexonomy will insert one of these elements for each example sentence.</span></div></div><div class="row"><div class="input-field"><textarea expr132="expr132" id="xampl_template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="xampl_template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each corpus example. The actual text will be where the placeholder <tt expr133="expr133"></tt> is.</span></div></div><div class="row"><div class="input-field"><select id="xampl_markup"><option value>(not set)</option></select><label for="xampl_markup">Headword mark-up</label><span class="helper-text">Select the element which should mark up the headword in inserted corpus examples. This setting is optional: if you make no selection, corpus examples will be inserted without mark-up.</span></div></div><div class="row"><h4>Collocations</h4></div><div class="row"><div class="input-field"><select id="collx_container"><option value>(not set)</option></select><label for="collx_container">Collocation container</label><span class="helper-text">Select the element which should wrap each collocation (the collocate plus any other data). When you pull collocations automatically from a corpus, Lexonomy will insert one of these elements for each collocation.</span></div></div><div class="row"><div class="input-field"><textarea expr134="expr134" id="collx_template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="collx_template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each collocation. The actual text will be where the placeholder <tt expr135="expr135"></tt> is.</span></div></div><div class="row"><h4>Thesaurus items</h4></div><div class="row"><div class="input-field"><select id="thes_container"><option value>(not set)</option></select><label for="thes_container">Thesaurus item container</label><span class="helper-text">Select the element which should wrap each individual thesaurus item (a word). When you pull thesaurus items automatically from a corpus, Lexonomy will insert one of these elements for each thesaurus item.</span></div></div><div class="row"><div class="input-field"><textarea expr136="expr136" id="thes_template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="thes_template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each thesaurus item. The actual text will be where the placeholder <tt expr137="expr137"></tt> is.</span></div></div><div class="row"><h4>Definitions</h4></div><div class="row"><div class="input-field"><select id="defo_container"><option value>(not set)</option></select><label for="defo_container">Definition container</label><span class="helper-text">Select the element which should wrap each definition. When you pull definitions automatically from a corpus, Lexonomy will insert one of these elements for each definition.</span></div></div><div class="row"><div class="input-field"><textarea expr138="expr138" id="defo_template" class="materialize-textarea" placeholder="XML template"> </textarea><label for="defo_template">XML template</label><span class="helper-text">This is the XML that will be inserted into your entries with each definition. The actual text will be where the placeholder <tt expr139="expr139"></tt> is.</span></div></div><dict-config-buttons expr140="expr140"></dict-config-buttons>',
       [
         {
           type: bindingTypes.TAG,
@@ -6469,12 +6469,12 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr131',
-          selector: '[expr131]'
+          redundantAttribute: 'expr121',
+          selector: '[expr121]'
         },
         {
-          redundantAttribute: 'expr132',
-          selector: '[expr132]',
+          redundantAttribute: 'expr122',
+          selector: '[expr122]',
 
           expressions: [
             {
@@ -6497,12 +6497,12 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr133',
-          selector: '[expr133]'
+          redundantAttribute: 'expr123',
+          selector: '[expr123]'
         },
         {
-          redundantAttribute: 'expr134',
-          selector: '[expr134]',
+          redundantAttribute: 'expr124',
+          selector: '[expr124]',
 
           expressions: [
             {
@@ -6525,8 +6525,8 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr135',
-          selector: '[expr135]'
+          redundantAttribute: 'expr125',
+          selector: '[expr125]'
         },
         {
           type: bindingTypes.TAG,
@@ -6542,21 +6542,21 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr136',
-          selector: '[expr136]'
+          redundantAttribute: 'expr126',
+          selector: '[expr126]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.userInfo.ske_username && _scope.props.userInfo.ske_apiKey && _scope.props.userInfo.ske_username != "" && _scope.props.userInfo.ske_apiKey != "",
-          redundantAttribute: 'expr137',
-          selector: '[expr137]',
+          redundantAttribute: 'expr127',
+          selector: '[expr127]',
 
           template: template(
-            '<div class="row"><div class="input-field"><input expr138="expr138" type="text" id="kex_corpus" class="autocomplete" placeholder="Retrieving available corpora from Sketch Engine, please wait..."/><label for="kex_corpus">Corpus name</label><span class="helper-text">Select a Sketch Engine corpus from the list of corpora available to you.</span><span class="helper-text" id="corpusInfo" style="display: none"></span></div></div><div class="row"><div class="input-field"><input expr139="expr139" placeholder id="kex_concquery" type="text" class/><label for="kex_concquery">Concordance query</label><span class="helper-text">The CQL query that will be used to obtain concordance from Sketch Engine. You can use placeholders for elements in the form of \'%(element)\', e.g. \'[lemma="%(headword)"]\'. If left empty the \'simple\' query type will be used as configured for the respective corpus. Please note that you cannot use CQL syntax with default attribute because it is not specified.</span></div></div><div class="row"><div class="input-field"><input expr140="expr140" placeholder id="kex_concsampling" type="number" class/><label for="kex_concsampling">Sample size</label><span class="helper-text">Whether to apply automatic sampling of the concordance. Any non-zero value means to automatically create a random sample of that size.</span></div></div><div class="row"><div class="input-field"><select id="kex_searchElements" multiple></select><label for="kex_searchElements">Additional search elements</label><span class="helper-text">You can select any textual elements here whose content you would like to search for in Sketch Engine. A menu will be displayed next to all these elements like for the root entry element.</span></div></div>',
+            '<div class="row"><div class="input-field"><input expr128="expr128" type="text" id="kex_corpus" class="autocomplete" placeholder="Retrieving available corpora from Sketch Engine, please wait..."/><label for="kex_corpus">Corpus name</label><span class="helper-text">Select a Sketch Engine corpus from the list of corpora available to you.</span><span class="helper-text" id="corpusInfo" style="display: none"></span></div></div><div class="row"><div class="input-field"><input expr129="expr129" placeholder id="kex_concquery" type="text" class/><label for="kex_concquery">Concordance query</label><span class="helper-text">The CQL query that will be used to obtain concordance from Sketch Engine. You can use placeholders for elements in the form of \'%(element)\', e.g. \'[lemma="%(headword)"]\'. If left empty the \'simple\' query type will be used as configured for the respective corpus. Please note that you cannot use CQL syntax with default attribute because it is not specified.</span></div></div><div class="row"><div class="input-field"><input expr130="expr130" placeholder id="kex_concsampling" type="number" class/><label for="kex_concsampling">Sample size</label><span class="helper-text">Whether to apply automatic sampling of the concordance. Any non-zero value means to automatically create a random sample of that size.</span></div></div><div class="row"><div class="input-field"><select id="kex_searchElements" multiple></select><label for="kex_searchElements">Additional search elements</label><span class="helper-text">You can select any textual elements here whose content you would like to search for in Sketch Engine. A menu will be displayed next to all these elements like for the root entry element.</span></div></div>',
             [
               {
-                redundantAttribute: 'expr138',
-                selector: '[expr138]',
+                redundantAttribute: 'expr128',
+                selector: '[expr128]',
 
                 expressions: [
                   {
@@ -6567,8 +6567,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr139',
-                selector: '[expr139]',
+                redundantAttribute: 'expr129',
+                selector: '[expr129]',
 
                 expressions: [
                   {
@@ -6578,8 +6578,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr140',
-                selector: '[expr140]',
+                redundantAttribute: 'expr130',
+                selector: '[expr130]',
 
                 expressions: [
                   {
@@ -6594,8 +6594,8 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.props.userInfo.ske_username || !_scope.props.userInfo.ske_apiKey || _scope.props.userInfo.ske_apiKey == "" || _scope.props.userInfo.ske_username == "",
-          redundantAttribute: 'expr141',
-          selector: '[expr141]',
+          redundantAttribute: 'expr131',
+          selector: '[expr131]',
 
           template: template(
             '<div class="card-panel amber lighten-2">\n         Please setup your Sketch Engine account in your <a href="#/userprofile">profile</a> settings to be able to select a corpus.\n      </div>',
@@ -6603,8 +6603,8 @@ div.myEditor input {font-weight: bold}`
           )
         },
         {
-          redundantAttribute: 'expr142',
-          selector: '[expr142]',
+          redundantAttribute: 'expr132',
+          selector: '[expr132]',
 
           expressions: [
             {
@@ -6628,12 +6628,12 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr143',
-          selector: '[expr143]'
+          redundantAttribute: 'expr133',
+          selector: '[expr133]'
         },
         {
-          redundantAttribute: 'expr144',
-          selector: '[expr144]',
+          redundantAttribute: 'expr134',
+          selector: '[expr134]',
 
           expressions: [
             {
@@ -6657,12 +6657,12 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr145',
-          selector: '[expr145]'
+          redundantAttribute: 'expr135',
+          selector: '[expr135]'
         },
         {
-          redundantAttribute: 'expr146',
-          selector: '[expr146]',
+          redundantAttribute: 'expr136',
+          selector: '[expr136]',
 
           expressions: [
             {
@@ -6686,12 +6686,12 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr147',
-          selector: '[expr147]'
+          redundantAttribute: 'expr137',
+          selector: '[expr137]'
         },
         {
-          redundantAttribute: 'expr148',
-          selector: '[expr148]',
+          redundantAttribute: 'expr138',
+          selector: '[expr138]',
 
           expressions: [
             {
@@ -6715,8 +6715,8 @@ div.myEditor input {font-weight: bold}`
           ],
 
           attributes: [],
-          redundantAttribute: 'expr149',
-          selector: '[expr149]'
+          redundantAttribute: 'expr139',
+          selector: '[expr139]'
         },
         {
           type: bindingTypes.TAG,
@@ -6737,8 +6737,8 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr150',
-          selector: '[expr150]'
+          redundantAttribute: 'expr140',
+          selector: '[expr140]'
         }
       ]
     ),
@@ -6819,7 +6819,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr181="expr181"></dict-config-nav><h3>Subentries</h3><div expr182="expr182" class="center-align grey-text"></div><template expr183="expr183"></template><br/><br/><dict-config-buttons expr190="expr190"></dict-config-buttons>',
+      '<dict-config-nav expr151="expr151"></dict-config-nav><h3>Subentries</h3><div expr152="expr152" class="center-align grey-text"></div><template expr153="expr153"></template><br/><br/><dict-config-buttons expr160="expr160"></dict-config-buttons>',
       [
         {
           type: bindingTypes.TAG,
@@ -6850,14 +6850,14 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr181',
-          selector: '[expr181]'
+          redundantAttribute: 'expr151',
+          selector: '[expr151]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.isLoading,
-          redundantAttribute: 'expr182',
-          selector: '[expr182]',
+          redundantAttribute: 'expr152',
+          selector: '[expr152]',
 
           template: template(
             '<h3>Loading elements...</h3>',
@@ -6867,17 +6867,17 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isLoading,
-          redundantAttribute: 'expr183',
-          selector: '[expr183]',
+          redundantAttribute: 'expr153',
+          selector: '[expr153]',
 
           template: template(
-            '<div><label>\n            Selected subentries\n         </label><div expr184="expr184" class="grey-text"></div><div expr185="expr185"></div><br/></div><template expr188="expr188"></template>',
+            '<div><label>\n            Selected subentries\n         </label><div expr154="expr154" class="grey-text"></div><div expr155="expr155"></div><br/></div><template expr158="expr158"></template>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.configData.elements.length,
-                redundantAttribute: 'expr184',
-                selector: '[expr184]',
+                redundantAttribute: 'expr154',
+                selector: '[expr154]',
 
                 template: template(
                   '<i>no subentry element selected</i>',
@@ -6887,11 +6887,11 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.configData.elements.length,
-                redundantAttribute: 'expr185',
-                selector: '[expr185]',
+                redundantAttribute: 'expr155',
+                selector: '[expr155]',
 
                 template: template(
-                  '<div expr186="expr186" class="chip"></div><br/>',
+                  '<div expr156="expr156" class="chip"></div><br/>',
                   [
                     {
                       type: bindingTypes.EACH,
@@ -6899,7 +6899,7 @@ div.myEditor input {font-weight: bold}`
                       condition: null,
 
                       template: template(
-                        ' <i expr187="expr187" class="close material-icons">close</i>',
+                        ' <i expr157="expr157" class="close material-icons">close</i>',
                         [
                           {
                             expressions: [
@@ -6916,8 +6916,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr187',
-                            selector: '[expr187]',
+                            redundantAttribute: 'expr157',
+                            selector: '[expr157]',
 
                             expressions: [
                               {
@@ -6930,8 +6930,8 @@ div.myEditor input {font-weight: bold}`
                         ]
                       ),
 
-                      redundantAttribute: 'expr186',
-                      selector: '[expr186]',
+                      redundantAttribute: 'expr156',
+                      selector: '[expr156]',
                       itemName: 'element',
                       indexName: null,
                       evaluate: _scope => _scope.configData.elements
@@ -6942,15 +6942,15 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.selectOptions.length,
-                redundantAttribute: 'expr188',
-                selector: '[expr188]',
+                redundantAttribute: 'expr158',
+                selector: '[expr158]',
 
                 template: template(
-                  '<label for="new-element">Add subentry element</label><div class="input-field"><div class="buttons" style="max-width: 500px;"><select id="new-element"></select><a expr189="expr189" class="btn" style="margin-top: 4px;">\n                  add\n                  <i class="material-icons right">add</i></a></div><span class="helper-text">Elements listed here function as subentries which can be shared by multiple entries.</span></div>',
+                  '<label for="new-element">Add subentry element</label><div class="input-field"><div class="buttons" style="max-width: 500px;"><select id="new-element"></select><a expr159="expr159" class="btn" style="margin-top: 4px;">\n                  add\n                  <i class="material-icons right">add</i></a></div><span class="helper-text">Elements listed here function as subentries which can be shared by multiple entries.</span></div>',
                   [
                     {
-                      redundantAttribute: 'expr189',
-                      selector: '[expr189]',
+                      redundantAttribute: 'expr159',
+                      selector: '[expr159]',
 
                       expressions: [
                         {
@@ -6985,8 +6985,8 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr190',
-          selector: '[expr190]'
+          redundantAttribute: 'expr160',
+          selector: '[expr160]'
         }
       ]
     ),
@@ -7015,7 +7015,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr151="expr151"></dict-config-nav><h3>Configuration</h3><div class="columnContainer" style="margin-left: 20px;"><div><h5 class="header">Manage dictionary</h5><ul><li><a expr152="expr152">Description</a></li><li><a expr153="expr153">Users</a></li><li><a expr154="expr154">Publishing</a></li><li><a expr155="expr155">Change URL</a></li></ul></div><div><h5 class="header">Entry settings</h5><ul><li><a expr156="expr156">Structure</a></li><li expr157="expr157"></li><li expr159="expr159"></li><li><a expr161="expr161">Headword list</a></li><li><a expr162="expr162">Searching</a></li></ul></div><div><h5 class="header">Expert settings</h5><ul><li><a expr163="expr163">Entry editor</a></li><li><a expr164="expr164">Flags</a></li><li><a expr165="expr165">Auto-numbering</a></li><li><a expr166="expr166">Linking</a></li><li><a expr167="expr167">Download settings</a></li><li><a expr168="expr168">Subentries</a></li><li><a expr169="expr169">Sketch Engine</a></li><li><a expr170="expr170">KonText</a></li><li><a expr171="expr171">Multimedia API</a></li></ul></div></div>',
+      '<dict-config-nav expr170="expr170"></dict-config-nav><h3>Configuration</h3><div class="columnContainer" style="margin-left: 20px;"><div><h5 class="header">Manage dictionary</h5><ul><li><a expr171="expr171">Description</a></li><li><a expr172="expr172">Users</a></li><li><a expr173="expr173">Publishing</a></li><li><a expr174="expr174">Change URL</a></li></ul></div><div><h5 class="header">Entry settings</h5><ul><li><a expr175="expr175">Structure</a></li><li expr176="expr176"></li><li expr178="expr178"></li><li><a expr180="expr180">Headword list</a></li><li><a expr181="expr181">Searching</a></li></ul></div><div><h5 class="header">Expert settings</h5><ul><li><a expr182="expr182">Entry editor</a></li><li><a expr183="expr183">Flags</a></li><li><a expr184="expr184">Auto-numbering</a></li><li><a expr185="expr185">Linking</a></li><li><a expr186="expr186">Download settings</a></li><li><a expr187="expr187">Subentries</a></li><li><a expr188="expr188">Sketch Engine</a></li><li><a expr189="expr189">KonText</a></li><li><a expr190="expr190">Multimedia API</a></li></ul></div></div>',
       [
         {
           type: bindingTypes.TAG,
@@ -7036,12 +7036,12 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr151',
-          selector: '[expr151]'
+          redundantAttribute: 'expr170',
+          selector: '[expr170]'
         },
         {
-          redundantAttribute: 'expr152',
-          selector: '[expr152]',
+          redundantAttribute: 'expr171',
+          selector: '[expr171]',
 
           expressions: [
             {
@@ -7059,8 +7059,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr153',
-          selector: '[expr153]',
+          redundantAttribute: 'expr172',
+          selector: '[expr172]',
 
           expressions: [
             {
@@ -7078,8 +7078,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr154',
-          selector: '[expr154]',
+          redundantAttribute: 'expr173',
+          selector: '[expr173]',
 
           expressions: [
             {
@@ -7097,8 +7097,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr155',
-          selector: '[expr155]',
+          redundantAttribute: 'expr174',
+          selector: '[expr174]',
 
           expressions: [
             {
@@ -7116,8 +7116,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr156',
-          selector: '[expr156]',
+          redundantAttribute: 'expr175',
+          selector: '[expr175]',
 
           expressions: [
             {
@@ -7137,15 +7137,15 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.props.dictDetails.xemplateOverride,
-          redundantAttribute: 'expr157',
-          selector: '[expr157]',
+          redundantAttribute: 'expr176',
+          selector: '[expr176]',
 
           template: template(
-            '<a expr158="expr158">Formatting</a>',
+            '<a expr177="expr177">Formatting</a>',
             [
               {
-                redundantAttribute: 'expr158',
-                selector: '[expr158]',
+                redundantAttribute: 'expr177',
+                selector: '[expr177]',
 
                 expressions: [
                   {
@@ -7168,15 +7168,15 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.dictDetails.xemplateOverride,
-          redundantAttribute: 'expr159',
-          selector: '[expr159]',
+          redundantAttribute: 'expr178',
+          selector: '[expr178]',
 
           template: template(
-            '<a expr160="expr160">Formatting</a>',
+            '<a expr179="expr179">Formatting</a>',
             [
               {
-                redundantAttribute: 'expr160',
-                selector: '[expr160]',
+                redundantAttribute: 'expr179',
+                selector: '[expr179]',
 
                 expressions: [
                   {
@@ -7197,8 +7197,8 @@ div.myEditor input {font-weight: bold}`
           )
         },
         {
-          redundantAttribute: 'expr161',
-          selector: '[expr161]',
+          redundantAttribute: 'expr180',
+          selector: '[expr180]',
 
           expressions: [
             {
@@ -7216,8 +7216,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr162',
-          selector: '[expr162]',
+          redundantAttribute: 'expr181',
+          selector: '[expr181]',
 
           expressions: [
             {
@@ -7235,8 +7235,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr163',
-          selector: '[expr163]',
+          redundantAttribute: 'expr182',
+          selector: '[expr182]',
 
           expressions: [
             {
@@ -7254,8 +7254,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr164',
-          selector: '[expr164]',
+          redundantAttribute: 'expr183',
+          selector: '[expr183]',
 
           expressions: [
             {
@@ -7273,8 +7273,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr165',
-          selector: '[expr165]',
+          redundantAttribute: 'expr184',
+          selector: '[expr184]',
 
           expressions: [
             {
@@ -7292,8 +7292,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr166',
-          selector: '[expr166]',
+          redundantAttribute: 'expr185',
+          selector: '[expr185]',
 
           expressions: [
             {
@@ -7311,8 +7311,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr167',
-          selector: '[expr167]',
+          redundantAttribute: 'expr186',
+          selector: '[expr186]',
 
           expressions: [
             {
@@ -7330,8 +7330,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr168',
-          selector: '[expr168]',
+          redundantAttribute: 'expr187',
+          selector: '[expr187]',
 
           expressions: [
             {
@@ -7349,8 +7349,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr169',
-          selector: '[expr169]',
+          redundantAttribute: 'expr188',
+          selector: '[expr188]',
 
           expressions: [
             {
@@ -7368,8 +7368,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr170',
-          selector: '[expr170]',
+          redundantAttribute: 'expr189',
+          selector: '[expr189]',
 
           expressions: [
             {
@@ -7387,8 +7387,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr171',
-          selector: '[expr171]',
+          redundantAttribute: 'expr190',
+          selector: '[expr190]',
 
           expressions: [
             {
@@ -7543,7 +7543,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr172="expr172"></dict-config-nav><h3>Headword</h3><div class="row"><div class="input-field col s6"><select id="headword"><option value>(not set)</option></select><label for="headword">Headword</label><span class="helper-text">Select the element which contains the entry\'s headword. If you make no selection here Lexonomy will try to guess what the headword of each entry is.</span></div></div><div class="row"><div class="input-field col s6"><select id="headwordSorting"><option value>(not set)</option></select><label for="headwordSorting">Headword sorting</label><span class="helper-text">Select the element which will be used for sorting of headwords in the entry list. If you make no selection here Lexonomy will use the element you chose for headword.</span></div><div class="input-field col s6"><label style="padding-top: 30px;"><input expr173="expr173" type="checkbox" id="sortDesc"/><span>Sort in descending order</span></label></div></div><div class="row"><h6>Headword annotations</h6></div><div class="row"><div class="col s5"><label><input expr174="expr174" name="hwannotype" type="radio" value="simple"/><span>simple</span></label><br/><div class="input-field"><select expr175="expr175" id="headwordAnnotations" multiple></select><span class="helper-text">You can select any elements here whose content you want displayed beside the headword in the entry list, such as homograph numbers or part-of-speech labels.</span></div></div><div class="col s5"><label><input expr176="expr176" name="hwannotype" type="radio" value="advanced"/><span>advanced</span></label><br/><div class="input-field"><textarea expr177="expr177" id="advancedAnnotations" class="materialize-textarea" placeholder="headword annotations"> </textarea><span class="helper-text">You can insert any HTML containing placeholders for elements in the form of \'%(element)\', e.g. \'&lt;b>%(headword)&lt;/b>\'.</span></div></div></div><div class="row"><div class="input-field col s8"><input expr178="expr178" type="text" id="sort_locale" class="autocomplete" placeholder="Type to search for language"/><label for="sort_locale">Alphabetical order</label><span class="helper-text">Select language to sort entries alphabetically in the entry list.</span></div></div><div class="row"><div class="input-field col s6"><input expr179="expr179" placeholder id="numberEntries" type="number" class/><label for="numberEntries">Number of entries to be shown in the entry list at once</label><span class="helper-text">If your dictionary contains large entries (large XML files), it is recommended to reduce this number for quicker loading of entry list.</span></div></div><dict-config-buttons expr180="expr180"></dict-config-buttons>',
+      '<dict-config-nav expr161="expr161"></dict-config-nav><h3>Headword</h3><div class="row"><div class="input-field col s6"><select id="headword"><option value>(not set)</option></select><label for="headword">Headword</label><span class="helper-text">Select the element which contains the entry\'s headword. If you make no selection here Lexonomy will try to guess what the headword of each entry is.</span></div></div><div class="row"><div class="input-field col s6"><select id="headwordSorting"><option value>(not set)</option></select><label for="headwordSorting">Headword sorting</label><span class="helper-text">Select the element which will be used for sorting of headwords in the entry list. If you make no selection here Lexonomy will use the element you chose for headword.</span></div><div class="input-field col s6"><label style="padding-top: 30px;"><input expr162="expr162" type="checkbox" id="sortDesc"/><span>Sort in descending order</span></label></div></div><div class="row"><h6>Headword annotations</h6></div><div class="row"><div class="col s5"><label><input expr163="expr163" name="hwannotype" type="radio" value="simple"/><span>simple</span></label><br/><div class="input-field"><select expr164="expr164" id="headwordAnnotations" multiple></select><span class="helper-text">You can select any elements here whose content you want displayed beside the headword in the entry list, such as homograph numbers or part-of-speech labels.</span></div></div><div class="col s5"><label><input expr165="expr165" name="hwannotype" type="radio" value="advanced"/><span>advanced</span></label><br/><div class="input-field"><textarea expr166="expr166" id="advancedAnnotations" class="materialize-textarea" placeholder="headword annotations"> </textarea><span class="helper-text">You can insert any HTML containing placeholders for elements in the form of \'%(element)\', e.g. \'&lt;b>%(headword)&lt;/b>\'.</span></div></div></div><div class="row"><div class="input-field col s8"><input expr167="expr167" type="text" id="sort_locale" class="autocomplete" placeholder="Type to search for language"/><label for="sort_locale">Alphabetical order</label><span class="helper-text">Select language to sort entries alphabetically in the entry list.</span></div></div><div class="row"><div class="input-field col s6"><input expr168="expr168" placeholder id="numberEntries" type="number" class/><label for="numberEntries">Number of entries to be shown in the entry list at once</label><span class="helper-text">If your dictionary contains large entries (large XML files), it is recommended to reduce this number for quicker loading of entry list.</span></div></div><dict-config-buttons expr169="expr169"></dict-config-buttons>',
       [
         {
           type: bindingTypes.TAG,
@@ -7574,12 +7574,12 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr172',
-          selector: '[expr172]'
+          redundantAttribute: 'expr161',
+          selector: '[expr161]'
         },
         {
-          redundantAttribute: 'expr173',
-          selector: '[expr173]',
+          redundantAttribute: 'expr162',
+          selector: '[expr162]',
 
           expressions: [
             {
@@ -7590,8 +7590,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr174',
-          selector: '[expr174]',
+          redundantAttribute: 'expr163',
+          selector: '[expr163]',
 
           expressions: [
             {
@@ -7607,8 +7607,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr175',
-          selector: '[expr175]',
+          redundantAttribute: 'expr164',
+          selector: '[expr164]',
 
           expressions: [
             {
@@ -7619,8 +7619,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr176',
-          selector: '[expr176]',
+          redundantAttribute: 'expr165',
+          selector: '[expr165]',
 
           expressions: [
             {
@@ -7636,8 +7636,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr177',
-          selector: '[expr177]',
+          redundantAttribute: 'expr166',
+          selector: '[expr166]',
 
           expressions: [
             {
@@ -7653,8 +7653,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr178',
-          selector: '[expr178]',
+          redundantAttribute: 'expr167',
+          selector: '[expr167]',
 
           expressions: [
             {
@@ -7665,8 +7665,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr179',
-          selector: '[expr179]',
+          redundantAttribute: 'expr168',
+          selector: '[expr168]',
 
           expressions: [
             {
@@ -7694,8 +7694,8 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr180',
-          selector: '[expr180]'
+          redundantAttribute: 'expr169',
+          selector: '[expr169]'
         }
       ]
     ),
@@ -7754,7 +7754,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr225="expr225"></dict-config-nav><h3>Change URL</h3><div class="row"><label for="url">Current URL</label><div style="margin: 0 0 30px;"><span expr226="expr226"> </span></div></div><div class="row"><label for="url">New URL</label><div><div style="display: flex; align-items: baseline;"><span id="baseUrl">https://www.lexonomy.eu/</span><span><input id="url" type="text" class="validate inlineBlock" required minlength="5" pattern="[a-zA-Z0-9\\-_]*" style="max-width: 300px;"/></span></div><div class="input-field" style="margin-top: 0;"><span class="helper-text">This will be your dictionary\'s address on the web. You will be able to change this later. Allowed: letters, numbers, - and _</span></div></div></div><dict-config-buttons expr227="expr227" label="Change"></dict-config-buttons><br/><div><span id="error" style="display:none">This URL is already taken.</span><span id="success" style="display:none">Your dictionary has been moved to a new URL. <a href id="newlink">Go to new dictionary URL</a>.</span></div>',
+      '<dict-config-nav expr251="expr251"></dict-config-nav><h3>Change URL</h3><div class="row"><label for="url">Current URL</label><div style="margin: 0 0 30px;"><span expr252="expr252"> </span></div></div><div class="row"><label for="url">New URL</label><div><div style="display: flex; align-items: baseline;"><span id="baseUrl">https://www.lexonomy.eu/</span><span><input id="url" type="text" class="validate inlineBlock" required minlength="5" pattern="[a-zA-Z0-9\\-_]*" style="max-width: 300px;"/></span></div><div class="input-field" style="margin-top: 0;"><span class="helper-text">This will be your dictionary\'s address on the web. You will be able to change this later. Allowed: letters, numbers, - and _</span></div></div></div><dict-config-buttons expr253="expr253" label="Change"></dict-config-buttons><br/><div><span id="error" style="display:none">This URL is already taken.</span><span id="success" style="display:none">Your dictionary has been moved to a new URL. <a href id="newlink">Go to new dictionary URL</a>.</span></div>',
       [
         {
           type: bindingTypes.TAG,
@@ -7785,12 +7785,12 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr225',
-          selector: '[expr225]'
+          redundantAttribute: 'expr251',
+          selector: '[expr251]'
         },
         {
-          redundantAttribute: 'expr226',
-          selector: '[expr226]',
+          redundantAttribute: 'expr252',
+          selector: '[expr252]',
 
           expressions: [
             {
@@ -7825,8 +7825,8 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr227',
-          selector: '[expr227]'
+          redundantAttribute: 'expr253',
+          selector: '[expr253]'
         }
       ]
     ),
@@ -7922,7 +7922,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr207="expr207"></dict-config-nav><h3>Users</h3><div expr208="expr208" class="center-align grey-text"></div><template expr209="expr209"></template>',
+      '<dict-config-nav expr191="expr191"></dict-config-nav><h3>Users</h3><div expr192="expr192" class="center-align grey-text"></div><template expr193="expr193"></template>',
       [
         {
           type: bindingTypes.TAG,
@@ -7953,14 +7953,14 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr207',
-          selector: '[expr207]'
+          redundantAttribute: 'expr191',
+          selector: '[expr191]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.isLoading,
-          redundantAttribute: 'expr208',
-          selector: '[expr208]',
+          redundantAttribute: 'expr192',
+          selector: '[expr192]',
 
           template: template(
             '<h3>Loading users...</h3>',
@@ -7970,24 +7970,24 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isLoading,
-          redundantAttribute: 'expr209',
-          selector: '[expr209]',
+          redundantAttribute: 'expr193',
+          selector: '[expr193]',
 
           template: template(
-            '<div expr210="expr210" class="grey-text center-align"></div><div><div expr213="expr213"></div></div>',
+            '<div expr194="expr194" class="grey-text center-align"></div><div><div expr197="expr197"></div></div>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.configData.users.length,
-                redundantAttribute: 'expr210',
-                selector: '[expr210]',
+                redundantAttribute: 'expr194',
+                selector: '[expr194]',
 
                 template: template(
-                  '<h4>No users</h4><br/><button expr211="expr211" class="btn btn-primary"><i class="material-icons right">add</i>\n            Add new user\n         </button><br/><br/><br/><br/><div class="buttons" style="justify-content: center;"><dict-config-buttons expr212="expr212"></dict-config-buttons></div>',
+                  '<h4>No users</h4><br/><button expr195="expr195" class="btn btn-primary"><i class="material-icons right">add</i>\n            Add new user\n         </button><br/><br/><br/><br/><div class="buttons" style="justify-content: center;"><dict-config-buttons expr196="expr196"></dict-config-buttons></div>',
                   [
                     {
-                      redundantAttribute: 'expr211',
-                      selector: '[expr211]',
+                      redundantAttribute: 'expr195',
+                      selector: '[expr195]',
 
                       expressions: [
                         {
@@ -8016,8 +8016,8 @@ div.myEditor input {font-weight: bold}`
                         }
                       ],
 
-                      redundantAttribute: 'expr212',
-                      selector: '[expr212]'
+                      redundantAttribute: 'expr196',
+                      selector: '[expr196]'
                     }
                   ]
                 )
@@ -8025,11 +8025,11 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.configData.users.length,
-                redundantAttribute: 'expr213',
-                selector: '[expr213]',
+                redundantAttribute: 'expr197',
+                selector: '[expr197]',
 
                 template: template(
-                  '<table><thead><tr style="border-bottom: none;"><th></th><th colspan="5">Privileges</th></tr><tr><th>User email</th><th>Edit</th><th>Configure</th><th>Download</th><th>Upload</th><th></th></tr></thead><tbody><tr expr214="expr214" no-reorder></tr></tbody></table><br/><div><button expr223="expr223" class="btn"><i class="material-icons right">add</i>\n               Add new user\n            </button></div><br/><br/><dict-config-buttons expr224="expr224"></dict-config-buttons><div id="userConfigError"></div>',
+                  '<table><thead><tr style="border-bottom: none;"><th></th><th colspan="5">Privileges</th></tr><tr><th>User email</th><th>Edit</th><th>Configure</th><th>Download</th><th>Upload</th><th></th></tr></thead><tbody><tr expr198="expr198" no-reorder></tr></tbody></table><br/><div><button expr207="expr207" class="btn"><i class="material-icons right">add</i>\n               Add new user\n            </button></div><br/><br/><dict-config-buttons expr208="expr208"></dict-config-buttons><div id="userConfigError"></div>',
                   [
                     {
                       type: bindingTypes.EACH,
@@ -8037,20 +8037,20 @@ div.myEditor input {font-weight: bold}`
                       condition: null,
 
                       template: template(
-                        '<td><span expr215="expr215"></span><span expr217="expr217"></span></td><td><label><input expr218="expr218" type="checkbox" name="canEdit"/><span></span></label></td><td><label><input expr219="expr219" type="checkbox" name="canConfig"/><span></span></label></td><td><label><input expr220="expr220" type="checkbox" name="canDownload"/><span></span></label></td><td><label><input expr221="expr221" type="checkbox" name="canEdit"/><span></span></label></td><td><a expr222="expr222" class="btn btn-floating delete-user"><i class="material-icons">delete</i></a></td>',
+                        '<td><span expr199="expr199"></span><span expr201="expr201"></span></td><td><label><input expr202="expr202" type="checkbox" name="canEdit"/><span></span></label></td><td><label><input expr203="expr203" type="checkbox" name="canConfig"/><span></span></label></td><td><label><input expr204="expr204" type="checkbox" name="canDownload"/><span></span></label></td><td><label><input expr205="expr205" type="checkbox" name="canEdit"/><span></span></label></td><td><a expr206="expr206" class="btn btn-floating delete-user"><i class="material-icons">delete</i></a></td>',
                         [
                           {
                             type: bindingTypes.IF,
                             evaluate: _scope => _scope.user.isEditable,
-                            redundantAttribute: 'expr215',
-                            selector: '[expr215]',
+                            redundantAttribute: 'expr199',
+                            selector: '[expr199]',
 
                             template: template(
-                              '<input expr216="expr216" id="new-email" type="email" class="validate" style="max-width: 300px;"/>',
+                              '<input expr200="expr200" id="new-email" type="email" class="validate" style="max-width: 300px;"/>',
                               [
                                 {
-                                  redundantAttribute: 'expr216',
-                                  selector: '[expr216]',
+                                  redundantAttribute: 'expr200',
+                                  selector: '[expr200]',
 
                                   expressions: [
                                     {
@@ -8066,8 +8066,8 @@ div.myEditor input {font-weight: bold}`
                           {
                             type: bindingTypes.IF,
                             evaluate: _scope => !_scope.user.isEditable,
-                            redundantAttribute: 'expr217',
-                            selector: '[expr217]',
+                            redundantAttribute: 'expr201',
+                            selector: '[expr201]',
 
                             template: template(
                               ' ',
@@ -8090,8 +8090,8 @@ div.myEditor input {font-weight: bold}`
                             )
                           },
                           {
-                            redundantAttribute: 'expr218',
-                            selector: '[expr218]',
+                            redundantAttribute: 'expr202',
+                            selector: '[expr202]',
 
                             expressions: [
                               {
@@ -8107,8 +8107,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr219',
-                            selector: '[expr219]',
+                            redundantAttribute: 'expr203',
+                            selector: '[expr203]',
 
                             expressions: [
                               {
@@ -8124,8 +8124,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr220',
-                            selector: '[expr220]',
+                            redundantAttribute: 'expr204',
+                            selector: '[expr204]',
 
                             expressions: [
                               {
@@ -8141,8 +8141,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr221',
-                            selector: '[expr221]',
+                            redundantAttribute: 'expr205',
+                            selector: '[expr205]',
 
                             expressions: [
                               {
@@ -8158,8 +8158,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr222',
-                            selector: '[expr222]',
+                            redundantAttribute: 'expr206',
+                            selector: '[expr206]',
 
                             expressions: [
                               {
@@ -8172,15 +8172,15 @@ div.myEditor input {font-weight: bold}`
                         ]
                       ),
 
-                      redundantAttribute: 'expr214',
-                      selector: '[expr214]',
+                      redundantAttribute: 'expr198',
+                      selector: '[expr198]',
                       itemName: 'user',
                       indexName: 'idx',
                       evaluate: _scope => _scope.configData.users
                     },
                     {
-                      redundantAttribute: 'expr223',
-                      selector: '[expr223]',
+                      redundantAttribute: 'expr207',
+                      selector: '[expr207]',
 
                       expressions: [
                         {
@@ -8209,8 +8209,8 @@ div.myEditor input {font-weight: bold}`
                         }
                       ],
 
-                      redundantAttribute: 'expr224',
-                      selector: '[expr224]'
+                      redundantAttribute: 'expr208',
+                      selector: '[expr208]'
                     }
                   ]
                 )
@@ -8367,7 +8367,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr191="expr191"></dict-config-nav><h3>Entry structure</h3><div expr192="expr192"></div><template expr193="expr193"></template>',
+      '<dict-config-nav expr384="expr384"></dict-config-nav><h3>Entry structure</h3><div expr385="expr385"></div><template expr386="expr386"></template>',
       [
         {
           type: bindingTypes.TAG,
@@ -8398,14 +8398,14 @@ div.myEditor input {font-weight: bold}`
             }
           ],
 
-          redundantAttribute: 'expr191',
-          selector: '[expr191]'
+          redundantAttribute: 'expr384',
+          selector: '[expr384]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.state.xema,
-          redundantAttribute: 'expr192',
-          selector: '[expr192]',
+          redundantAttribute: 'expr385',
+          selector: '[expr385]',
 
           template: template(
             'Loading...',
@@ -8415,20 +8415,20 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.state.xema,
-          redundantAttribute: 'expr193',
-          selector: '[expr193]',
+          redundantAttribute: 'expr386',
+          selector: '[expr386]',
 
           template: template(
-            '<div expr194="expr194" id="editor" class="editor designer"></div><div expr198="expr198"></div><div><button expr205="expr205" class="btn waves-effect waves-light"> <i class="material-icons right">edit</i></button></div><dict-config-buttons expr206="expr206"></dict-config-buttons>',
+            '<div expr387="expr387" id="editor" class="editor designer"></div><div expr391="expr391"></div><div><button expr398="expr398" class="btn waves-effect waves-light"> <i class="material-icons right">edit</i></button></div><dict-config-buttons expr399="expr399"></dict-config-buttons>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.state.override,
-                redundantAttribute: 'expr194',
-                selector: '[expr194]',
+                redundantAttribute: 'expr387',
+                selector: '[expr387]',
 
                 template: template(
-                  '<div class="list"><dict-config-element-in-tree expr195="expr195"></dict-config-element-in-tree></div><div class="details"><dict-config-xema-element expr196="expr196"></dict-config-xema-element><dict-config-xema-attribute expr197="expr197"></dict-config-xema-attribute></div>',
+                  '<div class="list"><dict-config-element-in-tree expr388="expr388"></dict-config-element-in-tree></div><div class="details"><dict-config-xema-element expr389="expr389"></dict-config-xema-element><dict-config-xema-attribute expr390="expr390"></dict-config-xema-attribute></div>',
                   [
                     {
                       type: bindingTypes.EACH,
@@ -8475,8 +8475,8 @@ div.myEditor input {font-weight: bold}`
                         ]
                       ),
 
-                      redundantAttribute: 'expr195',
-                      selector: '[expr195]',
+                      redundantAttribute: 'expr388',
+                      selector: '[expr388]',
                       itemName: 'root',
                       indexName: null,
                       evaluate: _scope => _scope.state.roots
@@ -8484,8 +8484,8 @@ div.myEditor input {font-weight: bold}`
                     {
                       type: bindingTypes.IF,
                       evaluate: _scope => _scope.state.currentElement && !_scope.state.currentAttribute,
-                      redundantAttribute: 'expr196',
-                      selector: '[expr196]',
+                      redundantAttribute: 'expr389',
+                      selector: '[expr389]',
 
                       template: template(
                         null,
@@ -8540,8 +8540,8 @@ div.myEditor input {font-weight: bold}`
                     {
                       type: bindingTypes.IF,
                       evaluate: _scope => _scope.state.currentElement && _scope.state.currentAttribute,
-                      redundantAttribute: 'expr197',
-                      selector: '[expr197]',
+                      redundantAttribute: 'expr390',
+                      selector: '[expr390]',
 
                       template: template(
                         null,
@@ -8594,15 +8594,15 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.state.override,
-                redundantAttribute: 'expr198',
-                selector: '[expr198]',
+                redundantAttribute: 'expr391',
+                selector: '[expr391]',
 
                 template: template(
-                  '<div class="row"><div class="col s10"><p>To specify your custom Lexonomy schema use either <i>Xonomy Document Specification</i>, or <i>DTD</i>.</p><h5>Xonomy Document Specification</h5><p>A <a href="http://www.lexiconista.com/xonomy/" target="_blank">Xonomy Document Specification</a> is a JavaScript object which configures the Xonomy XML editor used in Lexonomy.</p></div></div><div class="row"><div class="input-field col s10"><textarea expr199="expr199" id="editor_doc" class="materialize-textarea" placeholder> </textarea><label for="editor_doc">Document specification</label><span class="helper-text">Xonomy Document Specification. If you would like to see an example, <a expr200="expr200">click here to load a sample specification</a>.</span></div></div><div class="row"><div class="input-field col s10"><textarea expr201="expr201" id="editor_xml" class="materialize-textarea" placeholder> </textarea><label for="editor_xml">Template for new entries</label><span class="helper-text">XML template for newly created entries. If you would like to see an example, <a expr202="expr202">click here to load a sample XML template</a>.</span></div></div><div class="row"><div class="col s10"><h5>DTD (Document Type Defition)</h5><p><a href="https://en.wikipedia.org/wiki/Document_type_definition" target="_blank">Document Type Definitions</a> are a popular formalism for defining the structure of XML documents.</p></div></div><div class="row"><div class="input-field col s10"><textarea expr203="expr203" id="editor_dtd" class="materialize-textarea" placeholder> </textarea><label for="editor_dtd">Your DTD</label><span class="helper-text">If you would like to see an example, <a expr204="expr204">click here to load a sample DTD</a>.</span></div></div>',
+                  '<div class="row"><div class="col s10"><p>To specify your custom Lexonomy schema use either <i>Xonomy Document Specification</i>, or <i>DTD</i>.</p><h5>Xonomy Document Specification</h5><p>A <a href="http://www.lexiconista.com/xonomy/" target="_blank">Xonomy Document Specification</a> is a JavaScript object which configures the Xonomy XML editor used in Lexonomy.</p></div></div><div class="row"><div class="input-field col s10"><textarea expr392="expr392" id="editor_doc" class="materialize-textarea" placeholder> </textarea><label for="editor_doc">Document specification</label><span class="helper-text">Xonomy Document Specification. If you would like to see an example, <a expr393="expr393">click here to load a sample specification</a>.</span></div></div><div class="row"><div class="input-field col s10"><textarea expr394="expr394" id="editor_xml" class="materialize-textarea" placeholder> </textarea><label for="editor_xml">Template for new entries</label><span class="helper-text">XML template for newly created entries. If you would like to see an example, <a expr395="expr395">click here to load a sample XML template</a>.</span></div></div><div class="row"><div class="col s10"><h5>DTD (Document Type Defition)</h5><p><a href="https://en.wikipedia.org/wiki/Document_type_definition" target="_blank">Document Type Definitions</a> are a popular formalism for defining the structure of XML documents.</p></div></div><div class="row"><div class="input-field col s10"><textarea expr396="expr396" id="editor_dtd" class="materialize-textarea" placeholder> </textarea><label for="editor_dtd">Your DTD</label><span class="helper-text">If you would like to see an example, <a expr397="expr397">click here to load a sample DTD</a>.</span></div></div>',
                   [
                     {
-                      redundantAttribute: 'expr199',
-                      selector: '[expr199]',
+                      redundantAttribute: 'expr392',
+                      selector: '[expr392]',
 
                       expressions: [
                         {
@@ -8613,8 +8613,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr200',
-                      selector: '[expr200]',
+                      redundantAttribute: 'expr393',
+                      selector: '[expr393]',
 
                       expressions: [
                         {
@@ -8625,8 +8625,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr201',
-                      selector: '[expr201]',
+                      redundantAttribute: 'expr394',
+                      selector: '[expr394]',
 
                       expressions: [
                         {
@@ -8637,8 +8637,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr202',
-                      selector: '[expr202]',
+                      redundantAttribute: 'expr395',
+                      selector: '[expr395]',
 
                       expressions: [
                         {
@@ -8649,8 +8649,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr203',
-                      selector: '[expr203]',
+                      redundantAttribute: 'expr396',
+                      selector: '[expr396]',
 
                       expressions: [
                         {
@@ -8661,8 +8661,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr204',
-                      selector: '[expr204]',
+                      redundantAttribute: 'expr397',
+                      selector: '[expr397]',
 
                       expressions: [
                         {
@@ -8676,8 +8676,8 @@ div.myEditor input {font-weight: bold}`
                 )
               },
               {
-                redundantAttribute: 'expr205',
-                selector: '[expr205]',
+                redundantAttribute: 'expr398',
+                selector: '[expr398]',
 
                 expressions: [
                   {
@@ -8716,8 +8716,8 @@ div.myEditor input {font-weight: bold}`
                   }
                 ],
 
-                redundantAttribute: 'expr206',
-                selector: '[expr206]'
+                redundantAttribute: 'expr399',
+                selector: '[expr399]'
               }
             ]
           )
@@ -8747,6 +8747,11 @@ div.myEditor input {font-weight: bold}`
               this.state.config.elementName = this.state.config.elementName || this.props.elementId;
               this.state.isAddingAttribute = false;
               this.state.newAttributeName = '';
+
+              // Value from list.
+              this.state.isAddingValue = false;
+              this.state.newValue = '';
+              this.state.newCaption = '';
 
               const xemaEntries = Object.entries(this.props.xema.elements).map(([id, config]) => ({
                   ...config,
@@ -8968,6 +8973,44 @@ div.myEditor input {font-weight: bold}`
           this.update();
       },
 
+      /** User is adding a new value */
+      beginNewValue(event) {
+          this.state.isAddingValue = true;
+          this.update();
+      },
+
+      /** User canceled adding a new value */
+      cancelNewValue(event) {
+          this.state.isAddingValue = false;
+          this.state.newValue = '';
+          this.state.newCaption = '';
+          this.state.newValueError = '';
+          this.update();
+      },
+
+      /** User commits new value */
+      saveNewValue(event) {
+          if (event) event.preventDefault(); // form submit
+
+          const value = this.state.newValue;
+          this.state.newCaption;
+          if (this.state.config.values.find(v => v.value === value)) {
+              this.state.newValueError = `Value ${value} already exists`;
+              return;
+          }
+
+          this.state.config.values.push({
+              value: this.state.newValue,
+              caption: this.state.newCaption,
+          });
+          this.state.newValueError = '';
+          // Keep open, nice and simple.
+          // this.state.isAddingValue = false;
+          this.state.newValue = '';
+          this.state.newCaption = '';
+          this.applyLocalData();
+      },
+
       /**
        * Set or return the value at an arbitrary property path
        * @param object any object 
@@ -9022,11 +9065,11 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<div class="block"><div class="title">Element</div><input expr424="expr424" class="textbox tech elName" data-path="config.elementName"/><template expr425="expr425"></template></div><div class="block"><div class="title tight">Attributes</div><table><tr expr429="expr429"></tr></table><button expr435="expr435" class="butAtNewOpener iconAdd"></button><template expr436="expr436"></template></div><div class="block"><div class="title">Content</div><label class="radio"><input expr443="expr443" type="radio" name="filling" value="chd" data-apply data-path="config.filling"/>Child elements</label><label class="radio"><input expr444="expr444" type="radio" name="filling" value="txt" data-apply data-path="config.filling"/>Text</label><label class="radio"><input expr445="expr445" type="radio" name="filling" value="inl" data-apply data-path="config.filling"/>Text with markup</label><label class="radio"><input expr446="expr446" type="radio" name="filling" value="lst" data-apply data-path="config.filling"/>Value from list</label><label class="radio"><input expr447="expr447" type="radio" name="filling" value="emp" data-apply data-path="config.filling"/>Empty</label><label class="radio"><input expr448="expr448" type="radio" name="filling" value="med" data-apply data-path="config.filling"/>Media</label></div><div class="block"><div class="title tight">Child elements</div><table expr449="expr449"></table><button expr461="expr461" class="butElNewOpener iconAdd"></button><template expr462="expr462"></template></div>',
+      '<div class="block"><div class="title">Element</div><input expr936="expr936" class="textbox tech elName" data-path="config.elementName"/><template expr937="expr937"></template></div><div class="block"><div class="title tight">Attributes</div><table><tr expr941="expr941"></tr></table><button expr947="expr947" class="butAtNewOpener iconAdd"></button><template expr948="expr948"></template></div><div class="block"><div class="title">Content</div><label class="radio"><input expr955="expr955" type="radio" name="filling" value="chd" data-apply data-path="config.filling"/>Child elements</label><label class="radio"><input expr956="expr956" type="radio" name="filling" value="txt" data-apply data-path="config.filling"/>Text</label><label class="radio"><input expr957="expr957" type="radio" name="filling" value="inl" data-apply data-path="config.filling"/>Text with markup</label><label class="radio"><input expr958="expr958" type="radio" name="filling" value="lst" data-apply data-path="config.filling"/>Value from list</label><label class="radio"><input expr959="expr959" type="radio" name="filling" value="emp" data-apply data-path="config.filling"/>Empty</label><label class="radio"><input expr960="expr960" type="radio" name="filling" value="med" data-apply data-path="config.filling"/>Media</label></div><div expr961="expr961" class="block"></div><div expr978="expr978" class="block"></div>',
       [
         {
-          redundantAttribute: 'expr424',
-          selector: '[expr424]',
+          redundantAttribute: 'expr936',
+          selector: '[expr936]',
 
           expressions: [
             {
@@ -9043,17 +9086,17 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.state.config.elementName !== (_scope.props.config.elementName || _scope.props.elementId),
-          redundantAttribute: 'expr425',
-          selector: '[expr425]',
+          redundantAttribute: 'expr937',
+          selector: '[expr937]',
 
           template: template(
-            '<button expr426="expr426" type="button" class="butRename iconAccept"></button><button expr427="expr427" type="button" class="butRenameCancel iconCancel" data-path="config.elementName">\n                Cancel renaming\n            </button><div expr428="expr428" class="warn"></div>',
+            '<button expr938="expr938" type="button" class="butRename iconAccept"></button><button expr939="expr939" type="button" class="butRenameCancel iconCancel" data-path="config.elementName">\n                Cancel renaming\n            </button><div expr940="expr940" class="warn"></div>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.isValidXmlName(_scope.state.config.elementName),
-                redundantAttribute: 'expr426',
-                selector: '[expr426]',
+                redundantAttribute: 'expr938',
+                selector: '[expr938]',
 
                 template: template(
                   '\n                Rename\n            ',
@@ -9071,8 +9114,8 @@ div.myEditor input {font-weight: bold}`
                 )
               },
               {
-                redundantAttribute: 'expr427',
-                selector: '[expr427]',
+                redundantAttribute: 'expr939',
+                selector: '[expr939]',
 
                 expressions: [
                   {
@@ -9085,8 +9128,8 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.isValidXmlName(_scope.state.config.elementName),
-                redundantAttribute: 'expr428',
-                selector: '[expr428]',
+                redundantAttribute: 'expr940',
+                selector: '[expr940]',
 
                 template: template(
                   ' ',
@@ -9118,11 +9161,11 @@ div.myEditor input {font-weight: bold}`
           condition: null,
 
           template: template(
-            '<td expr430="expr430" class="cell1"><span class="tech"><span class="ats">@</span><span expr431="expr431" class="att"> </span></span></td><td class="cell2"><span><label class="radio"><input expr432="expr432" type="radio" value="optional" data-apply/>optional</label><label class="radio"><input expr433="expr433" type="radio" value="obligatory" data-apply/>obligatory</label></span></td><td class="cell9"><button expr434="expr434" class="iconOnly iconCross" data-apply>&nbsp;</button></td>',
+            '<td expr942="expr942" class="cell1"><span class="tech"><span class="ats">@</span><span expr943="expr943" class="att"> </span></span></td><td class="cell2"><span><label class="radio"><input expr944="expr944" type="radio" value="optional" data-apply/>optional</label><label class="radio"><input expr945="expr945" type="radio" value="obligatory" data-apply/>obligatory</label></span></td><td class="cell9"><button expr946="expr946" class="iconOnly iconCross" data-apply>&nbsp;</button></td>',
             [
               {
-                redundantAttribute: 'expr430',
-                selector: '[expr430]',
+                redundantAttribute: 'expr942',
+                selector: '[expr942]',
 
                 expressions: [
                   {
@@ -9138,8 +9181,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr431',
-                selector: '[expr431]',
+                redundantAttribute: 'expr943',
+                selector: '[expr943]',
 
                 expressions: [
                   {
@@ -9150,8 +9193,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr432',
-                selector: '[expr432]',
+                redundantAttribute: 'expr944',
+                selector: '[expr944]',
 
                 expressions: [
                   {
@@ -9177,8 +9220,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr433',
-                selector: '[expr433]',
+                redundantAttribute: 'expr945',
+                selector: '[expr945]',
 
                 expressions: [
                   {
@@ -9204,8 +9247,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr434',
-                selector: '[expr434]',
+                redundantAttribute: 'expr946',
+                selector: '[expr946]',
 
                 expressions: [
                   {
@@ -9223,8 +9266,8 @@ div.myEditor input {font-weight: bold}`
             ]
           ),
 
-          redundantAttribute: 'expr429',
-          selector: '[expr429]',
+          redundantAttribute: 'expr941',
+          selector: '[expr941]',
           itemName: 'att',
           indexName: null,
           evaluate: _scope => Object.entries(_scope.state.config.attributes).sort((a, b) => a[0].localeCompare(b[0]))
@@ -9232,8 +9275,8 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.state.isAddingAttribute,
-          redundantAttribute: 'expr435',
-          selector: '[expr435]',
+          redundantAttribute: 'expr947',
+          selector: '[expr947]',
 
           template: template(
             '\n            Add...\n        ',
@@ -9253,15 +9296,15 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.state.isAddingAttribute,
-          redundantAttribute: 'expr436',
-          selector: '[expr436]',
+          redundantAttribute: 'expr948',
+          selector: '[expr948]',
 
           template: template(
-            '<form expr437="expr437"><input expr438="expr438" class="textbox tech atName txtAtNew" data-path="newAttributeName" focus/><button expr439="expr439" class="butAtNew iconAccept"></button><button expr440="expr440" class="butAtNewCancel iconCancel">Cancel</button></form><div expr441="expr441" class="warn errInvalidAtName"></div><div expr442="expr442" class="warn errAtNameExists"></div>',
+            '<form expr949="expr949"><input expr950="expr950" class="textbox tech atName txtAtNew" data-path="newAttributeName" autofocus/><button expr951="expr951" class="butAtNew iconAccept"></button><button expr952="expr952" class="butAtNewCancel iconCancel">Cancel</button></form><div expr953="expr953" class="warn errInvalidAtName"></div><div expr954="expr954" class="warn errAtNameExists"></div>',
             [
               {
-                redundantAttribute: 'expr437',
-                selector: '[expr437]',
+                redundantAttribute: 'expr949',
+                selector: '[expr949]',
 
                 expressions: [
                   {
@@ -9272,8 +9315,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr438',
-                selector: '[expr438]',
+                redundantAttribute: 'expr950',
+                selector: '[expr950]',
 
                 expressions: [
                   {
@@ -9286,8 +9329,8 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.state.newAttributeName && _scope.isValidXmlName(_scope.state.newAttributeName),
-                redundantAttribute: 'expr439',
-                selector: '[expr439]',
+                redundantAttribute: 'expr951',
+                selector: '[expr951]',
 
                 template: template(
                   'Add',
@@ -9305,8 +9348,8 @@ div.myEditor input {font-weight: bold}`
                 )
               },
               {
-                redundantAttribute: 'expr440',
-                selector: '[expr440]',
+                redundantAttribute: 'expr952',
+                selector: '[expr952]',
 
                 expressions: [
                   {
@@ -9319,8 +9362,8 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.isValidXmlName(_scope.state.newAttributeName),
-                redundantAttribute: 'expr441',
-                selector: '[expr441]',
+                redundantAttribute: 'expr953',
+                selector: '[expr953]',
 
                 template: template(
                   'Cannot add, not a valid XML name.',
@@ -9330,8 +9373,8 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.state.config.attributes[_scope.state.newAttributeName],
-                redundantAttribute: 'expr442',
-                selector: '[expr442]',
+                redundantAttribute: 'expr954',
+                selector: '[expr954]',
 
                 template: template(
                   'Cannot add, such attribute already exists.',
@@ -9342,8 +9385,8 @@ div.myEditor input {font-weight: bold}`
           )
         },
         {
-          redundantAttribute: 'expr443',
-          selector: '[expr443]',
+          redundantAttribute: 'expr955',
+          selector: '[expr955]',
 
           expressions: [
             {
@@ -9359,8 +9402,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr444',
-          selector: '[expr444]',
+          redundantAttribute: 'expr956',
+          selector: '[expr956]',
 
           expressions: [
             {
@@ -9376,8 +9419,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr445',
-          selector: '[expr445]',
+          redundantAttribute: 'expr957',
+          selector: '[expr957]',
 
           expressions: [
             {
@@ -9393,8 +9436,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr446',
-          selector: '[expr446]',
+          redundantAttribute: 'expr958',
+          selector: '[expr958]',
 
           expressions: [
             {
@@ -9410,8 +9453,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr447',
-          selector: '[expr447]',
+          redundantAttribute: 'expr959',
+          selector: '[expr959]',
 
           expressions: [
             {
@@ -9427,8 +9470,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr448',
-          selector: '[expr448]',
+          redundantAttribute: 'expr960',
+          selector: '[expr960]',
 
           expressions: [
             {
@@ -9445,12 +9488,12 @@ div.myEditor input {font-weight: bold}`
         },
         {
           type: bindingTypes.IF,
-          evaluate: _scope => _scope.state.config.children.length,
-          redundantAttribute: 'expr449',
-          selector: '[expr449]',
+          evaluate: _scope => _scope.state.config.filling === "lst",
+          redundantAttribute: 'expr961',
+          selector: '[expr961]',
 
           template: template(
-            '<tr expr450="expr450"></tr>',
+            '<div class="title">Values</div><table><tr expr962="expr962"></tr></table><template expr970="expr970"></template><form expr972="expr972" style="white-space: nowrap;"></form>',
             [
               {
                 type: bindingTypes.EACH,
@@ -9458,82 +9501,127 @@ div.myEditor input {font-weight: bold}`
                 condition: null,
 
                 template: template(
-                  '<td expr451="expr451" class="cell1"><span class="tech"><span class="brak">&lt;</span><span expr452="expr452" class="elm"> </span><span class="brak">&gt;</span></span></td><td class="cell2" style="white-space: nowrap;"><label>min <input expr453="expr453" class="textbox min" type="number" data-apply/></label><label>max <input expr454="expr454" class="textbox max" type="number" data-apply/></label></td><td class="cell9"><button expr455="expr455" class="iconOnly iconCross" data-apply>&nbsp;</button></td><td><div><button expr456="expr456"></button><template expr457="expr457"></template></div></td>',
+                  '<td class="cell1"><form expr963="expr963" style="white-space: nowrap;"><input expr964="expr964" class="textbox val" placeholder="value"/><input expr965="expr965" class="textbox cap" placeholder="caption"/><template expr966="expr966"></template></form></td><td class="cell9"><button expr969="expr969" class="iconOnly iconCross" data-apply>&nbsp;</button></td>',
                   [
                     {
-                      redundantAttribute: 'expr451',
-                      selector: '[expr451]',
+                      redundantAttribute: 'expr963',
+                      selector: '[expr963]',
 
                       expressions: [
                         {
                           type: expressionTypes.EVENT,
-                          name: 'onclick',
-                          evaluate: _scope => _scope.selectElement
-                        },
-                        {
-                          type: expressionTypes.ATTRIBUTE,
-                          name: 'data-name',
-                          evaluate: _scope => _scope.child.id
+                          name: 'onsubmit',
+                          evaluate: _scope => _scope.applyLocalData
                         }
                       ]
                     },
                     {
-                      redundantAttribute: 'expr452',
-                      selector: '[expr452]',
-
-                      expressions: [
-                        {
-                          type: expressionTypes.TEXT,
-                          childNodeIndex: 0,
-                          evaluate: _scope => _scope.child.elementName
-                        }
-                      ]
-                    },
-                    {
-                      redundantAttribute: 'expr453',
-                      selector: '[expr453]',
+                      redundantAttribute: 'expr964',
+                      selector: '[expr964]',
 
                       expressions: [
                         {
                           type: expressionTypes.VALUE,
-                          evaluate: _scope => _scope.child.min
+                          evaluate: _scope => _scope.value.value
                         },
                         {
                           type: expressionTypes.EVENT,
-                          name: 'onchange',
+                          name: 'oninput',
                           evaluate: _scope => _scope.updateLocalData
                         },
                         {
                           type: expressionTypes.ATTRIBUTE,
                           name: 'data-path',
-                          evaluate: _scope => `config.children[${_scope.index}].min`
+
+                          evaluate: _scope => [
+                            'config.values[',
+                            _scope.index,
+                            '].value'
+                          ].join(
+                            ''
+                          )
                         }
                       ]
                     },
                     {
-                      redundantAttribute: 'expr454',
-                      selector: '[expr454]',
+                      redundantAttribute: 'expr965',
+                      selector: '[expr965]',
 
                       expressions: [
                         {
                           type: expressionTypes.VALUE,
-                          evaluate: _scope => _scope.child.max
+                          evaluate: _scope => _scope.value.caption
                         },
                         {
                           type: expressionTypes.EVENT,
-                          name: 'onchange',
+                          name: 'oninput',
                           evaluate: _scope => _scope.updateLocalData
                         },
                         {
                           type: expressionTypes.ATTRIBUTE,
                           name: 'data-path',
-                          evaluate: _scope => `config.children[${_scope.index}].max`
+
+                          evaluate: _scope => [
+                            'config.values[',
+                            _scope.index,
+                            '].caption'
+                          ].join(
+                            ''
+                          )
                         }
                       ]
                     },
                     {
-                      redundantAttribute: 'expr455',
-                      selector: '[expr455]',
+                      type: bindingTypes.IF,
+                      evaluate: _scope => _scope.value.value !== _scope.props.config.values[_scope.index].value || _scope.value.caption !== _scope.props.config.values[_scope.index].caption,
+                      redundantAttribute: 'expr966',
+                      selector: '[expr966]',
+
+                      template: template(
+                        '<button expr967="expr967" class="change iconAccept" type="submit">Change</button><button expr968="expr968" class="cancel iconCancel" type="button">Cancel</button>',
+                        [
+                          {
+                            redundantAttribute: 'expr967',
+                            selector: '[expr967]',
+
+                            expressions: [
+                              {
+                                type: expressionTypes.EVENT,
+                                name: 'onclick',
+                                evaluate: _scope => _scope.applyLocalData
+                              }
+                            ]
+                          },
+                          {
+                            redundantAttribute: 'expr968',
+                            selector: '[expr968]',
+
+                            expressions: [
+                              {
+                                type: expressionTypes.EVENT,
+                                name: 'onclick',
+                                evaluate: _scope => _scope.resetLocalData
+                              },
+                              {
+                                type: expressionTypes.ATTRIBUTE,
+                                name: 'data-path',
+
+                                evaluate: _scope => [
+                                  'config.values[',
+                                  _scope.index,
+                                  ']'
+                                ].join(
+                                  ''
+                                )
+                              }
+                            ]
+                          }
+                        ]
+                      )
+                    },
+                    {
+                      redundantAttribute: 'expr969',
+                      selector: '[expr969]',
 
                       expressions: [
                         {
@@ -9544,25 +9632,185 @@ div.myEditor input {font-weight: bold}`
                         {
                           type: expressionTypes.ATTRIBUTE,
                           name: 'data-path',
-                          evaluate: _scope => `config.children[${_scope.index}]`
+
+                          evaluate: _scope => [
+                            'config.values[',
+                            _scope.index,
+                            ']'
+                          ].join(
+                            ''
+                          )
+                        }
+                      ]
+                    }
+                  ]
+                ),
+
+                redundantAttribute: 'expr962',
+                selector: '[expr962]',
+                itemName: 'value',
+                indexName: 'index',
+                evaluate: _scope => _scope.state.config.values
+              },
+              {
+                type: bindingTypes.IF,
+                evaluate: _scope => !_scope.state.isAddingValue,
+                redundantAttribute: 'expr970',
+                selector: '[expr970]',
+
+                template: template(
+                  '<button expr971="expr971" class="butNewValue iconAdd">Add...</button>',
+                  [
+                    {
+                      redundantAttribute: 'expr971',
+                      selector: '[expr971]',
+
+                      expressions: [
+                        {
+                          type: expressionTypes.EVENT,
+                          name: 'onclick',
+                          evaluate: _scope => _scope.beginNewValue
+                        }
+                      ]
+                    }
+                  ]
+                )
+              },
+              {
+                type: bindingTypes.IF,
+                evaluate: _scope => _scope.state.isAddingValue,
+                redundantAttribute: 'expr972',
+                selector: '[expr972]',
+
+                template: template(
+                  '<input expr973="expr973" class="textbox new val" data-path="newValue" placeholder="value" autofocus/><input expr974="expr974" class="textbox new cap" data-path="newCaption" placeholder="caption"/><button expr975="expr975" class="butNewValueOK iconAccept"></button><button expr976="expr976" class="butNewValueCancel iconCancel" type="button">Cancel</button><div expr977="expr977" class="warn"></div>',
+                  [
+                    {
+                      expressions: [
+                        {
+                          type: expressionTypes.EVENT,
+                          name: 'onsubmit',
+                          evaluate: _scope => _scope.saveNewValue
+                        }
+                      ]
+                    },
+                    {
+                      redundantAttribute: 'expr973',
+                      selector: '[expr973]',
+
+                      expressions: [
+                        {
+                          type: expressionTypes.VALUE,
+                          evaluate: _scope => _scope.state.newValue
+                        },
+                        {
+                          type: expressionTypes.EVENT,
+                          name: 'oninput',
+                          evaluate: _scope => _scope.updateLocalData
+                        }
+                      ]
+                    },
+                    {
+                      redundantAttribute: 'expr974',
+                      selector: '[expr974]',
+
+                      expressions: [
+                        {
+                          type: expressionTypes.VALUE,
+                          evaluate: _scope => _scope.state.newCaption
+                        },
+                        {
+                          type: expressionTypes.EVENT,
+                          name: 'oninput',
+                          evaluate: _scope => _scope.updateLocalData
                         }
                       ]
                     },
                     {
                       type: bindingTypes.IF,
-                      evaluate: _scope => _scope.child.isUsedElsewhere,
-                      redundantAttribute: 'expr456',
-                      selector: '[expr456]',
+                      evaluate: _scope => _scope.state.newValue,
+                      redundantAttribute: 'expr975',
+                      selector: '[expr975]',
 
                       template: template(
-                        'make&nbsp;unique',
+                        'Add',
+                        []
+                      )
+                    },
+                    {
+                      redundantAttribute: 'expr976',
+                      selector: '[expr976]',
+
+                      expressions: [
+                        {
+                          type: expressionTypes.EVENT,
+                          name: 'onclick',
+                          evaluate: _scope => _scope.cancelNewValue
+                        }
+                      ]
+                    },
+                    {
+                      type: bindingTypes.IF,
+                      evaluate: _scope => _scope.state.newValueError,
+                      redundantAttribute: 'expr977',
+                      selector: '[expr977]',
+
+                      template: template(
+                        ' ',
                         [
                           {
                             expressions: [
                               {
+                                type: expressionTypes.TEXT,
+                                childNodeIndex: 0,
+                                evaluate: _scope => _scope.state.newValueError
+                              }
+                            ]
+                          }
+                        ]
+                      )
+                    }
+                  ]
+                )
+              }
+            ]
+          )
+        },
+        {
+          type: bindingTypes.IF,
+          evaluate: _scope => _scope.state.config.filling === "inl" || _scope.state.config.filling === "chd",
+          redundantAttribute: 'expr978',
+          selector: '[expr978]',
+
+          template: template(
+            '<div class="title tight">Child elements</div><table expr979="expr979"></table><button expr991="expr991" class="butElNewOpener iconAdd"></button><template expr992="expr992"></template>',
+            [
+              {
+                type: bindingTypes.IF,
+                evaluate: _scope => _scope.state.config.children.length,
+                redundantAttribute: 'expr979',
+                selector: '[expr979]',
+
+                template: template(
+                  '<tr expr980="expr980"></tr>',
+                  [
+                    {
+                      type: bindingTypes.EACH,
+                      getKey: null,
+                      condition: null,
+
+                      template: template(
+                        '<td expr981="expr981" class="cell1"><span class="tech"><span class="brak">&lt;</span><span expr982="expr982" class="elm"> </span><span class="brak">&gt;</span></span></td><td class="cell2" style="white-space: nowrap;"><label>min <input expr983="expr983" class="textbox min" type="number" data-apply/></label><label>max <input expr984="expr984" class="textbox max" type="number" data-apply/></label></td><td class="cell9"><button expr985="expr985" class="iconOnly iconCross" data-apply>&nbsp;</button></td><td><div><button expr986="expr986"></button><template expr987="expr987"></template></div></td>',
+                        [
+                          {
+                            redundantAttribute: 'expr981',
+                            selector: '[expr981]',
+
+                            expressions: [
+                              {
                                 type: expressionTypes.EVENT,
                                 name: 'onclick',
-                                evaluate: _scope => _scope.makeUnique
+                                evaluate: _scope => _scope.selectElement
                               },
                               {
                                 type: expressionTypes.ATTRIBUTE,
@@ -9570,54 +9818,112 @@ div.myEditor input {font-weight: bold}`
                                 evaluate: _scope => _scope.child.id
                               }
                             ]
-                          }
-                        ]
-                      )
-                    },
-                    {
-                      type: bindingTypes.IF,
-                      evaluate: _scope => _scope.child.hasNameSiblings,
-                      redundantAttribute: 'expr457',
-                      selector: '[expr457]',
-
-                      template: template(
-                        ' <select expr458="expr458"><option expr459="expr459"></option></select><button expr460="expr460">use instead</button>',
-                        [
+                          },
                           {
+                            redundantAttribute: 'expr982',
+                            selector: '[expr982]',
+
                             expressions: [
                               {
                                 type: expressionTypes.TEXT,
                                 childNodeIndex: 0,
-
-                                evaluate: _scope => [
-                                  'Element ',
-                                  _scope.child.elementName,
-                                  ' has different configurations:'
-                                ].join(
-                                  ''
-                                )
+                                evaluate: _scope => _scope.child.elementName
                               }
                             ]
                           },
                           {
-                            redundantAttribute: 'expr458',
-                            selector: '[expr458]',
+                            redundantAttribute: 'expr983',
+                            selector: '[expr983]',
 
                             expressions: [
                               {
+                                type: expressionTypes.VALUE,
+                                evaluate: _scope => _scope.child.min
+                              },
+                              {
+                                type: expressionTypes.EVENT,
+                                name: 'onchange',
+                                evaluate: _scope => _scope.updateLocalData
+                              },
+                              {
                                 type: expressionTypes.ATTRIBUTE,
-                                name: 'data-name',
-                                evaluate: _scope => _scope.child.id
+                                name: 'data-path',
+                                evaluate: _scope => `config.children[${_scope.index}].min`
                               }
                             ]
                           },
                           {
-                            type: bindingTypes.EACH,
-                            getKey: null,
-                            condition: null,
+                            redundantAttribute: 'expr984',
+                            selector: '[expr984]',
+
+                            expressions: [
+                              {
+                                type: expressionTypes.VALUE,
+                                evaluate: _scope => _scope.child.max
+                              },
+                              {
+                                type: expressionTypes.EVENT,
+                                name: 'onchange',
+                                evaluate: _scope => _scope.updateLocalData
+                              },
+                              {
+                                type: expressionTypes.ATTRIBUTE,
+                                name: 'data-path',
+                                evaluate: _scope => `config.children[${_scope.index}].max`
+                              }
+                            ]
+                          },
+                          {
+                            redundantAttribute: 'expr985',
+                            selector: '[expr985]',
+
+                            expressions: [
+                              {
+                                type: expressionTypes.EVENT,
+                                name: 'onclick',
+                                evaluate: _scope => _scope.deleteLocalData
+                              },
+                              {
+                                type: expressionTypes.ATTRIBUTE,
+                                name: 'data-path',
+                                evaluate: _scope => `config.children[${_scope.index}]`
+                              }
+                            ]
+                          },
+                          {
+                            type: bindingTypes.IF,
+                            evaluate: _scope => _scope.child.isUsedElsewhere,
+                            redundantAttribute: 'expr986',
+                            selector: '[expr986]',
 
                             template: template(
-                              ' ',
+                              'make&nbsp;unique',
+                              [
+                                {
+                                  expressions: [
+                                    {
+                                      type: expressionTypes.EVENT,
+                                      name: 'onclick',
+                                      evaluate: _scope => _scope.makeUnique
+                                    },
+                                    {
+                                      type: expressionTypes.ATTRIBUTE,
+                                      name: 'data-name',
+                                      evaluate: _scope => _scope.child.id
+                                    }
+                                  ]
+                                }
+                              ]
+                            )
+                          },
+                          {
+                            type: bindingTypes.IF,
+                            evaluate: _scope => _scope.child.hasNameSiblings,
+                            redundantAttribute: 'expr987',
+                            selector: '[expr987]',
+
+                            template: template(
+                              ' <select expr988="expr988"><option expr989="expr989"></option></select><button expr990="expr990">use instead</button>',
                               [
                                 {
                                   expressions: [
@@ -9626,122 +9932,112 @@ div.myEditor input {font-weight: bold}`
                                       childNodeIndex: 0,
 
                                       evaluate: _scope => [
-                                        _scope.sibling.parentElementName,
-                                        '/',
-                                        _scope.sibling.elementName
+                                        'Element ',
+                                        _scope.child.elementName,
+                                        ' has different configurations:'
                                       ].join(
                                         ''
                                       )
+                                    }
+                                  ]
+                                },
+                                {
+                                  redundantAttribute: 'expr988',
+                                  selector: '[expr988]',
+
+                                  expressions: [
+                                    {
+                                      type: expressionTypes.ATTRIBUTE,
+                                      name: 'data-name',
+                                      evaluate: _scope => _scope.child.id
+                                    }
+                                  ]
+                                },
+                                {
+                                  type: bindingTypes.EACH,
+                                  getKey: null,
+                                  condition: null,
+
+                                  template: template(
+                                    ' ',
+                                    [
+                                      {
+                                        expressions: [
+                                          {
+                                            type: expressionTypes.TEXT,
+                                            childNodeIndex: 0,
+
+                                            evaluate: _scope => [
+                                              _scope.sibling.parentElementName,
+                                              '/',
+                                              _scope.sibling.elementName
+                                            ].join(
+                                              ''
+                                            )
+                                          },
+                                          {
+                                            type: expressionTypes.ATTRIBUTE,
+                                            name: 'value',
+                                            evaluate: _scope => _scope.sibling.id
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  ),
+
+                                  redundantAttribute: 'expr989',
+                                  selector: '[expr989]',
+                                  itemName: 'sibling',
+                                  indexName: null,
+                                  evaluate: _scope => _scope.child.nameSiblings
+                                },
+                                {
+                                  redundantAttribute: 'expr990',
+                                  selector: '[expr990]',
+
+                                  expressions: [
+                                    {
+                                      type: expressionTypes.EVENT,
+                                      name: 'onclick',
+                                      evaluate: _scope => _scope.replaceWithNameSibling
                                     },
                                     {
                                       type: expressionTypes.ATTRIBUTE,
-                                      name: 'value',
-                                      evaluate: _scope => _scope.sibling.id
+                                      name: 'data-name',
+                                      evaluate: _scope => _scope.child.id
                                     }
                                   ]
                                 }
                               ]
-                            ),
-
-                            redundantAttribute: 'expr459',
-                            selector: '[expr459]',
-                            itemName: 'sibling',
-                            indexName: null,
-                            evaluate: _scope => _scope.child.nameSiblings
-                          },
-                          {
-                            redundantAttribute: 'expr460',
-                            selector: '[expr460]',
-
-                            expressions: [
-                              {
-                                type: expressionTypes.EVENT,
-                                name: 'onclick',
-                                evaluate: _scope => _scope.replaceWithNameSibling
-                              },
-                              {
-                                type: expressionTypes.ATTRIBUTE,
-                                name: 'data-name',
-                                evaluate: _scope => _scope.child.id
-                              }
-                            ]
+                            )
                           }
                         ]
-                      )
+                      ),
+
+                      redundantAttribute: 'expr980',
+                      selector: '[expr980]',
+                      itemName: 'child',
+                      indexName: 'index',
+                      evaluate: _scope => _scope.state.computedChildren
                     }
                   ]
-                ),
-
-                redundantAttribute: 'expr450',
-                selector: '[expr450]',
-                itemName: 'child',
-                indexName: 'index',
-                evaluate: _scope => _scope.state.computedChildren
-              }
-            ]
-          )
-        },
-        {
-          type: bindingTypes.IF,
-          evaluate: _scope => !_scope.state.isAddingElement,
-          redundantAttribute: 'expr461',
-          selector: '[expr461]',
-
-          template: template(
-            'Add...',
-            [
-              {
-                expressions: [
-                  {
-                    type: expressionTypes.EVENT,
-                    name: 'onclick',
-                    evaluate: _scope => _scope.beginNewElement
-                  }
-                ]
-              }
-            ]
-          )
-        },
-        {
-          type: bindingTypes.IF,
-          evaluate: _scope => _scope.state.isAddingElement,
-          redundantAttribute: 'expr462',
-          selector: '[expr462]',
-
-          template: template(
-            '<input expr463="expr463" class="textbox tech elName txtElNew" data-path="newElementName"/><button expr464="expr464" class="butElNew iconAccept"></button><button expr465="expr465" class="butElNewCancel iconCancel">Cancel</button><div expr466="expr466" class="warn errInvalidElName"></div>',
-            [
-              {
-                redundantAttribute: 'expr463',
-                selector: '[expr463]',
-
-                expressions: [
-                  {
-                    type: expressionTypes.VALUE,
-                    evaluate: _scope => _scope.state.newElementName
-                  },
-                  {
-                    type: expressionTypes.EVENT,
-                    name: 'oninput',
-                    evaluate: _scope => _scope.updateLocalData
-                  }
-                ]
+                )
               },
               {
                 type: bindingTypes.IF,
-                evaluate: _scope => _scope.state.newElementName && _scope.isValidXmlName(_scope.state.newElementName),
-                redundantAttribute: 'expr464',
-                selector: '[expr464]',
+                evaluate: _scope => !_scope.state.isAddingElement,
+                redundantAttribute: 'expr991',
+                selector: '[expr991]',
 
                 template: template(
-                  'Add',
+                  'Add...',
                   [
                     {
                       expressions: [
                         {
                           type: expressionTypes.EVENT,
                           name: 'onclick',
-                          evaluate: _scope => _scope.saveNewElement
+                          evaluate: _scope => _scope.beginNewElement
                         }
                       ]
                     }
@@ -9749,26 +10045,75 @@ div.myEditor input {font-weight: bold}`
                 )
               },
               {
-                redundantAttribute: 'expr465',
-                selector: '[expr465]',
-
-                expressions: [
-                  {
-                    type: expressionTypes.EVENT,
-                    name: 'onclick',
-                    evaluate: _scope => _scope.cancelNewElement
-                  }
-                ]
-              },
-              {
                 type: bindingTypes.IF,
-                evaluate: _scope => _scope.state.newElementName && !_scope.isValidXmlName(_scope.state.newElementName),
-                redundantAttribute: 'expr466',
-                selector: '[expr466]',
+                evaluate: _scope => _scope.state.isAddingElement,
+                redundantAttribute: 'expr992',
+                selector: '[expr992]',
 
                 template: template(
-                  'Cannot add, not a valid XML name.',
-                  []
+                  '<input expr993="expr993" class="textbox tech elName txtElNew" data-path="newElementName"/><button expr994="expr994" class="butElNew iconAccept"></button><button expr995="expr995" class="butElNewCancel iconCancel">Cancel</button><div expr996="expr996" class="warn errInvalidElName"></div>',
+                  [
+                    {
+                      redundantAttribute: 'expr993',
+                      selector: '[expr993]',
+
+                      expressions: [
+                        {
+                          type: expressionTypes.VALUE,
+                          evaluate: _scope => _scope.state.newElementName
+                        },
+                        {
+                          type: expressionTypes.EVENT,
+                          name: 'oninput',
+                          evaluate: _scope => _scope.updateLocalData
+                        }
+                      ]
+                    },
+                    {
+                      type: bindingTypes.IF,
+                      evaluate: _scope => _scope.state.newElementName && _scope.isValidXmlName(_scope.state.newElementName),
+                      redundantAttribute: 'expr994',
+                      selector: '[expr994]',
+
+                      template: template(
+                        'Add',
+                        [
+                          {
+                            expressions: [
+                              {
+                                type: expressionTypes.EVENT,
+                                name: 'onclick',
+                                evaluate: _scope => _scope.saveNewElement
+                              }
+                            ]
+                          }
+                        ]
+                      )
+                    },
+                    {
+                      redundantAttribute: 'expr995',
+                      selector: '[expr995]',
+
+                      expressions: [
+                        {
+                          type: expressionTypes.EVENT,
+                          name: 'onclick',
+                          evaluate: _scope => _scope.cancelNewElement
+                        }
+                      ]
+                    },
+                    {
+                      type: bindingTypes.IF,
+                      evaluate: _scope => _scope.state.newElementName && !_scope.isValidXmlName(_scope.state.newElementName),
+                      redundantAttribute: 'expr996',
+                      selector: '[expr996]',
+
+                      template: template(
+                        'Cannot add, not a valid XML name.',
+                        []
+                      )
+                    }
+                  ]
                 )
               }
             ]
@@ -9877,7 +10222,8 @@ div.myEditor input {font-weight: bold}`
               value: this.state.newValue,
               caption: this.state.newCaption,
           });
-          this.isAddingValue = false;
+          // Keep open
+          // this.state.isAddingValue = false;
           this.state.newValue = '';
           this.state.newCaption = '';
           this.applyLocalData();
@@ -9928,7 +10274,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<div class="block"><div class="title">Attribute</div><form expr401="expr401"><input expr402="expr402" class="textbox tech atName" data-path="newAttributeId"/><button expr403="expr403" class="butRename iconAccept" type="submit"></button><div expr404="expr404" class="warn errInvalidAtName"></div><div expr405="expr405" class="warn errAtNameExists"></div></form></div><div class="block"><div class="title">Content</div><label class="radio"><input expr406="expr406" type="radio" name="filling" value="txt" data-path="config.filling" data-apply/>Text</label><label class="radio"><input expr407="expr407" type="radio" name="filling" value="lst" data-path="config.filling" data-apply/>Value from list</label></div><div expr408="expr408" class="block"></div>',
+      '<div class="block"><div class="title">Attribute</div><form expr733="expr733"><input expr734="expr734" class="textbox tech atName" data-path="newAttributeId"/><button expr735="expr735" class="butRename iconAccept" type="submit"></button><div expr736="expr736" class="warn errInvalidAtName"></div><div expr737="expr737" class="warn errAtNameExists"></div></form></div><div class="block"><div class="title">Content</div><label class="radio"><input expr738="expr738" type="radio" name="filling" value="txt" data-path="config.filling" data-apply/>Text</label><label class="radio"><input expr739="expr739" type="radio" name="filling" value="lst" data-path="config.filling" data-apply/>Value from list</label></div><div expr740="expr740" class="block"></div>',
       [
         {
           expressions: [
@@ -9940,8 +10286,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr401',
-          selector: '[expr401]',
+          redundantAttribute: 'expr733',
+          selector: '[expr733]',
 
           expressions: [
             {
@@ -9952,8 +10298,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr402',
-          selector: '[expr402]',
+          redundantAttribute: 'expr734',
+          selector: '[expr734]',
 
           expressions: [
             {
@@ -9970,8 +10316,8 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.attributeId !== _scope.state.newAttributeId && _scope.isValidXmlName(_scope.state.newAttributeId) && _scope.props.xema.elements[_scope.props.elementId].attributes[_scope.state.newAttributeId] == null,
-          redundantAttribute: 'expr403',
-          selector: '[expr403]',
+          redundantAttribute: 'expr735',
+          selector: '[expr735]',
 
           template: template(
             'Rename',
@@ -9991,8 +10337,8 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isValidXmlName(_scope.state.newAttributeId),
-          redundantAttribute: 'expr404',
-          selector: '[expr404]',
+          redundantAttribute: 'expr736',
+          selector: '[expr736]',
 
           template: template(
             'Cannot rename, not a valid XML name.',
@@ -10002,8 +10348,8 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.state.newAttributeId != _scope.props.attributeId && _scope.props.xema.elements[_scope.props.elementId].attributes[_scope.state.newAttributeId],
-          redundantAttribute: 'expr405',
-          selector: '[expr405]',
+          redundantAttribute: 'expr737',
+          selector: '[expr737]',
 
           template: template(
             'Cannot rename, such attribute already exists.',
@@ -10011,8 +10357,8 @@ div.myEditor input {font-weight: bold}`
           )
         },
         {
-          redundantAttribute: 'expr406',
-          selector: '[expr406]',
+          redundantAttribute: 'expr738',
+          selector: '[expr738]',
 
           expressions: [
             {
@@ -10028,8 +10374,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr407',
-          selector: '[expr407]',
+          redundantAttribute: 'expr739',
+          selector: '[expr739]',
 
           expressions: [
             {
@@ -10047,11 +10393,11 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.state.config.filling === "lst",
-          redundantAttribute: 'expr408',
-          selector: '[expr408]',
+          redundantAttribute: 'expr740',
+          selector: '[expr740]',
 
           template: template(
-            '<div class="title">Values</div><table><tr expr409="expr409"></tr></table><template expr417="expr417"></template><form expr419="expr419" style="white-space: nowrap;"></form>',
+            '<div class="title">Values</div><table><tr expr741="expr741"></tr></table><template expr749="expr749"></template><form expr751="expr751" style="white-space: nowrap;"></form>',
             [
               {
                 type: bindingTypes.EACH,
@@ -10059,11 +10405,11 @@ div.myEditor input {font-weight: bold}`
                 condition: null,
 
                 template: template(
-                  '<td class="cell1"><form expr410="expr410" style="white-space: nowrap;"><input expr411="expr411" class="textbox val" placeholder="value"/><input expr412="expr412" class="textbox cap" placeholder="caption"/><template expr413="expr413"></template></form></td><td class="cell9"><button expr416="expr416" class="iconOnly iconCross" data-apply>&nbsp;</button></td>',
+                  '<td class="cell1"><form expr742="expr742" style="white-space: nowrap;"><input expr743="expr743" class="textbox val" placeholder="value"/><input expr744="expr744" class="textbox cap" placeholder="caption"/><template expr745="expr745"></template></form></td><td class="cell9"><button expr748="expr748" class="iconOnly iconCross" data-apply>&nbsp;</button></td>',
                   [
                     {
-                      redundantAttribute: 'expr410',
-                      selector: '[expr410]',
+                      redundantAttribute: 'expr742',
+                      selector: '[expr742]',
 
                       expressions: [
                         {
@@ -10074,8 +10420,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr411',
-                      selector: '[expr411]',
+                      redundantAttribute: 'expr743',
+                      selector: '[expr743]',
 
                       expressions: [
                         {
@@ -10102,8 +10448,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr412',
-                      selector: '[expr412]',
+                      redundantAttribute: 'expr744',
+                      selector: '[expr744]',
 
                       expressions: [
                         {
@@ -10132,15 +10478,15 @@ div.myEditor input {font-weight: bold}`
                     {
                       type: bindingTypes.IF,
                       evaluate: _scope => _scope.value.value !== _scope.props.config.values[_scope.index].value || _scope.value.caption !== _scope.props.config.values[_scope.index].caption,
-                      redundantAttribute: 'expr413',
-                      selector: '[expr413]',
+                      redundantAttribute: 'expr745',
+                      selector: '[expr745]',
 
                       template: template(
-                        '<button expr414="expr414" class="change iconAccept" type="submit">Change</button><button expr415="expr415" class="cancel iconCancel" type="button">Cancel</button>',
+                        '<button expr746="expr746" class="change iconAccept" type="submit">Change</button><button expr747="expr747" class="cancel iconCancel" type="button">Cancel</button>',
                         [
                           {
-                            redundantAttribute: 'expr414',
-                            selector: '[expr414]',
+                            redundantAttribute: 'expr746',
+                            selector: '[expr746]',
 
                             expressions: [
                               {
@@ -10151,8 +10497,8 @@ div.myEditor input {font-weight: bold}`
                             ]
                           },
                           {
-                            redundantAttribute: 'expr415',
-                            selector: '[expr415]',
+                            redundantAttribute: 'expr747',
+                            selector: '[expr747]',
 
                             expressions: [
                               {
@@ -10178,8 +10524,8 @@ div.myEditor input {font-weight: bold}`
                       )
                     },
                     {
-                      redundantAttribute: 'expr416',
-                      selector: '[expr416]',
+                      redundantAttribute: 'expr748',
+                      selector: '[expr748]',
 
                       expressions: [
                         {
@@ -10204,8 +10550,8 @@ div.myEditor input {font-weight: bold}`
                   ]
                 ),
 
-                redundantAttribute: 'expr409',
-                selector: '[expr409]',
+                redundantAttribute: 'expr741',
+                selector: '[expr741]',
                 itemName: 'value',
                 indexName: 'index',
                 evaluate: _scope => _scope.state.config.values
@@ -10213,15 +10559,15 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.state.isAddingValue,
-                redundantAttribute: 'expr417',
-                selector: '[expr417]',
+                redundantAttribute: 'expr749',
+                selector: '[expr749]',
 
                 template: template(
-                  '<button expr418="expr418" class="butNewValue iconAdd">Add...</button>',
+                  '<button expr750="expr750" class="butNewValue iconAdd">Add...</button>',
                   [
                     {
-                      redundantAttribute: 'expr418',
-                      selector: '[expr418]',
+                      redundantAttribute: 'expr750',
+                      selector: '[expr750]',
 
                       expressions: [
                         {
@@ -10237,11 +10583,11 @@ div.myEditor input {font-weight: bold}`
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.state.isAddingValue,
-                redundantAttribute: 'expr419',
-                selector: '[expr419]',
+                redundantAttribute: 'expr751',
+                selector: '[expr751]',
 
                 template: template(
-                  '<input expr420="expr420" class="textbox new val" data-path="newValue" placeholder="value" autofocus/><input expr421="expr421" class="textbox new cap" data-path="newCaption" placeholder="caption"/><button expr422="expr422" class="butNewValueOK iconAccept"></button><button expr423="expr423" class="butNewValueCancel iconCancel" type="button">Cancel</button>',
+                  '<input expr752="expr752" class="textbox new val" data-path="newValue" placeholder="value" autofocus/><input expr753="expr753" class="textbox new cap" data-path="newCaption" placeholder="caption"/><button expr754="expr754" class="butNewValueOK iconAccept"></button><button expr755="expr755" class="butNewValueCancel iconCancel" type="button">Cancel</button>',
                   [
                     {
                       expressions: [
@@ -10253,8 +10599,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr420',
-                      selector: '[expr420]',
+                      redundantAttribute: 'expr752',
+                      selector: '[expr752]',
 
                       expressions: [
                         {
@@ -10269,8 +10615,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr421',
-                      selector: '[expr421]',
+                      redundantAttribute: 'expr753',
+                      selector: '[expr753]',
 
                       expressions: [
                         {
@@ -10287,8 +10633,8 @@ div.myEditor input {font-weight: bold}`
                     {
                       type: bindingTypes.IF,
                       evaluate: _scope => _scope.state.newValue,
-                      redundantAttribute: 'expr422',
-                      selector: '[expr422]',
+                      redundantAttribute: 'expr754',
+                      selector: '[expr754]',
 
                       template: template(
                         'Add',
@@ -10296,8 +10642,8 @@ div.myEditor input {font-weight: bold}`
                       )
                     },
                     {
-                      redundantAttribute: 'expr423',
-                      selector: '[expr423]',
+                      redundantAttribute: 'expr755',
+                      selector: '[expr755]',
 
                       expressions: [
                         {
@@ -10387,7 +10733,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<div class="horizontal"><span expr478="expr478" class="plusminus"></span></div><div expr479="expr479"><span class="tech"><span class="brak">&lt;</span><span expr480="expr480" class="elm"> </span><span class="brak">&gt;</span></span></div><div expr481="expr481" class="children"></div>',
+      '<div class="horizontal"><span expr226="expr226" class="plusminus"></span></div><div expr227="expr227"><span class="tech"><span class="brak">&lt;</span><span expr228="expr228" class="elm"> </span><span class="brak">&gt;</span></span></div><div expr229="expr229" class="children"></div>',
       [
         {
           expressions: [
@@ -10401,8 +10747,8 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.state.hasChildren,
-          redundantAttribute: 'expr478',
-          selector: '[expr478]',
+          redundantAttribute: 'expr226',
+          selector: '[expr226]',
 
           template: template(
             null,
@@ -10420,8 +10766,8 @@ div.myEditor input {font-weight: bold}`
           )
         },
         {
-          redundantAttribute: 'expr479',
-          selector: '[expr479]',
+          redundantAttribute: 'expr227',
+          selector: '[expr227]',
 
           expressions: [
             {
@@ -10437,8 +10783,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr480',
-          selector: '[expr480]',
+          redundantAttribute: 'expr228',
+          selector: '[expr228]',
 
           expressions: [
             {
@@ -10451,11 +10797,11 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => (_scope.state.hasChildren || _scope.hasAttributes) && _scope.state.showChildren,
-          redundantAttribute: 'expr481',
-          selector: '[expr481]',
+          redundantAttribute: 'expr229',
+          selector: '[expr229]',
 
           template: template(
-            '<dict-config-attribute-in-tree expr482="expr482"></dict-config-attribute-in-tree><dict-config-element-in-tree expr483="expr483"></dict-config-element-in-tree>',
+            '<dict-config-attribute-in-tree expr230="expr230"></dict-config-attribute-in-tree><dict-config-element-in-tree expr231="expr231"></dict-config-element-in-tree>',
             [
               {
                 type: bindingTypes.EACH,
@@ -10507,8 +10853,8 @@ div.myEditor input {font-weight: bold}`
                   ]
                 ),
 
-                redundantAttribute: 'expr482',
-                selector: '[expr482]',
+                redundantAttribute: 'expr230',
+                selector: '[expr230]',
                 itemName: 'att',
                 indexName: null,
                 evaluate: _scope => _scope.state.attributes
@@ -10558,8 +10904,8 @@ div.myEditor input {font-weight: bold}`
                   ]
                 ),
 
-                redundantAttribute: 'expr483',
-                selector: '[expr483]',
+                redundantAttribute: 'expr231',
+                selector: '[expr231]',
                 itemName: 'child',
                 indexName: null,
                 evaluate: _scope => _scope.state.children
@@ -10622,7 +10968,7 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<div class="horizontal"></div><div expr228="expr228"><span class="tech"><span class="ats">@</span><span expr229="expr229" class="att"> </span></span></div>',
+      '<div class="horizontal"></div><div expr209="expr209"><span class="tech"><span class="ats">@</span><span expr210="expr210" class="att"> </span></span></div>',
       [
         {
           expressions: [
@@ -10634,8 +10980,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr228',
-          selector: '[expr228]',
+          redundantAttribute: 'expr209',
+          selector: '[expr209]',
 
           expressions: [
             {
@@ -10651,8 +10997,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr229',
-          selector: '[expr229]',
+          redundantAttribute: 'expr210',
+          selector: '[expr210]',
 
           expressions: [
             {
@@ -11110,11 +11456,11 @@ div.myEditor input {font-weight: bold}`
       bindingTypes,
       getComponent
     ) => template(
-      '<div class="display-styles"><div><h4 expr678="expr678"> </h4><div class="toggle-input"><label>Visibility</label><div class="switch"><label>\n            Off\n            <input expr679="expr679" id="shown" type="checkbox"/><span class="lever"></span>\n            On\n          </label></div></div><div expr680="expr680" class="toggle-input"></div></div><div class="break"></div><div expr683="expr683"></div></div>',
+      '<div class="display-styles"><div><h4 expr482="expr482"> </h4><div class="toggle-input"><label>Visibility</label><div class="switch"><label>\n            Off\n            <input expr483="expr483" id="shown" type="checkbox"/><span class="lever"></span>\n            On\n          </label></div></div><div expr484="expr484" class="toggle-input"></div></div><div class="break"></div><div expr487="expr487"></div></div>',
       [
         {
-          redundantAttribute: 'expr678',
-          selector: '[expr678]',
+          redundantAttribute: 'expr482',
+          selector: '[expr482]',
 
           expressions: [
             {
@@ -11131,8 +11477,8 @@ div.myEditor input {font-weight: bold}`
           ]
         },
         {
-          redundantAttribute: 'expr679',
-          selector: '[expr679]',
+          redundantAttribute: 'expr483',
+          selector: '[expr483]',
 
           expressions: [
             {
@@ -11153,11 +11499,11 @@ div.myEditor input {font-weight: bold}`
           condition: _scope => _scope.state.elementData.shown,
 
           template: template(
-            '<label expr681="expr681"> </label><div class="switch"><label>\n            Off\n            <input expr682="expr682" type="checkbox"/><span class="lever"></span>\n            On\n          </label></div>',
+            '<label expr485="expr485"> </label><div class="switch"><label>\n            Off\n            <input expr486="expr486" type="checkbox"/><span class="lever"></span>\n            On\n          </label></div>',
             [
               {
-                redundantAttribute: 'expr681',
-                selector: '[expr681]',
+                redundantAttribute: 'expr485',
+                selector: '[expr485]',
 
                 expressions: [
                   {
@@ -11168,8 +11514,8 @@ div.myEditor input {font-weight: bold}`
                 ]
               },
               {
-                redundantAttribute: 'expr682',
-                selector: '[expr682]',
+                redundantAttribute: 'expr486',
+                selector: '[expr486]',
 
                 expressions: [
                   {
@@ -11192,8 +11538,8 @@ div.myEditor input {font-weight: bold}`
             ]
           ),
 
-          redundantAttribute: 'expr680',
-          selector: '[expr680]',
+          redundantAttribute: 'expr484',
+          selector: '[expr484]',
           itemName: 'setting',
           indexName: null,
           evaluate: _scope => _scope.possibleToggles
@@ -11201,11 +11547,11 @@ div.myEditor input {font-weight: bold}`
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.state.elementData.shown,
-          redundantAttribute: 'expr683',
-          selector: '[expr683]',
+          redundantAttribute: 'expr487',
+          selector: '[expr487]',
 
           template: template(
-            '<div expr684="expr684" class="select-input"></div>',
+            '<div expr488="expr488" class="select-input"></div>',
             [
               {
                 type: bindingTypes.EACH,
@@ -11213,11 +11559,11 @@ div.myEditor input {font-weight: bold}`
                 condition: _scope => _scope.shouldRenderStyle(_scope.style.type),
 
                 template: template(
-                  '<label expr685="expr685"> </label><select expr686="expr686" required style="display: block"><option expr687="expr687" value>\n            Select option\n          </option><option expr688="expr688"></option></select>',
+                  '<label expr489="expr489"> </label><select expr490="expr490" required style="display: block"><option expr491="expr491" value>\n            Select option\n          </option><option expr492="expr492"></option></select>',
                   [
                     {
-                      redundantAttribute: 'expr685',
-                      selector: '[expr685]',
+                      redundantAttribute: 'expr489',
+                      selector: '[expr489]',
 
                       expressions: [
                         {
@@ -11233,8 +11579,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr686',
-                      selector: '[expr686]',
+                      redundantAttribute: 'expr490',
+                      selector: '[expr490]',
 
                       expressions: [
                         {
@@ -11259,8 +11605,8 @@ div.myEditor input {font-weight: bold}`
                       ]
                     },
                     {
-                      redundantAttribute: 'expr687',
-                      selector: '[expr687]',
+                      redundantAttribute: 'expr491',
+                      selector: '[expr491]',
 
                       expressions: [
                         {
@@ -11305,8 +11651,8 @@ div.myEditor input {font-weight: bold}`
                         ]
                       ),
 
-                      redundantAttribute: 'expr688',
-                      selector: '[expr688]',
+                      redundantAttribute: 'expr492',
+                      selector: '[expr492]',
                       itemName: 'option',
                       indexName: null,
                       evaluate: _scope => _scope.style.values
@@ -11314,8 +11660,8 @@ div.myEditor input {font-weight: bold}`
                   ]
                 ),
 
-                redundantAttribute: 'expr684',
-                selector: '[expr684]',
+                redundantAttribute: 'expr488',
+                selector: '[expr488]',
                 itemName: 'style',
                 indexName: null,
                 evaluate: _scope => _scope.possibleStyles
@@ -11460,7 +11806,7 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-config-nav expr666="expr666"></dict-config-nav><h3>Entry formatting</h3><div expr667="expr667"></div><div expr671="expr671"></div><dict-config-buttons expr677="expr677"></dict-config-buttons>',
+      '<dict-config-nav expr214="expr214"></dict-config-nav><h3>Entry formatting</h3><div expr215="expr215"></div><div expr219="expr219"></div><dict-config-buttons expr225="expr225"></dict-config-buttons>',
       [
         {
           type: bindingTypes.TAG,
@@ -11491,17 +11837,17 @@ div.myEntry span.myHeadword {font-weight: bold}
             }
           ],
 
-          redundantAttribute: 'expr666',
-          selector: '[expr666]'
+          redundantAttribute: 'expr214',
+          selector: '[expr214]'
         },
         {
           type: bindingTypes.IF,
           evaluate: _scope => (!_scope.configData._xsl || _scope.configData._xsl == "") && (!_scope.configData._css || _scope.configData._css == "") && !_scope.override,
-          redundantAttribute: 'expr667',
-          selector: '[expr667]',
+          redundantAttribute: 'expr215',
+          selector: '[expr215]',
 
           template: template(
-            '<div style="display: flex"><div style="flex-basis: 0; width: auto; position: static; overflow: initial!important; margin-right: 15px;!important" id="editor" class="designer"><div class="list"><dict-config-element-in-tree expr668="expr668"></dict-config-element-in-tree></div></div><display-styles expr669="expr669" name="displayStylesComponent"></display-styles></div><div class="row"><div class="col s10"><button expr670="expr670" class="btn waves-effect waves-light">Use your own stylesheet <i class="material-icons right">edit</i></button></div></div>',
+            '<div style="display: flex"><div style="flex-basis: 0; width: auto; position: static; overflow: initial!important; margin-right: 15px;!important" id="editor" class="designer"><div class="list"><dict-config-element-in-tree expr216="expr216"></dict-config-element-in-tree></div></div><display-styles expr217="expr217" name="displayStylesComponent"></display-styles></div><div class="row"><div class="col s10"><button expr218="expr218" class="btn waves-effect waves-light">Use your own stylesheet <i class="material-icons right">edit</i></button></div></div>',
             [
               {
                 type: bindingTypes.EACH,
@@ -11548,8 +11894,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                   ]
                 ),
 
-                redundantAttribute: 'expr668',
-                selector: '[expr668]',
+                redundantAttribute: 'expr216',
+                selector: '[expr216]',
                 itemName: 'root',
                 indexName: null,
                 evaluate: _scope => _scope.state.roots
@@ -11557,8 +11903,8 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.elementName,
-                redundantAttribute: 'expr669',
-                selector: '[expr669]',
+                redundantAttribute: 'expr217',
+                selector: '[expr217]',
 
                 template: template(
                   null,
@@ -11611,8 +11957,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 )
               },
               {
-                redundantAttribute: 'expr670',
-                selector: '[expr670]',
+                redundantAttribute: 'expr218',
+                selector: '[expr218]',
 
                 expressions: [
                   {
@@ -11628,15 +11974,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => (_scope.configData._xsl && _scope.configData._xsl != "") || (_scope.configData._css && _scope.configData._css != "") || _scope.override,
-          redundantAttribute: 'expr671',
-          selector: '[expr671]',
+          redundantAttribute: 'expr219',
+          selector: '[expr219]',
 
           template: template(
-            '<div class="row"><div class="input-field col s10"><textarea expr672="expr672" id="editor_xsl" class="materialize-textarea" placeholder> </textarea><label for="editor_xsl">XSL</label><span class="helper-text">Custom XSL stylesheet. If you would like to see an example, <a expr673="expr673">click here to load a sample XSL</a>.</span></div></div><div class="row"><div class="input-field col s10"><textarea expr674="expr674" id="editor_css" class="materialize-textarea" placeholder> </textarea><label for="editor_css">CSS</label><span class="helper-text">Custom CSS stylesheet. If you would like to see an example, <a expr675="expr675">click here to load a sample CSS</a>.</span></div></div><div class="row"><div class="col s10"><button expr676="expr676" class="btn waves-effect waves-light">Stop using your own stylesheet <i class="material-icons right">edit</i></button></div></div>',
+            '<div class="row"><div class="input-field col s10"><textarea expr220="expr220" id="editor_xsl" class="materialize-textarea" placeholder> </textarea><label for="editor_xsl">XSL</label><span class="helper-text">Custom XSL stylesheet. If you would like to see an example, <a expr221="expr221">click here to load a sample XSL</a>.</span></div></div><div class="row"><div class="input-field col s10"><textarea expr222="expr222" id="editor_css" class="materialize-textarea" placeholder> </textarea><label for="editor_css">CSS</label><span class="helper-text">Custom CSS stylesheet. If you would like to see an example, <a expr223="expr223">click here to load a sample CSS</a>.</span></div></div><div class="row"><div class="col s10"><button expr224="expr224" class="btn waves-effect waves-light">Stop using your own stylesheet <i class="material-icons right">edit</i></button></div></div>',
             [
               {
-                redundantAttribute: 'expr672',
-                selector: '[expr672]',
+                redundantAttribute: 'expr220',
+                selector: '[expr220]',
 
                 expressions: [
                   {
@@ -11647,8 +11993,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr673',
-                selector: '[expr673]',
+                redundantAttribute: 'expr221',
+                selector: '[expr221]',
 
                 expressions: [
                   {
@@ -11659,8 +12005,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr674',
-                selector: '[expr674]',
+                redundantAttribute: 'expr222',
+                selector: '[expr222]',
 
                 expressions: [
                   {
@@ -11671,8 +12017,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr675',
-                selector: '[expr675]',
+                redundantAttribute: 'expr223',
+                selector: '[expr223]',
 
                 expressions: [
                   {
@@ -11683,8 +12029,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr676',
-                selector: '[expr676]',
+                redundantAttribute: 'expr224',
+                selector: '[expr224]',
 
                 expressions: [
                   {
@@ -11716,8 +12062,8 @@ div.myEntry span.myHeadword {font-weight: bold}
             }
           ],
 
-          redundantAttribute: 'expr677',
-          selector: '[expr677]'
+          redundantAttribute: 'expr225',
+          selector: '[expr225]'
         }
       ]
     ),
@@ -11756,11 +12102,11 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<nav class="nav-breadcrumbs"><div class="nav-wrapper"><a expr230="expr230" class="breadcrumb"> </a><a expr231="expr231" class="breadcrumb">Download</a></div></nav><h3>Download</h3><div class="input-field"><a expr232="expr232" class="waves-effect waves-light btn btn-primary download-link" target="_blank"><i class="material-icons left">file_download</i> </a></div><div><label><input type="checkbox" class="noAttributes" name="noAttributes"/><span>XML without Lexonomy attributes</span></label></div><small class="helper-text">\n      If you want to import the XML file back to Lexonomy, you need Lexonomy attributes.\n   </small>',
+      '<nav class="nav-breadcrumbs"><div class="nav-wrapper"><a expr211="expr211" class="breadcrumb"> </a><a expr212="expr212" class="breadcrumb">Download</a></div></nav><h3>Download</h3><div class="input-field"><a expr213="expr213" class="waves-effect waves-light btn btn-primary download-link" target="_blank"><i class="material-icons left">file_download</i> </a></div><div><label><input type="checkbox" class="noAttributes" name="noAttributes"/><span>XML without Lexonomy attributes</span></label></div><small class="helper-text">\n      If you want to import the XML file back to Lexonomy, you need Lexonomy attributes.\n   </small>',
       [
         {
-          redundantAttribute: 'expr230',
-          selector: '[expr230]',
+          redundantAttribute: 'expr211',
+          selector: '[expr211]',
 
           expressions: [
             {
@@ -11782,8 +12128,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr231',
-          selector: '[expr231]',
+          redundantAttribute: 'expr212',
+          selector: '[expr212]',
 
           expressions: [
             {
@@ -11801,8 +12147,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr232',
-          selector: '[expr232]',
+          redundantAttribute: 'expr213',
+          selector: '[expr213]',
 
           expressions: [
             {
@@ -12213,11 +12559,11 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<h3 expr246="expr246" class="header"> </h3><div expr247="expr247" class="row doctypes"></div><div class="row"><div class="col s3"><div style="display: flex; gap: 10px"><input expr250="expr250" type="text" id="searchBox" placeholder="search" class="input-field" style="width: 100px;"/><select id="searchType"><option value disabled selected>?</option><option value="start">starts like this</option><option value="exact">is exactly</option><option value="wordstart">contains a word that starts like this</option><option value="substring">contains this sequence of characters</option></select></div><div class="entry-list collection"><list-headword expr251="expr251"></list-headword></div></div><div class="col s9"><dict-edit-entry expr252="expr252"></dict-edit-entry></div></div>',
+      '<h3 expr232="expr232" class="header"> </h3><div expr233="expr233" class="row doctypes"></div><div class="row"><div class="col s3"><div style="display: flex; gap: 10px"><input expr236="expr236" type="text" id="searchBox" placeholder="search" class="input-field" style="width: 100px;"/><select id="searchType"><option value disabled selected>?</option><option value="start">starts like this</option><option value="exact">is exactly</option><option value="wordstart">contains a word that starts like this</option><option value="substring">contains this sequence of characters</option></select></div><div class="entry-list collection"><list-headword expr237="expr237"></list-headword></div></div><div class="col s9"><dict-edit-entry expr238="expr238"></dict-edit-entry></div></div>',
       [
         {
-          redundantAttribute: 'expr246',
-          selector: '[expr246]',
+          redundantAttribute: 'expr232',
+          selector: '[expr232]',
 
           expressions: [
             {
@@ -12230,11 +12576,11 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.doctypes.length > 1,
-          redundantAttribute: 'expr247',
-          selector: '[expr247]',
+          redundantAttribute: 'expr233',
+          selector: '[expr233]',
 
           template: template(
-            '<div class="col s12"><ul class="tabs"><li expr248="expr248" class="tab col s2"></li></ul></div>',
+            '<div class="col s12"><ul class="tabs"><li expr234="expr234" class="tab col s2"></li></ul></div>',
             [
               {
                 type: bindingTypes.EACH,
@@ -12242,7 +12588,7 @@ div.myEntry span.myHeadword {font-weight: bold}
                 condition: null,
 
                 template: template(
-                  '<a expr249="expr249"> </a>',
+                  '<a expr235="expr235"> </a>',
                   [
                     {
                       expressions: [
@@ -12254,8 +12600,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                       ]
                     },
                     {
-                      redundantAttribute: 'expr249',
-                      selector: '[expr249]',
+                      redundantAttribute: 'expr235',
+                      selector: '[expr235]',
 
                       expressions: [
                         {
@@ -12278,8 +12624,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                   ]
                 ),
 
-                redundantAttribute: 'expr248',
-                selector: '[expr248]',
+                redundantAttribute: 'expr234',
+                selector: '[expr234]',
                 itemName: 'type',
                 indexName: null,
                 evaluate: _scope => _scope.doctypes
@@ -12288,8 +12634,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           )
         },
         {
-          redundantAttribute: 'expr250',
-          selector: '[expr250]',
+          redundantAttribute: 'expr236',
+          selector: '[expr236]',
 
           expressions: [
             {
@@ -12350,8 +12696,8 @@ div.myEntry span.myHeadword {font-weight: bold}
             ]
           ),
 
-          redundantAttribute: 'expr251',
-          selector: '[expr251]',
+          redundantAttribute: 'expr237',
+          selector: '[expr237]',
           itemName: 'entry',
           indexName: null,
           evaluate: _scope => _scope.entryList
@@ -12400,8 +12746,8 @@ div.myEntry span.myHeadword {font-weight: bold}
             }
           ],
 
-          redundantAttribute: 'expr252',
-          selector: '[expr252]'
+          redundantAttribute: 'expr238',
+          selector: '[expr238]'
         }
       ]
     ),
@@ -12473,13 +12819,13 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<div expr259="expr259" class="grey-text center-align"></div><template expr260="expr260"></template>',
+      '<div expr239="expr239" class="grey-text center-align"></div><template expr240="expr240"></template>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.isLoading,
-          redundantAttribute: 'expr259',
-          selector: '[expr259]',
+          redundantAttribute: 'expr239',
+          selector: '[expr239]',
 
           template: template(
             '<h3>loading dictionaries...</h3>',
@@ -12489,20 +12835,20 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isLoading,
-          redundantAttribute: 'expr260',
-          selector: '[expr260]',
+          redundantAttribute: 'expr240',
+          selector: '[expr240]',
 
           template: template(
-            '<div expr261="expr261"></div><div expr270="expr270" class="grey-text center-align"></div>',
+            '<div expr241="expr241"></div><div expr250="expr250" class="grey-text center-align"></div>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.userdicts.length,
-                redundantAttribute: 'expr261',
-                selector: '[expr261]',
+                redundantAttribute: 'expr241',
+                selector: '[expr241]',
 
                 template: template(
-                  '<h3>your dictionaries</h3><ul class="collection"><li expr262="expr262" class="collection-item "></li></ul><a href="#/make" class="btn waves-effect waves-light"><i class="material-icons left">add</i>\n            create new dictionary\n         </a>',
+                  '<h3>your dictionaries</h3><ul class="collection"><li expr242="expr242" class="collection-item "></li></ul><a href="#/make" class="btn waves-effect waves-light"><i class="material-icons left">add</i>\n            create new dictionary\n         </a>',
                   [
                     {
                       type: bindingTypes.EACH,
@@ -12510,11 +12856,11 @@ div.myEntry span.myHeadword {font-weight: bold}
                       condition: null,
 
                       template: template(
-                        '<div><a expr263="expr263" style="cursor: pointer"> </a><span expr264="expr264" class="dict-lang"></span><span expr265="expr265" class="dict-lang"> </span><a expr266="expr266" style="cursor: pointer" class="secondary-content" title="delete dictionary"></a><a expr267="expr267" style="cursor: pointer" class="secondary-content" title="clone dictionary"><i class="material-icons">content_copy</i></a><a expr268="expr268" style="cursor: pointer" class="secondary-content" title="config dictionary"></a><a expr269="expr269" style="cursor: pointer" class="secondary-content" title="edit dictionary"></a></div>',
+                        '<div><a expr243="expr243" style="cursor: pointer"> </a><span expr244="expr244" class="dict-lang"></span><span expr245="expr245" class="dict-lang"> </span><a expr246="expr246" style="cursor: pointer" class="secondary-content" title="delete dictionary"></a><a expr247="expr247" style="cursor: pointer" class="secondary-content" title="clone dictionary"><i class="material-icons">content_copy</i></a><a expr248="expr248" style="cursor: pointer" class="secondary-content" title="config dictionary"></a><a expr249="expr249" style="cursor: pointer" class="secondary-content" title="edit dictionary"></a></div>',
                         [
                           {
-                            redundantAttribute: 'expr263',
-                            selector: '[expr263]',
+                            redundantAttribute: 'expr243',
+                            selector: '[expr243]',
 
                             expressions: [
                               {
@@ -12538,8 +12884,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                           {
                             type: bindingTypes.IF,
                             evaluate: _scope => _scope.dict.lang,
-                            redundantAttribute: 'expr264',
-                            selector: '[expr264]',
+                            redundantAttribute: 'expr244',
+                            selector: '[expr244]',
 
                             template: template(
                               ' ',
@@ -12557,8 +12903,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                             )
                           },
                           {
-                            redundantAttribute: 'expr265',
-                            selector: '[expr265]',
+                            redundantAttribute: 'expr245',
+                            selector: '[expr245]',
 
                             expressions: [
                               {
@@ -12577,8 +12923,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                           {
                             type: bindingTypes.IF,
                             evaluate: _scope => _scope.dict.currentUserCanDelete,
-                            redundantAttribute: 'expr266',
-                            selector: '[expr266]',
+                            redundantAttribute: 'expr246',
+                            selector: '[expr246]',
 
                             template: template(
                               '<i class="material-icons">delete</i>',
@@ -12606,8 +12952,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                             )
                           },
                           {
-                            redundantAttribute: 'expr267',
-                            selector: '[expr267]',
+                            redundantAttribute: 'expr247',
+                            selector: '[expr247]',
 
                             expressions: [
                               {
@@ -12625,8 +12971,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                           {
                             type: bindingTypes.IF,
                             evaluate: _scope => _scope.dict.currentUserCanDelete,
-                            redundantAttribute: 'expr268',
-                            selector: '[expr268]',
+                            redundantAttribute: 'expr248',
+                            selector: '[expr248]',
 
                             template: template(
                               '<i class="material-icons">settings</i>',
@@ -12656,8 +13002,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                           {
                             type: bindingTypes.IF,
                             evaluate: _scope => _scope.dict.currentUserCanEdit,
-                            redundantAttribute: 'expr269',
-                            selector: '[expr269]',
+                            redundantAttribute: 'expr249',
+                            selector: '[expr249]',
 
                             template: template(
                               '<i class="material-icons">edit</i>',
@@ -12682,8 +13028,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                         ]
                       ),
 
-                      redundantAttribute: 'expr262',
-                      selector: '[expr262]',
+                      redundantAttribute: 'expr242',
+                      selector: '[expr242]',
                       itemName: 'dict',
                       indexName: null,
                       evaluate: _scope => _scope.userdicts
@@ -12694,8 +13040,8 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.userdicts.length,
-                redundantAttribute: 'expr270',
-                selector: '[expr270]',
+                redundantAttribute: 'expr250',
+                selector: '[expr250]',
 
                 template: template(
                   '<h3>no dictionaries</h3><div>\n            You have no dictionary yet. Create one using button below.\n         </div><br/><a href="#/make" class="btn waves-effect waves-light"><i class="material-icons left">add</i>\n            create new dictionary\n         </a>',
@@ -12721,7 +13067,7 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<dict-public expr271="expr271"></dict-public>',
+      '<dict-public expr260="expr260"></dict-public>',
       [
         {
           type: bindingTypes.TAG,
@@ -12737,8 +13083,8 @@ div.myEntry span.myHeadword {font-weight: bold}
             }
           ],
 
-          redundantAttribute: 'expr271',
-          selector: '[expr271]'
+          redundantAttribute: 'expr260',
+          selector: '[expr260]'
         }
       ]
     ),
@@ -12783,20 +13129,20 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<h3>\n      New dictionary\n   </h3><div class="row"><div class="input-field"><input id="title" type="text" class="validate inlineBlock" required style="max-width: 300px;"/><label for="title">Title</label><span class="helper-text">Enter a human-readable title such as "My Esperanto Dictionary". You will be able to change this later.</span></div></div><div><label for="url">URL</label></div><div class="row"><div style="display: flex; align-items: baseline;"><span id="baseUrl" class="grey-text">https://www.lexonomy.eu/</span><span class="input-field" style="margin-top: 0;"><input id="url" type="text" class="validate inlineBlock" required minlength="5" pattern="[a-zA-Z0-9\\-_]*" style="max-width: 300px;"/><span class="helper-text">This will be your dictionary\'s address on the web. You will be able to change this later. Allowed:  letters, numbers, - and _</span></span></div></div><div></div><div class="input-field"><div style="max-width: 300px;"><select id="template"><option value="blank">(none)</option><option value="smd">Simple Monolingual Dictionary</option><option value="sbd">Simple Bilingual Dictionary</option></select></div><label>Template</label><span class="helper-text">You can choose a template here to start you off. Each template comes with a few sample entries. You will be able to change or delete those and to customize the template.</span></div><div expr278="expr278" class="row"></div><div class="buttons"><button expr280="expr280" class="btn waves-effect waves-light" type="submit" name="makeDict" id="makeButton">Create dictionary\n         <i class="material-icons left">add</i></button><a href="#" class="btn btn-flat">cancel</a></div>',
+      '<h3>\n      New dictionary\n   </h3><div class="row"><div class="input-field"><input id="title" type="text" class="validate inlineBlock" required style="max-width: 300px;"/><label for="title">Title</label><span class="helper-text">Enter a human-readable title such as "My Esperanto Dictionary". You will be able to change this later.</span></div></div><div><label for="url">URL</label></div><div class="row"><div style="display: flex; align-items: baseline;"><span id="baseUrl" class="grey-text">https://www.lexonomy.eu/</span><span class="input-field" style="margin-top: 0;"><input id="url" type="text" class="validate inlineBlock" required minlength="5" pattern="[a-zA-Z0-9\\-_]*" style="max-width: 300px;"/><span class="helper-text">This will be your dictionary\'s address on the web. You will be able to change this later. Allowed:  letters, numbers, - and _</span></span></div></div><div></div><div class="input-field"><div style="max-width: 300px;"><select id="template"><option value="blank">(none)</option><option value="smd">Simple Monolingual Dictionary</option><option value="sbd">Simple Bilingual Dictionary</option></select></div><label>Template</label><span class="helper-text">You can choose a template here to start you off. Each template comes with a few sample entries. You will be able to change or delete those and to customize the template.</span></div><div expr262="expr262" class="row"></div><div class="buttons"><button expr264="expr264" class="btn waves-effect waves-light" type="submit" name="makeDict" id="makeButton">Create dictionary\n         <i class="material-icons left">add</i></button><a href="#" class="btn btn-flat">cancel</a></div>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.errorMessage != '',
-          redundantAttribute: 'expr278',
-          selector: '[expr278]',
+          redundantAttribute: 'expr262',
+          selector: '[expr262]',
 
           template: template(
-            '<div class="col s8"><div class="card red darken-2"><div class="card-content white-text"><p expr279="expr279"> </p></div></div></div>',
+            '<div class="col s8"><div class="card red darken-2"><div class="card-content white-text"><p expr263="expr263"> </p></div></div></div>',
             [
               {
-                redundantAttribute: 'expr279',
-                selector: '[expr279]',
+                redundantAttribute: 'expr263',
+                selector: '[expr263]',
 
                 expressions: [
                   {
@@ -12810,8 +13156,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           )
         },
         {
-          redundantAttribute: 'expr280',
-          selector: '[expr280]',
+          redundantAttribute: 'expr264',
+          selector: '[expr264]',
 
           expressions: [
             {
@@ -12865,11 +13211,11 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<h3 class="header"><a expr272="expr272"> </a></h3><template expr273="expr273"></template>',
+      '<h3 class="header"><a expr254="expr254"> </a></h3><template expr255="expr255"></template>',
       [
         {
-          redundantAttribute: 'expr272',
-          selector: '[expr272]',
+          redundantAttribute: 'expr254',
+          selector: '[expr254]',
 
           expressions: [
             {
@@ -12893,11 +13239,11 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.dictDetails.public,
-          redundantAttribute: 'expr273',
-          selector: '[expr273]',
+          redundantAttribute: 'expr255',
+          selector: '[expr255]',
 
           template: template(
-            '<div class="divider"></div><div class="row"><div class="col s9"><entry-view expr274="expr274" is="entry-view"></entry-view></div><div class="col s3"><ul class="nabes"><li expr275="expr275"></li></ul></div></div><div class="divider"></div><div expr277="expr277" class="section"> </div>',
+            '<div class="divider"></div><div class="row"><div class="col s9"><entry-view expr256="expr256" is="entry-view"></entry-view></div><div class="col s3"><ul class="nabes"><li expr257="expr257"></li></ul></div></div><div class="divider"></div><div expr259="expr259" class="section"> </div>',
             [
               {
                 type: bindingTypes.TAG,
@@ -12918,8 +13264,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                   }
                 ],
 
-                redundantAttribute: 'expr274',
-                selector: '[expr274]'
+                redundantAttribute: 'expr256',
+                selector: '[expr256]'
               },
               {
                 type: bindingTypes.EACH,
@@ -12927,7 +13273,7 @@ div.myEntry span.myHeadword {font-weight: bold}
                 condition: null,
 
                 template: template(
-                  '<a expr276="expr276"> </a>',
+                  '<a expr258="expr258"> </a>',
                   [
                     {
                       expressions: [
@@ -12939,8 +13285,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                       ]
                     },
                     {
-                      redundantAttribute: 'expr276',
-                      selector: '[expr276]',
+                      redundantAttribute: 'expr258',
+                      selector: '[expr258]',
 
                       expressions: [
                         {
@@ -12966,15 +13312,15 @@ div.myEntry span.myHeadword {font-weight: bold}
                   ]
                 ),
 
-                redundantAttribute: 'expr275',
-                selector: '[expr275]',
+                redundantAttribute: 'expr257',
+                selector: '[expr257]',
                 itemName: 'entry',
                 indexName: null,
                 evaluate: _scope => _scope.moreEntries
               },
               {
-                redundantAttribute: 'expr277',
-                selector: '[expr277]',
+                redundantAttribute: 'expr259',
+                selector: '[expr259]',
 
                 expressions: [
                   {
@@ -13044,11 +13390,11 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<h3 expr281="expr281" class="header"> <div class="buttons right" style="margin-top: 5px;"><a expr282="expr282" class="btn"></a><a expr283="expr283" class="btn"></a><a expr284="expr284" class="btn"></a><a expr285="expr285" class="btn"></a></div></h3><p expr286="expr286" class="blurb"> </p><div expr287="expr287" class="section"></div>',
+      '<h3 expr283="expr283" class="header"> <div class="buttons right" style="margin-top: 5px;"><a expr284="expr284" class="btn"></a><a expr285="expr285" class="btn"></a><a expr286="expr286" class="btn"></a><a expr287="expr287" class="btn"></a></div></h3><p expr288="expr288" class="blurb"> </p><div expr289="expr289" class="section"></div>',
       [
         {
-          redundantAttribute: 'expr281',
-          selector: '[expr281]',
+          redundantAttribute: 'expr283',
+          selector: '[expr283]',
 
           expressions: [
             {
@@ -13066,8 +13412,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.userAccess.canEdit,
-          redundantAttribute: 'expr282',
-          selector: '[expr282]',
+          redundantAttribute: 'expr284',
+          selector: '[expr284]',
 
           template: template(
             'edit',
@@ -13094,8 +13440,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.userAccess.canConfig,
-          redundantAttribute: 'expr283',
-          selector: '[expr283]',
+          redundantAttribute: 'expr285',
+          selector: '[expr285]',
 
           template: template(
             'config',
@@ -13122,8 +13468,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.userAccess.canUpload,
-          redundantAttribute: 'expr284',
-          selector: '[expr284]',
+          redundantAttribute: 'expr286',
+          selector: '[expr286]',
 
           template: template(
             'upload',
@@ -13150,8 +13496,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.userAccess.canDownload,
-          redundantAttribute: 'expr285',
-          selector: '[expr285]',
+          redundantAttribute: 'expr287',
+          selector: '[expr287]',
 
           template: template(
             'download',
@@ -13176,8 +13522,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           )
         },
         {
-          redundantAttribute: 'expr286',
-          selector: '[expr286]',
+          redundantAttribute: 'expr288',
+          selector: '[expr288]',
 
           expressions: [
             {
@@ -13190,15 +13536,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.dictDetails.public,
-          redundantAttribute: 'expr287',
-          selector: '[expr287]',
+          redundantAttribute: 'expr289',
+          selector: '[expr289]',
 
           template: template(
-            '<br/><div class="divider"></div><a expr288="expr288" class="btn btn-floating waves-effect waves-light right" style="margin-top: 15px;"><i class="material-icons">refresh</i></a><h5 style="margin-left: 8px;">Examples</h5><div expr289="expr289" class="grey-text" style="min-height: 20px; margin: 15px 10px;"></div><ul expr290="expr290" class="random-entries s10"></ul><div class="divider"></div><div expr293="expr293" class="section right" style="opacity: .5;"> </div>',
+            '<br/><div class="divider"></div><a expr290="expr290" class="btn btn-floating waves-effect waves-light right" style="margin-top: 15px;"><i class="material-icons">refresh</i></a><h5 style="margin-left: 8px;">Examples</h5><div expr291="expr291" class="grey-text" style="min-height: 20px; margin: 15px 10px;"></div><ul expr292="expr292" class="random-entries s10"></ul><div class="divider"></div><div expr295="expr295" class="section right" style="opacity: .5;"> </div>',
             [
               {
-                redundantAttribute: 'expr288',
-                selector: '[expr288]',
+                redundantAttribute: 'expr290',
+                selector: '[expr290]',
 
                 expressions: [
                   {
@@ -13211,8 +13557,8 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.loadingExamples,
-                redundantAttribute: 'expr289',
-                selector: '[expr289]',
+                redundantAttribute: 'expr291',
+                selector: '[expr291]',
 
                 template: template(
                   '\n         Loading...\n      ',
@@ -13222,11 +13568,11 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.loadingExamples && _scope.randomEntries,
-                redundantAttribute: 'expr290',
-                selector: '[expr290]',
+                redundantAttribute: 'expr292',
+                selector: '[expr292]',
 
                 template: template(
-                  '<li expr291="expr291"></li>',
+                  '<li expr293="expr293"></li>',
                   [
                     {
                       type: bindingTypes.EACH,
@@ -13234,11 +13580,11 @@ div.myEntry span.myHeadword {font-weight: bold}
                       condition: null,
 
                       template: template(
-                        '<a expr292="expr292"> </a>',
+                        '<a expr294="expr294"> </a>',
                         [
                           {
-                            redundantAttribute: 'expr292',
-                            selector: '[expr292]',
+                            redundantAttribute: 'expr294',
+                            selector: '[expr294]',
 
                             expressions: [
                               {
@@ -13264,8 +13610,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                         ]
                       ),
 
-                      redundantAttribute: 'expr291',
-                      selector: '[expr291]',
+                      redundantAttribute: 'expr293',
+                      selector: '[expr293]',
                       itemName: 'entry',
                       indexName: null,
                       evaluate: _scope => _scope.randomEntries
@@ -13274,8 +13620,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 )
               },
               {
-                redundantAttribute: 'expr293',
-                selector: '[expr293]',
+                redundantAttribute: 'expr295',
+                selector: '[expr295]',
 
                 expressions: [
                   {
@@ -13377,11 +13723,11 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<nav class="nav-breadcrumbs"><div class="nav-wrapper"><a expr294="expr294" class="breadcrumb"> </a><a expr295="expr295" class="breadcrumb">Upload</a></div></nav><h3>Upload</h3><div><div class="file-field input-field buttons" style="max-width: 700px;"><div class="btn"><span>Choose XML file</span><input type="file" id="file"/></div><div class="file-path-wrapper"><input class="file-path validate" type="text"/></div><div><a expr296="expr296" class="waves-effect waves-light btn btn-primary" id="startButton"><i class="material-icons left">file_upload</i>Upload file\n            </a></div></div></div><div><label><input type="checkbox" id="purge"/><span>Purge dictionary before upload</span></label></div><br/><br/><div><div class="col s10" id="info"></div></div><div><div class="col s10" id="errors"><pre>\n         </pre></div></div>',
+      '<nav class="nav-breadcrumbs"><div class="nav-wrapper"><a expr265="expr265" class="breadcrumb"> </a><a expr266="expr266" class="breadcrumb">Upload</a></div></nav><h3>Upload</h3><div><div class="file-field input-field buttons" style="max-width: 700px;"><div class="btn"><span>Choose XML file</span><input type="file" id="file"/></div><div class="file-path-wrapper"><input class="file-path validate" type="text"/></div><div><a expr267="expr267" class="waves-effect waves-light btn btn-primary" id="startButton"><i class="material-icons left">file_upload</i>Upload file\n            </a></div></div></div><div><label><input type="checkbox" id="purge"/><span>Purge dictionary before upload</span></label></div><br/><br/><div><div class="col s10" id="info"></div></div><div><div class="col s10" id="errors"><pre>\n         </pre></div></div>',
       [
         {
-          redundantAttribute: 'expr294',
-          selector: '[expr294]',
+          redundantAttribute: 'expr265',
+          selector: '[expr265]',
 
           expressions: [
             {
@@ -13403,8 +13749,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr295',
-          selector: '[expr295]',
+          redundantAttribute: 'expr266',
+          selector: '[expr266]',
 
           expressions: [
             {
@@ -13422,8 +13768,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr296',
-          selector: '[expr296]',
+          redundantAttribute: 'expr267',
+          selector: '[expr267]',
 
           expressions: [
             {
@@ -13517,7 +13863,7 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<div class="footer-logos"><div class="logolint"><a target="_blank" href="https://www.muni.cz/" title="Masaryk University"><img class="mulogo" src="img/logo_muni_small.png"/></a><a target="_blank" href="https://www.sketchengine.co.uk/" title="Sketch Engine"><img class="skelogo" src="img/logo_ske_small.png"/></a></div><div expr330="expr330" class="version right white-text"></div></div><div class="footer-copyright">\n      Lexonomy is developed as part of <a href="https://elex.is/">ELEXIS</a> project.\n      <a class="right" href="https://github.com/elexis-eu/lexonomy" title="GitHub" target="_blank"><img src="img/github.png"/></a></div>',
+      '<div class="footer-logos"><div class="logolint"><a target="_blank" href="https://www.muni.cz/" title="Masaryk University"><img class="mulogo" src="img/logo_muni_small.png"/></a><a target="_blank" href="https://www.sketchengine.co.uk/" title="Sketch Engine"><img class="skelogo" src="img/logo_ske_small.png"/></a></div><div expr261="expr261" class="version right white-text"></div></div><div class="footer-copyright">\n      Lexonomy is developed as part of <a href="https://elex.is/">ELEXIS</a> project.\n      <a class="right" href="https://github.com/elexis-eu/lexonomy" title="GitHub" target="_blank"><img src="img/github.png"/></a></div>',
       [
         {
           expressions: [
@@ -13531,8 +13877,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.siteconfig.version,
-          redundantAttribute: 'expr330',
-          selector: '[expr330]',
+          redundantAttribute: 'expr261',
+          selector: '[expr261]',
 
           template: template(
             ' ',
@@ -13608,20 +13954,20 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<div expr297="expr297"></div><div expr301="expr301" class="row"></div><div expr302="expr302" class="row"></div><div expr303="expr303" class="row"></div><div expr304="expr304" class="row"></div>',
+      '<div expr268="expr268"></div><div expr272="expr272" class="row"></div><div expr273="expr273" class="row"></div><div expr274="expr274" class="row"></div><div expr275="expr275" class="row"></div>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.messageSent && _scope.tokenValid,
-          redundantAttribute: 'expr297',
-          selector: '[expr297]',
+          redundantAttribute: 'expr268',
+          selector: '[expr268]',
 
           template: template(
-            '<div class="row"><div class="input-field col s12"><input expr298="expr298" id="password" type="password" class="validate"/><label for="password">Your password</label><span class="helper-text">Set your password to access Lexonomy.</span><input expr299="expr299" id="token" type="hidden"/></div></div><div class="row"><button expr300="expr300" class="btn waves-effect waves-light" type="submit" name="login" id="loginButton">Set password\n            <i class="material-icons right">send</i></button></div>',
+            '<div class="row"><div class="input-field col s12"><input expr269="expr269" id="password" type="password" class="validate"/><label for="password">Your password</label><span class="helper-text">Set your password to access Lexonomy.</span><input expr270="expr270" id="token" type="hidden"/></div></div><div class="row"><button expr271="expr271" class="btn waves-effect waves-light" type="submit" name="login" id="loginButton">Set password\n            <i class="material-icons right">send</i></button></div>',
             [
               {
-                redundantAttribute: 'expr298',
-                selector: '[expr298]',
+                redundantAttribute: 'expr269',
+                selector: '[expr269]',
 
                 expressions: [
                   {
@@ -13632,8 +13978,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr299',
-                selector: '[expr299]',
+                redundantAttribute: 'expr270',
+                selector: '[expr270]',
 
                 expressions: [
                   {
@@ -13643,8 +13989,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr300',
-                selector: '[expr300]',
+                redundantAttribute: 'expr271',
+                selector: '[expr271]',
 
                 expressions: [
                   {
@@ -13660,8 +14006,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.tokenValid && !_scope.checkingToken,
-          redundantAttribute: 'expr301',
-          selector: '[expr301]',
+          redundantAttribute: 'expr272',
+          selector: '[expr272]',
 
           template: template(
             '<div class="col s12"><div class="card red darken-2"><div class="card-content white-text"><p>This recovery link is invalid. It may have expired or has been used before.</p></div></div></div>',
@@ -13671,8 +14017,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.checkingToken,
-          redundantAttribute: 'expr302',
-          selector: '[expr302]',
+          redundantAttribute: 'expr273',
+          selector: '[expr273]',
 
           template: template(
             '<p>Validating recovery token...</p>',
@@ -13682,8 +14028,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.messageSent,
-          redundantAttribute: 'expr303',
-          selector: '[expr303]',
+          redundantAttribute: 'expr274',
+          selector: '[expr274]',
 
           template: template(
             '<p>Your password is updated. You can now <a href="#/">log in</a> with your e-mail address and password.</p>',
@@ -13693,15 +14039,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.errorMessage != '',
-          redundantAttribute: 'expr304',
-          selector: '[expr304]',
+          redundantAttribute: 'expr275',
+          selector: '[expr275]',
 
           template: template(
-            '<div class="col s6"><div class="card red darken-2"><div class="card-content white-text"><p expr305="expr305"> </p></div></div></div>',
+            '<div class="col s6"><div class="card red darken-2"><div class="card-content white-text"><p expr276="expr276"> </p></div></div></div>',
             [
               {
-                redundantAttribute: 'expr305',
-                selector: '[expr305]',
+                redundantAttribute: 'expr276',
+                selector: '[expr276]',
 
                 expressions: [
                   {
@@ -13748,20 +14094,20 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<div expr306="expr306" class="section"></div><div expr309="expr309" class="section"></div><div expr310="expr310" class="row"></div>',
+      '<div expr277="expr277" class="section"></div><div expr280="expr280" class="section"></div><div expr281="expr281" class="row"></div>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.messageSent,
-          redundantAttribute: 'expr306',
-          selector: '[expr306]',
+          redundantAttribute: 'expr277',
+          selector: '[expr277]',
 
           template: template(
-            '<div class="input-field"><input expr307="expr307" id="email" type="email"/><label for="email">Your e-mail</label><span class="helper-text">If you have forgotten your password, enter your e-mail address and we will send you instructions on how to create a new one.</span></div><div><button expr308="expr308" class="btn waves-effect waves-light" type="submit" name="login" id="loginButton">Get a new password\n            <i class="material-icons right">send</i></button></div>',
+            '<div class="input-field"><input expr278="expr278" id="email" type="email"/><label for="email">Your e-mail</label><span class="helper-text">If you have forgotten your password, enter your e-mail address and we will send you instructions on how to create a new one.</span></div><div><button expr279="expr279" class="btn waves-effect waves-light" type="submit" name="login" id="loginButton">Get a new password\n            <i class="material-icons right">send</i></button></div>',
             [
               {
-                redundantAttribute: 'expr307',
-                selector: '[expr307]',
+                redundantAttribute: 'expr278',
+                selector: '[expr278]',
 
                 expressions: [
                   {
@@ -13772,8 +14118,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr308',
-                selector: '[expr308]',
+                redundantAttribute: 'expr279',
+                selector: '[expr279]',
 
                 expressions: [
                   {
@@ -13789,8 +14135,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.messageSent,
-          redundantAttribute: 'expr309',
-          selector: '[expr309]',
+          redundantAttribute: 'expr280',
+          selector: '[expr280]',
 
           template: template(
             '<p>We have sent you an e-mail with instructions on how to reset your password.</p>',
@@ -13800,15 +14146,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.errorMessage != '',
-          redundantAttribute: 'expr310',
-          selector: '[expr310]',
+          redundantAttribute: 'expr281',
+          selector: '[expr281]',
 
           template: template(
-            '<div class="col s6"><div class="card red darken-2"><div class="card-content white-text"><p expr311="expr311"> </p></div></div></div>',
+            '<div class="col s6"><div class="card red darken-2"><div class="card-content white-text"><p expr282="expr282"> </p></div></div></div>',
             [
               {
-                redundantAttribute: 'expr311',
-                selector: '[expr311]',
+                redundantAttribute: 'expr282',
+                selector: '[expr282]',
 
                 expressions: [
                   {
@@ -13852,29 +14198,29 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<ul expr312="expr312" id="dropdown-menu-dict" class="dropdown-content"></ul><ul expr323="expr323" id="dropdown-menu-anon" class="dropdown-content"></ul><ul expr324="expr324" id="dropdown-menu-user" class="dropdown-content"></ul><nav class="white"><div class="nav-wrapper"><a href="#" class="brand-logo"><img class="site-logo" src="img/logo_50.png"/></a><ul id="nav-mobile" class="right hide-on-med-and-down"><li expr326="expr326"></li><li expr327="expr327"></li><li expr328="expr328"></li></ul></div></nav>',
+      '<ul expr296="expr296" id="dropdown-menu-dict" class="dropdown-content"></ul><ul expr307="expr307" id="dropdown-menu-anon" class="dropdown-content"></ul><ul expr308="expr308" id="dropdown-menu-user" class="dropdown-content"></ul><nav class="white"><div class="nav-wrapper"><a href="#" class="brand-logo"><img class="site-logo" src="img/logo_50.png"/></a><ul id="nav-mobile" class="right hide-on-med-and-down"><li expr310="expr310"></li><li expr311="expr311"></li><li expr312="expr312"></li></ul></div></nav>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => true,
-          redundantAttribute: 'expr312',
-          selector: '[expr312]',
+          redundantAttribute: 'expr296',
+          selector: '[expr296]',
 
           template: template(
-            '<li expr313="expr313"></li><li expr315="expr315"></li><li expr317="expr317"></li><li expr319="expr319"></li><li expr321="expr321"></li>',
+            '<li expr297="expr297"></li><li expr299="expr299"></li><li expr301="expr301"></li><li expr303="expr303"></li><li expr305="expr305"></li>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.userAccess && _scope.props.userAccess.canEdit,
-                redundantAttribute: 'expr313',
-                selector: '[expr313]',
+                redundantAttribute: 'expr297',
+                selector: '[expr297]',
 
                 template: template(
-                  '<a expr314="expr314">View</a>',
+                  '<a expr298="expr298">View</a>',
                   [
                     {
-                      redundantAttribute: 'expr314',
-                      selector: '[expr314]',
+                      redundantAttribute: 'expr298',
+                      selector: '[expr298]',
 
                       expressions: [
                         {
@@ -13896,15 +14242,15 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.userAccess && _scope.props.userAccess.canEdit,
-                redundantAttribute: 'expr315',
-                selector: '[expr315]',
+                redundantAttribute: 'expr299',
+                selector: '[expr299]',
 
                 template: template(
-                  '<a expr316="expr316">Edit</a>',
+                  '<a expr300="expr300">Edit</a>',
                   [
                     {
-                      redundantAttribute: 'expr316',
-                      selector: '[expr316]',
+                      redundantAttribute: 'expr300',
+                      selector: '[expr300]',
 
                       expressions: [
                         {
@@ -13927,15 +14273,15 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.userAccess && _scope.props.userAccess.canConfig,
-                redundantAttribute: 'expr317',
-                selector: '[expr317]',
+                redundantAttribute: 'expr301',
+                selector: '[expr301]',
 
                 template: template(
-                  '<a expr318="expr318">Configure</a>',
+                  '<a expr302="expr302">Configure</a>',
                   [
                     {
-                      redundantAttribute: 'expr318',
-                      selector: '[expr318]',
+                      redundantAttribute: 'expr302',
+                      selector: '[expr302]',
 
                       expressions: [
                         {
@@ -13958,15 +14304,15 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.userAccess && _scope.props.userAccess.canDownload,
-                redundantAttribute: 'expr319',
-                selector: '[expr319]',
+                redundantAttribute: 'expr303',
+                selector: '[expr303]',
 
                 template: template(
-                  '<a expr320="expr320">Download</a>',
+                  '<a expr304="expr304">Download</a>',
                   [
                     {
-                      redundantAttribute: 'expr320',
-                      selector: '[expr320]',
+                      redundantAttribute: 'expr304',
+                      selector: '[expr304]',
 
                       expressions: [
                         {
@@ -13989,15 +14335,15 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.userAccess && _scope.props.userAccess.canUpload,
-                redundantAttribute: 'expr321',
-                selector: '[expr321]',
+                redundantAttribute: 'expr305',
+                selector: '[expr305]',
 
                 template: template(
-                  '<a expr322="expr322">Upload</a>',
+                  '<a expr306="expr306">Upload</a>',
                   [
                     {
-                      redundantAttribute: 'expr322',
-                      selector: '[expr322]',
+                      redundantAttribute: 'expr306',
+                      selector: '[expr306]',
 
                       expressions: [
                         {
@@ -14023,8 +14369,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.props.authorized,
-          redundantAttribute: 'expr323',
-          selector: '[expr323]',
+          redundantAttribute: 'expr307',
+          selector: '[expr307]',
 
           template: template(
             '<li><a href="#/">Log in</a></li><li><a href="#/register">Get an account</a></li><li><a href="#/forgot">Forgot your password?</a></li>',
@@ -14034,15 +14380,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.authorized,
-          redundantAttribute: 'expr324',
-          selector: '[expr324]',
+          redundantAttribute: 'expr308',
+          selector: '[expr308]',
 
           template: template(
-            '<li><a expr325="expr325" href="#/">Log out</a></li><li><a href="#/userprofile">Your profile</a></li>',
+            '<li><a expr309="expr309" href="#/">Log out</a></li><li><a href="#/userprofile">Your profile</a></li>',
             [
               {
-                redundantAttribute: 'expr325',
-                selector: '[expr325]',
+                redundantAttribute: 'expr309',
+                selector: '[expr309]',
 
                 expressions: [
                   {
@@ -14058,8 +14404,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.showDictMenu,
-          redundantAttribute: 'expr326',
-          selector: '[expr326]',
+          redundantAttribute: 'expr310',
+          selector: '[expr310]',
 
           template: template(
             '<a class="dropdown-trigger" href="#/" data-target="dropdown-menu-dict">Dictionary<i class="material-icons right">arrow_drop_down</i></a>',
@@ -14069,8 +14415,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.props.authorized,
-          redundantAttribute: 'expr327',
-          selector: '[expr327]',
+          redundantAttribute: 'expr311',
+          selector: '[expr311]',
 
           template: template(
             '<a class="dropdown-trigger" href="#/" data-target="dropdown-menu-anon">anonymous user<i class="material-icons right">arrow_drop_down</i></a>',
@@ -14080,15 +14426,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.authorized,
-          redundantAttribute: 'expr328',
-          selector: '[expr328]',
+          redundantAttribute: 'expr312',
+          selector: '[expr312]',
 
           template: template(
-            '<a expr329="expr329" class="dropdown-trigger" href="#/" data-target="dropdown-menu-user"> <i class="material-icons right">arrow_drop_down</i></a>',
+            '<a expr313="expr313" class="dropdown-trigger" href="#/" data-target="dropdown-menu-user"> <i class="material-icons right">arrow_drop_down</i></a>',
             [
               {
-                redundantAttribute: 'expr329',
-                selector: '[expr329]',
+                redundantAttribute: 'expr313',
+                selector: '[expr313]',
 
                 expressions: [
                   {
@@ -14130,11 +14476,11 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<a expr345="expr345"></a>',
+      '<a expr314="expr314"></a>',
       [
         {
-          redundantAttribute: 'expr345',
-          selector: '[expr345]',
+          redundantAttribute: 'expr314',
+          selector: '[expr314]',
 
           expressions: [
             {
@@ -14177,11 +14523,11 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<div class="section"><div class="input-field"><input id="username" type="email" class="validate" value/><label for="username">Username</label><small>\n            No account? <a href="#register" tabindex="-1">Sign up</a></small></div><div class="input-field"><input expr346="expr346" id="password" type="password"/><label for="password">Password</label><small><a href="#forgot" tabindex="-1">Forgot password?</a></small></div><button expr347="expr347" class="btn btn-primary waves-effect waves-light" type="submit" name="login" id="loginButton">Log in\n         <i class="material-icons right">send</i></button></div><div expr348="expr348" class="section"></div>',
+      '<div class="section"><div class="input-field"><input id="username" type="email" class="validate" value/><label for="username">Username</label><small>\n            No account? <a href="#register" tabindex="-1">Sign up</a></small></div><div class="input-field"><input expr343="expr343" id="password" type="password"/><label for="password">Password</label><small><a href="#forgot" tabindex="-1">Forgot password?</a></small></div><button expr344="expr344" class="btn btn-primary waves-effect waves-light" type="submit" name="login" id="loginButton">Log in\n         <i class="material-icons right">send</i></button></div><div expr345="expr345" class="section"></div>',
       [
         {
-          redundantAttribute: 'expr346',
-          selector: '[expr346]',
+          redundantAttribute: 'expr343',
+          selector: '[expr343]',
 
           expressions: [
             {
@@ -14192,8 +14538,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr347',
-          selector: '[expr347]',
+          redundantAttribute: 'expr344',
+          selector: '[expr344]',
 
           expressions: [
             {
@@ -14206,15 +14552,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => 'sketchengineLoginPage' in _scope.props.siteconfig && _scope.props.siteconfig.sketchengineLoginPage != "",
-          redundantAttribute: 'expr348',
-          selector: '[expr348]',
+          redundantAttribute: 'expr345',
+          selector: '[expr345]',
 
           template: template(
-            '<a expr349="expr349" class="btn waves-effect waves-light">Sign up or log in with\n         <img class="skelogin" alt="Sketch Engine" title="Sketch Engine" src="img/logo_ske_white.png"/><i class="material-icons right">send</i></a>',
+            '<a expr346="expr346" class="btn waves-effect waves-light">Sign up or log in with\n         <img class="skelogin" alt="Sketch Engine" title="Sketch Engine" src="img/logo_ske_white.png"/><i class="material-icons right">send</i></a>',
             [
               {
-                redundantAttribute: 'expr349',
-                selector: '[expr349]',
+                redundantAttribute: 'expr346',
+                selector: '[expr346]',
 
                 expressions: [
                   {
@@ -14243,25 +14589,25 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<div expr331="expr331"></div><div expr338="expr338" class="row"></div><div class="divider" style="margin-top: 50px;"></div><div class="section" style="opacity: 0.6;"><h5>Reference</h5><p>Měchura, M. B. (2017) ‘<a href="docs/elex2017.pdf">Introducing Lexonomy: an open-source dictionary writing and publishing system</a>’ in <i>Electronic Lexicography in the 21st Century: Lexicography from Scratch. Proceedings of the eLex 2017 conference, 19-21 September 2017, Leiden, The Netherlands.</i><br/><span class>If you are referring to Lexonomy from an academic publication, it is recommended that you cite this paper.</span></p></div>',
+      '<div expr315="expr315"></div><div expr322="expr322" class="row"></div><div class="divider" style="margin-top: 50px;"></div><div class="section" style="opacity: 0.6;"><h5>Reference</h5><p>Měchura, M. B. (2017) ‘<a href="docs/elex2017.pdf">Introducing Lexonomy: an open-source dictionary writing and publishing system</a>’ in <i>Electronic Lexicography in the 21st Century: Lexicography from Scratch. Proceedings of the eLex 2017 conference, 19-21 September 2017, Leiden, The Netherlands.</i><br/><span class>If you are referring to Lexonomy from an academic publication, it is recommended that you cite this paper.</span></p></div>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.props.authorized,
-          redundantAttribute: 'expr331',
-          selector: '[expr331]',
+          redundantAttribute: 'expr315',
+          selector: '[expr315]',
 
           template: template(
-            '<template expr332="expr332"></template><template expr334="expr334"></template>',
+            '<template expr316="expr316"></template><template expr318="expr318"></template>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.siteconfig.consent && _scope.props.siteconfig.consent.terms && !_scope.props.userInfo.consent,
-                redundantAttribute: 'expr332',
-                selector: '[expr332]',
+                redundantAttribute: 'expr316',
+                selector: '[expr316]',
 
                 template: template(
-                  '<user-consent expr333="expr333"></user-consent>',
+                  '<user-consent expr317="expr317"></user-consent>',
                   [
                     {
                       type: bindingTypes.TAG,
@@ -14287,8 +14633,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                         }
                       ],
 
-                      redundantAttribute: 'expr333',
-                      selector: '[expr333]'
+                      redundantAttribute: 'expr317',
+                      selector: '[expr317]'
                     }
                   ]
                 )
@@ -14296,17 +14642,17 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.props.siteconfig.consent || !_scope.props.siteconfig.consent.terms || _scope.props.userInfo.consent,
-                redundantAttribute: 'expr334',
-                selector: '[expr334]',
+                redundantAttribute: 'expr318',
+                selector: '[expr318]',
 
                 template: template(
-                  '<dict-list expr335="expr335"></dict-list><dict-new expr336="expr336"></dict-new><userprofile expr337="expr337"></userprofile>',
+                  '<dict-list expr319="expr319"></dict-list><dict-new expr320="expr320"></dict-new><userprofile expr321="expr321"></userprofile>',
                   [
                     {
                       type: bindingTypes.IF,
                       evaluate: _scope => _scope.props.mainSubPage != 'new' && _scope.props.mainSubPage != 'userprofile',
-                      redundantAttribute: 'expr335',
-                      selector: '[expr335]',
+                      redundantAttribute: 'expr319',
+                      selector: '[expr319]',
 
                       template: template(
                         null,
@@ -14324,8 +14670,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                     {
                       type: bindingTypes.IF,
                       evaluate: _scope => _scope.props.mainSubPage == 'new',
-                      redundantAttribute: 'expr336',
-                      selector: '[expr336]',
+                      redundantAttribute: 'expr320',
+                      selector: '[expr320]',
 
                       template: template(
                         null,
@@ -14343,8 +14689,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                     {
                       type: bindingTypes.IF,
                       evaluate: _scope => _scope.props.mainSubPage == 'userprofile',
-                      redundantAttribute: 'expr337',
-                      selector: '[expr337]',
+                      redundantAttribute: 'expr321',
+                      selector: '[expr321]',
 
                       template: template(
                         null,
@@ -14380,11 +14726,11 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.props.authorized,
-          redundantAttribute: 'expr338',
-          selector: '[expr338]',
+          redundantAttribute: 'expr322',
+          selector: '[expr322]',
 
           template: template(
-            '<div class="col m7 s12"><welcome expr339="expr339"></welcome></div><div class="col m5 s12"><login expr340="expr340"></login><register expr341="expr341"></register><register-password expr342="expr342"></register-password><forgot expr343="expr343"></forgot><forgot-password expr344="expr344"></forgot-password></div>',
+            '<div class="col m7 s12"><welcome expr323="expr323"></welcome></div><div class="col m5 s12"><login expr324="expr324"></login><register expr325="expr325"></register><register-password expr326="expr326"></register-password><forgot expr327="expr327"></forgot><forgot-password expr328="expr328"></forgot-password></div>',
             [
               {
                 type: bindingTypes.TAG,
@@ -14392,14 +14738,14 @@ div.myEntry span.myHeadword {font-weight: bold}
                 evaluate: _scope => 'welcome',
                 slots: [],
                 attributes: [],
-                redundantAttribute: 'expr339',
-                selector: '[expr339]'
+                redundantAttribute: 'expr323',
+                selector: '[expr323]'
               },
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.mainSubPage == 'login',
-                redundantAttribute: 'expr340',
-                selector: '[expr340]',
+                redundantAttribute: 'expr324',
+                selector: '[expr324]',
 
                 template: template(
                   null,
@@ -14429,8 +14775,8 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.mainSubPage == 'register',
-                redundantAttribute: 'expr341',
-                selector: '[expr341]',
+                redundantAttribute: 'expr325',
+                selector: '[expr325]',
 
                 template: template(
                   null,
@@ -14455,8 +14801,8 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.mainSubPage == 'registerPassword',
-                redundantAttribute: 'expr342',
-                selector: '[expr342]',
+                redundantAttribute: 'expr326',
+                selector: '[expr326]',
 
                 template: template(
                   null,
@@ -14486,8 +14832,8 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.mainSubPage == 'forgot',
-                redundantAttribute: 'expr343',
-                selector: '[expr343]',
+                redundantAttribute: 'expr327',
+                selector: '[expr327]',
 
                 template: template(
                   null,
@@ -14512,8 +14858,8 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.props.mainSubPage == 'forgotPassword',
-                redundantAttribute: 'expr344',
-                selector: '[expr344]',
+                redundantAttribute: 'expr328',
+                selector: '[expr328]',
 
                 template: template(
                   null,
@@ -14654,13 +15000,13 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<h4>\n      Open dictionaries\n   </h4><div expr365="expr365"></div><div expr366="expr366"></div>',
+      '<h4>\n      Open dictionaries\n   </h4><div expr329="expr329"></div><div expr330="expr330"></div>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.isLoading,
-          redundantAttribute: 'expr365',
-          selector: '[expr365]',
+          redundantAttribute: 'expr329',
+          selector: '[expr329]',
 
           template: template(
             '<div class="progress" style="margin: 20vh auto; max-width: 50%;"><div class="indeterminate"></div></div>',
@@ -14670,15 +15016,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.isLoading,
-          redundantAttribute: 'expr366',
-          selector: '[expr366]',
+          redundantAttribute: 'expr330',
+          selector: '[expr330]',
 
           template: template(
-            '<div><div class="input-field" style="display: inline-block; margin-right: 40px;"><i class="material-icons prefix grey-text">search</i><input expr367="expr367" id="search" type="text" style="width: 200px;"/><label for="search">Find</label></div><div class="input-field" style="display: inline-block;"><i class="material-icons prefix grey-text">translate</i><select id="languageSelect" style="width: 200px;"><option value>All languages</option><option expr368="expr368"></option></select><label>Language</label></div></div><div expr369="expr369" class="center" style="margin: 20vh auto;"></div><table expr370="expr370" class="striped highlight" style="margin: 0 15px;"></table>',
+            '<div><div class="input-field" style="display: inline-block; margin-right: 40px;"><i class="material-icons prefix grey-text">search</i><input expr331="expr331" id="search" type="text" style="width: 200px;"/><label for="search">Find</label></div><div class="input-field" style="display: inline-block;"><i class="material-icons prefix grey-text">translate</i><select id="languageSelect" style="width: 200px;"><option value>All languages</option><option expr332="expr332"></option></select><label>Language</label></div></div><div expr333="expr333" class="center" style="margin: 20vh auto;"></div><table expr334="expr334" class="striped highlight" style="margin: 0 15px;"></table>',
             [
               {
-                redundantAttribute: 'expr367',
-                selector: '[expr367]',
+                redundantAttribute: 'expr331',
+                selector: '[expr331]',
 
                 expressions: [
                   {
@@ -14713,8 +15059,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                   ]
                 ),
 
-                redundantAttribute: 'expr368',
-                selector: '[expr368]',
+                redundantAttribute: 'expr332',
+                selector: '[expr332]',
                 itemName: 'language',
                 indexName: null,
                 evaluate: _scope => _scope.languageList
@@ -14722,8 +15068,8 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => !_scope.visibleDicts.length,
-                redundantAttribute: 'expr369',
-                selector: '[expr369]',
+                redundantAttribute: 'expr333',
+                selector: '[expr333]',
 
                 template: template(
                   '<h3 class="grey-text lighten-2">Nothing found</h3>',
@@ -14733,11 +15079,11 @@ div.myEntry span.myHeadword {font-weight: bold}
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.visibleDicts.length,
-                redundantAttribute: 'expr370',
-                selector: '[expr370]',
+                redundantAttribute: 'expr334',
+                selector: '[expr334]',
 
                 template: template(
-                  '<thead><th>\n               Title\n            </th><th>\n               Language\n            </th><th>\n               Size\n            </th><th>\n               Author\n            </th><th>\n               Licence\n            </th></thead><tbody><tr expr371="expr371"></tr></tbody>',
+                  '<thead><th>\n               Title\n            </th><th>\n               Language\n            </th><th>\n               Size\n            </th><th>\n               Author\n            </th><th>\n               Licence\n            </th></thead><tbody><tr expr335="expr335"></tr></tbody>',
                   [
                     {
                       type: bindingTypes.EACH,
@@ -14745,7 +15091,7 @@ div.myEntry span.myHeadword {font-weight: bold}
                       condition: null,
 
                       template: template(
-                        '<td><a expr372="expr372"><span expr373="expr373"> </span></a><a expr374="expr374" title="edit dictionary"></a></td><td><span expr375="expr375"> </span></td><td><span expr376="expr376"> </span></td><td><span expr377="expr377"> </span></td><td><span expr378="expr378"> </span></td>',
+                        '<td><a expr336="expr336"><span expr337="expr337"> </span></a><a expr338="expr338" title="edit dictionary"></a></td><td><span expr339="expr339"> </span></td><td><span expr340="expr340"> </span></td><td><span expr341="expr341"> </span></td><td><span expr342="expr342"> </span></td>',
                         [
                           {
                             expressions: [
@@ -14763,8 +15109,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                             ]
                           },
                           {
-                            redundantAttribute: 'expr372',
-                            selector: '[expr372]',
+                            redundantAttribute: 'expr336',
+                            selector: '[expr336]',
 
                             expressions: [
                               {
@@ -14781,8 +15127,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                             ]
                           },
                           {
-                            redundantAttribute: 'expr373',
-                            selector: '[expr373]',
+                            redundantAttribute: 'expr337',
+                            selector: '[expr337]',
 
                             expressions: [
                               {
@@ -14811,8 +15157,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                           {
                             type: bindingTypes.IF,
                             evaluate: _scope => _scope.row.isAdmin,
-                            redundantAttribute: 'expr374',
-                            selector: '[expr374]',
+                            redundantAttribute: 'expr338',
+                            selector: '[expr338]',
 
                             template: template(
                               '<i class="material-icons">edit</i>',
@@ -14837,8 +15183,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                             )
                           },
                           {
-                            redundantAttribute: 'expr375',
-                            selector: '[expr375]',
+                            redundantAttribute: 'expr339',
+                            selector: '[expr339]',
 
                             expressions: [
                               {
@@ -14865,8 +15211,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                             ]
                           },
                           {
-                            redundantAttribute: 'expr376',
-                            selector: '[expr376]',
+                            redundantAttribute: 'expr340',
+                            selector: '[expr340]',
 
                             expressions: [
                               {
@@ -14893,8 +15239,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                             ]
                           },
                           {
-                            redundantAttribute: 'expr377',
-                            selector: '[expr377]',
+                            redundantAttribute: 'expr341',
+                            selector: '[expr341]',
 
                             expressions: [
                               {
@@ -14921,8 +15267,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                             ]
                           },
                           {
-                            redundantAttribute: 'expr378',
-                            selector: '[expr378]',
+                            redundantAttribute: 'expr342',
+                            selector: '[expr342]',
 
                             expressions: [
                               {
@@ -14951,8 +15297,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                         ]
                       ),
 
-                      redundantAttribute: 'expr371',
-                      selector: '[expr371]',
+                      redundantAttribute: 'expr335',
+                      selector: '[expr335]',
                       itemName: 'row',
                       indexName: 'idx',
                       evaluate: _scope => _scope.visibleDicts
@@ -15016,20 +15362,20 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<div expr356="expr356"></div><div expr360="expr360" class="row"></div><div expr361="expr361" class="row"></div><div expr362="expr362" class="row"></div><div expr363="expr363" class="row"></div>',
+      '<div expr347="expr347"></div><div expr351="expr351" class="row"></div><div expr352="expr352" class="row"></div><div expr353="expr353" class="row"></div><div expr354="expr354" class="row"></div>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.messageSent && _scope.tokenValid,
-          redundantAttribute: 'expr356',
-          selector: '[expr356]',
+          redundantAttribute: 'expr347',
+          selector: '[expr347]',
 
           template: template(
-            '<div class="row"><div class="input-field col s12"><input expr357="expr357" id="password" type="password" class="validate"/><label for="password">Your password</label><span class="helper-text">Set your password to access Lexonomy.</span><input expr358="expr358" id="token" type="hidden"/></div></div><div class="row"><button expr359="expr359" class="btn waves-effect waves-light" type="submit" name="login" id="loginButton">Set password\n            <i class="material-icons right">send</i></button></div>',
+            '<div class="row"><div class="input-field col s12"><input expr348="expr348" id="password" type="password" class="validate"/><label for="password">Your password</label><span class="helper-text">Set your password to access Lexonomy.</span><input expr349="expr349" id="token" type="hidden"/></div></div><div class="row"><button expr350="expr350" class="btn waves-effect waves-light" type="submit" name="login" id="loginButton">Set password\n            <i class="material-icons right">send</i></button></div>',
             [
               {
-                redundantAttribute: 'expr357',
-                selector: '[expr357]',
+                redundantAttribute: 'expr348',
+                selector: '[expr348]',
 
                 expressions: [
                   {
@@ -15040,8 +15386,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr358',
-                selector: '[expr358]',
+                redundantAttribute: 'expr349',
+                selector: '[expr349]',
 
                 expressions: [
                   {
@@ -15051,8 +15397,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr359',
-                selector: '[expr359]',
+                redundantAttribute: 'expr350',
+                selector: '[expr350]',
 
                 expressions: [
                   {
@@ -15068,8 +15414,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.tokenValid && !_scope.checkingToken,
-          redundantAttribute: 'expr360',
-          selector: '[expr360]',
+          redundantAttribute: 'expr351',
+          selector: '[expr351]',
 
           template: template(
             '<div class="col s12"><div class="card red darken-2"><div class="card-content white-text"><p>This signup link is invalid. It may have expired or has been used before.</p></div></div></div>',
@@ -15079,8 +15425,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.checkingToken,
-          redundantAttribute: 'expr361',
-          selector: '[expr361]',
+          redundantAttribute: 'expr352',
+          selector: '[expr352]',
 
           template: template(
             '<p>Validating signup token...</p>',
@@ -15090,8 +15436,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.messageSent,
-          redundantAttribute: 'expr362',
-          selector: '[expr362]',
+          redundantAttribute: 'expr353',
+          selector: '[expr353]',
 
           template: template(
             '<p>We have created your account. You can now <a href="#/">log in</a> with your e-mail address and password.</p>',
@@ -15101,15 +15447,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.errorMessage != '',
-          redundantAttribute: 'expr363',
-          selector: '[expr363]',
+          redundantAttribute: 'expr354',
+          selector: '[expr354]',
 
           template: template(
-            '<div class="col s6"><div class="card red darken-2"><div class="card-content white-text"><p expr364="expr364"> </p></div></div></div>',
+            '<div class="col s6"><div class="card red darken-2"><div class="card-content white-text"><p expr355="expr355"> </p></div></div></div>',
             [
               {
-                redundantAttribute: 'expr364',
-                selector: '[expr364]',
+                redundantAttribute: 'expr355',
+                selector: '[expr355]',
 
                 expressions: [
                   {
@@ -15157,20 +15503,20 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<div expr350="expr350" class="section"></div><div expr353="expr353"></div><div expr354="expr354"></div>',
+      '<div expr376="expr376" class="section"></div><div expr379="expr379"></div><div expr380="expr380"></div>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.messageSent,
-          redundantAttribute: 'expr350',
-          selector: '[expr350]',
+          redundantAttribute: 'expr376',
+          selector: '[expr376]',
 
           template: template(
-            '<div class="input-field"><input expr351="expr351" id="email" type="email" class="validate"/><label for="email">Your e-mail</label><span class="helper-text">To get a new account, enter your e-mail address and we will send you instructions.</span></div><button expr352="expr352" class="btn waves-effect waves-light" type="submit" name="login" id="loginButton">Register\n         <i class="material-icons right">send</i></button>',
+            '<div class="input-field"><input expr377="expr377" id="email" type="email" class="validate"/><label for="email">Your e-mail</label><span class="helper-text">To get a new account, enter your e-mail address and we will send you instructions.</span></div><button expr378="expr378" class="btn waves-effect waves-light" type="submit" name="login" id="loginButton">Register\n         <i class="material-icons right">send</i></button>',
             [
               {
-                redundantAttribute: 'expr351',
-                selector: '[expr351]',
+                redundantAttribute: 'expr377',
+                selector: '[expr377]',
 
                 expressions: [
                   {
@@ -15181,8 +15527,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr352',
-                selector: '[expr352]',
+                redundantAttribute: 'expr378',
+                selector: '[expr378]',
 
                 expressions: [
                   {
@@ -15198,8 +15544,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.messageSent,
-          redundantAttribute: 'expr353',
-          selector: '[expr353]',
+          redundantAttribute: 'expr379',
+          selector: '[expr379]',
 
           template: template(
             '<p>We have sent you an e-mail with instructions on how to create a new account.</p>',
@@ -15209,15 +15555,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.errorMessage != '',
-          redundantAttribute: 'expr354',
-          selector: '[expr354]',
+          redundantAttribute: 'expr380',
+          selector: '[expr380]',
 
           template: template(
-            '<div class="card red darken-2"><div class="card-content white-text"><p expr355="expr355"> </p></div></div>',
+            '<div class="card red darken-2"><div class="card-content white-text"><p expr381="expr381"> </p></div></div>',
             [
               {
-                redundantAttribute: 'expr355',
-                selector: '[expr355]',
+                redundantAttribute: 'expr381',
+                selector: '[expr381]',
 
                 expressions: [
                   {
@@ -15345,20 +15691,20 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<h3>Account settings</h3><div class="row"><label>Sketch Engine login</label><div expr379="expr379"></div><div expr382="expr382"></div><div expr384="expr384"></div></div><div class="row"><label>Sketch Engine API key</label><p expr388="expr388"></p><p expr389="expr389"></p><div class="input-field" style="margin-top: 0;"><div style="display: flex; gap: 10px; align-items: center;"><input expr391="expr391" id="skeapi" type="text" class="validate" style="width: 350px;"/><button expr392="expr392" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Change API key\n               <i class="material-icons right">send</i></button></div><span class="helper-text">Set your API key for Sketch Engine.</span></div></div><div class="row"><p expr393="expr393"> </p><label>Lexonomy API key</label><div class="input-field" style="margin-top: 0;"><div style="display: flex; gap: 10px; align-items: center;"><input expr394="expr394" type="text" disabled style="width: 350px;"/><button expr395="expr395" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Generate new API key\n               <i class="material-icons right">autorenew</i></button><button expr396="expr396" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Remove API key\n               <i class="material-icons right">delete</i></button></div><span class="helper-text">This key allows external tools such as Sketch Engine to create a dictionary in your account and to populate it with pre-generated entries.</span></div></div><div class="row"><p expr397="expr397"> </p><label>New password</label><div class="input-field" style="margin-top: 0;"><div style="display: flex; gap: 10px; align-items: center;"><input id="password" type="password" class="validate" style="width: 350px;"/><button expr398="expr398" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Change password\n               <i class="material-icons right">send</i></button></div><span class="helper-text">Set your password to access Lexonomy.</span></div></div><div><a class="btn" href="#/" onclick="window.history.back()">Back</a></div>',
+      '<h3>Account settings</h3><div class="row"><label>Sketch Engine login</label><div expr356="expr356"></div><div expr359="expr359"></div><div expr361="expr361"></div></div><div class="row"><label>Sketch Engine API key</label><p expr365="expr365"></p><p expr366="expr366"></p><div class="input-field" style="margin-top: 0;"><div style="display: flex; gap: 10px; align-items: center;"><input expr368="expr368" id="skeapi" type="text" class="validate" style="width: 350px;"/><button expr369="expr369" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Change API key\n               <i class="material-icons right">send</i></button></div><span class="helper-text">Set your API key for Sketch Engine.</span></div></div><div class="row"><p expr370="expr370"> </p><label>Lexonomy API key</label><div class="input-field" style="margin-top: 0;"><div style="display: flex; gap: 10px; align-items: center;"><input expr371="expr371" type="text" disabled style="width: 350px;"/><button expr372="expr372" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Generate new API key\n               <i class="material-icons right">autorenew</i></button><button expr373="expr373" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Remove API key\n               <i class="material-icons right">delete</i></button></div><span class="helper-text">This key allows external tools such as Sketch Engine to create a dictionary in your account and to populate it with pre-generated entries.</span></div></div><div class="row"><p expr374="expr374"> </p><label>New password</label><div class="input-field" style="margin-top: 0;"><div style="display: flex; gap: 10px; align-items: center;"><input id="password" type="password" class="validate" style="width: 350px;"/><button expr375="expr375" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Change password\n               <i class="material-icons right">send</i></button></div><span class="helper-text">Set your password to access Lexonomy.</span></div></div><div><a class="btn" href="#/" onclick="window.history.back()">Back</a></div>',
       [
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.siteconfig.sketchengineLoginPage && _scope.props.userInfo.ske_username,
-          redundantAttribute: 'expr379',
-          selector: '[expr379]',
+          redundantAttribute: 'expr356',
+          selector: '[expr356]',
 
           template: template(
-            '<p>Your Lexonomy account is linked to your Sketch Engine account <b expr380="expr380"> </b><br/><a expr381="expr381">Link to a different Sketch Engine account&nbsp;»</a></p>',
+            '<p>Your Lexonomy account is linked to your Sketch Engine account <b expr357="expr357"> </b><br/><a expr358="expr358">Link to a different Sketch Engine account&nbsp;»</a></p>',
             [
               {
-                redundantAttribute: 'expr380',
-                selector: '[expr380]',
+                redundantAttribute: 'expr357',
+                selector: '[expr357]',
 
                 expressions: [
                   {
@@ -15369,8 +15715,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr381',
-                selector: '[expr381]',
+                redundantAttribute: 'expr358',
+                selector: '[expr358]',
 
                 expressions: [
                   {
@@ -15386,15 +15732,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.siteconfig.sketchengineLoginPage && !_scope.props.userInfo.ske_username,
-          redundantAttribute: 'expr382',
-          selector: '[expr382]',
+          redundantAttribute: 'expr359',
+          selector: '[expr359]',
 
           template: template(
-            '<p><strong>Sketch Engine login</strong></p><p><a expr383="expr383">Link Lexonomy to your Sketch Engine account&nbsp;»</a></p>',
+            '<p><strong>Sketch Engine login</strong></p><p><a expr360="expr360">Link Lexonomy to your Sketch Engine account&nbsp;»</a></p>',
             [
               {
-                redundantAttribute: 'expr383',
-                selector: '[expr383]',
+                redundantAttribute: 'expr360',
+                selector: '[expr360]',
 
                 expressions: [
                   {
@@ -15410,17 +15756,17 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => !_scope.siteconfig.sketchengineLoginPage,
-          redundantAttribute: 'expr384',
-          selector: '[expr384]',
+          redundantAttribute: 'expr361',
+          selector: '[expr361]',
 
           template: template(
-            '<p expr385="expr385"></p><div class="input-field" style="margin-top: 0;"><div style="display: flex; gap: 10px; align-items: center;"><input expr386="expr386" id="skeusername" type="text" class="validate" style="width: 350px;"/><button expr387="expr387" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Change username\n                  <i class="material-icons right">send</i></button></div><span class="helper-text">Set your login username to Sketch Engine.</span></div>',
+            '<p expr362="expr362"></p><div class="input-field" style="margin-top: 0;"><div style="display: flex; gap: 10px; align-items: center;"><input expr363="expr363" id="skeusername" type="text" class="validate" style="width: 350px;"/><button expr364="expr364" class="btn waves-effect waves-light" type="submit" style="margin-bottom: 10px;">Change username\n                  <i class="material-icons right">send</i></button></div><span class="helper-text">Set your login username to Sketch Engine.</span></div>',
             [
               {
                 type: bindingTypes.IF,
                 evaluate: _scope => _scope.skeuserMessage != '',
-                redundantAttribute: 'expr385',
-                selector: '[expr385]',
+                redundantAttribute: 'expr362',
+                selector: '[expr362]',
 
                 template: template(
                   ' ',
@@ -15438,8 +15784,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 )
               },
               {
-                redundantAttribute: 'expr386',
-                selector: '[expr386]',
+                redundantAttribute: 'expr363',
+                selector: '[expr363]',
 
                 expressions: [
                   {
@@ -15449,8 +15795,8 @@ div.myEntry span.myHeadword {font-weight: bold}
                 ]
               },
               {
-                redundantAttribute: 'expr387',
-                selector: '[expr387]',
+                redundantAttribute: 'expr364',
+                selector: '[expr364]',
 
                 expressions: [
                   {
@@ -15466,8 +15812,8 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => _scope.skeapiMessage != '',
-          redundantAttribute: 'expr388',
-          selector: '[expr388]',
+          redundantAttribute: 'expr365',
+          selector: '[expr365]',
 
           template: template(
             ' ',
@@ -15487,15 +15833,15 @@ div.myEntry span.myHeadword {font-weight: bold}
         {
           type: bindingTypes.IF,
           evaluate: _scope => 'sketchengineLoginPage' in _scope.siteconfig && _scope.siteconfig.sketchengineLoginPage != "",
-          redundantAttribute: 'expr389',
-          selector: '[expr389]',
+          redundantAttribute: 'expr366',
+          selector: '[expr366]',
 
           template: template(
-            '\n         Unless you need special setup, Please, <a expr390="expr390">login via Sketch Engine</a> to set API key automatically.\n      ',
+            '\n         Unless you need special setup, Please, <a expr367="expr367">login via Sketch Engine</a> to set API key automatically.\n      ',
             [
               {
-                redundantAttribute: 'expr390',
-                selector: '[expr390]',
+                redundantAttribute: 'expr367',
+                selector: '[expr367]',
 
                 expressions: [
                   {
@@ -15509,8 +15855,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           )
         },
         {
-          redundantAttribute: 'expr391',
-          selector: '[expr391]',
+          redundantAttribute: 'expr368',
+          selector: '[expr368]',
 
           expressions: [
             {
@@ -15520,8 +15866,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr392',
-          selector: '[expr392]',
+          redundantAttribute: 'expr369',
+          selector: '[expr369]',
 
           expressions: [
             {
@@ -15532,8 +15878,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr393',
-          selector: '[expr393]',
+          redundantAttribute: 'expr370',
+          selector: '[expr370]',
 
           expressions: [
             {
@@ -15544,8 +15890,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr394',
-          selector: '[expr394]',
+          redundantAttribute: 'expr371',
+          selector: '[expr371]',
 
           expressions: [
             {
@@ -15555,8 +15901,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr395',
-          selector: '[expr395]',
+          redundantAttribute: 'expr372',
+          selector: '[expr372]',
 
           expressions: [
             {
@@ -15567,8 +15913,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr396',
-          selector: '[expr396]',
+          redundantAttribute: 'expr373',
+          selector: '[expr373]',
 
           expressions: [
             {
@@ -15579,8 +15925,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr397',
-          selector: '[expr397]',
+          redundantAttribute: 'expr374',
+          selector: '[expr374]',
 
           expressions: [
             {
@@ -15591,8 +15937,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr398',
-          selector: '[expr398]',
+          redundantAttribute: 'expr375',
+          selector: '[expr375]',
 
           expressions: [
             {
@@ -15654,11 +16000,11 @@ div.myEntry span.myHeadword {font-weight: bold}
       bindingTypes,
       getComponent
     ) => template(
-      '<div><div class="row"><div expr399="expr399" class="col"> </div></div><div class="row"><div class="col"><button expr400="expr400" class="btn waves-effect waves-light" type="submit"> <i class="material-icons right">check</i></button></div></div></div>',
+      '<div><div class="row"><div expr382="expr382" class="col"> </div></div><div class="row"><div class="col"><button expr383="expr383" class="btn waves-effect waves-light" type="submit"> <i class="material-icons right">check</i></button></div></div></div>',
       [
         {
-          redundantAttribute: 'expr399',
-          selector: '[expr399]',
+          redundantAttribute: 'expr382',
+          selector: '[expr382]',
 
           expressions: [
             {
@@ -15674,8 +16020,8 @@ div.myEntry span.myHeadword {font-weight: bold}
           ]
         },
         {
-          redundantAttribute: 'expr400',
-          selector: '[expr400]',
+          redundantAttribute: 'expr383',
+          selector: '[expr383]',
 
           expressions: [
             {

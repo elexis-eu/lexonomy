@@ -59,7 +59,7 @@
 
         <template if={state.isAddingAttribute}>
             <form onsubmit={saveNewAttribute}>
-                <input class="textbox tech atName txtAtNew" oninput={updateLocalData} data-path="newAttributeName" focus>
+                <input class="textbox tech atName txtAtNew" oninput={updateLocalData} data-path="newAttributeName" autofocus>
                 <button if={state.newAttributeName && isValidXmlName(state.newAttributeName)} class="butAtNew iconAccept" onclick={saveNewAttribute}>Add</button>
                 <button class="butAtNewCancel iconCancel" onclick={cancelNewAttribute}>Cancel</button>
             </form>
@@ -89,8 +89,43 @@
             <input type="radio" name="filling" value="med" onchange={updateLocalData} data-apply data-path="config.filling" checked={state.config.filling === "med"}>Media</label>
     </div>
 
+    <div class="block" if={state.config.filling === "lst"}>
+        <div class="title">Values</div>
+        <table>
+            <tr each={(value, index) in state.config.values}>
+                <td class="cell1">
+                    <form onsubmit={applyLocalData} style="white-space: nowrap;">
+                        <input class="textbox val" placeholder="value" value={value.value} oninput={updateLocalData} data-path="config.values[{index}].value">
+                        <input class="textbox cap" placeholder="caption" value={value.caption} oninput={updateLocalData} data-path="config.values[{index}].caption">
+                        <template if={value.value !== props.config.values[index].value || value.caption !== props.config.values[index].caption}>
+                            <button class="change iconAccept" onclick={applyLocalData} type="submit">Change</button>
+                            <button class="cancel iconCancel" onclick={resetLocalData} data-path="config.values[{index}]" type="button">Cancel</button>
+                        </template>
+                    </form>
+                </td>
+                <td class="cell9">
+                    <!-- <button class="iconOnly iconArrowUp">&nbsp;</button>
+                    <button class="iconOnly iconArrowDown">&nbsp;</button> -->
+                    <button class="iconOnly iconCross" onclick={deleteLocalData} data-apply data-path="config.values[{index}]">&nbsp;</button>
+                </td>
+            </tr>
+        </table>
+        
+        <template if={!state.isAddingValue}>
+            <button class="butNewValue iconAdd" onclick={beginNewValue}>Add...</button>
+        </template>
+        <form if={state.isAddingValue} onsubmit={saveNewValue} style="white-space: nowrap;">
+            <input class="textbox new val" data-path="newValue" placeholder="value" value={state.newValue} oninput={updateLocalData} autofocus>
+            <input class="textbox new cap" data-path="newCaption" placeholder="caption" value={state.newCaption} oninput={updateLocalData}>
+            
+            <button if={state.newValue} class="butNewValueOK iconAccept">Add</button>
+            <button class="butNewValueCancel iconCancel" onclick={cancelNewValue} type="button">Cancel</button>
+            <div if={state.newValueError} class="warn">{state.newValueError}</div>
+        </template>
+    </div>
+
     <!-- child element selection/min-max/creation -->
-    <div class="block">
+    <div class="block" if={state.config.filling === "inl" || state.config.filling === "chd"}>
         <div class="title tight">Child elements</div>
         <table if={state.config.children.length}>
             <tr each={(child, index) in state.computedChildren}>
@@ -161,6 +196,11 @@
                     this.state.config.elementName = this.state.config.elementName || this.props.elementId;
                     this.state.isAddingAttribute = false;
                     this.state.newAttributeName = '';
+
+                    // Value from list.
+                    this.state.isAddingValue = false;
+                    this.state.newValue = '';
+                    this.state.newCaption = '';
 
                     const xemaEntries = Object.entries(this.props.xema.elements).map(([id, config]) => ({
                         ...config,
@@ -372,6 +412,42 @@
                 if (!childHasOtherParents) this.props.deleteElement(childIdToReplace);
                 this.resetIfSelectedElementChanged(true);
                 this.update();
+            },
+
+            /** User is adding a new value */
+            beginNewValue(event) {
+                this.state.isAddingValue = true;
+                this.update();
+            },
+            /** User canceled adding a new value */
+            cancelNewValue(event) {
+                this.state.isAddingValue = false;
+                this.state.newValue = '';
+                this.state.newCaption = '';
+                this.state.newValueError = '';
+                this.update();
+            },
+            /** User commits new value */
+            saveNewValue(event) {
+                if (event) event.preventDefault(); // form submit
+
+                const value = this.state.newValue;
+                const caption = this.state.newCaption;
+                if (this.state.config.values.find(v => v.value === value)) {
+                    this.state.newValueError = `Value ${value} already exists`;
+                    return;
+                }
+
+                this.state.config.values.push({
+                    value: this.state.newValue,
+                    caption: this.state.newCaption,
+                })
+                this.state.newValueError = '';
+                // Keep open, nice and simple.
+                // this.state.isAddingValue = false;
+                this.state.newValue = '';
+                this.state.newCaption = '';
+                this.applyLocalData();
             },
 
             /**
