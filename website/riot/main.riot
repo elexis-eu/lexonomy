@@ -72,6 +72,10 @@
             })
             this.auth.checkAuthCookie()
             this.store.loadSiteconfig().always(this.update.bind(this))
+            let appUpdater = new window.AppUpdaterClass({
+               url: window.window.API_URL + 'version.txt',
+               windowVersionKey: 'LEXONOMY_VERSION'
+            })
 
             route('/api', () => {
                this.goTo.bind(this, 'api')
