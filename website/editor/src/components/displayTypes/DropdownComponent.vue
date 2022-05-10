@@ -50,14 +50,15 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .dropdown {
   display: flex;
   justify-content: center;
-}
 
-.dropdown p {
-  margin-right: 8px;
+  p {
+    margin-right: 8px;
+    color: inherit;
+  }
 }
 
 </style>

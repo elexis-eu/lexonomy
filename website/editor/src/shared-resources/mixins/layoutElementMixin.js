@@ -6,6 +6,38 @@ export default {
     valueDisplayMixin
   ],
   computed: {
+    configStyles() {
+      let output = {}
+      for (const [style, value] of Object.entries(this.elementData)) {
+        switch (style) {
+          case "background":
+            output[style] = value
+            break
+          case "color":
+            output.color = value
+            break
+          case "border":
+            output.border = `1px ${value} #767676`
+            break
+          case "slant":
+            output.fontStyle = value
+            break
+          case "weight":
+            output.fontWeight = value
+            break
+          case "separation":
+            if (value === "space") {
+              output.marginBottom = "24px"
+            }
+            break
+        }
+      }
+      if (!this.elementData.color) {
+        output.color = "#767676"
+      }
+      return output
+
+    },
     componentData() {
       if (this.elementData.valueRenderType === "text-input-with-markup") {
         return this.calculatedContent.elements

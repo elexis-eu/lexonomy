@@ -51,5 +51,6 @@ label {
     font-size: 1rem;
     text-transform: capitalize;
     padding-right: 10px;
+    color: inherit;
 }
 </style>

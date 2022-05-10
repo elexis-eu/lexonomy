@@ -5,14 +5,16 @@ export default {
     }
   },
   created() {
-    let displayTypeToComponentMap = {
-        "read-only": "ReadOnlyComponent",
-        "text-input": "TextInputComponent",
-        "textarea-input": "TextAreaInputComponent",
-        "dropdown": "DropdownComponent",
-        "media": "MediaComponent",
-        "text-input-with-markup": "TextInputWithMarkupComponent"
+    let fillingToComponentMap = {
+        "chd": "ReadOnlyComponent",
+        "emp": "ReadOnlyComponent",
+        "txt": "TextInputComponent",
+        "lst": "DropdownComponent",
+        "med": "MediaComponent",
+        "inl": "TextInputWithMarkupComponent"
       }
-      this.valueComponent = displayTypeToComponentMap[(this.elementData && this.elementData.valueRenderType) || "text-input"]
+
+      let filling = this.state.entry.dictConfigs.xema.elements[this.elementName].filling
+      this.valueComponent = fillingToComponentMap[filling]
   }
 }

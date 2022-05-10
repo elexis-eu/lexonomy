@@ -273,6 +273,8 @@ export default {
 <style lang="scss" scoped>
 .text-with-markup {
   display: flex;
+  flex-flow: wrap;
+  font-style: normal;
 
   span {
     height: 3rem;

@@ -62,35 +62,12 @@ export default {
     childrenContent: Object,
     editorChildNumber: Number
   },
-  computed: {
-    configStyles() {
-      let output = {}
-      for (const [style, value] of Object.entries(this.elementData)) {
-        switch (style) {
-          case "background":
-          case "color":
-            output[style] = value
-            break
-          case "border":
-            output.border = `1px ${value}`
-            break
-          case "slant":
-            output.fontStyle = value
-            break
-          case "weight":
-            output.fontWeight = value
-        }
-      }
-      return output
-
-    },
-  },
 }
 </script>
 
 <style scoped>
 .inline-component {
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     padding: 8px;
 }
 .content {

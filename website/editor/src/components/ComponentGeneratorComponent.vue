@@ -1,16 +1,22 @@
 <template>
   <div>
-    <component v-for="(element, i) in renderedChildren"
-               :ref="element.props.elementName + element.props.editorChildNumber"
-               :key="element.props.elementName + '-' + i"
-               :is="element.componentName"
-               v-bind="element.props"
-               @input="handleChildUpdate"
-               @create-element="createElement"
-               @move-element="moveElement"
-               @delete-element="deleteElement"
-               @clone-element="createElement"
-    />
+    <ul v-for="(typeElement) in renderedChildren"
+        :key="typeElement.name"
+        :style="getEncompassingStyles(typeElement.name)"
+    >
+      <component v-for="(element, i) in typeElement.children"
+                 :ref="element.props.elementName + element.props.editorChildNumber"
+                 :key="element.props.elementName + '-' + i"
+                 :is="element.componentName"
+                 v-bind="element.props"
+                 @input="handleChildUpdate"
+                 @create-element="createElement"
+                 @move-element="moveElement"
+                 @delete-element="deleteElement"
+                 @clone-element="createElement"
+                 style="display: list-item"
+      />
+    </ul>
   </div>
 </template>
 
@@ -57,30 +63,66 @@ export default {
     this.loadNewData(this.content)
   },
   methods: {
+    getEncompassingStyles(elementName) {
+      let gutter = this.state.entry.dictConfigs.xemplate[elementName].gutter
+      let listStyle = "none"
+      switch (gutter) {
+        case "disk":
+          listStyle = "disc"
+          break
+        case "square":
+          listStyle = "square"
+          break
+        case "diamond":
+        case "arrow":
+        case "handing":
+          break
+        case "indent":
+          return {marginLeft: "40px"}
+        case "sensenum0":
+          listStyle = "upper-roman"
+          break
+        case "sensenum1":
+          listStyle = "decimal"
+          break
+        case "sensenum2":
+          listStyle = "lower-alpha"
+          break
+        case "sensenum3":
+          listStyle = "lower-roman"
+          break
+      }
+      return {
+        listStyleType: listStyle,
+        listStylePosition: "inside",
+        textAlign: "left"
+      }
+    },
     // Update only content of children to prevent re-rendering of whole structure
     updateContentInChildren(newContent) {
       if (!newContent || !newContent.elements) {
         return
       }
-      for (let i in this.renderedChildren) {
-        let renderedChild = this.renderedChildren[i]
+      for (let elementType of this.renderedChildren) {
         let newContentForChild = newContent.elements.filter(element => {
-          return element.name === renderedChild.props.elementName
+          return element.name === elementType.name
         })
         if (newContentForChild.length === 0) {
           continue
         }
+        for (let i in elementType.children) {
+          let renderedChild = elementType.children[i]
 
-        let renderedChildRefs = this.$refs[renderedChild.props.elementName + renderedChild.props.editorChildNumber]
-        let renderedChildRef = (renderedChildRefs && renderedChildRefs[0]) || null
+          let renderedChildRefs = this.$refs[renderedChild.props.elementName + renderedChild.props.editorChildNumber]
+          let renderedChildRef = (renderedChildRefs && renderedChildRefs[0]) || null
 
-        if (renderedChildRef && newContentForChild[renderedChild.props.editorChildNumber]) {
-          renderedChildRef.updateContent(newContentForChild[renderedChild.props.editorChildNumber])
+          if (renderedChildRef && newContentForChild[renderedChild.props.editorChildNumber]) {
+            renderedChildRef.updateContent(newContentForChild[renderedChild.props.editorChildNumber])
+          }
+          if (renderedChildRef && !newContentForChild[renderedChild.props.editorChildNumber]) {
+            elementType.children.splice(Number(i), 1)
+          }
         }
-        if (renderedChildRef && !newContentForChild[renderedChild.props.editorChildNumber]) {
-          this.renderedChildren.splice(Number(i), 1)
-        }
-
       }
     },
     loadNewData(XMLContent) {
@@ -113,10 +155,12 @@ export default {
           }
         }
         // Decide if multiple instances need to be made and push children to array to be rendered
+
+        let sameTypeChildren = []
         if (Array.isArray(content)) {
           content.forEach((contentInstance, index) => {
             // Add elements to render list
-            this.renderedChildren.push({
+            sameTypeChildren.push({
               componentName: componentName,
               props: {
                 elementName: elementName,
@@ -131,7 +175,7 @@ export default {
           })
         } else {
           // content._editorChildNumber = 0
-          this.renderedChildren.push({
+          sameTypeChildren.push({
             componentName: componentName,
             props: {
               elementName: elementName,
@@ -144,6 +188,11 @@ export default {
             }
           })
         }
+
+        this.renderedChildren.push({
+          name: elementName,
+          children: sameTypeChildren
+        })
 
       })
     },

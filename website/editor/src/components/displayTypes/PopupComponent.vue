@@ -1,49 +1,51 @@
 <template>
-  <div class="popup">
-    <button @click="openPopup">Open {{ elementName }}</button>
-    <section v-if="elementData.shown">
-      <ActionButtons
-        :elementName="elementName"
-        :elementEditorConfig="elementData"
-        :editorChildNumber="editorChildNumber"
-        :parentElementName="parentElementName"
-        :numberOfElements="numberOfElements"
-        @move-element-down="moveElementDown"
-        @move-element-up="moveElementUp"
-        @add-element="createSibling"
-        @clone-element="cloneElement"
-        @remove-element="deleteElement"
-      />
-      <component :is="valueComponent"
-                 :elementEditorConfig="elementData"
-                 :elementName="elementName"
-                 :elementData="elementData"
-                 :content="componentData"
-                 @hide-children="hideChildren"
-                 @input="handleValueUpdate"
-      />
-    </section>
-    <div v-if="showPopup" ref="wrapper" class="modal" @click="maybeClosePopup">
-      <div ref="modalContent" class="modal-content">
-        <span class="close" @click="closePopup">&times;</span>
-        <component
-          v-if="elementData.shown"
-          :is="valueComponent"
-          :elementEditorConfig="elementData"
+  <div class="popup" :style="configStyles">
+    <div>
+      <button @click="openPopup">Open {{ elementName }}</button>
+      <section v-if="elementData.shown">
+        <ActionButtons
           :elementName="elementName"
-          :elementData="elementData"
-          :content="componentData"
-          @hide-children="hideChildren"
-          @input="handleValueUpdate"
-        />
-        <ComponentGeneratorComponent
-          v-if="showChildren"
-          :children="children"
           :elementEditorConfig="elementData"
-          :elementName="elementName"
-          :content="calculatedContent"
-          @input="handleChildUpdate"
+          :editorChildNumber="editorChildNumber"
+          :parentElementName="parentElementName"
+          :numberOfElements="numberOfElements"
+          @move-element-down="moveElementDown"
+          @move-element-up="moveElementUp"
+          @add-element="createSibling"
+          @clone-element="cloneElement"
+          @remove-element="deleteElement"
         />
+        <component :is="valueComponent"
+                   :elementEditorConfig="elementData"
+                   :elementName="elementName"
+                   :elementData="elementData"
+                   :content="componentData"
+                   @hide-children="hideChildren"
+                   @input="handleValueUpdate"
+        />
+      </section>
+      <div v-if="showPopup" ref="wrapper" class="modal" @click="maybeClosePopup">
+        <div ref="modalContent" class="modal-content">
+          <span class="close" @click="closePopup">&times;</span>
+          <component
+            v-if="elementData.shown"
+            :is="valueComponent"
+            :elementEditorConfig="elementData"
+            :elementName="elementName"
+            :elementData="elementData"
+            :content="componentData"
+            @hide-children="hideChildren"
+            @input="handleValueUpdate"
+          />
+          <ComponentGeneratorComponent
+            v-if="showChildren"
+            :children="children"
+            :elementEditorConfig="elementData"
+            :elementName="elementName"
+            :content="calculatedContent"
+            @input="handleChildUpdate"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -98,45 +100,47 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .popup {
-  /*border: 1px solid #eee;*/
+  padding: 8px 16px;
+  margin-bottom: 8px;
+
+  .modal {
+    display: block;
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  }
+
+  /* Modal Content/Box */
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+  }
+
+  /* The Close Button */
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+
+    &:hover,
+    &:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
 }
 
-.modal {
-  display: block;
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0, 0, 0); /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-}
-
-/* Modal Content/Box */
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
-}
-
-/* The Close Button */
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
 </style>
