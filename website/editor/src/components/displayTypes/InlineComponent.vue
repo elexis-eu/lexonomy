@@ -1,7 +1,8 @@
 <template>
-  <div v-if="elementData.shown" class="inline-component" :style="configStyles">
-    <section class="content">
+  <div class="inline-component" :style="configStyles">
+    <section v-if="elementData.shown" class="content">
       <ActionButtons
+        v-if="!isAttribute"
         :elementName="elementName"
         :elementEditorConfig="elementData"
         :editorChildNumber="editorChildNumber"
@@ -60,16 +61,18 @@ export default {
       required: true
     },
     childrenContent: Object,
-    editorChildNumber: Number
-  },
+    editorChildNumber: Number,
+    isAttribute: Boolean
+  }
 }
 </script>
 
 <style scoped>
 .inline-component {
-    margin-bottom: 8px;
-    padding: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
 }
+
 .content {
   display: flex;
 }

@@ -17,12 +17,6 @@ export default {
   components: {
     ComponentGeneratorComponent
   },
-  props: {
-    contentHtml: {
-      type: String,
-      required: false
-    }
-  },
   watch: {
     dirty(newVal) {
       try {
@@ -31,7 +25,7 @@ export default {
       } catch (e) {
         console.error(e)
       }
-    },
+    }
   },
   computed: {
     preparedDataForEntry() {

@@ -39,6 +39,10 @@ export default {
   },
   created() {
     let structureConfig = this.state.entry.dictConfigs.xema.elements[this.elementName]
+    if (!structureConfig) {
+      let parentConfig = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
+      structureConfig = parentConfig[this.elementName]
+    }
     this.options = structureConfig.values
     this.value = this.content.text
   },

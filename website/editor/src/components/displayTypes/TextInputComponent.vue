@@ -30,9 +30,13 @@ export default {
       if (newVal === this.content.text) {
         return
       }
-      let elements = Object.assign({}, this.content)
-      elements.text = newVal
-      this.$emit('input', {elementName: this.elementName, elements: [elements]})
+      if (this.content.type === "attribute") {
+        this.$emit('input', {elementName: this.elementName, attributes: {[this.content.name]: newVal}})
+      } else {
+        let elements = Object.assign({}, this.content)
+        elements.text = newVal
+        this.$emit('input', {elementName: this.elementName, elements: [elements]})
+      }
     }
   },
   mounted() {

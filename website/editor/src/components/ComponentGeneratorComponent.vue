@@ -136,22 +136,27 @@ export default {
         let elementName = child.name
 
         //Extract element data and/or assign defaults
-        let elementData = this.getElementData(elementName)
+        let elementData = this.getElementData(elementName, this.elementName, child.isAttribute)
         this.state.entry.dictConfigs.xemplate[elementName] = elementData
 
         // Calculate component name to render
         // !!!MUST WAIT FOR NEW ELEMENT DATA TO SET!!!
-        let componentName = this.getComponentFromElementName(elementName)
+        let componentName = this.getComponentFromElementName(elementName, child.isAttribute)
 
 
         //  Get XML content for current element instance
         let content = [{}]
-        if (Array.isArray(XMLContent && XMLContent.elements)) {
-          content = XMLContent.elements.filter(element => {
-            return element.name === elementName
-          })
-          if (content.length === 0) {
-            content = [{}]
+        if (child.isAttribute) {
+          let attrValue = XMLContent.attributes && XMLContent.attributes[elementName]
+          content = [{type: "attribute", name: elementName, text: attrValue}]
+        } else {
+          if (Array.isArray(XMLContent && XMLContent.elements)) {
+            content = XMLContent.elements.filter(element => {
+              return element.name === elementName
+            })
+            if (content.length === 0) {
+              content = [{}]
+            }
           }
         }
         // Decide if multiple instances need to be made and push children to array to be rendered
@@ -169,7 +174,8 @@ export default {
                 elementData: elementData,
                 editorChildNumber: index,
                 parentElementName: this.elementName,
-                numberOfElements: content.length
+                numberOfElements: content.length,
+                isAttribute: child.isAttribute
               }
             })
           })
@@ -184,7 +190,8 @@ export default {
               elementData: elementData,
               editorChildNumber: 0,
               parentElementName: this.elementName,
-              numberOfElements: content.length
+              numberOfElements: content.length,
+              isAttribute: child.isAttribute
             }
           })
         }
@@ -202,6 +209,12 @@ export default {
     getElementChildren(elementName, content) {
       let elementInXema = this.state.entry.dictConfigs.xema.elements[elementName]
       let children = elementInXema && elementInXema.children
+      if (elementInXema && Object.keys(elementInXema.attributes || {}).length > 0) {
+        let mappedAttributes = Object.keys(elementInXema.attributes).map(att => {
+          return {name: att, isAttribute: true}
+        })
+        children = mappedAttributes.concat(children)
+      }
       if (content.elements) {
         let elemntsInContent = content.elements.filter(el => !!el.name)
         let differentElementsInXMLContent = elemntsInContent.map((value) => value.name).filter((value, index, _arr) => _arr.indexOf(value) === index).length
@@ -223,8 +236,15 @@ export default {
       return children
     },
 
-    getElementData(elementName) {
-      let elementData = this.state.entry.dictConfigs.xemplate[elementName]
+    getElementData(elementName, parentName, isAttribute) {
+      let formatterConfig = this.state.entry.dictConfigs.xemplate
+      let elementData
+      if (isAttribute) {
+        elementData = formatterConfig[parentName].attributes && formatterConfig[parentName].attributes[elementName]
+      } else {
+        elementData = formatterConfig[elementName]
+      }
+
       if (!elementData) {
         elementData = {
           shown: true,
@@ -245,17 +265,22 @@ export default {
       return elementData
     },
     handleChildUpdate(data) {
-      // Update content without creating new content/elements
       let content = Object.assign({}, this.content)
-      if (!content.elements) {
-        content.elements = this.createElementTemplate(data.elementName)
-      } else if (!content.elements.find(el => {
-        return el.name === data.elementName
-      })) {
-        content.elements.push(data.content)
+      if (data.isAttribute) {
+        content.attributes = {...content.attributes, ...data.content}
         this.$emit("input", {content: content})
-        return
+        return true
       }
+        // Update content without creating new content/elements
+        if (!content.elements) {
+          content.elements = this.createElementTemplate(data.elementName)
+        } else if (!content.elements.find(el => {
+          return el.name === data.elementName
+        })) {
+          content.elements.push(data.content)
+          this.$emit("input", {content: content})
+          return
+        }
 
       let consecutiveNumber = 0
       let contentUpdated = false
@@ -275,8 +300,14 @@ export default {
       this.$emit("input", {content: content})
     },
 
-    getComponentFromElementName(elementName) {
-      const elementConfig = this.state.entry.dictConfigs.xemplate[elementName]
+    getComponentFromElementName(elementName, parentName, isAttribute) {
+      let formatterConfig = this.state.entry.dictConfigs.xemplate
+      let elementConfig
+      if (isAttribute) {
+        elementConfig = formatterConfig[parentName].attributes && formatterConfig[parentName].attributes[elementName]
+      } else {
+        elementConfig = formatterConfig[elementName]
+      }
       let type = (elementConfig && elementConfig.displayType) || "inline"
       return this.displayTypeToComponentMap[type]
     },

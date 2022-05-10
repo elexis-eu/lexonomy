@@ -43,6 +43,9 @@ export default {
         return this.calculatedContent.elements
           || []
       }
+      if (this.isAttribute) {
+        return this.calculatedContent || {type: "attribute", name: this.elementName, text: ""}
+      }
       let textElement = this.calculatedContent.elements && this.calculatedContent.elements.find(element => {
         return element.type === "text" && !element.name
       })
@@ -66,6 +69,10 @@ export default {
       return xml2js(`<${elementName}></${elementName}>`, this.state.xml2jsConfig).elements[0]
     },
     handleValueUpdate(data) {
+      if (this.isAttribute) {
+        this.$emit('input', {elementName: this.elementName, content: data.attributes, isAttribute: true})
+        return
+      }
       let content = Object.assign({}, this.calculatedContent)
       if (Object.keys(content).length === 0) {
         content = this.createElementTemplate(this.elementName)
@@ -87,7 +94,6 @@ export default {
       this.$emit("move-element", {name: this.elementName, direction: -1, position: this.editorChildNumber})
     },
     createSibling() {
-      console.log("createSibling")
       this.$emit("create-element", {name: this.elementName})
     },
     deleteElement() {

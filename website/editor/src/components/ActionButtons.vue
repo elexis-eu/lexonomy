@@ -31,14 +31,22 @@ export default {
       return this.elementName === this.state.entry.dictConfigs.xema.root
     },
     canAddElement() {
-      let parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].children
-      let {max} = parentChildren.find(el => el.name === this.elementName)
-      return max === 0 || this.numberOfElements < max
+      let parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].children || []
+      let childElement = parentChildren.find(el => el.name === this.elementName)
+      // if (!childElement) {
+      //   parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
+      //   childElement = parentChildren[this.elementName]
+      // }
+      return childElement && (childElement.max === 0 || this.numberOfElements < childElement.max)
     },
     canRemoveElement() {
-      let parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].children
-      let {min} = parentChildren.find(el => el.name === this.elementName)
-      return min === 0 || this.numberOfElements > min
+      let parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].children || []
+      let childElement = parentChildren.find(el => el.name === this.elementName)
+      // if (!childElement) {
+      //   parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
+      //   childElement = parentChildren[this.elementName]
+      // }
+      return childElement && (childElement.min === 0 || this.numberOfElements < childElement.min)
     },
     canMoveElementDown() {
       return this.elementEditorConfig.enablePositionChange && this.editorChildNumber < this.numberOfElements - 1

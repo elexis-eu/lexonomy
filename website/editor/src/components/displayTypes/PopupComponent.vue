@@ -4,6 +4,7 @@
       <button @click="openPopup">Open {{ elementName }}</button>
       <section v-if="elementData.shown">
         <ActionButtons
+          v-if="!isAttribute"
           :elementName="elementName"
           :elementEditorConfig="elementData"
           :editorChildNumber="editorChildNumber"
@@ -75,7 +76,8 @@ export default {
       type: [Object, Array],
       required: true
     },
-    editorChildNumber: Number
+    editorChildNumber: Number,
+    isAttribute: Boolean
   },
   data() {
     return {
