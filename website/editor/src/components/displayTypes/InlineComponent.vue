@@ -1,6 +1,6 @@
 <template>
-  <div class="inline-component" :style="configStyles">
-    <section v-if="elementData.shown" class="content">
+  <div v-if="elementData.shown" class="inline-component" :style="configStyles">
+    <section class="content">
       <ActionButtons
         :elementName="elementName"
         :elementEditorConfig="elementData"

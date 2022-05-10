@@ -193,7 +193,6 @@ export default {
           name: elementName,
           children: sameTypeChildren
         })
-
       })
     },
 
