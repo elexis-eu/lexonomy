@@ -24,12 +24,12 @@
             <label>Language</label>
          </div>
       </div>
-      <div if={!state.visibleDicts.length}
+      <div if={!state.visibleDictionaries.length}
             class="center"
             style="margin: 20vh auto;">
          <h3 class="grey-text lighten-2">Nothing found</h3>
       </div>
-      <table if={state.visibleDicts.length}
+      <table if={state.visibleDictionaries.length}
             class="striped highlight"
             style="margin: 0 15px;">
          <thead>
@@ -40,7 +40,7 @@
             <th>Licence</th>
          </thead>
          <tbody>
-            <tr each={(row, idx) in state.visibleDicts}
+            <tr each={(row, idx) in state.visibleDictionaries}
                   id="r_{idx}">
                <td>
                   <a href="#/{row.id}">
@@ -81,11 +81,9 @@
 
    <script>
       export default {
-         bindings: [["store", "isPublicDictlistLoadingChanged", "update"]],
-
          state: {
             isLoading: true,
-            visibleDicts: [],
+            visibleDictionaries: [],
             languageList: [],
             language: "",
             query: ""
@@ -94,8 +92,8 @@
          loadData(){
             this.store.loadPublicDictionaryList()
                   .done(response => {
-                     this.state.visibleDicts = this.dictData.publicDictlist
-                     this.state.languageList = [...new Set(this.dictData.publicDictlist.map(d => d.lang))].filter(l => !!l)
+                     this.state.visibleDictionaries = this.dictData.publicDictionaryList
+                     this.state.languageList = [...new Set(this.dictData.publicDictionaryList.map(d => d.lang))].filter(l => !!l)
                   })
                   .always(() => {
                      this.update({isLoading: false})
@@ -115,22 +113,22 @@
          },
 
          filter(){
-            this.dictData.publicDictlist.forEach(c => {
+            this.dictData.publicDictionaryList.forEach(c => {
                delete c.h_title
                delete c.h_lang
                delete c.h_author
                delete c.h_licence
             })
-            this.state.visibleDicts = this.dictData.publicDictlist
+            this.state.visibleDictionaries = this.dictData.publicDictionaryList
             if(this.state.language){
-               this.state.visibleDicts = this.state.visibleDicts.filter(d => d.lang == this.state.language)
+               this.state.visibleDictionaries = this.state.visibleDictionaries.filter(d => d.lang == this.state.language)
             }
             if(this.state.query !== ""){
-               let sortResult = FuzzySort.go(this.state.query, this.state.visibleDicts, {
+               let sortResult = FuzzySort.go(this.state.query, this.state.visibleDictionaries, {
                   key: "id",
                   keys: ["title", "lang", "author", "licence"]
                })
-               this.state.visibleDicts = sortResult.map(fs => {
+               this.state.visibleDictionaries = sortResult.map(fs => {
                   fs.obj.h_title = FuzzySort.highlight(fs[0], '<b class="red-text">', "</b>")
                   fs.obj.h_lang = FuzzySort.highlight(fs[1], '<b class="red-text">', "</b>")
                   fs.obj.h_author = FuzzySort.highlight(fs[2], '<b class="red-text">', "</b>")
@@ -146,7 +144,7 @@
 
          highlightOccurrences(){
             let el, row
-            this.state.visibleDicts.forEach((c, idx) => {
+            this.state.visibleDictionaries.forEach((c, idx) => {
                row = this.$(`#r_${idx}`)
                if(row){
                   el = this.$(`#t_${idx}`)

@@ -4,7 +4,7 @@
    <div class="contentWrapper">
       <div if={!authData.isCheckingAuth && !dictData.isSiteconfigLoading}
             is={ state.content }
-            class="container content row {['dict-edit'].includes(state.content) ? 'wideContainer' : ''}"
+            class="container content row {['dict-edit', 'dict-public-entry', 'dict-public'].includes(state.content) ? 'wideContainer' : ''}"
             token={state.token}
             main-sub-page={ state.subPage }></div>
    </div>
@@ -38,7 +38,7 @@
          onCheckingAuthChange(){
             this.update()
             if(this.authData.authorized){
-               this.store.loadDictlist()
+               this.store.loadDictionaryList()
             }
             route.start(true)
          },

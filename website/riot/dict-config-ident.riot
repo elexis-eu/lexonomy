@@ -90,7 +90,7 @@
                'lang': $('#ident_lang').val(),
                'handle': $('#ident_handle').val()
             })
-                  .done(this.store.loadDictlist.bind(this.store))
+                  .done(this.store.loadDictionaryList.bind(this.store))
                   .always(() => this.update({isSaving: false}))
          }
       }

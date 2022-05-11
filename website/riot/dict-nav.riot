@@ -1,7 +1,7 @@
 <dict-nav>
 	<nav class="nav-breadcrumbs">
       <div class="nav-wrapper">
-         <a href="#/"
+         <a href="{authData.authorized ? '#/' : '#/opendictionaries'}"
                class="breadcrumb">Dictionaries</a>
          <a if={dictData.dictId}
                href="#/{dictData.dictId}"

@@ -1,11 +1,10 @@
 <dict-public>
-   <dict-nav if={authData.authorized}/>
-   <loading-overlay if={dictData.isDictionaryLoading}/>
+   <dict-nav/>
+   <loading-overlay if={dictData.isDictionaryLoading || state.isEntryListLoading}/>
    <template if={!dictData.isDictionaryLoading}>
       <h3 class="header">
          { dictData.title }
-         <div class="buttons right"
-               style="margin-top: 5px;">
+         <div class="dictBtns buttons">
             <a if={dictData.userAccess.canEdit}
                   href="#/{dictData.dictId}/edit"
                   class="btn">edit</a>
@@ -22,40 +21,110 @@
                   class="btn">links</a>
          </div>
       </h3>
-      <p class="blurb">
-         <raw-html content={dictData.blurb}></raw-html>
-      </p>
 
-      <div if={ dictData.public }
-            class="section">
-         <br>
+      <div class="firstRowContainer">
+         <div class="firstRowCol">
+            <h5>Description</h5>
+            <raw-html content={dictData.blurb}></raw-html>
+         </div>
+         <div class="sectionDivider"></div>
+         <div class="firstRowCol">
+            <h5>Search</h5>
+            <dict-entry-filter search-func={search}/>
+            <div if={!state.isEntryListLoading && state.showFoundEntries && dictData.entryList}
+                  class="searchResult">
+               <ul if={dictData.entryList.length}
+                     class="entry-list found-entries">
+                  <li each={entry in dictData.entryList}>
+                     <a href="#/{ dictData.dictId }/{ entry.id }">
+                        <raw-html content={entry.title}></raw-html>
+                     </a>
+                  </li>
+               </ul>
+               <div if={dictData.entryCount > 20}
+                     class="serchResultNote grey-text">
+                     Showing first 20 entries of {dictData.entryCount}.
+               </div>
+               <div if={!dictData.entryList.length}
+                     class="noEntries">
+                   <h4 class="grey-text center-align">No entries</h4>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div if={ dictData.public }>
          <div class="divider"></div>
-         <a class="btn btn-floating waves-effect waves-light right"
-               onclick={ onReloadExamplesClick }
-               style="margin-top: 15px;"><i class="material-icons">refresh</i></a>
-         <h5 style="margin-left: 8px;">Examples</h5>
+         <a if={dictData.dictionaryExamplesHasMore}
+               class="refreshExamplesBtn btn btn-floating waves-effect waves-light right"
+               onclick={ onReloadExamplesClick }>
+            <i class="material-icons">refresh</i>
+         </a>
+         <h5>Examples</h5>
          <div if={dictData.isDictionaryExamplesLoading}
-               class="grey-text"
-               style="min-height: 20px; margin: 15px 10px;">
+               class="loadingExamples grey-text">
             Loading...
          </div>
          <ul if={ !dictData.isDictionaryExamplesLoading && dictData.dictionaryExamples }
-               class="random-entries s10" >
+               class="entry-list random-entries">
             <li each={ entry in dictData.dictionaryExamples }>
                <a href="#/{ dictData.dictId }/{ entry.id }">{ entry.titlePlain }</a>
             </li>
          </ul>
          <div class="divider"></div>
-         <div class="section right"
-               style="opacity: .5;">
+         <div class="licence section right">
             { dictData.licence }
          </div>
       </div>
    </template>
 
    <style>
-      .random-entries li {display: inline; padding: 5px 10px;}
-      .random-entries li a:hover {text-decoration: underline;}
+      .dictBtns{
+         margin-top: 5px;
+      }
+      .firstRowContainer{
+         display: flex;
+      }
+      .sectionDivider{
+         width: 1px;
+         border-left: 1px solid #e0e0e0;
+         padding-left: 30px;
+         margin-left: 30px;
+      }
+      .firstRowCol{
+         flex: 1;
+         padding-bottom: 30px;
+      }
+      dict-entry-filter{
+         max-width: 500px;
+      }
+      .searchResult{
+         min-height: max(15vh, 200px);
+      }
+      .searchResultNote{
+         font-size: 0.8rem;
+         margin-left: 10px;
+      }
+      .noEntries{
+         padding-top: 30px;
+      }
+      .entry-list li {
+         display: inline-block;
+         padding: 3px 10px;
+      }
+      .entry-list li a:hover {
+         text-decoration: underline;
+      }
+      .refreshExamplesBtn{
+         margin-top: 15px;
+      }
+      .loadingExamples{
+         min-height: 20px;
+         margin: 15px 10px;
+      }
+      .licence{
+         opacity: .5;
+      }
    </style>
 
    <script>
@@ -63,10 +132,26 @@
          bindings: [["store", "dictionaryChanged", "onDictionaryChanged"],
                     ["store", "isDictionaryExamplesLoading", "update"]],
 
+         state: {
+            isEntryListLoading: false,
+            showFoundEntries: false
+         },
+
          reloadDictionaryExamples(){
             if(this.dictData.public || this.authData.authorized){
                this.store.reloadDictionaryExamples()
             }
+         },
+
+         search(){
+            this.update({isEntryListLoading: true})
+            this.store.loadEntryList(20)
+                  .done(() =>{
+                     this.state.showFoundEntries = true
+                  })
+                  .always(() => {
+                     this.update({isEntryListLoading: false})
+                  })
          },
 
          onReloadExamplesClick(){
@@ -76,6 +161,26 @@
 
          onDictionaryChanged(){
             this.reloadDictionaryExamples()
+         },
+
+         onCloseSearchResultClick(){
+            this.update({showFoundEntries: false})
+         },
+
+         onUpdated(){
+            // make all items in list same width to create columns
+            [".entry-list li", ".random-entries li"].forEach(selector => {
+               let maxWidth = 0;
+               $(selector).each((i, e) => {maxWidth = Math.max(maxWidth, $(e).width())})
+               $(selector).each((i, e) => {$(e).css("width", Math.min(300, maxWidth + 20) + "px")})
+            })
+         },
+
+         onMounted(){
+            this.dictData.searchtext = ""
+            if(!this.dictData.dictionaryExamples && !this.dictData.isDictionaryExamplesLoading){
+               this.reloadDictionaryExamples()
+            }
          }
       }
    </script>

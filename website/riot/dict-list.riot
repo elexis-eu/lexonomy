@@ -1,10 +1,10 @@
 <dict-list>
-   <loading-overlay if={state.isLoading || dictData.isDictlistLoading}/>
-   <template if={!dictData.isDictlistLoading}>
-      <div if={dictData.dictlist.length}>
+   <loading-overlay if={state.isLoading || dictData.isDictionaryListLoading}/>
+   <template if={!dictData.isDictionaryListLoading}>
+      <div if={dictData.dictionaryList.length}>
          <h3>your dictionaries</h3>
          <ul class="collection">
-            <li each={ dict in dictData.dictlist }
+            <li each={ dict in dictData.dictionaryList }
                   class="collection-item ">
                <div>
                   <a href="#/{ dict.id }">{ dict.title }</a>
@@ -44,7 +44,7 @@
             create new dictionary
          </a>
       </div>
-      <div if={!dictData.dictlist.length}
+      <div if={!dictData.dictionaryList.length}
             class="grey-text center-align">
          <h3>no dictionaries</h3>
          <div>
@@ -70,8 +70,8 @@
 
    <script>
       export default {
-         bindings: [["store", "dictlistChanged", "update"],
-                    ["store", "dictlistLoadingChanged", "update"]],
+         bindings: [["store", "dictionaryListChanged", "update"],
+                    ["store", "dictionaryListLoadingChanged", "update"]],
          state: {
             isLoading: false
          },
@@ -99,7 +99,7 @@
          },
 
          onBeforeMount() {
-            !this.dictData.isDictlistLoaded && this.store.loadDictlist()
+            !this.dictData.isDictionaryListLoaded && this.store.loadDictionaryList()
          }
       }
    </script>

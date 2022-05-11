@@ -1,40 +1,44 @@
 <entry-view>
+   <loading-overlay if={dictData.isEntryLoading}
+         fulscreen={false}/>
    <div class="viewer"
          id="viewer"></div>
+
    <style>
-   .voicetts {
-      display: inline-block;
-      vertical-align: top;
-   }
-   .voicetts-icon img {
-      width: 30px;
-      cursor: pointer;
-      margin-left: 1em;
-   }
+      :host{
+         position: relative;
+         display: block;
+         min-height: calc(100vh - 260px);
+      }
+      .voicetts {
+         display: inline-block;
+         vertical-align: top;
+      }
+      .voicetts-icon img {
+         width: 30px;
+         cursor: pointer;
+         margin-left: 1em;
+      }
    </style>
+
    <script>
       export default {
-         bindings: [["store", "entryChanged", "entryChanged"]],
-         entryId: '',
+         bindings: [["store", "isEntryLoadingChanged", "update"]],
 
-         readEntry() {
-            if (this.dictData.dictId != '') {
-               $.post(window.API_URL + this.dictData.dictId + "/entryread.json", {id: this.dictData.entryId}, (response) => {
-                  if (response.success) {
-                     $('.viewer').html(response.contentHtml)
-                     Gmedia.addVoicePublic(response, this.dictData.config.gapi, this.dictData.config.titling);
-                  }
-               })
+         initViewer(){
+            if(this.dictData.entry && this.dictData.entry.content){
+               let html = Xemplatron.xml2html(this.dictData.entry.content, this.dictData.config.xemplate, this.dictData.config.xema)
+               $('#viewer').html(html)
+               Gmedia.addVoicePublic(this.dictData.entry, this.dictData.config.gapi, this.dictData.config.titling);
             }
          },
 
-         onMounted() {
-            this.readEntry()
+         onUpdated(){
+            this.initViewer()
          },
 
-         entryChanged(){
-            this.readEntry()
-            this.update()
+         onMounted() {
+            this.initViewer()
          }
       }
    </script>

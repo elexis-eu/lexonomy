@@ -1,0 +1,90 @@
+<dict-entry-filter>
+   <div class="filterForm">
+      <span class="searchBox">
+         <input type="text"
+               id="searchBox"
+               placeholder="search"
+               class="input-field"
+               value={dictData.searchtext}
+               onkeyup={ onKeyUp }/>
+         <i onclick={onClearFilterClick}
+            class="material-icons clearFilterIcon grey-text clickable">close</i>
+      </span>
+      <select id="searchType">
+         <option value="start" selected>starts like this</option>
+         <option value="exact">is exactly</option>
+         <option value="wordstart">contains a word that starts like this</option>
+         <option value="substring">contains this sequence of characters</option>
+      </select>
+   </div>
+
+   <style>
+      :host{
+         display: block;
+      }
+      .filterForm{
+         display: flex;
+         gap: 10px;
+      }
+      .filterForm .searchBox{
+         width: 100px;
+         position: relative;
+         flex: 2;
+      }
+      .filterForm .searchBox input{
+         padding-right: 27px;
+      }
+      .filterForm > .select-wrapper{
+         flex: 3;
+      }
+      .filterForm .clearFilterIcon{
+         position: absolute;
+         right: 5px;
+         top: 11px;
+      }
+   </style>
+
+   <script>
+      export default {
+         search() {
+            this.dictData.searchtext = $('#searchBox').val()
+            this.dictData.modifier = $('#searchType').val()
+            this.props.searchFunc()
+         },
+
+         onClearFilterClick(evt){
+            if($('#searchBox').val()){
+               $('#searchBox').val("")
+               this.search()
+            }
+         },
+
+         onKeyUp(evt) {
+            if (evt.keyCode == 13) {
+               this.search()
+            }
+         },
+
+         initSelect(){
+            $('select').off("change")
+                  .formSelect({
+                     dropdownOptions: {
+                        coverTrigger: false,
+                        constrainWidth: false
+                     }
+                  })
+                  .on("change", () => {
+                     $('#searchBox').val() && this.search()
+                  })
+         },
+
+         onMounted(){
+            this.initSelect()
+         },
+
+         onUpdated(){
+            this.initSelect()
+         }
+      }
+   </script>
+</dict-entry-filter>

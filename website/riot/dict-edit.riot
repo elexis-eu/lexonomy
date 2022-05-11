@@ -1,12 +1,12 @@
 <dict-edit>
-   <loading-overlay if={dictData.isDictlistLoading || dictData.isDictionaryLoading}/>
+   <loading-overlay if={dictData.isDictionaryListLoading || dictData.isDictionaryLoading}/>
    <dict-nav links={[["edit", "Edit"]]}/>
    <h3 class="header">
       { dictData.title }
       <span if={dictData.entryCount}
             class="totalEntries">total {dictData.entryCount} entries</span>
    </h3>
-   <template if={dictData.isDictionaryLoaded && !dictData.isDictlistLoading}>
+   <template if={dictData.isDictionaryLoaded && !dictData.isDictionaryListLoading}>
       <div if={ dictData.doctypes.length > 1 }
             class="doctypes">
          <ul class="tabs">
@@ -20,27 +20,11 @@
       <div id="dictEditContainer" >
          <div class="dictLeftCol"
                style="width: max({dictData.config.flagging.flags.length ? '25vw' : '20vw'}, 250px);">
-            <div if={dictData.isEntrylistLoading}>
+            <div if={dictData.isEntryListLoading}>
                <loading-overlay/>
             </div>
-            <template if={dictData.isEntrylistLoaded}>
-               <div class="filterForm">
-                  <span class="searchBox">
-                     <input type="text"
-                           id="searchBox"
-                           placeholder="search"
-                           class="input-field"
-                           onkeyup={ onKeyUp }/>
-                     <i onclick={onClearFilterClick}
-                        class="material-icons clearFilterIcon grey-text clickable">close</i>
-                  </span>
-                  <select id="searchType">
-                     <option value="start" selected>starts like this</option>
-                     <option value="exact">is exactly</option>
-                     <option value="wordstart">contains a word that starts like this</option>
-                     <option value="substring">contains this sequence of characters</option>
-                  </select>
-               </div>
+            <template if={dictData.isEntryListLoaded}>
+               <dict-entry-filter search-func={store.loadEntryList.bind(store)}/>
                <div if={dictData.entryCount > dictData.entryList.length}
                      class="entriesCountInfo">
                   Showing {dictData.entryList.length} of {dictData.entryCount} entries.
@@ -63,7 +47,7 @@
                         {store.getFlagLabel(entry.flag && entry.flag[0]) || "no flag"}
                      </span>
                   </div>
-                  <div if={!dictData.entryList.length && !dictData.isEntrylistLoading}
+                  <div if={!dictData.entryList.length && !dictData.isEntryListLoading}
                         style="padding-top: 10vh;">
                      <h4 class="grey-text center-align">No entries</h4>
                   </div>
@@ -135,26 +119,6 @@
       .dictRightCol{
          min-width: 500px;
          flex: 1;
-      }
-      .filterForm{
-         display: flex;
-         gap: 10px
-      }
-      .filterForm .searchBox{
-         width: 100px;
-         position: relative;
-         flex: 2;
-      }
-      .filterForm .searchBox input{
-         padding-right: 27px;
-      }
-      .filterForm > .select-wrapper{
-         flex: 3;
-      }
-      .clearFilterIcon{
-         position: absolute;
-         right: 5px;
-         top: 11px;
       }
       .entriesCountInfo{
          font-size: 0.85rem;
@@ -232,10 +196,10 @@
 
    <script>
       export default {
-         bindings: [["store", "dictlistLoadingChanged", "update"],
-                    ["store", "entrylistChanged", "update"],
-                    ["store", "entrylistLoadingChanged", "update"],
-                    ["store", "entryChanged", "update"]],
+         bindings: [["store", "dictionaryListLoadingChanged", "update"],
+                    ["store", "entryListChanged", "update"],
+                    ["store", "entryListLoadingChanged", "update"],
+                    ["store", "entryIdChanged", "update"]],
 
          state: {
             focused: false,
@@ -250,33 +214,14 @@
             return `color: ${color}; background-color: ${bgColor}`
          },
 
-         search() {
-            this.dictData.searchtext = $('#searchBox').val()
-            this.dictData.modifier = $('#searchType').val()
-            this.store.loadEntrylist()
-         },
-
          onHeadwordClick(entryId, evt){
-            this.store.changeEntry(entryId)
+            this.store.changeEntryId(entryId)
          },
 
          onHeadwordLinkClick(entryId, evt){
             evt.preventDefault()
             this.onDocumentClick(evt)
-            this.store.changeEntry(entryId)
-         },
-
-         onClearFilterClick(evt){
-            if($('#searchBox').val()){
-               $('#searchBox').val("")
-               this.search()
-            }
-         },
-
-         onKeyUp(evt) {
-            if (evt.keyCode == 13) {
-               this.search()
-            }
+            this.store.changeEntryId(entryId)
          },
 
          onOpenFlagMenuClick(entry, evt){
@@ -330,7 +275,7 @@
                    this.moveCursorDown(this.state.size) // pgDown
                } else if(evt.keyCode == 13){
                   if(this.state.cursorPosition){
-                     this.store.changeEntry(this.dictData.entryList[this.state.cursorPosition - 1].id)
+                     this.store.changeEntryId(this.dictData.entryList[this.state.cursorPosition - 1].id)
                      this.updateCursor()
                   }
                }
@@ -365,10 +310,10 @@
                this.dictData.searchtext = ""
                this.dictData.modifier = "start"
                route(this.dictData.dictId + "/edit/" + newdoctype)
-               this.store.loadEntrylist()
+               this.store.loadEntryList()
                   .done(() => {
                      if(this.dictData.entryList.length){
-                        this.store.changeEntry(this.dictData.entryList[0].id)
+                        this.store.changeEntryId(this.dictData.entryList[0].id)
                      } else {
                         $("#container").html("").addClass("empty")
                         Screenful.Editor.updateToolbar()
@@ -444,13 +389,12 @@
          },
 
          onMounted(){
-            $('select').formSelect({dropdownOptions: {coverTrigger: false, constrainWidth: false}})
             document.addEventListener('click', this.onDocumentClick)
             document.addEventListener('keydown', this.onDocumentKeyDown)
-            if(this.dictData.isEntrylistLoaded){
+            if(this.dictData.isEntryListLoaded){
                this.setCursorByEntryId()
             } else {
-               this.store.one("entrylistChanged", this.setCursorByEntryId.bind(this))
+               this.store.one("entryListChanged", this.setCursorByEntryId.bind(this))
             }
          },
 
@@ -460,7 +404,6 @@
          },
 
          onUpdated() {
-            $('select').formSelect({dropdownOptions: {coverTrigger: false, constrainWidth: false}})
             this.updateCursor()
          }
       }

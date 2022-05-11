@@ -66,9 +66,9 @@
 
    <script>
       export default {
-         bindings: [["store", "entryChanged", "onEntryChanged"]],
+         bindings: [["store", "entryIdChanged", "onEntryIdChanged"]],
 
-         onEntryChanged(){
+         onEntryIdChanged(){
             this.initEditorIfNeeded()
             this.updateUrl()
             Screenful.Editor[this.dictData.mode](null, this.dictData.entryId)
@@ -97,7 +97,7 @@
                editing = this.dictData.config.editing;
                gapi = this.dictData.config.gapi;
                dictId = this.dictId;
-               userDicts = this.dictData.dictlist;
+               userDicts = this.dictData.dictionaryList;
                ske_username = this.authData.ske_username;
                ske_apiKey = this.authData.ske_apiKey;
 
@@ -246,7 +246,7 @@
          },
 
          onListChange(){
-            this.store.loadEntrylist()
+            this.store.loadEntryList()
          },
 
          onEntryIdChange(entryId){

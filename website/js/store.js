@@ -4,23 +4,23 @@ class StoreClass {
 
       this.data = {
          isSiteconfigLoading: false,
-         isDictlistLoading: false,
-         isDictlistLoaded: false,
+         isDictionaryListLoading: false,
+         isDictionaryListLoaded: false,
          siteconfig: null,
-         dictlist: []
+         dictionaryList: []
       }
 
       this.resetDictionary()
    }
 
    getDictionary(dictId){
-      return this.data.dictlist.find(d => d.id == dictId)
+      return this.data.dictionaryList.find(d => d.id == dictId)
    }
 
    open(dictId, doctype, entryId, mode){
       this.changeDictionary(dictId)
       typeof doctype != "undefined" && this.changeDoctype(doctype)
-      typeof entryId != "undefined" && this.changeEntry(entryId)
+      typeof entryId != "undefined" && this.changeEntryId(entryId)
       if(mode){
          this.data.mode = mode
       }
@@ -50,13 +50,13 @@ class StoreClass {
       }
    }
 
-   changeEntry(entryId){
+   changeEntryId(entryId){
       if(this.data.isDictionaryLoading){
-         this.one("dictionaryChanged", this.changeEntry.bind(this, entryId))
+         this.one("dictionaryChanged", this.changeEntryId.bind(this, entryId))
       } else {
          if(entryId != this.data.entryId){
             this.data.entryId = entryId
-            this.trigger("entryChanged")
+            this.trigger("entryIdChanged")
          }
       }
    }
@@ -64,7 +64,7 @@ class StoreClass {
    setEntryFlag(entryId, flag){
       let entry = this.data.entryList.find(e => e.id == entryId)
       entry.isSaving = true
-      this.trigger("entrylistChanged", entryId)
+      this.trigger("entryListChanged", entryId)
       return $.ajax({
          url: `${window.API_URL}${this.data.dictId}/entryflag.json`,
          method: 'POST',
@@ -83,7 +83,7 @@ class StoreClass {
             })
             .always(response => {
                delete entry.isSaving
-               this.trigger("entrylistChanged", entryId)
+               this.trigger("entryListChanged", entryId)
             })
    }
 
@@ -119,13 +119,16 @@ class StoreClass {
       Object.assign(this.data, {
          isDictionaryLoading: false,
          isDictionaryLoaded: false,
-         isEntrylistLoading: false,
-         isEntrylistLoaded: false,
+         isEntryListLoading: false,
+         isEntryListLoaded: false,
+         isEntryLoading: false,
+         isEntryLoaded: false,
          isDictionaryExamplesLoading: false,
          config: null,
          doctype: null,
          doctypes: null,
          entryList: null,
+         entry: null,
          dictId: null,
          entryId: null,
          searchtext: '',
@@ -137,7 +140,8 @@ class StoreClass {
             canUpload: false,
             canDownload: false
          },
-         dictionaryExamples: null
+         dictionaryExamples: null,
+         dictionaryExamplesHasMore: null
       })
    }
 
@@ -156,28 +160,28 @@ class StoreClass {
             })
    }
 
-   loadDictlist(){
-      this.data.isDictlistLoading = true
-      this.trigger("dictlistLoadingChanged")
+   loadDictionaryList(){
+      this.data.isDictionaryListLoading = true
+      this.trigger("dictionaryListLoadingChanged")
       return $.ajax(`${window.API_URL}userdicts.json`)
             .done(response => {
-               this.data.dictlist = response.dicts || []
-               this.data.isDictlistLoaded = true
-               this.trigger("dictlistChanged")
+               this.data.dictionaryList = response.dicts || []
+               this.data.isDictionaryListLoaded = true
+               this.trigger("dictionaryListChanged")
             })
             .fail(response => {
                M.toast({html: "Dictionary list could not be loaded."})
             })
             .always(response => {
-               this.data.isDictlistLoading = false
-               this.trigger("dictlistLoadingChanged")
+               this.data.isDictionaryListLoading = false
+               this.trigger("dictionaryListLoadingChanged")
             })
    }
 
    loadPublicDictionaryList(){
       return $.ajax(`${window.API_URL}publicdicts.json`)
             .done(response => {
-               this.data.publicDictlist = response.entries || []
+               this.data.publicDictionaryList = response.entries || []
             })
             .fail(response => {
                M.toast({html: "Dictionary list could not be loaded."})
@@ -208,10 +212,11 @@ class StoreClass {
                      },
                      response.publicInfo
                   )
+                  window.xema = this.data.config.xema  // global variable xema is used by some custom editors
                   this.data.isDictionaryLoaded = true
                   this.data.isDictionaryLoading = false
                   this.trigger("dictionaryChanged")
-                  this.loadEntrylist()
+                  this.loadEntryList()
                } else {
                   this.data.isDictionaryLoading = false
                   route("#/")
@@ -236,33 +241,68 @@ class StoreClass {
             }.bind(this, dictId))
    }
 
-   loadEntrylist(){
-      if(!this.data.dictId || !this.data.doctype){
+   loadEntryList(howmany){
+      let authorized = window.auth.data.authorized
+      if(!this.data.dictId || (authorized && !this.data.doctype)){
          return
       }
-      this.data.isEntrylistLoading = true
-      this.trigger("entrylistLoadingChanged")
+      this.data.isEntryListLoading = true
+      this.trigger("entryListLoadingChanged")
+      let url;
+      let data = {
+         searchtext: this.data.searchtext,
+         modifier: this.data.modifier,
+         howmany: howmany ? howmany : (this.data.dictConfigs.titling.numberEntries || 1000)
+      }
+      if(authorized){
+         url = `${window.API_URL}${this.data.dictId}/${this.data.doctype}/entrylist.json`
+      } else {
+         url = `${window.API_URL}${this.data.dictId}/search.json`
+      }
       return $.ajax({
-         url: `${window.API_URL}${this.data.dictId}/${this.data.doctype}/entrylist.json`,
+         url: url,
          method: "POST",
-         data: {
-            searchtext: this.data.searchtext,
-            modifier: this.data.modifier,
-            howmany: this.data.dictConfigs.titling.numberEntries || 1000
-         }
+         data: data
       })
             .done(response => {
                this.data.entryList = response.entries
                this.data.entryCount = response.total
-               this.data.isEntrylistLoaded = true
-               this.trigger("entrylistChanged")
+               this.data.isEntryListLoaded = true
+               this.trigger("entryListChanged")
             })
             .fail(response => {
                M.toast({html: "Entry list could not be loaded."})
             })
             .always(response => {
-               this.data.isEntrylistLoading = false
-               this.trigger("entrylistLoadingChanged")
+               this.data.isEntryListLoading = false
+               this.trigger("entryListLoadingChanged")
+            })
+   }
+
+   loadEntry(){
+      if(!this.data.entryId){
+         return
+      }
+      this.data.isEntryLoading = true
+      this.trigger("isEntryLoadingChanged")
+      return $.ajax({
+         url: `${window.API_URL}${this.data.dictId}/entryread.json`,
+         method: "POST",
+         data: {
+            id: this.data.entryId
+         }
+      })
+            .done(response => {
+               this.data.entry = response
+               this.data.isEntryLoaded = true
+               this.trigger("entryChanged")
+            })
+            .fail(response => {
+               M.toast({html: "Entry could not be loaded."})
+            })
+            .always(() => {
+               this.data.isEntryLoading = false
+               this.trigger("isEntryLoadingChanged")
             })
    }
 
@@ -320,7 +360,7 @@ class StoreClass {
       })
             .done(response => {
                if (response.success) {
-                  this.loadDictlist()
+                  this.loadDictionaryList()
                }
             })
             .fail(response => {
@@ -337,9 +377,9 @@ class StoreClass {
          method: 'POST'
       })
             .done(response => {
-               this.data.dictlist = response.dicts
+               this.data.dictionaryList = response.dicts
                M.toast({html: "Dictionary was cloned."})
-               this.trigger("dictlistChanged")
+               this.trigger("dictionaryListChanged")
                this.changeDictionary(response.dictID)
                this.one("dictionaryChanged", () => {
                   route(response.dictID)
@@ -358,9 +398,9 @@ class StoreClass {
          method: 'POST'
       })
             .done(response => {
-               this.data.dictlist = response.dicts
+               this.data.dictionaryList = response.dicts
                M.toast({html: "Dictionary was deleted."})
-               this.trigger("dictlistChanged")
+               this.trigger("dictionaryListChanged")
             })
             .fail(response => {
                M.toast({html: "Dictionary clone creation failed."})
@@ -387,8 +427,8 @@ class StoreClass {
       })
             .done(response => {
                if(response.finished){
-                  this.loadDictlist()
-                  this.loadEntrylist()
+                  this.loadDictionaryList()
+                  this.loadEntryList()
                }
             })
    }
@@ -405,6 +445,7 @@ class StoreClass {
       })
             .done(response => {
                this.data.dictionaryExamples = response.entries
+               this.data.dictionaryExamplesHasMore = response.more
                this.trigger("dictionaryExamplesChanged")
             })
             .fail(response => {
