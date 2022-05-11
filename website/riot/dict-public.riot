@@ -2,7 +2,7 @@
    <dict-nav/>
    <loading-overlay if={dictData.isDictionaryLoading || state.isEntryListLoading}/>
    <template if={!dictData.isDictionaryLoading}>
-      <h3 class="header">
+      <h1 class="header">
          { dictData.title }
          <div class="dictBtns buttons">
             <a if={dictData.userAccess.canEdit}
@@ -20,16 +20,16 @@
             <a if={authData.authorized} href="#/{dictData.dictId}/links"
                   class="btn">links</a>
          </div>
-      </h3>
+      </h1>
 
       <div class="firstRowContainer">
-         <div class="firstRowCol">
-            <h5>Description</h5>
+         <div class="firstRowCol description">
+            <h3>Description</h3>
             <raw-html content={dictData.blurb}></raw-html>
          </div>
          <div class="sectionDivider"></div>
          <div class="firstRowCol">
-            <h5>Search</h5>
+            <h3>Search</h3>
             <dict-entry-filter search-func={search}/>
             <div if={!state.isEntryListLoading && state.showFoundEntries && dictData.entryList}
                   class="searchResult">
@@ -47,7 +47,7 @@
                </div>
                <div if={!dictData.entryList.length}
                      class="noEntries">
-                   <h4 class="grey-text center-align">No entries</h4>
+                   <h2 class="grey-text center-align">No entries</h2>
                </div>
             </div>
          </div>
@@ -60,7 +60,7 @@
                onclick={ onReloadExamplesClick }>
             <i class="material-icons">refresh</i>
          </a>
-         <h5>Examples</h5>
+         <h3>Examples</h3>
          <div if={dictData.isDictionaryExamplesLoading}
                class="loadingExamples grey-text">
             Loading...
@@ -94,6 +94,9 @@
       .firstRowCol{
          flex: 1;
          padding-bottom: 30px;
+      }
+      .description{
+         word-break: break-word;
       }
       dict-entry-filter{
          max-width: 500px;

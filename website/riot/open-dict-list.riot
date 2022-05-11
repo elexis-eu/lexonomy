@@ -1,5 +1,5 @@
 <open-dict-list>
-   <h4>Open dictionaries</h4>
+   <h2>Open dictionaries</h2>
    <loading-overlay if={state.isLoading}></loading-overlay>
    <div if={!state.isLoading}>
       <div>
@@ -27,7 +27,7 @@
       <div if={!state.visibleDictionaries.length}
             class="center"
             style="margin: 20vh auto;">
-         <h3 class="grey-text lighten-2">Nothing found</h3>
+         <h1 class="grey-text lighten-2">Nothing found</h1>
       </div>
       <table if={state.visibleDictionaries.length}
             class="striped highlight"

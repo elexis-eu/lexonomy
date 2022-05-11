@@ -1,7 +1,7 @@
 <dict-config-xemplate>
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["xemplate", "Entry formatting"]]}/>
-   <h3>Entry formatting</h3>
+   <h1>Entry formatting</h1>
    <div if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
       <div class="row designer"
             id="editor"></div>

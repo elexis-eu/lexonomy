@@ -2,7 +2,7 @@
    <loading-overlay if={state.isLoading || dictData.isDictionaryListLoading}/>
    <template if={!dictData.isDictionaryListLoading}>
       <div if={dictData.dictionaryList.length}>
-         <h3>your dictionaries</h3>
+         <h1>your dictionaries</h1>
          <ul class="collection">
             <li each={ dict in dictData.dictionaryList }
                   class="collection-item ">
@@ -46,7 +46,7 @@
       </div>
       <div if={!dictData.dictionaryList.length}
             class="grey-text center-align">
-         <h3>no dictionaries</h3>
+         <h1>no dictionaries</h1>
          <div>
             You have no dictionary yet. Create one using button below.
          </div>

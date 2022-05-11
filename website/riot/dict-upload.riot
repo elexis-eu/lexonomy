@@ -1,7 +1,7 @@
 <dict-upload>
    <loading-overlay if={state.isUploading}/>
    <dict-nav links={[["upload", "Upload"]]}/>
-   <h3>Upload</h3>
+   <h1>Upload</h1>
    <div class="file-field input-field buttons"
          style="max-width: 700px;">
       <div class="btn">
@@ -32,7 +32,7 @@
 
 
    <template if={state.infoMessage || state.errorMessage}>
-      <h5>Progress</h5>
+      <h3>Progress</h3>
       <div if={state.infoMessage}
             classs="message messageInfo">
          <raw-html content={state.infoMessage}></raw-html>

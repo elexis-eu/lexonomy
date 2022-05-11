@@ -1,11 +1,11 @@
 <dict-edit>
    <loading-overlay if={dictData.isDictionaryListLoading || dictData.isDictionaryLoading}/>
    <dict-nav links={[["edit", "Edit"]]}/>
-   <h3 class="header">
+   <h1 class="header">
       { dictData.title }
       <span if={dictData.entryCount}
             class="totalEntries">total {dictData.entryCount} entries</span>
-   </h3>
+   </h1>
    <template if={dictData.isDictionaryLoaded && !dictData.isDictionaryListLoading}>
       <div if={ dictData.doctypes.length > 1 }
             class="doctypes">
@@ -49,7 +49,7 @@
                   </div>
                   <div if={!dictData.entryList.length && !dictData.isEntryListLoading}
                         style="padding-top: 10vh;">
-                     <h4 class="grey-text center-align">No entries</h4>
+                     <h2 class="grey-text center-align">No entries</h2>
                   </div>
                </div>
                <ul if={dictData.config.flagging.flags.length}

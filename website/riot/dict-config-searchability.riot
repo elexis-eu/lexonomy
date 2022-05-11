@@ -1,10 +1,10 @@
 <dict-config-searchability>
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["searchability", "Searching"]]}/>
-   <h3>Searching</h3>
+   <h1>Searching</h1>
    <div if={!state.isLoading && !state.hasElements}
          class="center-align grey-text">
-      <h3>No elements found</h3>
+      <h1>No elements found</h1>
    </div>
    <div if={!state.isLoading && state.hasElements}>
       <label for="search-element">Searchable elements</label>

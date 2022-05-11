@@ -1,11 +1,11 @@
 <dict-config-flagging>
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["flagging", "Entry flags"]]}/>
-   <h3>Entry flags</h3>
+   <h1>Entry flags</h1>
    <template if={!state.isLoading}>
       <div if={!state.data.flags.length}
             class="center-align grey-text">
-         <h3>no entry flags</h3>
+         <h1>no entry flags</h1>
          <br>
          <a class="btn btn-primary waves-effect waves-light"
                onclick={ doAddEl }>

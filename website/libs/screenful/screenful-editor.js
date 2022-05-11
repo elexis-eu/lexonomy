@@ -266,7 +266,7 @@ Screenful.Editor={
       $('#outlinks').remove();
       $('#inlinks').remove();
       if (links.out.length > 0) {
-        linkElement.append('<span id="outlinks"><h4>Outgoing links</h4></span>');
+        linkElement.append('<span id="outlinks"><h2>Outgoing links</h2></span>');
         for (var link in links.out) {
           var linkdata = links.out[link];
           if (linkdata['target_hw'] != '') {
@@ -287,7 +287,7 @@ Screenful.Editor={
         }
       }
       if (links.in.length > 0) {
-        linkElement.append('<span id="inlinks"><h4>Incoming links</h4></span>');
+        linkElement.append('<span id="inlinks"><h2>Incoming links</h2></span>');
         for (var link in links.in) {
           var linkdata = links.in[link];
           if (linkdata['source_hw'] != '') {

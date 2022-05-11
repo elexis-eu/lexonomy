@@ -1,11 +1,11 @@
 <dict-config-users>
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["users", "Users"]]}/>
-   <h3>Users</h3>
+   <h1>Users</h1>
    <template if={!state.isLoading}>
       <div if={!state.data.users.length}
             class="grey-text center-align">
-         <h4>No users</h4>
+         <h2>No users</h2>
          <br>
          <button class="btn btn-primary"
                onclick={doAddUser}>

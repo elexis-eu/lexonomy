@@ -1,7 +1,7 @@
 <dict-config-xema>
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["xema", "Entry structure"]]}/>
-   <h3>Entry structure</h3>
+   <h1>Entry structure</h1>
    <div if={ (!state.data._xonomyDocSpec || state.data._xonomyDocSpec == "") && (!state.data._dtd || state.data._dtd == "") && !state.override }>
       <div class="row">
          <div id="editor"
@@ -21,7 +21,7 @@
       <div class="row">
          <div class="col s10">
             <p>To specify your custom Lexonomy schema use either <i>Xonomy Document Specification</i>, or <i>DTD</i>.</p>
-            <h5>Xonomy Document Specification</h5>
+            <h3>Xonomy Document Specification</h3>
             <p>A <a href="http://www.lexiconista.com/xonomy/" target="_blank">Xonomy Document Specification</a> is a JavaScript object which configures the Xonomy XML editor used in Lexonomy.</p>
          </div>
       </div>
@@ -47,7 +47,7 @@
       </div>
       <div class="row">
          <div class="col s10">
-            <h5>DTD (Document Type Defition)</h5>
+            <h3>DTD (Document Type Defition)</h3>
             <p><a href="https://en.wikipedia.org/wiki/Document_type_definition" target="_blank">Document Type Definitions</a> are a popular formalism for defining the structure of XML documents.</p>
          </div>
       </div>
