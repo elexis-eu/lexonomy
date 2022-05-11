@@ -32,5 +32,8 @@
   "bugs": {
     "url": "https://github.com/elexis-eu/lexonomy/issues"
   },
-  "homepage": "https://github.com/elexis-eu/lexonomy#readme"
+  "homepage": "https://github.com/elexis-eu/lexonomy#readme",
+  "dependencies": {
+    "@kcmertens/xonomy": "^0.1.1"
+  }
 }
