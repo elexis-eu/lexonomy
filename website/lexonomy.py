@@ -732,10 +732,12 @@ def entrylist(dictID, doctype, user, dictDB, configs):
 def publicsearch(dictID):
     dictDB = ops.getDB(dictID)
     configs = ops.readDictConfigs(dictDB)
+    modifier = request.forms.modifier or "start"
+    howmany = request.forms.howmany or 100
     if not configs["publico"]["public"]:
         return {"success": False}
     else:
-        total, entries, first = ops.listEntries(dictDB, dictID, configs, configs['xema']['root'], request.forms.searchtext, "start", request.forms.howmany)
+        total, entries, first = ops.listEntries(dictDB, dictID, configs, configs['xema']['root'], request.forms.searchtext, modifier, howmany)
         return {"success": True, "entries": entries, "total": total}
 
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
