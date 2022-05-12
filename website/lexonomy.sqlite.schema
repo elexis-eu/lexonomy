@@ -8,3 +8,6 @@ CREATE INDEX dict_id ON user_dict (dict_id);
 CREATE INDEX user_email ON user_dict (user_email);
 CREATE TABLE recovery_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text);
 CREATE TABLE register_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text);
+CREATE TABLE dict_fav (dict_id text, user_email text);
+CREATE INDEX fav_dict_id on dict_fav (dict_id);
+CREATE INDEX fav_user_email on dict_fav (user_email);

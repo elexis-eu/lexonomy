@@ -1034,6 +1034,12 @@ def entrylinks(dictID, user, dictDB, configs):
     res = ops.getEntryLinks(dictDB, dictID, request.query.id)
     return {"links": res}
 
+@post(siteconfig["rootPath"] + "changefavdict.json")
+@auth
+def changefavdict(user):
+    res = ops.changeFavDict(user['email'], request.forms.dictId, request.forms.status)
+    return {"success": res}
+
 @get(siteconfig["rootPath"]+"<dictID>")
 def publicdict(dictID):
     if ops.dictExists(dictID):

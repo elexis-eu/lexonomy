@@ -595,9 +595,13 @@ def getDictsByUser(email):
     dicts = []
     email = str(email).lower()
     conn = getMainDB()
-    c = conn.execute("select d.id, d.title from dicts as d inner join user_dict as ud on ud.dict_id=d.id where ud.user_email=? order by d.title", (email,))
+    favs = []
+    c = conn.execute("SELECT * FROM dict_fav WHERE user_email=?", (email,))
     for r in c.fetchall():
-        info = {"id": r["id"], "title": r["title"], "hasLinks": False, "lang": ""}
+        favs.append(r['dict_id'])
+    c = conn.execute("SELECT DISTINCT d.id, d.title FROM dicts AS d INNER JOIN user_dict AS ud ON ud.dict_id=d.id WHERE ud.user_email=? OR d.id IN (SELECT dict_id FROM dict_fav WHERE user_email=?) ORDER BY d.title", (email, email))
+    for r in c.fetchall():
+        info = {"id": r["id"], "title": r["title"], "hasLinks": False, "lang": "", "favorite": False}
         try:
             dictDB = getDB(r["id"])
             cc = dictDB.execute("select count(*) as total from entries")
@@ -611,6 +615,8 @@ def getDictsByUser(email):
                 info["hasLinks"] = True
             if configs["ident"] and configs["ident"]["lang"]:
                 info["lang"] = configs["ident"]["lang"]
+            if r["id"] in favs:
+                info["favorite"] = True
         except:
             info["broken"] = True
         dicts.append(info)
@@ -1954,6 +1960,15 @@ def notifyUsers(configOld, configNew, dictInfo, dictID):
                 sendmail(user, mailSubject, mailText)
             except Exception as e:
                 pass
+
+def changeFavDict(userEmail, dictID, status):
+    if userEmail != '' and dictID != '':
+        conn = getMainDB()
+        conn.execute("DELETE FROM dict_fav WHERE user_email=? AND dict_id=?", (userEmail, dictID))
+        if status == 'true':
+            conn.execute("INSERT INTO dict_fav VALUES (?, ?)", (dictID, userEmail))
+        conn.commit()
+    return True
 
 def get_iso639_1():
     codes = []

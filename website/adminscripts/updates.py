@@ -31,6 +31,9 @@ def do_query(conn, q):
 
 do_query(conn, "CREATE TABLE IF NOT EXISTS recovery_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text)")
 do_query(conn, "CREATE TABLE IF NOT EXISTS register_tokens (email text, requestAddress text, token text, expiration datetime, usedDate datetime, usedAddress text)")
+do_query(conn, "CREATE TABLE IF NOT EXISTS dict_fav (dict_id text, user_email text)")
+do_query(conn, "CREATE INDEX IF NOT EXISTS fav_dict_id on dict_fav (dict_id)")
+do_query(conn, "CREATE INDEX IF NOT EXISTS fav_user_email on dict_fav (user_email)")
 
 #### ADDING COLUMNS TO EXISTING TABLES ####
 
