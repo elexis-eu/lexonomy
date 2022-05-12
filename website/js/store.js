@@ -19,8 +19,8 @@ class StoreClass {
 
    open(dictId, doctype, entryId, mode){
       this.changeDictionary(dictId)
-      typeof doctype != "undefined" && this.changeDoctype(doctype)
-      typeof entryId != "undefined" && this.changeEntryId(entryId)
+      this.changeDoctype(doctype)
+      entryId && this.changeEntryId(entryId)
       if(mode){
          this.data.mode = mode
       }
@@ -42,6 +42,7 @@ class StoreClass {
       if(this.data.isDictionaryLoading){
          this.one("dictionaryChanged", this.changeDoctype.bind(this, doctype))
       } else {
+         doctype = doctype || this.data.doctypes[0]
          if(doctype != this.data.doctype){
             this.data.doctype = doctype
             this.data.config.xema.root = doctype

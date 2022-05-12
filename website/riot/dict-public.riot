@@ -27,30 +27,32 @@
             <h3>Description</h3>
             <raw-html content={dictData.blurb}></raw-html>
          </div>
-         <div class="sectionDivider"></div>
-         <div class="firstRowCol">
-            <h3>Search</h3>
-            <dict-entry-filter search-func={search}/>
-            <div if={!state.isEntryListLoading && state.showFoundEntries && dictData.entryList}
-                  class="searchResult">
-               <ul if={dictData.entryList.length}
-                     class="entry-list found-entries">
-                  <li each={entry in dictData.entryList}>
-                     <a href="#/{ dictData.dictId }/{ entry.id }">
-                        <raw-html content={entry.title}></raw-html>
-                     </a>
-                  </li>
-               </ul>
-               <div if={dictData.entryCount > 20}
-                     class="serchResultNote grey-text">
-                     Showing first 20 entries of {dictData.entryCount}.
-               </div>
-               <div if={!dictData.entryList.length}
-                     class="noEntries">
-                   <h2 class="grey-text center-align">No entries</h2>
+         <template if={dictData.public || dictData.userAccess}>
+            <div class="sectionDivider"></div>
+            <div class="firstRowCol">
+               <h3>Search</h3>
+               <dict-entry-filter search-func={search}/>
+               <div if={!state.isEntryListLoading && state.showFoundEntries && dictData.entryList}
+                     class="searchResult">
+                  <ul if={dictData.entryList.length}
+                        class="entry-list found-entries">
+                     <li each={entry in dictData.entryList}>
+                        <a href={getEntryUrl(entry)}>
+                           <raw-html content={entry.title}></raw-html>
+                        </a>
+                     </li>
+                  </ul>
+                  <div if={dictData.entryCount > 20}
+                        class="serchResultNote grey-text">
+                        Showing first 20 entries of {dictData.entryCount}.
+                  </div>
+                  <div if={!dictData.entryList.length}
+                        class="noEntries">
+                      <h2 class="grey-text center-align">No entries</h2>
+                  </div>
                </div>
             </div>
-         </div>
+         </template>
       </div>
 
       <div if={ dictData.public }>
@@ -168,6 +170,14 @@
 
          onCloseSearchResultClick(){
             this.update({showFoundEntries: false})
+         },
+
+         getEntryUrl(entry){
+            if(this.dictData.userAccess && this.dictData.userAccess.canEdit){
+               return `#/${this.dictData.dictId}/edit/${this.dictData.doctype}/${entry.id}/view`
+            } else {
+               return `#/${this.dictData.dictId}/${entry.id}`
+            }
          },
 
          onUpdated(){
