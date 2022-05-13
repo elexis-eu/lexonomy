@@ -1428,8 +1428,16 @@ def getEntryLinks(dictDB, dictID, entryID):
         c = dictDB.execute("SELECT * FROM linkables WHERE entry_id=?", (entryID,))
         conn = getLinkDB()
         for r in c.fetchall():
-            ret["out"] = ret["out"] + links_get(dictID, r["element"], r["txt"], "", "", "")
-            ret["in"] = ret["in"] + links_get("", "", "", dictID, r["element"], r["txt"])
+            lout = []
+            lin = []
+            for lr in links_get(dictID, r["element"], r["txt"], "", "", ""):
+                lr['source_preview'] = r['preview']
+                lout.append(lr)
+            for lr in links_get("", "", "", dictID, r["element"], r["txt"]):
+                lr['target_preview'] = r['preview']
+                lin.append(lr)
+            ret["out"] = ret["out"] + lout
+            ret["in"] = ret["in"] + lin
     return ret
 
 def updateEntryLinkables(dictDB, entryID, xml, configs, save=True, save_xml=True):
