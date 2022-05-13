@@ -13,7 +13,7 @@ export default {
           case "background":
             output[style] = value
             break
-          case "color":
+          case "colour":
             output.color = value
             break
           case "border":

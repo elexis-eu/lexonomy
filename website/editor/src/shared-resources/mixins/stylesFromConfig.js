@@ -26,8 +26,8 @@ export default {
             }
             break
           // case "background":
-          case "color":
-            output[style] = value
+          case "colour":
+            output.color = value
             break
           // case "slant":
           //   output.fontStyle = value
