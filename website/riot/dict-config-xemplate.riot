@@ -7,8 +7,8 @@
       <!-- TODO fixup styles so we don't need this sillyness. -->
       <div style="flex-basis: 0; width: auto; position: static; overflow: initial!important; margin-right: 15px;!important" id="editor" class="designer">
         <div class="list">
-          <dict-config-element-in-tree each={root in state.roots} 
-            data={root} 
+          <dict-config-element-in-tree each={root in state.roots}
+            data={root}
             xema={props.dictConfigs.xema}
             current-element={elementName}
             current-attribute={attributeName}
@@ -22,7 +22,7 @@
         elementName={this.elementName}
         attributeName={attributeName}
         elementConfigData={this.configData[elementName]}
-        structureConfig={this.props.dictConfigs.xema}
+        config={this.props.dictConfigs}
         loadConfigData={this.props.loadConfigData}
         configId={this.props.configId}
         save-data={handleElementData}
@@ -172,7 +172,11 @@ div.myEntry span.myHeadword {font-weight: bold}
         if (attributeName) {
           const elementAttributes = this.configData[elementName].attributes
           if (elementAttributes) {
-            elementAttributes[attributeName][attribute] = value
+            if (elementAttributes[attributeName]) {
+              elementAttributes[attributeName][attribute] = value
+            } else {
+              elementAttributes[attributeName] = {[attribute]: value}
+            }
           } else {
             elementAttributes.attributes = {[attribute]: value}
           }

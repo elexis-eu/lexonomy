@@ -166,13 +166,20 @@
       },
 
       shouldRenderStyle(style) {
-        if (!this.props.structureConfig || !this.elementName) {
+        if (!this.props.config.xema || !this.elementName) {
           return false
         }
-        const structureConfig = this.props.structureConfig
+        const structureConfig = this.props.config.xema
+        if (style === "editorInputType" && this.props.config.editing.xonomyMode === "graphical") {
+          if (this.props.attributeName) {
+            return structureConfig.elements[this.elementName].attributes[this.props.attributeName].filling === "txt"
+          } else {
+            return structureConfig.elements[this.elementName].filling === "txt"
+          }
+        }
 
         if ((style === "separation" || style === "gutter")
-          && structureConfig.root == this.elementName) {
+          && structureConfig.root === this.elementName) {
           return false
         }
         if (
@@ -226,40 +233,20 @@
           ]
         },
         {
-          type: "valueRenderType",
-          title: "Value type",
+          type: "editorInputType",
+          title: "Input type in editor",
           values: [
             {
-              value: "read-only",
+              value: "text",
               label: "Read-only"
             },
             {
-              value: "text-input",
+              value: "textarea",
               label: "Singleline text input"
             },
             {
-              value: "textarea-input",
+              value: "number",
               label: "Multiline text input"
-            },
-            {
-              value: "dropdown",
-              label: "Dropdown"
-            },
-            {
-              value: "media",
-              label: "Media browser"
-            },
-            {
-              value: "text-input-with-markup",
-              label: "Text input with markup"
-            },
-            {
-              value: "id-link",
-              label: "Id to another element"
-            },
-            {
-              value: "number-input",
-              label: "Number input?"
             }
           ]
         },
