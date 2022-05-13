@@ -4,7 +4,7 @@
       <h4>EntryID</h4>
       <p>{{ state.entry.entryId }}</p>
     </div>
-    <EntryDisplay :content-html="state.entry.contentHtml"/>
+    <EntryDisplay/>
   </div>
 </template>
 

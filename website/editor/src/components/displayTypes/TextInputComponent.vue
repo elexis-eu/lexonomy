@@ -1,8 +1,13 @@
 <template>
   <div>
     <section class="text-input" v-if="elementData.shown">
-        <label :for="elementName">{{elementName}}:</label>
-        <input :name="elementName" v-model="value">
+      <label :for="elementName">{{ elementName }}:</label>
+      <textarea v-if="this.elementData.editorInputType === 'textarea'"
+                name="elementName"
+                cols="30"
+                rows="10"
+                v-model="value"/>
+      <input v-else :name="elementName" :type="getInputType()" v-model="value">
     </section>
   </div>
 </template>
@@ -17,11 +22,11 @@ export default {
     content: {
       type: Object,
       required: true
-    },
+    }
   },
   data() {
     return {
-      value: "",
+      value: ""
 
     }
   },
@@ -42,19 +47,31 @@ export default {
   mounted() {
     this.value = this.content.text
   },
+  methods: {
+    getInputType() {
+      switch (this.elementData.editorInputType) {
+        case "number":
+        case "text":
+          return this.elementData.editorInputType
+        default:
+          return "text"
+      }
+    }
+  }
 }
 </script>
 
 <style scoped>
 .text-input {
-    display: flex;
-    align-items: baseline;
+  display: flex;
+  align-items: baseline;
 
 }
+
 label {
-    font-size: 1rem;
-    text-transform: capitalize;
-    padding-right: 10px;
-    color: inherit;
+  font-size: 1rem;
+  text-transform: capitalize;
+  padding-right: 10px;
+  color: inherit;
 }
 </style>
