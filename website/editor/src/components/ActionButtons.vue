@@ -2,16 +2,18 @@
   <div v-if="!isRootElement" ref="actionButton" class="dropdown">
     <button @click="toggleDropdown">...</button>
     <div v-show="show" class="vue-dropdown-content">
-      <a v-if="canMoveElementDown" @click="triggerEvent('move-element-down')">Move {{ elementName }} down</a>
-      <a v-if="canMoveElementUp" @click="triggerEvent('move-element-up')">Move {{ elementName }} up</a>
-      <a v-if="canAddElement" @click="triggerEvent('add-element')">Create new {{ elementName }}</a>
-      <a v-if="canAddElement && elementEditorConfig.enableCopying" @click="triggerEvent('clone-element')">Duplicate {{ elementName }}</a>
-      <a v-if="canRemoveElement" @click="triggerEvent('remove-element')">Remove selected {{ elementName }}</a>
+      <a v-if="canMoveElementDown" @click="triggerEvent('move-element-down')">Move {{ computedElementName }} down</a>
+      <a v-if="canMoveElementUp" @click="triggerEvent('move-element-up')">Move {{ computedElementName }} up</a>
+      <a v-if="canAddElement" @click="triggerEvent('add-element')">Create new {{ computedElementName }}</a>
+      <a v-if="canAddElement && elementEditorConfig.enableCopying" @click="triggerEvent('clone-element')">Duplicate {{ computedElementName }}</a>
+      <a v-if="canRemoveElement" @click="triggerEvent('remove-element')">Remove selected {{ computedElementName }}</a>
     </div>
   </div>
 </template>
 
 <script>
+import computedElementName from "@/shared-resources/mixins/computedElementName"
+
 export default {
   name: "ActionButtons",
   props: {
@@ -21,6 +23,9 @@ export default {
     numberOfElements: Number,
     editorChildNumber: Number
   },
+  mixins: [
+    computedElementName
+  ],
   data() {
     return {
       show: false
@@ -37,7 +42,7 @@ export default {
       //   parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
       //   childElement = parentChildren[this.elementName]
       // }
-      return childElement && (childElement.max === 0 || this.numberOfElements < childElement.max)
+      return childElement && (!childElement.max || this.numberOfElements < childElement.max)
     },
     canRemoveElement() {
       let parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].children || []
@@ -46,7 +51,7 @@ export default {
       //   parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
       //   childElement = parentChildren[this.elementName]
       // }
-      return childElement && (childElement.min === 0 || this.numberOfElements < childElement.min)
+      return childElement && (!childElement.min || this.numberOfElements > childElement.min)
     },
     canMoveElementDown() {
       return this.elementEditorConfig.enablePositionChange && this.editorChildNumber < this.numberOfElements - 1

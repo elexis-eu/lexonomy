@@ -2,12 +2,14 @@
   <div>
     <section v-if="elementData.shown">
 <!--      <p>Read-only component</p>-->
-      <p> {{ elementName }}: {{content.text}}</p>
+      <p> {{ computedElementName }}: {{content.text}}</p>
     </section>
   </div>
 </template>
 
 <script>
+import computedElementName from "@/shared-resources/mixins/computedElementName"
+
 export default {
   name: "ReadOnlyComponent",
   props: {
@@ -19,6 +21,7 @@ export default {
       required: true
     }
   },
+  mixins: [computedElementName]
 }
 </script>
 

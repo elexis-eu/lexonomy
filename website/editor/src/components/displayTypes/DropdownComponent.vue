@@ -1,7 +1,7 @@
 <template>
   <div>
     <section v-if="elementData.shown" class="dropdown">
-      <p> {{ elementName }}</p>
+      <p> {{ computedElementName }}</p>
       <select v-model="value">
         <option v-for="option in options" :key="option.value" :value="option.value">{{ option.caption }}</option>
       </select>
@@ -10,6 +10,8 @@
 </template>
 
 <script>
+
+import computedElementName from "@/shared-resources/mixins/computedElementName"
 
 export default {
   name: "DropdownComponent",
@@ -21,6 +23,7 @@ export default {
       required: true
     }
   },
+  mixins: [computedElementName],
   data() {
     return {
       value: null,

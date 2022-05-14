@@ -1,18 +1,20 @@
 <template>
   <div>
     <section class="text-input" v-if="elementData.shown">
-      <label :for="elementName">{{ elementName }}:</label>
+      <label :for="computedElementName">{{ computedElementName }}:</label>
       <textarea v-if="this.elementData.editorInputType === 'textarea'"
                 name="elementName"
                 cols="30"
                 rows="10"
                 v-model="value"/>
-      <input v-else :name="elementName" :type="getInputType()" v-model="value">
+      <input v-else :name="computedElementName" :type="getInputType()" v-model="value">
     </section>
   </div>
 </template>
 
 <script>
+
+import computedElementName from "@/shared-resources/mixins/computedElementName"
 
 export default {
   name: "TextInputComponent",
@@ -24,6 +26,7 @@ export default {
       required: true
     }
   },
+  mixins: [computedElementName],
   data() {
     return {
       value: ""

@@ -1,7 +1,7 @@
 <template>
   <div>
     <section class="input-section" v-if="elementData.shown">
-      <label>{{ elementName }}:</label>
+      <label>{{ computedElementName }}:</label>
       <div ref="wholeInput" class="text-with-markup">
         <span
           v-for="(element, index) in values"
@@ -37,6 +37,7 @@
 <script>
 
 import stylesFromConfig from "@/shared-resources/mixins/stylesFromConfig"
+import computedElementName from "@/shared-resources/mixins/computedElementName"
 
 export default {
   name: "TextInputWithMarkupComponent",
@@ -50,7 +51,8 @@ export default {
     children: Array
   },
   mixins: [
-    stylesFromConfig
+    stylesFromConfig,
+    computedElementName
   ],
   watch: {
     values: {
@@ -112,7 +114,9 @@ export default {
     this.markupElements = [{type: "text", disabled: false}]
     if (Array.isArray(this.children)) {
       this.children.forEach(child => {
-        this.markupElements.push({type: child.name, disabled: false})
+        if (!child.isAttribute) {
+          this.markupElements.push({type: this.getElementNameInConfig(child.name), disabled: false})
+        }
       })
     } else {
       this.markupElements = [{type: xampl.markup, disabled: false}]
@@ -123,6 +127,11 @@ export default {
     this.computeValues()
   },
   methods: {
+    getElementNameInConfig(elementName) {
+      let config = this.state.entry.dictConfigs.xema.elements
+      let configData = config[elementName]
+      return (configData && configData.elementName) || elementName
+    },
     computeValues() {
       if (Array.isArray(this.content) && this.content.length > 0) {
         this.content.forEach((element, index) => {

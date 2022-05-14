@@ -24,13 +24,55 @@ export default {
   },
   methods: {
     updateEntry(data) {
-      if(!data) {
+      if (!data) {
         return
       }
+      console.log(data.content)
       // We want to make 2 separate copies of content so we can easily track dirty flag
       this.state._initialContent = xml2js(data.content || "", this.state.xml2jsConfig)
       data.content = xml2js(data.content || "", this.state.xml2jsConfig)
+      this.changeElementNames(data.content, null, data.dictConfigs.xema)
       this.state.entry = {...this.state.entry, ...data}
+    },
+    changeElementNames(structure, parentName = null, config) {
+      if (structure.name) {
+        structure.name = this.getFakeName(structure.name, parentName, config) || structure.name
+      }
+      if (structure.attributes) {
+        for (const attribute of Object.keys(structure.attributes)) {
+          let fakeName = this.getFakeName(attribute, structure.name, config)
+          if (fakeName && fakeName !== attribute) {
+            structure.attributes[fakeName] = structure.attributes[attribute]
+            delete structure.attributes[attribute]
+          }
+        }
+      }
+      if (structure.elements) {
+        for (const element of structure.elements) {
+          this.changeElementNames(element, structure.name, config)
+        }
+      }
+    },
+    getFakeName(elementName, parentElement, config) {
+      if (config.root === elementName) {
+        return config.elements[elementName].name
+      }
+      if (!parentElement) {
+        console.error("No parent element")
+        return elementName
+      }
+
+      let parentChildren = config.elements[parentElement] && config.elements[parentElement].children || []
+      if (parentElement) {
+        parentChildren = parentChildren.map(child => child.name)
+      }
+      for (const [el, data] of Object.entries(config.elements)) {
+        if (data.elementName === elementName) {
+          if (parentChildren.includes(el)) {
+            return el
+          }
+        }
+      }
     }
   }
 }
