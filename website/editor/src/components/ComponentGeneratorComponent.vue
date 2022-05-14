@@ -4,10 +4,10 @@
         :key="typeElement.name"
         :style="getEncompassingStyles(typeElement.name)"
     >
-      <component v-for="(element, i) in typeElement.children"
-                 :ref="element.props.elementName + element.props.editorChildNumber"
-                 :key="element.props.elementName + '-' + i"
+      <component v-for="element in typeElement.children"
                  :is="element.componentName"
+                 :ref="element.props.elementName + element.props.editorChildNumber"
+                 :key="element.props.key"
                  v-bind="element.props"
                  @input="handleChildUpdate"
                  @create-element="createElement"
@@ -104,22 +104,29 @@ export default {
         return
       }
       for (let elementType of this.renderedChildren) {
-        let newContentForChild = newContent.elements.filter(element => {
+        let newContentForChildType = newContent.elements.filter(element => {
           return element.name === elementType.name
         })
-        if (newContentForChild.length === 0) {
+        if (newContentForChildType.length === 0) {
           continue
         }
+
         for (let i in elementType.children) {
           let renderedChild = elementType.children[i]
 
           let renderedChildRefs = this.$refs[renderedChild.props.elementName + renderedChild.props.editorChildNumber]
           let renderedChildRef = (renderedChildRefs && renderedChildRefs[0]) || null
 
-          if (renderedChildRef && newContentForChild[renderedChild.props.editorChildNumber]) {
-            renderedChildRef.updateContent(newContentForChild[renderedChild.props.editorChildNumber])
+          let newContent
+          if (newContentForChildType.length !== elementType.children.length) {
+            newContent = newContentForChildType.find(child => child._index === renderedChild.props.editorChildNumber)
+          } else {
+            newContent = newContentForChildType[renderedChild.props.editorChildNumber]
           }
-          if (renderedChildRef && !newContentForChild[renderedChild.props.editorChildNumber]) {
+          if (renderedChildRef && newContent) {
+            renderedChildRef.updateContent(newContent)
+          }
+          if (renderedChildRef && !newContent) {
             elementType.children.splice(Number(i), 1)
           }
         }
@@ -175,7 +182,8 @@ export default {
                 editorChildNumber: index,
                 parentElementName: this.elementName,
                 numberOfElements: content.length,
-                isAttribute: child.isAttribute
+                isAttribute: child.isAttribute,
+                key: Math.random()
               }
             })
           })
@@ -191,7 +199,8 @@ export default {
               editorChildNumber: 0,
               parentElementName: this.elementName,
               numberOfElements: content.length,
-              isAttribute: child.isAttribute
+              isAttribute: child.isAttribute,
+              key: Math.random()
             }
           })
         }
@@ -346,13 +355,25 @@ export default {
       elements.splice(elementToMoveIndex, 1)
       elements.splice(elementToMoveIndex + direction, 0, element)
 
+      console.log(elements)
+
       let content = Object.assign({}, this.content)
       content.elements = elements
       this.$emit("input", {content: content})
     },
     deleteElement({name, position}) {
       let elements = this.content.elements || []
-      let elementToDeleteIndex = this.getPositionOfElementInContent(name, position, this.content)
+      let consecutiveNumber = 0
+      let elementToDeleteIndex
+      for (const i in elements) {
+        if (elements[i].name === name) {
+          elements[i]._index = consecutiveNumber
+          if (consecutiveNumber === position) {
+            elementToDeleteIndex = i
+          }
+          consecutiveNumber++
+        }
+      }
       elements.splice(elementToDeleteIndex, 1)
 
       let content = Object.assign({}, this.content)
