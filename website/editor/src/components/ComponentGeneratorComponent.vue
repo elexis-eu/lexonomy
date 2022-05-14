@@ -110,7 +110,6 @@ export default {
         if (newContentForChildType.length === 0) {
           continue
         }
-
         for (let i in elementType.children) {
           let renderedChild = elementType.children[i]
 
@@ -355,10 +354,9 @@ export default {
       elements.splice(elementToMoveIndex, 1)
       elements.splice(elementToMoveIndex + direction, 0, element)
 
-      console.log(elements)
-
       let content = Object.assign({}, this.content)
       content.elements = elements
+      this.loadNewData(content)
       this.$emit("input", {content: content})
     },
     deleteElement({name, position}) {
