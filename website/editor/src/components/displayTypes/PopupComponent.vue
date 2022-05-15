@@ -21,6 +21,8 @@
                    :elementName="elementName"
                    :elementData="elementData"
                    :content="componentData"
+                   :isAttribute="isAttribute"
+                   :parentElementName="parentElementName"
                    @hide-children="hideChildren"
                    @input="handleValueUpdate"
         />
@@ -35,6 +37,8 @@
             :elementName="elementName"
             :elementData="elementData"
             :content="componentData"
+            :isAttribute="isAttribute"
+            :parentElementName="parentElementName"
             @hide-children="hideChildren"
             @input="handleValueUpdate"
           />

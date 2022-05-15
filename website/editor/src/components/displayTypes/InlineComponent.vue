@@ -20,6 +20,8 @@
                  :elementData="elementData"
                  :content="componentData"
                  :children="children"
+                 :isAttribute="isAttribute"
+                 :parentElementName="parentElementName"
                  @hide-children="hideChildren"
                  @input="handleValueUpdate"
       />
