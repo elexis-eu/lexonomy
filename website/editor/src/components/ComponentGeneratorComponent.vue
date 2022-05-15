@@ -4,6 +4,7 @@
         :key="typeElement.name"
         :style="getEncompassingStyles(typeElement.name)"
     >
+      <CorpusComponent v-if="useExampleEngine(typeElement.name)"></CorpusComponent>
       <component v-for="element in typeElement.children"
                  :is="element.componentName"
                  :ref="element.props.elementName + element.props.editorChildNumber"
@@ -22,9 +23,13 @@
 
 <script>
 import {xml2js} from "xml-js"
+import CorpusComponent from "@/components/CorpusComponent"
 
 export default {
   name: "ComponentGeneratorComponent",
+  components: {
+    CorpusComponent
+  },
   props: {
     children: Array,
     elementEditorConfig: Object,
@@ -63,6 +68,9 @@ export default {
     this.loadNewData(this.content)
   },
   methods: {
+    useExampleEngine(elementName) {
+      return this.state.entry.dictConfigs.xampl.container === elementName
+    },
     getEncompassingStyles(elementName) {
       let gutter = this.state.entry.dictConfigs.xemplate[elementName].gutter
       let listStyle = "none"
@@ -279,16 +287,16 @@ export default {
         this.$emit("input", {content: content})
         return true
       }
-        // Update content without creating new content/elements
-        if (!content.elements) {
-          content.elements = this.createElementTemplate(data.elementName)
-        } else if (!content.elements.find(el => {
-          return el.name === data.elementName
-        })) {
-          content.elements.push(data.content)
-          this.$emit("input", {content: content})
-          return
-        }
+      // Update content without creating new content/elements
+      if (!content.elements) {
+        content.elements = this.createElementTemplate(data.elementName)
+      } else if (!content.elements.find(el => {
+        return el.name === data.elementName
+      })) {
+        content.elements.push(data.content)
+        this.$emit("input", {content: content})
+        return
+      }
 
       let consecutiveNumber = 0
       let contentUpdated = false
