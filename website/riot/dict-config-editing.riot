@@ -29,29 +29,11 @@
       </div>
       <div id="info_graphical" style="padding-left: 50px;">
         <p>When editing an entry in <b>graphical mode</b> the XML source code is hidden and the entry uses settings configuration to display a more graphically friendly interface.
-          <div class='instro'><img src='docs/mode-laic.png' alt='Illustration'/></div>
+<!--          <div class='instro'><img src='docs/mode-laic.png' alt='Illustration'/></div>-->
+          <div class='instro'>Image of graphical editor</div>
         </p>
       </div>
       <br>
-      <div class="input-field">
-         <p>
-            <label>
-               <input name="xonomyTextEditor" id="xonomyTextEditor_string" type="radio" class="with-gap" checked={ this.configData.xonomyTextEditor == "askString" } onchange={ changeInfo }/>
-               <span>Single line</span>
-            </label>
-            <label style="margin-left: 30px;">
-               <input name="xonomyTextEditor" id="xonomyTextEditor_longstring" type="radio" class="with-gap" checked={ this.configData.xonomyTextEditor == "askLongString" } onchange={ changeInfo }/>
-               <span>Multi line</span>
-            </label>
-            </p>
-         <span class="helper-text">Choose the default text editor for node values.</span>
-      </div>
-      <div id="info_string" style="margin-left: 30px;">
-         <p>When editing text in <b>single line mode</b> the user sees a smaller editor.<div class='instro'><img src='docs/text-editor-askstring.png' alt='Illustration'/></div></p>
-      </div>
-      <div id="info_longstring" style="margin-left: 30px;">
-         <p>When editing text in <b>multi line mode</b> the user sees a full-fledged text editor.<div class='instro'><img src='docs/text-editor-asklongstring.png' alt='Illustration'/></div></p>
-      </div>
       <div>
          <br>
          <button class="btn waves-effect waves-light" onclick={ startOverride } >Customize entry editor <i class="material-icons right">edit</i>

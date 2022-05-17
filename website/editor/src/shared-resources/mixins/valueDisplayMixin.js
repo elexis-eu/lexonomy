@@ -22,6 +22,10 @@ export default {
       structureConfig = this.state.entry.dictConfigs.xema.elements[this.elementName]
     }
     if (structureConfig) {
+      if (this.elementData.readOnly) {
+        this.valueComponent = fillingToComponentMap["emp"]
+        return
+      }
       let filling = structureConfig.filling
       this.valueComponent = fillingToComponentMap[filling]
     } else {

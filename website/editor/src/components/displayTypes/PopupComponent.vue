@@ -1,8 +1,7 @@
 <template>
   <div class="popup" :style="configStyles">
-    <div>
-      <button @click="openPopup">Open {{ elementName }}</button>
-      <section v-if="elementData.shown">
+    <div style="display: flex">
+      <section v-if="elementData.shown" style="display: flex">
         <ActionButtons
           v-if="!isAttribute"
           :elementName="elementName"
@@ -27,6 +26,7 @@
                    @input="handleValueUpdate"
         />
       </section>
+      <button @click="openPopup">Open {{ elementName }}</button>
       <div v-if="showPopup" ref="wrapper" class="modal" @click="maybeClosePopup">
         <div ref="modalContent" class="modal-content">
           <span class="close" @click="closePopup">&times;</span>
