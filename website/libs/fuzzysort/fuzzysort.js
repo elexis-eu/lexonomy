@@ -461,6 +461,18 @@
         prepared.score = score
         prepared.indexes = new Array(matchesBestLen); for(var i = matchesBestLen - 1; i >= 0; --i) prepared.indexes[i] = matchesBest[i]
 
+        // the whole string match (no spaces between indexes) -> move up in results
+        if(!(prepared.indexes[0] +  prepared.indexes.length - 1 - prepared.indexes[prepared.indexes.length - 1])){
+          score *= 0.25
+        }
+        // modified to prefer first letters match
+        for(var i = 0; i < prepared.indexes.length; i++){
+          if(prepared.indexes[i] == 0 || prepared.indexes[i-1] == 32){
+            score *= 0.5
+          }
+        }
+        prepared.score = Math.round(score)
+
         return prepared
       }
     },

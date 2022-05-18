@@ -135,6 +135,7 @@
                   fs.obj.h_lang = FuzzySort.highlight(fs[1], '<b class="red-text">', "</b>")
                   fs.obj.h_author = FuzzySort.highlight(fs[2], '<b class="red-text">', "</b>")
                   fs.obj.h_licence = FuzzySort.highlight(fs[3], '<b class="red-text">', "</b>")
+                  fs.obj.score = fs.score
                   return fs.obj
                }).sort((a, b) => {
                   return a.score == b.score ? a.title.localeCompare(b.title) : Math.sign(b.score - a.score)
