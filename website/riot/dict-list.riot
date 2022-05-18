@@ -3,11 +3,42 @@
    <template if={!dictData.isDictionaryListLoading}>
       <div if={dictData.dictionaryList.length}>
          <h1>your dictionaries</h1>
-         <ul class="collection">
-            <li each={ dict in dictData.dictionaryList }
-                  class="collection-item ">
+         <div style="display: flex; align-items: center; flex-wrap: wrap;">
+            <span if={dictData.dictionaryList.length}
+                  class="searchBox input-field">
+                  <i class="material-icons prefix grey-text">search</i>
+               <input id="searchBox"
+                     oninput={onSearchInput}>
+               <i onclick={onClearFilterClick}
+                  class="material-icons clearFilterIcon grey-text clickable">close</i>
+            </span>
+            <span style="margin-left: auto;">
+               <a href="#/make"
+                     class="btn waves-effect waves-light">
+                  <i class="material-icons left">add</i>
+                  create new dictionary
+               </a>
+            </span>
+         </div>
+         <ul if={state.visibleDictionaries.length}
+               class="collection">
+            <li each={ (dict, idx) in state.visibleDictionaries }
+                  id="r_{idx}"
+                  class="collection-item {dict.selected ? 'selected' : ''}"
+                  key={dict.id}>
                <div>
-                  <a href="#/{ dict.id }">{ dict.title }</a>
+                  <label if={dict.currentUserCanDelete}
+                           class="checkbox">
+                     <input id="chb_{idx}"
+                           type="checkbox"
+                           idx={idx}
+                           checked={dict.selected}
+                           onclick={onCheckboxClick}/>
+                     <span></span>
+                  </label>
+                  <a href="#/{ dict.id }"
+                        id="t_{idx}"
+                        class="title">{ dict.title }</a>
                   <span if={ dict.lang }
                         class="dict-lang">{ dict.lang }</span>
                   <span class="dict-lang grey-text">{ dict.size } entries</span>
@@ -38,11 +69,28 @@
                </div>
             </li>
          </ul>
-         <a href="#/make"
-               class="btn waves-effect waves-light">
-            <i class="material-icons left">add</i>
-            create new dictionary
-         </a>
+         <div if={!state.visibleDictionaries.length}
+               class="center"
+               style="margin: 10vh auto;">
+            <h1 class="grey-text lighten-2">Nothing found</h1>
+         </div>
+         <div id="deleteAllBox"
+               class="deleteAllBox z-depth-5"
+               if={state.selectedCount}>
+               <div>
+                  Delete selected dictionaries ({state.selectedCount})?
+                  <button class="btn"
+                        onclick={onDeleteSelectedClick}>
+                     delete
+                  </button>
+                  <button class="btn btn-secondary"
+                        onclick={onDeselectAll}>
+                     cancel
+                  </button>
+               </div>
+
+         </div>
+
       </div>
       <div if={!dictData.dictionaryList.length}
             class="grey-text center-align">
@@ -60,20 +108,169 @@
    </template>
 
    <style>
+      .searchBox{
+         max-width: 200px;
+         display: inline-block;
+         margin: 0 15px 0 0;
+      }
+      .searchBox input{
+         padding-right: 27px;
+      }
+      .clearFilterIcon{
+         position: absolute;
+         right: 5px;
+         top: 11px;
+      }
       .dict-lang {
          padding-left: 0.5em;
       }
+      ul li{
+         position: relative;
+      }
       ul li:hover{
          background-color: #f8f8f8f2!important;
+      }
+      ul li.selected{
+         background-color: #fffde7 !important;
+      }
+      .title{
+         padding-left: 35px;
+      }
+      .checkbox{
+         display: inline-block;
+         vertical-align: middle;
+         position: absolute;
+         left: 20px;
+      }
+      .checkbox span{
+         opacity: 0.2;
+      }
+      .checkbox:hover span{
+         opacity: 1;
+      }
+      .checkbox input:checked + span{
+         opacity: 1;
+      }
+      .deleteAllBox{
+         text-align: center;
+         position: fixed;
+         bottom: 0;
+         left: 0;
+         right: 0;
+         padding: 20px;
+         background-color: white;
+         font-size: 1.2rem;
+         z-index: 9999;
+      }
+      .deleteAllBox button{
+         margin-left: 20px;
       }
    </style>
 
    <script>
       export default {
          bindings: [["store", "dictionaryListChanged", "update"],
-                    ["store", "dictionaryListLoadingChanged", "update"]],
+                    ["store", "dictionaryListLoadingChanged", "onDictionaryListLoadingChange"]],
          state: {
-            isLoading: false
+            isLoading: false,
+            lastCheckedIdx: null,
+            visibleDictionaries: [],
+            selectedCount: 0,
+            query: ""
+         },
+
+         onDictionaryListLoadingChange(){
+            if(this.dictData.isDictionaryListLoaded){
+               this.state.visibleDictionaries = this.dictData.dictionaryList
+            }
+            this.update()
+         },
+
+         onSearchInput(evt){
+            this.state.query = evt.target.value
+            this.filter()
+         },
+
+         onClearFilterClick(evt){
+            if($('#searchBox').val()){
+               $('#searchBox').val("")
+               this.state.query = ""
+               this.filter()
+            }
+         },
+
+         onCheckboxClick(evt){
+            let idx = $(evt.currentTarget).attr("idx")
+            this.toggleLineSelection(idx, evt.shiftKey)
+            this.state.lastCheckedIdx = idx
+         },
+
+         toggleLineSelection(idx, shiftKey){
+            let selected = $("#chb_" + idx).prop("checked")
+            let fromIdx = shiftKey ? Math.min(idx, this.state.lastCheckedIdx) : idx
+            let toIdx = shiftKey ? Math.max(idx, this.state.lastCheckedIdx) : idx
+            for(let i = fromIdx; i <= toIdx; i++){
+               this.state.visibleDictionaries[i].selected = selected
+            }
+            this.update()
+         },
+
+         onDeleteSelectedClick(){
+            if (confirm("Are you sure you want to delete selected dictionaries? You will not be able to undo this.")) {
+               this.update({isLoading: true})
+               let toDelete = this.state.visibleDictionaries.filter(dict => dict.selected).map(dict => dict.id)
+               this.deleteNextSelected(toDelete)
+            }
+         },
+
+         filter(){
+            this.dictData.dictionaryList.forEach(c => {
+               delete c.h_title
+            })
+            this.state.visibleDictionaries = this.dictData.dictionaryList
+            if(this.state.query !== ""){
+               let sortResult = FuzzySort.go(this.state.query, this.state.visibleDictionaries, {
+                  key: "id",
+                  keys: ["title"]
+               })
+               this.state.visibleDictionaries = sortResult.map(fs => {
+                  fs.obj.h_title = FuzzySort.highlight(fs[0], '<b class="red-text">', "</b>")
+                  fs.obj.score = fs.score
+                  return fs.obj
+               }).sort((a, b) => {
+
+                  return (a.score == b.score) ? a.title.localeCompare(b.title) : Math.sign(b.score - a.score)
+               })
+            }
+            this.update()
+            this.highlightOccurrences()
+         },
+
+         highlightOccurrences(){
+            let el, row
+            this.state.visibleDictionaries.forEach((c, idx) => {
+               row = this.$(`#r_${idx}`)
+               if(row){
+                  el = this.$(`#t_${idx}`)
+                  el.innerHTML = c.h_title ? c.h_title : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
+               }
+            }, this)
+         },
+
+         deleteNextSelected(toDelete){
+            if(toDelete.length){
+               this.store.deleteDictionary(toDelete.pop())
+                     .always(this.deleteNextSelected.bind(this, toDelete))
+            } else {
+               this.state.visibleDictionaries = this.dictData.dictionaryList
+               this.state.isLoading = false
+               this.filter()
+            }
+         },
+
+         onDeselectAll(){
+            this.state.visibleDictionaries.forEach(dict => {dict.selected = false})
+            this.update()
          },
 
          doEditDict(dictId) {
@@ -98,8 +295,14 @@
             }
          },
 
+         onBeforeUpdate(){
+            this.state.selectedCount = this.state.visibleDictionaries.filter(dict => dict.selected).length
+         },
+
          onBeforeMount() {
-            !this.dictData.isDictionaryListLoaded && this.store.loadDictionaryList()
+            if(this.dictData.isDictionaryListLoaded){
+               this.state.visibleDictionaries = this.dictData.dictionaryList
+            }
          }
       }
    </script>
