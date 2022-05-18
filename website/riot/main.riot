@@ -51,6 +51,12 @@
                })
             } else {
                storeParams && this.store.open(...storeParams)
+               let query = route.query()
+               this.store.changeSearchParams({
+                  searchtext: decodeURIComponent(query.s || ""),
+                  modifier: query.m
+               })
+
                this.update(Object.assign({
                   content: content,
                   subPage: subPage || ''
@@ -107,16 +113,16 @@
             route('/make', () => {
                this.goTo('main-page', 'new')
             })
-            route('/*/edit', (dictId) => {
+            route('/*/edit(\?*){0,1}', (dictId) => {
                this.goTo('dict-edit', '', [dictId])
             })
-            route('/*/edit/*', (dictId, doctype) => {
+            route('/*/edit/*(\?*){0,1}', (dictId, doctype) => {
                this.goTo('dict-edit', '', [dictId, doctype])
             })
-            route('/*/edit/*/*/*', (dictId, doctype, entryId, mode) => {
+            route('/*/edit/*/*/*(\?*){0,1}', (dictId, doctype, entryId, mode) => {
                this.goTo('dict-edit', '', [dictId, doctype, entryId, mode])
             })
-            route('/*/([0-9]+)$', (dictId, entryId) => {
+            route('/*/([0-9]+)(\?*){0,1}', (dictId, entryId) => {
                this.goTo('dict-public-entry', '', [dictId, null, entryId])
             })
             route('/*/config/*', (dictId, configId) => {

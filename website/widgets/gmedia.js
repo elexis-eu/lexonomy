@@ -80,6 +80,6 @@ Gmedia.addVoicePublic=function(entry, gapi, titling) {
    var $xml = $($.parseXML(entry.content));
    var headword = $xml.find(titling.headword).html();
    if (headword != "" && gapi.voicekey && gapi.voicekey != '' && gapi.voicelang != '') {
-      $('#viewer div:first span:first').after('<span class="voicetts"><audio id="voiceplayer" src="https://api.voicerss.org/?key='+gapi.voicekey+'&hl='+gapi.voicelang+'&src='+headword+'"/><span class="voicetts-icon"><img src="/furniture/speaker.png" onclick="document.getElementById(\'voiceplayer\').play()"></span></span>');
+      $('#viewer div:first span:first').after('<span class="voicetts"><audio id="voiceplayer" src="https://api.voicerss.org/?key='+gapi.voicekey+'&hl='+gapi.voicelang+'&src='+headword+'"/><span class="voicetts-icon"><img src="./furniture/speaker.png" onclick="document.getElementById(\'voiceplayer\').play()"></span></span>');
    }
 }

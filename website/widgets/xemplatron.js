@@ -132,7 +132,7 @@ Xemplatron.styles={ //the dimensions are ordered from innermost to outermost
   },
   interactivity: {
     "title": "Interactivity",
-    "xref": {toHtml: function(ly, html, n, isF, isL){return "<a class='xref' onclick='route(\""+dictId+(document.location.hash.includes("/edit/")?"/edit":"")+"/"+n.nodeName+"/view"+(n.getAttribute('lxnm:subentryID'))+"\");' data-text='"+n.textContent.replace("'", "&apos;")+"'>"+html+"</a>"}, title: "Clickable cross-reference"},
+    "xref": {toHtml: function(ly, html, n, isF, isL){return "<a class='xref' href=\"" + window.location.hash.split("?")[0] + "?s=" + encodeURIComponent(n.textContent) + "&m=substring\">"+html+"</a>"}, title: "Clickable cross-reference"},
     "xlink": {toHtml: function(ly, html, n, isF, isL){return "<a class='xlink' target='_blank' href='"+n.textContent.replace("'", "&apos;")+"'>"+n.textContent+"</a>"}, title: "External URL link"},
   },
   innerPunc: {

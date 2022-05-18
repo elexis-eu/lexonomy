@@ -11,10 +11,10 @@
             class="material-icons clearFilterIcon grey-text clickable">close</i>
       </span>
       <select id="searchType">
-         <option value="start" selected>starts like this</option>
-         <option value="exact">is exactly</option>
-         <option value="wordstart">contains a word that starts like this</option>
-         <option value="substring">contains this sequence of characters</option>
+         <option value="start" selected={!dictData.modifier || dictData.modifier == 'start'}>starts like this</option>
+         <option value="exact" selected={dictData.modifier == 'exact'}>is exactly</option>
+         <option value="wordstart" selected={dictData.modifier == 'wordstart'}>contains a word that starts like this</option>
+         <option value="substring" selected={dictData.modifier == 'substring'}>contains this sequence of characters</option>
       </select>
    </div>
 

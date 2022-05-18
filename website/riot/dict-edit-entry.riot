@@ -260,7 +260,7 @@
          },
 
          updateUrl(){
-            let newUrl = `${window.location.href.split("#")[0]}#/${this.dictData.dictId}/edit/${this.dictData.doctype}/${this.dictData.entryId}/${this.dictData.mode}`
+            let newUrl = `${window.location.href.split("#")[0]}#/${this.dictData.dictId}/edit/${this.dictData.doctype}/${this.dictData.entryId}/${this.dictData.mode}${url.stringifyQuery(route.query())}`
             if(newUrl != window.location.href){
                history.pushState(null, null, newUrl)
             }

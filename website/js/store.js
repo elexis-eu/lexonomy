@@ -7,7 +7,10 @@ class StoreClass {
          isDictionaryListLoading: false,
          isDictionaryListLoaded: false,
          siteconfig: null,
-         dictionaryList: []
+         dictionaryList: [],
+         isPublicDictionaryListLoaded: false,
+         isPublicDictionaryListLoading: false,
+         publicDictionaryList: null
       }
 
       this.resetDictionary()
@@ -30,6 +33,7 @@ class StoreClass {
       if(dictId != this.data.dictId){
          this.resetDictionary()
          this.data.dictId = dictId
+         window.dictId = dictId  // global variable xema is used by some custom editors
          if(dictId){
             this.loadActualDictionary()
          } else {
@@ -51,6 +55,20 @@ class StoreClass {
       }
    }
 
+   changeSearchParams(searchParams){
+      if(this.data.isDictionaryLoading){
+         this.one("dictionaryChanged", this.changeSearchParams.bind(this, searchParams))
+      } else {
+         let searchtext = searchParams.searchtext || ""
+         let modifier = searchParams.modifier || "start"
+         if(searchtext !== this.data.searchtext || modifier !== this.data.modifier){
+            this.data.searchtext = searchtext
+            this.data.modifier = modifier
+            this.loadEntryList()
+         }
+      }
+   }
+
    changeEntryId(entryId){
       if(this.data.isDictionaryLoading){
          this.one("dictionaryChanged", this.changeEntryId.bind(this, entryId))
@@ -60,6 +78,14 @@ class StoreClass {
             this.trigger("entryIdChanged")
          }
       }
+   }
+
+   searchEntryList(){
+      this.loadEntryList()
+      url.setQuery(this.data.searchtext ? {
+         s: this.data.searchtext,
+         m: this.data.modifier
+      } : {}, true)
    }
 
    setEntryFlag(entryId, flag){
@@ -180,14 +206,21 @@ class StoreClass {
    }
 
    loadPublicDictionaryList(){
+      this.data.isPublicDictionaryListLoading = true
+      this.trigger("isPublicDictionaryListLoadingChanged")
       return $.ajax(`${window.API_URL}publicdicts.json`)
             .done(response => {
+               this.data.isPublicDictionaryListLoaded = true
                this.data.publicDictionaryList = response.entries || []
+               this.data.publicDictionaryLanguageList = [...new Set(this.data.publicDictionaryList.map(d => d.lang))].filter(l => !!l)
             })
             .fail(response => {
                M.toast({html: "Dictionary list could not be loaded."})
             })
-            .always(response => {})
+            .always(response => {
+               this.data.isPublicDictionaryListLoading = false
+               this.trigger("isPublicDictionaryListLoadingChanged")
+            })
    }
 
    loadActualDictionary(){

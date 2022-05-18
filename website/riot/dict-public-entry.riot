@@ -10,7 +10,7 @@
          <div class="col s4 leftCol">
             <loading-overlay if={dictData.isEntryListLoading && dictData.isEntryListLoaded}/>
             <template if={dictData.isEntryListLoaded}>
-               <dict-entry-filter search-func={store.loadEntryList.bind(store)}/>
+               <dict-entry-filter search-func={store.searchEntryList.bind(store)}/>
                <div if={dictData.openEntryCount > dictData.entryList.length}
                      class="entriesCountInfo">
                   Showing {dictData.entryList.length} of {dictData.openEntryCount} entries.

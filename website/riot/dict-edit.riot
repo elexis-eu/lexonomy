@@ -24,7 +24,7 @@
                <loading-overlay/>
             </div>
             <template if={dictData.isEntryListLoaded}>
-               <dict-entry-filter search-func={store.loadEntryList.bind(store)}/>
+               <dict-entry-filter search-func={store.searchEntryList.bind(store)}/>
                <div if={dictData.entryCount > dictData.entryList.length}
                      class="entriesCountInfo">
                   Showing {dictData.entryList.length} of {dictData.entryCount} entries.
@@ -275,8 +275,11 @@
                    this.moveCursorDown(this.state.size) // pgDown
                } else if(evt.keyCode == 13){
                   if(this.state.cursorPosition){
-                     this.store.changeEntryId(this.dictData.entryList[this.state.cursorPosition - 1].id)
-                     this.updateCursor()
+                     let entry = this.dictData.entryList[this.state.cursorPosition - 1]
+                     if(entry){
+                        this.store.changeEntryId(entry.id)
+                        this.updateCursor()
+                     }
                   }
                }
             } else if(this.dictData.config.flagging.flags.length && this.state.cursorPosition){

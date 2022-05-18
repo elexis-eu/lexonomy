@@ -1,7 +1,7 @@
 <open-dict-list>
-   <h2>Open dictionaries</h2>
-   <loading-overlay if={state.isLoading}></loading-overlay>
-   <div if={!state.isLoading}>
+   <h1>Open dictionaries</h1>
+   <loading-overlay if={dictData.isPublicDictionaryListLoading}></loading-overlay>
+   <div if={!dictData.isPublicDictionaryListLoading}>
       <div>
          <div class="input-field"
                style="display: inline-block; margin-right: 40px;">
@@ -18,7 +18,7 @@
             <select id="languageSelect"
                   style="width: 200px;">
                <option value="">All languages</option>
-               <option each={language in state.languageList}
+               <option each={language in dictData.publicDictionaryLanguageList}
                      value={language}>{language}</option>
             </select>
             <label>Language</label>
@@ -38,6 +38,7 @@
             <th>Size</th>
             <th>Author</th>
             <th>Licence</th>
+            <th></th>
          </thead>
          <tbody>
             <tr each={(row, idx) in state.visibleDictionaries}
@@ -47,11 +48,6 @@
                      <span id="t_{idx}">
                         {row.title}
                      </span>
-                  </a>
-                  <a if={ row.isAdmin }
-                        href="#/{ row.id }/edit"
-                        title="edit dictionary">
-                     <i class="material-icons">edit</i>
                   </a>
                </td>
                <td>
@@ -74,6 +70,13 @@
                      {row.licence}
                   </span>
                </td>
+               <td>
+                  <a if={ row.isAdmin }
+                        href="#/{ row.id }/edit"
+                        title="edit dictionary">
+                     <i class="material-icons">edit</i>
+                  </a>
+               </td>
             </tr>
          </tbody>
       </table>
@@ -81,10 +84,10 @@
 
    <script>
       export default {
+         bindings: [["store", "isPublicDictionaryListLoadingChanged", "update"]],
+
          state: {
-            isLoading: true,
             visibleDictionaries: [],
-            languageList: [],
             language: "",
             query: ""
          },
@@ -93,7 +96,6 @@
             this.store.loadPublicDictionaryList()
                   .done(response => {
                      this.state.visibleDictionaries = this.dictData.publicDictionaryList
-                     this.state.languageList = [...new Set(this.dictData.publicDictionaryList.map(d => d.lang))].filter(l => !!l)
                   })
                   .always(() => {
                      this.update({isLoading: false})
@@ -168,8 +170,18 @@
                .on("change", this.onLanguageChange)
          },
 
+         onBeforeMount(){
+            if(this.dictData.isPublicDictionaryListLoaded){
+               this.state.visibleDictionaries = this.dictData.publicDictionaryList
+            } else {
+               this.loadData()
+            }
+         },
+
          onMounted(){
-            this.loadData()
+            if(this.dictData.isPublicDictionaryListLoaded){
+               this.initializeLanguageSelect()
+            }
          }
       }
    </script>
