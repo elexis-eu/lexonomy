@@ -32,10 +32,12 @@ export default {
       if (!this.state.entry.dictConfigs) {
         return []
       }
+      const content = this.state.entry.content
+      let rootName = (content.elements && content.elements[0] && content.elements[0].name) || this.state.entry.dictConfigs.xema.root
       return [{
         max: 1,
         min: 1,
-        name: this.state.entry.dictConfigs.xema.root
+        name: rootName
       }]
     }
   },
@@ -48,8 +50,24 @@ export default {
   created() {
     this.dataStructure = this.state.entry.content
     window.harvestGraphicalEditorData = this.getXmlData
+    this.setHeadwordElement()
   },
   methods: {
+    setHeadwordElement() {
+      let config = this.state.entry.dictConfigs
+      let titling = config.titling
+      if (titling && titling.headword) {
+        this.state.headwordElement = titling.headword
+        return
+      }
+      let root = config.xema.root
+      if (root) {
+        let rootConfig = config.xema.elements[root]
+        if (rootConfig && rootConfig.children && rootConfig.children.length > 0) {
+          this.state.headwordElement = rootConfig.children[0].name
+        }
+      }
+    },
     handleContentUpdate(data) {
       this.dataStructure = data.content
       this.dirty = this.areAnyChanges()

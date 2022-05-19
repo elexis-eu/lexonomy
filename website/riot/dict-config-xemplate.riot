@@ -2,30 +2,33 @@
   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId }
                    configTitle={ configTitle }/>
   <h3>Entry formatting</h3>
-  <div if={ (!this.configData._xsl || this.configData._xsl == "") && (!this.configData._css || this.configData._css == "") && !this.override }>
+  <div
+    if={ (!this.configData._xsl || this.configData._xsl == "") && (!this.configData._css || this.configData._css == "") && !this.override }>
     <div style="display: flex">
       <!-- TODO fixup styles so we don't need this sillyness. -->
-      <div style="flex-basis: 0; width: auto; position: static; overflow: initial!important; margin-right: 15px;!important" id="editor" class="designer">
+      <div
+        style="flex-basis: 0; width: auto; position: static; overflow: initial!important; margin-right: 15px;!important"
+        id="editor" class="designer">
         <div class="list">
           <dict-config-element-in-tree each={root in state.roots}
-            data={root}
-            xema={props.dictConfigs.xema}
-            current-element={elementName}
-            current-attribute={attributeName}
-            selectElementOrAttribute={selectElementOrAttribute}
+                                       data={root}
+                                       xema={props.dictConfigs.xema}
+                                       current-element={elementName}
+                                       current-attribute={attributeName}
+                                       selectElementOrAttribute={selectElementOrAttribute}
           />
         </div>
       </div>
 
       <display-styles if={this.elementName}
-        name="displayStylesComponent"
-        elementName={this.elementName}
-        attributeName={attributeName}
-        elementConfigData={this.configData[elementName]}
-        config={this.props.dictConfigs}
-        loadConfigData={this.props.loadConfigData}
-        configId={this.props.configId}
-        save-data={handleElementData}
+                      name="displayStylesComponent"
+                      elementName={this.elementName}
+                      attributeName={attributeName}
+                      elementConfigData={this.configData[elementName]}
+                      config={this.props.dictConfigs}
+                      loadConfigData={this.props.loadConfigData}
+                      configId={this.props.configId}
+                      save-data={handleElementData}
       />
     </div>
 
@@ -128,17 +131,17 @@ div.myEntry span.myHeadword {font-weight: bold}
       },
 
       onBeforeUpdate() {
-        const xema = (this.props.dictConfigs || {}).xema;
-        if (!xema || !xema.elements) return;
-        const roots = new Set(Object.keys(xema.elements));
-        Object.values(xema.elements).forEach(el => el.children.forEach(c => roots.delete(c.name)));
-        this.state.roots = [...roots].map(id => ({...xema.elements[id], id})); // add ID so tree renderer knows the id of every element
+        const xema = (this.props.dictConfigs || {}).xema
+        if (!xema || !xema.elements) return
+        const roots = new Set(Object.keys(xema.elements))
+        Object.values(xema.elements).forEach(el => el.children.forEach(c => roots.delete(c.name)))
+        this.state.roots = [...roots].map(id => ({...xema.elements[id], id})) // add ID so tree renderer knows the id of every element
       },
 
       async fillConfigForm() {
         this.props.loadConfigData(this.configId).then((response) => {
           this.configData = response
-          this.override = !!(this.configData._xsl || this.configData._css);
+          this.override = !!(this.configData._xsl || this.configData._css)
           if (this.override) {
             this.update()
             M.updateTextFields()
@@ -163,14 +166,14 @@ div.myEntry span.myHeadword {font-weight: bold}
       },
 
       selectElementOrAttribute(elementId, attributeId) {
-        this.elementName = elementId;
-        this.attributeName = attributeId || null;
+        this.elementName = elementId
+        this.attributeName = attributeId || null
         this.update()
       },
 
       handleElementData(elementName, attributeName, attribute, value) {
         if (attributeName) {
-          const elementAttributes = this.configData[elementName].attributes
+          let elementAttributes = this.configData[elementName].attributes
           if (elementAttributes) {
             if (elementAttributes[attributeName]) {
               elementAttributes[attributeName][attribute] = value
@@ -178,7 +181,7 @@ div.myEntry span.myHeadword {font-weight: bold}
               elementAttributes[attributeName] = {[attribute]: value}
             }
           } else {
-            elementAttributes.attributes = {[attribute]: value}
+            this.configData[elementName].attributes = {[attribute]: value}
           }
         } else {
           if (!this.configData[elementName]) {

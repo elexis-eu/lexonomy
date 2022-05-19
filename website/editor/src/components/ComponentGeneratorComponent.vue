@@ -2,8 +2,8 @@
   <div>
     <ul v-for="(typeElement) in renderedChildren"
         :key="typeElement.name"
-        :style="getEncompassingStyles(typeElement.name)"
     >
+<!--        :style="getEncompassingStyles(typeElement.name)"-->
       <CorpusComponent v-if="useExampleEngine(typeElement.name)"></CorpusComponent>
       <component v-for="element in typeElement.children"
                  :is="element.componentName"
@@ -37,6 +37,10 @@ export default {
     content: {
       type: [Object, Array],
       required: true
+    },
+    forceReadOnlyElements: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -46,7 +50,6 @@ export default {
         "inline": "InlineComponent",
         "read-only": "ReadOnlyComponent",
         "text-input": "TextInputComponent",
-        "textarea-input": "TextAreaInputComponent",
         "dropdown": "DropdownComponent",
         "media": "MediaComponent"
       },
@@ -69,6 +72,9 @@ export default {
   },
   methods: {
     useExampleEngine(elementName) {
+      if (this.forceReadOnlyElements) {
+        return false
+      }
       return this.state.entry.dictConfigs.xampl.container === elementName
     },
     getEncompassingStyles(elementName) {
@@ -190,6 +196,7 @@ export default {
                 parentElementName: this.elementName,
                 numberOfElements: content.length,
                 isAttribute: child.isAttribute,
+                forceReadOnlyElements: this.forceReadOnlyElements,
                 key: Math.random()
               }
             })
@@ -207,6 +214,7 @@ export default {
               parentElementName: this.elementName,
               numberOfElements: content.length,
               isAttribute: child.isAttribute,
+              forceReadOnlyElements: this.forceReadOnlyElements,
               key: Math.random()
             }
           })
@@ -317,6 +325,9 @@ export default {
     },
 
     getComponentFromElementName(elementName, parentName, isAttribute) {
+      if (this.forceReadOnlyElements) {
+        return this.displayTypeToComponentMap["inline"]
+      }
       let formatterConfig = this.state.entry.dictConfigs.xemplate
       let elementConfig
       if (isAttribute) {

@@ -1,19 +1,22 @@
 <template>
   <div>
-    <section class="media-input" v-if="elementData.shown">
-      <label :for="computedElementName">{{ computedElementName }}:</label>
+    <section class="media-input" v-if="elementData.shown && !readOnly">
+      <label class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
       <input :name="computedElementName" type="text" v-model="value">
-      <button @click="$refs.imageSearcher.toggleOpen()">Search for image</button>
+      <button class="button--sm secondary" @click="$refs.imageSearcher.toggleOpen()" style="margin-left: 8px">Search for image</button>
     </section>
 
-    <ImageSearcher ref="imageSearcher" @selected="updateValue"/>
-
+    <ImageSearcher v-if="elementData.shown && !readOnly" ref="imageSearcher" @selected="updateValue"/>
+    <section v-if="elementData.shown && readOnly" class="read-only">
+        <p :class="computedClass">{{computedElementNameWithColon}} {{value}}</p>
+    </section>
   </div>
 </template>
 
 <script>
 import computedElementName from "@/shared-resources/mixins/computedElementName"
 import ImageSearcher from "@/components/ImageSearcher"
+import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
 
 export default {
   name: "MediaComponent",
@@ -26,7 +29,7 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName],
+  mixins: [computedElementName, forceReadOnly],
   computed: {
     isMultimediaAPI() {
       return true
@@ -64,7 +67,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .media-input {
   display: flex;
   align-items: center;
@@ -74,7 +76,6 @@ export default {
   }
 
   label {
-    font-size: 1rem;
     text-transform: capitalize;
     padding-right: 10px;
     color: inherit;

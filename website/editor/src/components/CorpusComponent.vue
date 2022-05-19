@@ -1,15 +1,15 @@
 <template>
-  <div class="corpus-managers" >
+  <div class="corpus-managers">
     <div ref="corpusManagers" class="dropdown" @click="toggleShow">
-      <div class="button"
+      <button
            :class="{active: show}"
       >
         <i class="material-icons right">arrow_drop_down</i>
         <p>Corpus Managers</p>
-      </div>
+      </button>
       <ul v-show="show">
-        <li v-if="sketchEngineEnabled"><a @click="openSketchEngine">Sketch Engine</a></li>
-        <li v-if="kontextEnabled"><a @click="openKontext">KonText</a></li>
+        <button v-if="sketchEngineEnabled" class="tertiary" @click="openSketchEngine">Sketch Engine</button>
+        <button v-if="kontextEnabled" class="tertiary" @click="openKontext">KonText</button>
       </ul>
     </div>
   </div>
@@ -20,10 +20,21 @@ export default {
   name: "CorpusComponent",
   computed: {
     sketchEngineEnabled() {
-      return true
+      let xampl = this.state.entry.dictConfigs.xampl
+      let apiData = this.state.entry.dictConfigs.kex
+      return !!(xampl.container &&
+        xampl.markup &&
+        xampl.template &&
+        apiData.apiurl &&
+        apiData.url);
+
     },
     kontextEnabled() {
-      return true
+      let apiData = this.state.entry.dictConfigs.kontext
+      return apiData.container &&
+        apiData.markup &&
+        apiData.template &&
+        apiData.url
     }
   },
   watch: {
@@ -74,13 +85,12 @@ export default {
 
   .dropdown {
     position: absolute;
-    width: 140px;
+    width: 190px;
     right: 0;
 
-    .button {
+    button {
       display: inline-block;
-      width: 140px;
-      height: 24px;
+      width: 190px;
 
       i {
         margin-left: 0;
@@ -104,14 +114,11 @@ export default {
   ul {
     position: absolute;
     width: 100%;
-    padding: 16px;
     background: white;
     border: 1px solid #eee;
+    border-radius: 8px;
     z-index: 2;
 
-    li {
-      cursor: pointer;
-    }
   }
 }
 

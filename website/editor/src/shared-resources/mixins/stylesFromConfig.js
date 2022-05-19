@@ -36,7 +36,8 @@ export default {
             output.fontWeight = value
         }
       }
-      return output
+      // return output
+      return {}
 
     }
   }

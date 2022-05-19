@@ -1,13 +1,21 @@
 <template>
   <div>
-    <section class="text-input" v-if="elementData.shown">
-      <label :for="computedElementName">{{ computedElementName }}:</label>
+    <section class="text-input" v-if="elementData.shown && !readOnly">
+      <label class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
       <textarea v-if="this.elementData.editorInputType === 'textarea'"
                 name="elementName"
                 cols="30"
                 rows="10"
                 v-model="value"/>
-      <input v-else :name="computedElementName" :type="getInputType()" v-model="value">
+      <input v-else
+             :name="computedElementName"
+             :type="getInputType()"
+             :placeholder="computedElementName"
+             v-model="value">
+      <button v-if="elementData.interactivity" class="button--sm tertiary" @click="previewValue" style="margin-left: 8px;">Preview</button>
+    </section>
+    <section class="read-only" v-if="elementData.shown && readOnly">
+      <p :class="computedClass">{{ computedElementNameWithColon }} {{ value }}</p>
     </section>
   </div>
 </template>
@@ -15,6 +23,7 @@
 <script>
 
 import computedElementName from "@/shared-resources/mixins/computedElementName"
+import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
 
 export default {
   name: "TextInputComponent",
@@ -26,7 +35,7 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName],
+  mixins: [computedElementName, forceReadOnly],
   data() {
     return {
       value: ""
@@ -51,6 +60,9 @@ export default {
     this.value = this.content.text
   },
   methods: {
+    previewValue() {
+      window.open(this.value, "_blank")
+    },
     getInputType() {
       switch (this.elementData.editorInputType) {
         case "number":
@@ -64,7 +76,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .text-input {
   display: flex;
   align-items: baseline;

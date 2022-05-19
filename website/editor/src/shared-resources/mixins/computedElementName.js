@@ -5,14 +5,41 @@ export default {
     },
     parentElementName: {
       type: String
-    },
+    }
   },
   computed: {
-    computedElementName() {
+    computedElementNameWithColon() {
+      if (this.elementData && this.elementData.hideElementName) {
+        return ""
+      }
       const structureConfig = this.state.entry.dictConfigs.xema.elements
       let name = (structureConfig[this.elementName] && structureConfig[this.elementName].elementName) || this.elementName
       if (this.isAttribute) {
         try {
+          name = "@" + name
+
+          let optionality = structureConfig[this.parentElementName].attributes[this.elementName].optionality
+
+          if (optionality === "obligatory") {
+            name += "*"
+          }
+        } catch (e) {
+          console.log("", name)
+        }
+      }
+
+      name += ":"
+      return name
+    },
+    computedElementName() {
+      if (this.elementData && this.elementData.hideElementName) {
+        return ""
+      }
+      const structureConfig = this.state.entry.dictConfigs.xema.elements
+      let name = (structureConfig[this.elementName] && structureConfig[this.elementName].elementName) || this.elementName
+      if (this.isAttribute) {
+        try {
+          name = "@" + name
 
           let optionality = structureConfig[this.parentElementName].attributes[this.elementName].optionality
 
@@ -25,5 +52,5 @@ export default {
       }
       return name
     }
-  },
+  }
 }

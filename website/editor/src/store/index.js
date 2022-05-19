@@ -13,7 +13,9 @@ var state = {
   xml2jsConfig: {
     compact: false
   },
-  _initialContent: null
+  _initialContent: null,
+  headwordElement: null,
+  headwordData: null,
 }
 export default {
   state: state

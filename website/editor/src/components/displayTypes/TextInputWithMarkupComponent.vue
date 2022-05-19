@@ -1,7 +1,7 @@
 <template>
   <div>
-    <section class="input-section" v-if="elementData.shown">
-      <label>{{ computedElementName }}:</label>
+    <section class="input-section" v-if="elementData.shown && !readOnly">
+      <label class="text--md">{{ computedElementNameWithColon }}</label>
       <div ref="wholeInput" class="text-with-markup">
         <span
           v-for="(element, index) in values"
@@ -22,15 +22,26 @@
 
       </div>
       <div ref="markActionButton" class="dropdown">
-        <button @click="toggleMarkActions">Mark as</button>
+        <button class="secondary" @click="toggleMarkActions">Mark as</button>
         <div v-show="showMarkActions" class="vue-dropdown-content">
-          <button v-for="(element, index) in markupElements" :key="index" @click="markTextAs(element.type)"
+          <button v-for="(element, index) in markupElements"
+                  :key="index"
+                  class="tertiary"
+                  @click="markTextAs(element.type)"
                   :disabled="element.disabled">{{ element.type }}
           </button>
         </div>
       </div>
     </section>
-
+    <section class="read-only" v-if="elementData.shown && readOnly && readOnlyValues.length > 0">
+      <p :class="computedClass">
+        {{ computedElementNameWithColon }}
+        <span v-for="(element, i) in readOnlyValues"
+              :key="i + element.type"
+              style="white-space: pre-wrap"
+              v-html="element.text"/>
+      </p>
+    </section>
   </div>
 </template>
 
@@ -38,6 +49,8 @@
 
 import stylesFromConfig from "@/shared-resources/mixins/stylesFromConfig"
 import computedElementName from "@/shared-resources/mixins/computedElementName"
+import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
+
 
 export default {
   name: "TextInputWithMarkupComponent",
@@ -52,8 +65,14 @@ export default {
   },
   mixins: [
     stylesFromConfig,
-    computedElementName
+    computedElementName,
+    forceReadOnly
   ],
+  computed: {
+    readOnlyValues() {
+      return this.values.filter(el => el.text)
+    }
+  },
   watch: {
     values: {
       handler(newVal) {
@@ -285,11 +304,15 @@ export default {
   flex-flow: wrap;
   font-style: normal;
 
-  span {
-    height: 3rem;
+
+  span[contenteditable] {
     margin: 0;
-    line-height: 3rem;
-    font-size: 16px;
+    padding: 14px 0;
+    border: 1px solid transparent;
+
+    &:focus {
+      border-color: #E85D04;
+    }
 
     &.empty-element {
       border: 1px solid #eee;
@@ -320,8 +343,8 @@ export default {
   margin: 0 5px;
 }
 
-button:hover, button:focus {
-  background-color: #2980B9;
+button {
+  margin-left: 8px;
 }
 
 .dropdown {

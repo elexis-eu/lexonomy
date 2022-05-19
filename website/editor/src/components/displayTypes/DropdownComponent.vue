@@ -1,10 +1,13 @@
 <template>
   <div>
-    <section v-if="elementData.shown" class="dropdown">
-      <p> {{ computedElementName }}</p>
+    <section v-if="elementData.shown && !readOnly" class="dropdown">
+      <p class="text--md"> {{ computedElementNameWithColon }}</p>
       <select v-model="value">
         <option v-for="option in options" :key="option.value" :value="option.value">{{ option.caption }}</option>
       </select>
+    </section>
+    <section v-if="elementData.shown && readOnly" class="read-only">
+      <p :class="computedClass">{{ computedElementNameWithColon }} {{ valueCaption }}</p>
     </section>
   </div>
 </template>
@@ -12,6 +15,7 @@
 <script>
 
 import computedElementName from "@/shared-resources/mixins/computedElementName"
+import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
 
 export default {
   name: "DropdownComponent",
@@ -23,7 +27,13 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName],
+  mixins: [computedElementName, forceReadOnly],
+  computed: {
+    valueCaption() {
+      let selectedOption = this.options.find(el => el.value === this.value)
+      return selectedOption && selectedOption.caption
+    }
+  },
   data() {
     return {
       value: null,
@@ -50,9 +60,9 @@ export default {
     this.value = this.content.text
   },
   mounted() {
-    var elems = document.querySelectorAll('select');
+    var elems = document.querySelectorAll('select')
     // eslint-disable-next-line no-undef
-    M.FormSelect.init(elems, {});
+    M.FormSelect.init(elems, {})
   }
 }
 </script>
@@ -60,7 +70,7 @@ export default {
 <style lang="scss" scoped>
 .dropdown {
   display: flex;
-  justify-content: center;
+  justify-content: start;
 
   p {
     margin-right: 8px;

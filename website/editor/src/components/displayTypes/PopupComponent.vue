@@ -1,9 +1,11 @@
 <template>
   <div class="popup" :style="configStyles">
-    <div style="display: flex">
-      <section v-if="elementData.shown" style="display: flex">
+    <div>
+      <!--      <button @click="openPopup">Open {{ elementName }}</button>-->
+      <section v-if="elementData.shown" class="preview drop-shadow--100" @click="openPopup">
         <ActionButtons
           v-if="!isAttribute"
+          class="actions-button"
           :elementName="elementName"
           :elementEditorConfig="elementData"
           :editorChildNumber="editorChildNumber"
@@ -15,18 +17,32 @@
           @clone-element="cloneElement"
           @remove-element="deleteElement"
         />
-        <component :is="valueComponent"
-                   :elementEditorConfig="elementData"
-                   :elementName="elementName"
-                   :elementData="elementData"
-                   :content="componentData"
-                   :isAttribute="isAttribute"
-                   :parentElementName="parentElementName"
-                   @hide-children="hideChildren"
-                   @input="handleValueUpdate"
-        />
+        <section>
+          <component :is="valueComponent"
+                     class="preview-element text--md"
+                     :elementEditorConfig="elementData"
+                     :elementName="elementName"
+                     :elementData="elementData"
+                     :content="componentData"
+                     :isAttribute="isAttribute"
+                     :parentElementName="parentElementName"
+                     :forceReadOnlyElements="true"
+                     @hide-children="hideChildren"
+                     @input="handleValueUpdate"
+          />
+
+          <ComponentGeneratorComponent
+            v-if="showChildren"
+            class="preview-components"
+            :children="children"
+            :elementEditorConfig="elementData"
+            :elementName="elementName"
+            :content="calculatedContent"
+            :forceReadOnlyElements="true"
+            @input="handleChildUpdate"
+          />
+        </section>
       </section>
-      <button @click="openPopup">Open {{ elementName }}</button>
       <div v-if="showPopup" ref="wrapper" class="modal" @click="maybeClosePopup">
         <div ref="modalContent" class="modal-content">
           <span class="close" @click="closePopup">&times;</span>
@@ -81,7 +97,11 @@ export default {
       required: true
     },
     editorChildNumber: Number,
-    isAttribute: Boolean
+    isAttribute: Boolean,
+    forceReadOnlyElements: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -111,6 +131,27 @@ export default {
   padding: 8px 16px;
   margin-bottom: 8px;
 
+  .preview {
+    display: flex;
+    padding: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s all;
+
+
+    &:hover {
+      box-shadow: 0px 2px 14px rgba(24, 24, 24, 0.2);
+    }
+
+    .actions-button {
+      margin-right: 8px;
+    }
+
+    .preview-element {
+      margin-left: -8px;
+    }
+  }
+
   .modal {
     display: block;
     position: fixed; /* Stay in place */
@@ -129,17 +170,17 @@ export default {
   .modal-content {
     background-color: #fefefe;
     margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
+    padding: 15px 12px;
     border: 1px solid #888;
+    border-radius: 16px;
     width: 80%; /* Could be more or less, depending on screen size */
   }
 
   /* The Close Button */
   .close {
-    color: #aaa;
+    color: #B6BFC9;
     float: right;
     font-size: 28px;
-    font-weight: bold;
 
     &:hover,
     &:focus {

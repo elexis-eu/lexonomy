@@ -85,7 +85,10 @@
           shown: false,
           enablePositionChange: false,
           enableCopying: false,
+          readOnly: false,
+          hideElementName: false,
           displayType: null,
+          popupDetails: null,
           valueRenderType: null,
           captioning: null,
           interactivity: null,
@@ -130,6 +133,10 @@
 
         this.state.elementData[attribute] = value
         this.props.saveData(this.elementName, this.attributeName, attribute, value)
+
+        if (attribute === "displayType") {
+          this.update()
+        }
       },
 
       setInitialData() {
@@ -178,6 +185,10 @@
           }
         }
 
+        if (style === "popupDetails") {
+          return this.state.elementData.displayType === "popup"
+        }
+
         if ((style === "separation" || style === "gutter")
           && structureConfig.root === this.elementName) {
           return false
@@ -217,6 +228,10 @@
         {
           type: "readOnly",
           label: "Disable editing of element"
+        },
+        {
+          type: "hideElementName",
+          label: "Hide element name in editor"
         }
       ],
 
@@ -233,6 +248,29 @@
               value: "inline",
               label: "Display in parent element"
             }
+          ]
+        },
+        {
+          type: "popupDetails",
+          title: "Detail of popup info next to popup button",
+          values: [
+            {
+              value: "all",
+              label: "All info"
+            },
+            {
+              value: "attributes",
+              label: "Attributes"
+            },
+            {
+              value: "elements",
+              label: "Children elements"
+            },
+            {
+              value: "self",
+              label: "Own value"
+            }
+
           ]
         },
         {
