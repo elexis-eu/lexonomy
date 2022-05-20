@@ -18,7 +18,8 @@
       <div class="col m5 s12">
          <login if={props.mainSubPage == 'login'}></login>
          <register if={props.mainSubPage == 'register'}></register>
-         <register-password if={props.mainSubPage == 'registerPassword'}></register-password>
+         <register-password if={props.mainSubPage == 'registerPassword'}
+               token={props.token}></register-password>
          <forgot if={props.mainSubPage == 'forgot'}></forgot>
          <forgot-password if={props.mainSubPage == 'forgotPassword'}
                token={props.token}></forgot-password>
