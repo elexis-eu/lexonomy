@@ -3,7 +3,7 @@
     <h2>Kontext search engine</h2>
     <div class="search-box">
       <input v-model="searchTerm" placeholder="Headword" type="text">
-      <button @click="getExamples">Search</button>
+      <button @click="getExamples(1)">Search</button>
     </div>
     <div v-if="!error" class="examples">
       <div v-for="(example, i) in examples" :key="example.text" class="example" @click="toggleCheck(i)">
@@ -21,12 +21,12 @@
     </div>
 
     <div class="navigation">
-      <button v-if="showPreviousButton" class="tertiary">Previous</button>
-      <button v-if="showNextButton" class="tertiary">Next</button>
+      <button v-if="showPreviousButton" class="tertiary" @click="getExamples(pagination.prevPage)">Previous</button>
+      <button v-if="showNextButton" class="tertiary" @click="getExamples(pagination.nextPage)">Next</button>
     </div>
     <div class="actions">
       <button @click="$emit('input', false)">Cancel</button>
-      <button :disabled="!isAnyExampleChecked" @click="saveSelectedExamples">Save</button>
+      <button :disabled="!isAnyExampleChecked" @click="saveSelectedExamples">Save {{examples.filter(el => el.checked).length || ""}}</button>
     </div>
   </PopupDisplay>
 </template>
@@ -81,16 +81,15 @@ export default {
     toggleCheck(index) {
       this.examples[index].checked = !this.examples[index].checked
     },
-    getExamples() {
-      // let url = `http://localhost:8080/${this.state.entry.dictId}/kontext/conc/`
-      let url = `https://lexonomy.elex.is/6xgi7he7/kontext/conc/`
+    getExamples(page) {
+      let url = `http://localhost:8080/${this.state.entry.dictId}/kontext/conc/`
       axios.get(url, {
         params: {
           querytype: "kontextsimple",
-          query: this.searchTerm
+          query: this.searchTerm,
+          fromp: page
         }
       }).then(response => {
-        console.log(response)
         if ((response.data.error && response.data.error === "Empty result") || (response.data.Lines && response.data.Lines.length === 0)) {
           this.error = true
           this.errorMessage = "No results found."
