@@ -64,6 +64,7 @@ import layoutElementMixin from "@/shared-resources/mixins/layoutElementMixin"
 
 export default {
   name: "InlineComponent",
+  inject: ['$validator'],
   components: {
     ActionButtons,
     ComponentGeneratorComponent

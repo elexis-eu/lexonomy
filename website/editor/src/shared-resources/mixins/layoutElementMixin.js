@@ -67,10 +67,23 @@ export default {
   },
   created() {
     if (this.state.headwordElement === this.elementName) {
-      this.state.headwordData
+      this.isHeadword = true
+      try {
+        this.state.headwordData = this.getHeadwordValue(this.content.elements)
+      } catch (e) {
+        console.error(e)
+      }
     }
   },
   methods: {
+    getHeadwordValue(data) {
+      try {
+        return data.find(el => el.type === "text").text
+      } catch (e) {
+        console.error(e)
+        return ""
+      }
+    },
     hideChildren() {
       this.showChildren = false
     },
@@ -81,6 +94,9 @@ export default {
       if (this.isAttribute) {
         this.$emit('input', {elementName: this.elementName, content: data.attributes, isAttribute: true})
         return
+      }
+      if (this.isHeadword) {
+        this.state.headwordData = this.getHeadwordValue(data.elements)
       }
       let content = Object.assign({}, this.calculatedContent)
       if (Object.keys(content).length === 0) {

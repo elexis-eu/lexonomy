@@ -360,10 +360,15 @@ Screenful.Editor={
     }
     return message;
   },
-  save: function(event){
+  save: async function(event){
     Screenful.Editor.hideHistory();
     var id=Screenful.Editor.entryID;
     var content=Screenful.Editor.harvester(document.getElementById("editor"));
+    content = await Promise.resolve(content)
+    if (!content) {
+      alert("Something is wrong with entry. Is there an element or a required field missing?")
+      return
+    }
     $("#container").addClass("empty");
     if(!id) { //we are creating a new entry
       Screenful.status(Screenful.Loc.saving, "wait"); //"saving entry..."

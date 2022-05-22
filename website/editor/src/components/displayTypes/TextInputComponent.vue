@@ -6,13 +6,22 @@
                 name="elementName"
                 cols="30"
                 rows="10"
-                v-model="value"/>
+                v-model="value"
+                :placeholder="(errors && errors.first(computedElementName)) || computedElementName"
+                v-validate.continues="computedValidation"
+                :class="{'error': errors.has(computedElementName)}"
+      />
       <input v-else
              :name="computedElementName"
              :type="getInputType()"
-             :placeholder="computedElementName"
-             v-model="value">
-      <button v-if="elementData.interactivity" class="button--sm tertiary" @click="previewValue" style="margin-left: 8px;">Preview</button>
+             v-model="value"
+             :placeholder="(errors && errors.first(computedElementName)) || computedElementName"
+             v-validate.continues="computedValidation"
+             :class="{'error': errors.has(computedElementName)}"
+      >
+      <button v-if="elementData.interactivity" class="button--sm tertiary" @click="previewValue"
+              style="margin-left: 8px;">Preview
+      </button>
     </section>
     <section class="read-only" v-if="elementData.shown && readOnly">
       <p :class="computedClass">{{ computedElementNameWithColon }} {{ value }}</p>
@@ -24,9 +33,11 @@
 
 import computedElementName from "@/shared-resources/mixins/computedElementName"
 import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
+import computedValidation from "@/shared-resources/mixins/computedValidation"
 
 export default {
   name: "TextInputComponent",
+  inject: ['$validator'],
   props: {
     elementData: Object,
     elementName: String,
@@ -35,7 +46,7 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName, forceReadOnly],
+  mixins: [computedElementName, forceReadOnly, computedValidation],
   data() {
     return {
       value: ""

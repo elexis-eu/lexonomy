@@ -4,7 +4,7 @@
         :key="typeElement.name"
     >
 <!--        :style="getEncompassingStyles(typeElement.name)"-->
-      <CorpusComponent v-if="useExampleEngine(typeElement.name)"></CorpusComponent>
+      <CorpusComponent v-if="useExampleEngine(typeElement.name)" @save="saveFromKontext(typeElement, $event)"></CorpusComponent>
       <component v-for="element in typeElement.children"
                  :is="element.componentName"
                  :ref="element.props.elementName + element.props.editorChildNumber"
@@ -27,6 +27,7 @@ import CorpusComponent from "@/components/CorpusComponent"
 
 export default {
   name: "ComponentGeneratorComponent",
+  inject: ['$validator'],
   components: {
     CorpusComponent
   },
@@ -71,6 +72,19 @@ export default {
     this.loadNewData(this.content)
   },
   methods: {
+    saveFromKontext(element, data) {
+      for (const elementData of data) {
+        let newObject = this.createElementTemplate(element.name)[0]
+        let newHeadword = this.createElementTemplate(this.state.entry.dictConfigs.kontext.markup)[0]
+        newHeadword.elements = [{type: "text", text: elementData.headword}]
+        newObject.elements = [
+          {type: "text", text: elementData.left},
+          newHeadword,
+          {type: "text", text: elementData.right},
+        ]
+        this.createElement({name: element.name, content: newObject})
+      }
+    },
     useExampleEngine(elementName) {
       if (this.forceReadOnlyElements) {
         return false

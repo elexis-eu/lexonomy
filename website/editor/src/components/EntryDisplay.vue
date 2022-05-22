@@ -5,6 +5,7 @@
       :content="dataStructure"
       @input="handleContentUpdate"
     />
+
   </div>
 </template>
 
@@ -79,12 +80,17 @@ export default {
       return initialContent != updatedContent
     },
     getXmlData() {
-      let structureCopy = this.createDeepCopy()
-      delete structureCopy.declaration
-      this.fixElementNames(structureCopy)
-      let data = js2xml(structureCopy, this.state.xml2jsConfig)
-      console.log(data)
-      return data
+      return this.$validator.validateAll().then(result => {
+        if (!result) {
+          return null
+        }
+        let structureCopy = this.createDeepCopy()
+        delete structureCopy.declaration
+        this.fixElementNames(structureCopy)
+        let data = js2xml(structureCopy, this.state.xml2jsConfig)
+        console.log(data)
+        return data
+      })
     },
     createDeepCopy() {
       let xml = js2xml(this.dataStructure, this.state.xml2jsConfig)

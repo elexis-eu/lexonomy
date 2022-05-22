@@ -350,6 +350,12 @@ $blue-600: #023672;
       border: 1px solid #E85D04;
     }
 
+    &.error {
+      color: #637383;
+      border-color: #FB4646;
+      background-color: #FFF2F2;
+    }
+
     &:disabled,
     &[disabled] {
       border: 1px solid #C7D0DD;

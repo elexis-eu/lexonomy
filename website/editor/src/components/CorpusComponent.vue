@@ -2,7 +2,7 @@
   <div class="corpus-managers">
     <div ref="corpusManagers" class="dropdown" @click="toggleShow">
       <button
-           :class="{active: show}"
+        :class="{active: show}"
       >
         <i class="material-icons right">arrow_drop_down</i>
         <p>Corpus Managers</p>
@@ -12,12 +12,21 @@
         <button v-if="kontextEnabled" class="tertiary" @click="openKontext">KonText</button>
       </ul>
     </div>
+      <KontextDisplay
+              v-model="showKontext"
+              @save="$emit('save', $event)"
+      />
   </div>
 </template>
 
 <script>
+import KontextDisplay from "@/components/corpusManagers/KontextDisplay"
+
 export default {
   name: "CorpusComponent",
+  components: {
+    KontextDisplay
+  },
   computed: {
     sketchEngineEnabled() {
       let xampl = this.state.entry.dictConfigs.xampl
@@ -26,7 +35,7 @@ export default {
         xampl.markup &&
         xampl.template &&
         apiData.apiurl &&
-        apiData.url);
+        apiData.url)
 
     },
     kontextEnabled() {
@@ -48,7 +57,8 @@ export default {
   },
   data() {
     return {
-      show: false
+      show: false,
+      showKontext: false
     }
   },
   methods: {
@@ -56,7 +66,7 @@ export default {
       this.show = !this.show
     },
     openKontext() {
-      alert("open kontext")
+      this.showKontext = true
     },
     openSketchEngine() {
       alert("open sketch engine")
@@ -75,7 +85,6 @@ export default {
   position: relative;
   width: 100%;
   height: 30px;
-  cursor: pointer;
 
   &:hover {
     .dropdown {
@@ -87,6 +96,7 @@ export default {
     position: absolute;
     width: 190px;
     right: 0;
+    cursor: pointer;
 
     button {
       display: inline-block;

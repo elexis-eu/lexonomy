@@ -8,9 +8,13 @@ import DropdownComponent from "@/components/displayTypes/DropdownComponent"
 import MediaComponent from "@/components/displayTypes/MediaComponent"
 import TextInputComponent from "@/components/displayTypes/TextInputComponent"
 import TextInputWithMarkupComponent from "@/components/displayTypes/TextInputWithMarkupComponent"
-
+import VeeValidate from "vee-validate"
 Vue.config.productionTip = false
 const bus = new Vue()
+
+Vue.use(VeeValidate, {
+  mode: "eager"
+});
 
 Vue.component("InlineComponent", InlineComponent)
 Vue.component("PopupComponent", PopupComponent)

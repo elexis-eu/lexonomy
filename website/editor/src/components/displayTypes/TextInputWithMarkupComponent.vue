@@ -309,6 +309,7 @@ export default {
     margin: 0;
     padding: 14px 0;
     border: 1px solid transparent;
+    text-align: left;
 
     &:focus {
       border-color: #E85D04;

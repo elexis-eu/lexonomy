@@ -43,31 +43,28 @@
           />
         </section>
       </section>
-      <div v-if="showPopup" ref="wrapper" class="modal" @click="maybeClosePopup">
-        <div ref="modalContent" class="modal-content">
-          <span class="close" @click="closePopup">&times;</span>
-          <component
-            v-if="elementData.shown"
-            :is="valueComponent"
-            :elementEditorConfig="elementData"
-            :elementName="elementName"
-            :elementData="elementData"
-            :content="componentData"
-            :isAttribute="isAttribute"
-            :parentElementName="parentElementName"
-            @hide-children="hideChildren"
-            @input="handleValueUpdate"
-          />
-          <ComponentGeneratorComponent
-            v-if="showChildren"
-            :children="children"
-            :elementEditorConfig="elementData"
-            :elementName="elementName"
-            :content="calculatedContent"
-            @input="handleChildUpdate"
-          />
-        </div>
-      </div>
+        <PopupDisplay v-model="showPopup">
+            <component
+                    v-if="elementData.shown"
+                    :is="valueComponent"
+                    :elementEditorConfig="elementData"
+                    :elementName="elementName"
+                    :elementData="elementData"
+                    :content="componentData"
+                    :isAttribute="isAttribute"
+                    :parentElementName="parentElementName"
+                    @hide-children="hideChildren"
+                    @input="handleValueUpdate"
+            />
+            <ComponentGeneratorComponent
+                    v-if="showChildren"
+                    :children="children"
+                    :elementEditorConfig="elementData"
+                    :elementName="elementName"
+                    :content="calculatedContent"
+                    @input="handleChildUpdate"
+            />
+        </PopupDisplay>
     </div>
   </div>
 </template>
@@ -76,12 +73,15 @@
 import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
 import ActionButtons from "@/components/ActionButtons"
 import layoutElementMixin from "@/shared-resources/mixins/layoutElementMixin"
+import PopupDisplay from "@/components/PopupDisplay"
 
 export default {
   name: "PopupComponent",
+  inject: ['$validator'],
   components: {
     ComponentGeneratorComponent,
-    ActionButtons
+    ActionButtons,
+    PopupDisplay
   },
   mixins: [
     layoutElementMixin
@@ -114,14 +114,6 @@ export default {
     openPopup() {
       this.showPopup = true
     },
-    maybeClosePopup(event) {
-      if (event.target === this.$refs.wrapper) {
-        this.closePopup()
-      }
-    },
-    closePopup() {
-      this.showPopup = false
-    }
   }
 }
 </script>
@@ -149,44 +141,6 @@ export default {
 
     .preview-element {
       margin-left: -8px;
-    }
-  }
-
-  .modal {
-    display: block;
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    max-height: 100%;
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-  }
-
-  /* Modal Content/Box */
-  .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 15px 12px;
-    border: 1px solid #888;
-    border-radius: 16px;
-    width: 80%; /* Could be more or less, depending on screen size */
-  }
-
-  /* The Close Button */
-  .close {
-    color: #B6BFC9;
-    float: right;
-    font-size: 28px;
-
-    &:hover,
-    &:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
     }
   }
 }
