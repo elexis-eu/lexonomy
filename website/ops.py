@@ -42,7 +42,6 @@ defaultDictConfig = {"editing": {"xonomyMode": "nerd", "xonomyTextEditor": "askS
                      "flagging": {"flag_element": "", "flags": []}}
 
 prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent", "userprofile"];
-
 # db management
 def getDB(dictID):
     if DB == 'mysql': 
