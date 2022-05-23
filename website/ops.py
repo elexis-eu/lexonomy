@@ -41,7 +41,8 @@ defaultDictConfig = {"editing": {"xonomyMode": "nerd", "xonomyTextEditor": "askS
                      "titling": {"headwordAnnotations": []},
                      "flagging": {"flag_element": "", "flags": []}}
 
-prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent", "userprofile"];
+prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent", "userprofile", "dictionaries", "about", "list", "lemma", "json", "ontolex", "tei"];
+
 # db management
 def getDB(dictID):
     if DB == 'mysql': 
@@ -66,11 +67,13 @@ def getDB(dictID):
             )
             conn = dictDB[dictID].cursor(dictionary=True, buffered=True)
         return conn
-    else:
+    elif os.path.isfile(os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")):
         conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite"))
         conn.row_factory = sqlite3.Row
         conn.executescript("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=on")
         return conn
+    else:
+        return None
 
 def getMainDB():
     if DB == 'mysql':
@@ -773,19 +776,30 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
                 data2 = (d["id"], entry["link_id"])
                 c2 = linkDB.execute(query2, data2)
                 for r2 in c2.fetchall() if c2 else []:
-                    info = info0
+                    info = info0.copy()
                     info["targetDict"] = r2["target_dict"]
                     info["confidence"] = r2["confidence"]
-                    info["targetLang"] = readDictConfigs(getDB(r2["target_dict"]))['ident']['lang']
-                    if r2["target_element"] == "sense" and "_" in r2["target_id"]:
-                        lia = r2["target_id"].split("_")
-                        info["targetSense"] = lia[1]
-                    query3 = f"SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt={ques} AND s.level=1"
-                    c3 = getDB(r2["target_dict"]).execute(query3, (r2["target_id"],))
-                    for r3 in c3.fetchall() if c3 else []:
-                        info["targetHeadword"] = r3["hw"]
-                        info["targetID"] = r3["entry_id"]
-                        info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
+                    targetDB = getDB(r2["target_dict"])
+                    if targetDB:
+                        info["targetLang"] = readDictConfigs(targetDB)['ident']['lang']
+                        info["targetDictConcept"] = False
+                        if r2["target_element"] == "sense" and "_" in r2["target_id"]:
+                            lia = r2["target_id"].split("_")
+                            info["targetSense"] = lia[1]
+                        query3 = f"SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt={ques} AND s.level=1"
+                        c3 = targetDB.execute(query3, (r2["target_id"],))
+                        for r3 in c3.fetchall() if c3 else []:
+                            info["targetHeadword"] = r3["hw"]
+                            info["targetID"] = r3["entry_id"]
+                            info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
+                            links.append(info)
+                    else:
+                        info["targetHeadword"] = r2["target_id"]
+                        info["targetID"] = r2["target_id"]
+                        info["targetDictConcept"] = True
+                        info["targetURL"] = ""
+                        info["targetSense"] = ""
+                        info["targetLang"] = ""
                         links.append(info)
                 # second, find links with search dict as target
                 if targetLang:
@@ -795,20 +809,104 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
                 data2 = (d["id"], entry["link_id"])
                 c2 = linkDB.execute(query2, data2)
                 for r2 in c2.fetchall() if c2 else []:
-                    info = info0
+                    info = info0.copy()
                     info["targetDict"] = r2["source_dict"]
                     info["confidence"] = r2["confidence"]
-                    info["targetLang"] = readDictConfigs(getDB(r2["source_dict"]))['ident']['lang']
+                    sourceDB = getDB(r2["source_dict"])
+                    if sourceDB:
+                        info["targetLang"] = readDictConfigs(sourceDB)['ident']['lang']
+                        info["targetDictConcept"] = False
+                        if r2["source_element"] == "sense" and "_" in r2["source_id"]:
+                            lia = r2["source_id"].split("_")
+                            info["targetSense"] = lia[1]
+                        query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=1"
+                        c3 = sourceDB.execute(query3, (r2["source_id"],))
+                        for r3 in c3.fetchall():
+                            info["targetHeadword"] = r3["hw"]
+                            info["targetID"] = r3["entry_id"]
+                            info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
+                            links.append(info)
+                    else:
+                        info["targetHeadword"] = r2["source_id"]
+                        info["targetID"] = r2["source_id"]
+                        info["targetDictConcept"] = True
+                        info["targetURL"] = ""
+                        info["targetSense"] = ""
+                        info["targetLang"] = ""
+                        links.append(info)
+        else:
+            # source dictionary is "concept", use headword as target_id
+            info0 = {"sourceDict": d["id"], "sourceHeadword": headword, "sourceID": headword, "sourceDictConcept": True, "sourceURL": "", "sourceSense": ""}
+            # first, find links with searched dict as source
+            if targetLang:
+                targetDicts = []
+                for td in getDictList(targetLang, True):
+                    targetDicts.append(td["id"])
+                query2 = "SELECT * FROM links WHERE source_dict=? AND source_id=? AND target_dict IN "+"('"+"','".join(targetDicts)+"')"
+            else:
+                query2 = "SELECT * FROM links WHERE source_dict=? AND source_id=?"
+            data2 = (d["id"], headword)
+            c2 = linkDB.execute(query2, data2)
+            for r2 in c2.fetchall():
+                info = info0.copy()
+                info["targetDict"] = r2["target_dict"]
+                info["confidence"] = r2["confidence"]
+                targetDB = getDB(r2["target_dict"])
+                if targetDB:
+                    info["targetLang"] = readDictConfigs(targetDB)['ident']['lang']
+                    info["targetDictConcept"] = False
+                    if r2["target_element"] == "sense" and "_" in r2["target_id"]:
+                        lia = r2["target_id"].split("_")
+                        info["targetSense"] = lia[1]
+                    query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=1"
+                    c3 = targetDB.execute(query3, (r2["target_id"],))
+                    for r3 in c3.fetchall():
+                        info["targetHeadword"] = r3["hw"]
+                        info["targetID"] = r3["entry_id"]
+                        info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
+                        links.append(info)
+                else:
+                    info["targetHeadword"] = r2["target_id"]
+                    info["targetID"] = r2["target_id"]
+                    info["targetDictConcept"] = True
+                    info["targetURL"] = ""
+                    info["targetSense"] = ""
+                    info["targetLang"] = ""
+                    links.append(info)
+            # second, find links with search dict as target
+            if targetLang:
+                query2 = "SELECT * FROM links WHERE target_dict=? AND target_id=? AND source_dict IN "+"('"+"','".join(targetDicts)+"')"
+            else:
+                query2 = "SELECT * FROM links WHERE target_dict=? AND target_id=?"
+            data2 = (d["id"], headword)
+            c2 = linkDB.execute(query2, data2)
+            for r2 in c2.fetchall():
+                info = info0.copy()
+                info["targetDict"] = r2["source_dict"]
+                info["confidence"] = r2["confidence"]
+                sourceDB = getDB(r2["source_dict"])
+                if sourceDB:
+                    info["targetLang"] = readDictConfigs(sourceDB)['ident']['lang']
+                    info["targetDictConcept"] = False
                     if r2["source_element"] == "sense" and "_" in r2["source_id"]:
                         lia = r2["source_id"].split("_")
                         info["targetSense"] = lia[1]
                     query3 = f"SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt={ques} AND s.level=1"
-                    c3 = getDB(r2["source_dict"]).execute(query3, (r2["source_id"],))
+                    c3 = sourceDB.execute(query3, (r2["source_id"],))
                     for r3 in c3.fetchall() if c3 else []:
                         info["targetHeadword"] = r3["hw"]
                         info["targetID"] = r3["entry_id"]
                         info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
                         links.append(info)
+                else:
+                    info["targetHeadword"] = r2["source_id"]
+                    info["targetID"] = r2["source_id"]
+                    info["targetDictConcept"] = True
+                    info["targetURL"] = ""
+                    info["targetSense"] = ""
+                    info["targetLang"] = ""
+                    links.append(info)
+
     return links
 
 def listUsers(searchtext, howmany):
@@ -1627,9 +1725,15 @@ def readDictHistory(dictDB, dictID, configs, entryID):
 
 def verifyUserApiKey(email, apikey):
     conn = getMainDB()
-    c = conn.execute(f"select email from users where email={ques} and apiKey={ques}", (email, apikey))
-    c = c if c else conn
-    row = c.fetchone() if c else None
+    if email == '':
+        c = conn.execute("select email from users where apiKey=?", (apikey,))
+        c = c if c else conn
+        row = c.fetchone()
+    else:
+        c = conn.execute(f"select email from users where email={ques} and apiKey={ques}", (email, apikey))
+        c = c if c else conn
+        row = c.fetchone()
+
     if not row or siteconfig["readonly"]:
         return {"valid": False}
     else:
@@ -1697,8 +1801,11 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
             dbs[row["source_dict"]] = getDB(row["source_dict"])
             dbconfigs[row["source_dict"]] = readDictConfigs(dbs[row["source_dict"]])
         if not row["target_dict"] in dbs:
-            dbs[row["target_dict"]] = getDB(row["target_dict"])
-            dbconfigs[row["target_dict"]] = readDictConfigs(dbs[row["target_dict"]])
+            try:
+                dbs[row["target_dict"]] = getDB(row["target_dict"])
+                dbconfigs[row["target_dict"]] = readDictConfigs(dbs[row["target_dict"]])
+            except:
+                dbconfigs[row["target_dict"]] = None
     #now the actual results
     c = conn.execute(query, tuple(params))
     c = c if c else conn
@@ -1732,11 +1839,14 @@ def links_get(source_dict, source_el, source_id, target_dict, target_el, target_
                 target_entry = rowt["entry_id"]
         except:
             target_entry = ""
-        # fallback for ontolex ids
+        # fallback for ontolex ids and CILI
         if target_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["target_id"]):
             target_entry = row["target_id"].split("_")[0]
         if target_entry != "":
             target_hw = getEntryTitleID(targetDB, targetConfig, target_entry, True)
+        if target_dict == "CILI":
+            target_entry = row["target_id"]
+            target_hw = row["target_id"]
 
         res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_entry": str(source_entry), "source_hw": source_hw, "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_entry": str(target_entry), "target_hw": target_hw, "target_el": row["target_element"], "target_id": row["target_id"], "confidence": row["confidence"]})
     return res
@@ -2024,9 +2134,114 @@ def listOntolexEntries(dictDB, dictID, configs, doctype, searchtext=""):
             line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
             yield line; yield "\n"
 
-############### New Additions
 def close_db(db, shouldclose = True):
     if DB == 'sqlite':
         db.commit()
     elif DB == 'mysql' and shouldclose:
         db.close()
+def elexisDictAbout(dictID):
+    dictDB = getDB(dictID)
+    if dictDB:
+        info = {"id": dictID}
+        configs = readDictConfigs(dictDB)
+        info["sourceLang"] = configs['ident'].get('lang')
+        if configs["publico"]["public"]:
+            info["release"] = "PUBLIC"
+            info["license"] = configs["publico"]["licence"]
+            if siteconfig["licences"][configs["publico"]["licence"]]:
+                info["license"] = siteconfig["licences"][configs["publico"]["licence"]]["url"]
+        else:
+            info["release"] = "PRIVATE"
+        info["creator"] = []
+        for user in configs["users"]:
+            info["creator"].append({"email": user})
+        return info
+    else:
+        return None
+
+def elexisLemmaList(dictID, limit=None, offset=0):
+    dictDB = getDB(dictID)
+    if dictDB:
+        info = {"language": "", "release": "PRIVATE"}
+        configs = readDictConfigs(dictDB)
+        info["language"] = configs['ident'].get('lang')
+        if configs["publico"]["public"]:
+            info["release"] = "PUBLIC"
+        lemmas = []
+        query = "SELECT id, xml FROM entries"
+        if limit != None and limit != "":
+            query += " LIMIT "+str(int(limit))
+        if offset != "" and int(offset) > 0:
+            query += " OFFSET "+str(int(offset))
+        c = dictDB.execute(query)
+        for r in c.fetchall():
+            lemma = {"release": info["release"], "language": info["language"], "formats": ["tei"]}
+            lemma["id"] = str(r["id"])
+            lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
+            pos = elexisGuessPOS(r["xml"])
+            if pos != "":
+                lemma["partOfSpeech"] = [pos]
+            lemmas.append(lemma)
+        return lemmas
+    else:
+        return None
+
+def elexisGetLemma(dictID, headword, limit=None, offset=0):
+    dictDB = getDB(dictID)
+    if dictDB:
+        info = {"language": "", "release": "PRIVATE"}
+        configs = readDictConfigs(dictDB)
+        info["language"] = configs['ident'].get('lang')
+        if configs["publico"]["public"]:
+            info["release"] = "PUBLIC"
+        lemmas = []
+        query = "SELECT e.id, e.xml FROM searchables AS s INNER JOIN entries AS e on e.id=s.entry_id WHERE doctype=? AND s.txt=? GROUP BY e.id ORDER by s.level"
+        params = (configs["xema"]["root"], headword)
+        if limit != None and limit != "":
+            query += " LIMIT "+str(int(limit))
+        if offset != "" and int(offset) > 0:
+            query += " OFFSET "+str(int(offset))
+        c = dictDB.execute(query, params)
+        for r in c.fetchall():
+            lemma = {"release": info["release"], "language": info["language"], "formats": ["tei"]}
+            lemma["id"] = str(r["id"])
+            lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
+            pos = elexisGuessPOS(r["xml"])
+            if pos != "":
+                lemma["partOfSpeech"] = [pos]
+            lemmas.append(lemma)
+        return lemmas
+    else:
+        return None
+
+def elexisGuessPOS(xml):
+    # try to guess frequent PoS element
+    pos = ""
+    if "</pos>" in xml:
+        arr = extractText(xml, "pos")
+        if arr[0] and arr[0] != "":
+            pos = arr[0]
+    if "<partOfSpeech>" in xml:
+        arr = extractText(xml, "partOfSpeech")
+        if arr[0] and arr[0] != "":
+            pos = arr[0]
+    if 'type="pos"' in xml:
+        pat = r'<gram[^>]*type="pos"[^>]*>([^<]*)</gram>'
+        arr = re.findall(pat, xml)
+        if arr[0] and arr[0] != "":
+            pos = arr[0]
+    return pos
+
+def elexisGetEntry(dictID, entryID):
+    dictDB = getDB(dictID)
+    if dictDB:
+        query = "SELECT id, xml FROM entries WHERE id=?"
+        c = dictDB.execute(query, (entryID, ))
+        r = c.fetchone()
+        if not r:
+            return None
+        else:
+            return r["xml"]
+    else:
+        return None
+

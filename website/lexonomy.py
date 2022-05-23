@@ -459,6 +459,12 @@ def userprofile(user):
         referer = request.headers["Referer"]
     return template("userprofile.tpl", **{"siteconfig": siteconfig, "i18n": i18n, "i18nDump": i18nDump, "redirectUrl": referer, "user": user})
 
+@get(siteconfig["rootPath"] + "userprofile.json")
+def userprofilejson():
+    user = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
+    return user
+
+
 @get(siteconfig["rootPath"] + "make")
 @auth
 def makedict(user):
@@ -920,10 +926,13 @@ def apilistlink():
     data = json.loads(request.body.getvalue().decode('utf-8'))
     user = ops.verifyUserApiKey(data["email"], data["apikey"])
     if not user["valid"]:
-        return {"success": False}
+        return {"success": False, "msg": "invalid user"}
     else:
-        dicts = ops.getLinkList(data.get('headword'), data.get('sourceLanguage'), data.get('sourceDict'), data.get('targetLanguage'))
-        return {"links": dicts, "success": True}
+        if data.get('headword') and (data.get('sourceLanguage') or data.get('sourceDict')):
+            dicts = ops.getLinkList(data.get('headword'), data.get('sourceLanguage'), data.get('sourceDict'), data.get('targetLanguage'))
+            return {"links": dicts, "success": True}
+        else:
+            return {"success": False, "msg": "missing parameters"}
 
 @get(siteconfig["rootPath"] + "push.api")
 def pushtest():
@@ -1088,9 +1097,72 @@ def entrylinks(dictID, user, dictDB, configs):
     res = ops.getEntryLinks(dictDB, dictID, request.query.id)
     return {"links": res}
 
+# ELEXIS REST API https://elexis-eu.github.io/elexis-rest/
+@get(siteconfig["rootPath"] + "dictionaries")
+def elexlistdict():
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    else:
+        dicts = list(map(lambda h: h['id'], ops.getDictList(None, None)))
+        return {"dictionaries": dicts}
+    
+@get(siteconfig["rootPath"] + "about/<dictID>")
+def elexaboutdict(dictID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    dictinfo = ops.elexisDictAbout(dictID)
+    if dictinfo is None:
+        abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return dictinfo
+
+@get(siteconfig["rootPath"] + "list/<dictID>")
+def elexlistlemma(dictID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    lemmalist = ops.elexisLemmaList(dictID, request.query.limit, request.query.offset)
+    if lemmalist is None:
+        abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return json.dumps(lemmalist)
+
+@get(siteconfig["rootPath"] + "lemma/<dictID>/<headword>")
+def elexgetlemma(dictID, headword):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    lemmalist = ops.elexisGetLemma(dictID, headword, request.query.limit, request.query.offset)
+    if lemmalist is None:
+        abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return json.dumps(lemmalist)
+
+@get(siteconfig["rootPath"] + "tei/<dictID>/<entryID>")
+def elexgetentry(dictID, entryID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    entry = ops.elexisGetEntry(dictID, entryID)
+    if entry is None:
+        abort(404, "No Entry Available")
+    else:
+        response.content_type = "text/xml; charset=utf-8"
+        return entry
+
 @error(404)
 def error404(error):
-    return template("404.tpl", **{"siteconfig": siteconfig, "i18n": i18n, "i18nDump": i18nDump})
+    if request.path.startswith("/about/") or request.path.startswith("/list/") or request.path.startswith("/lemma/"):
+        return error.body
+    else:
+        return template("404.tpl", **{"siteconfig": siteconfig, "i18n": i18n, "i18nDump": i18nDump})
 
 # deployment
 debug=False
