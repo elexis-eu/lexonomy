@@ -120,3 +120,5 @@ def migrate():
             migration(dictDB, configs)
         print(f"Migration of {title} ({id}) finished!")
     mainDB.execute(f"PRAGMA user_version={current_version}")
+
+migrate()
