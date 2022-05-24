@@ -113,6 +113,12 @@ class ConfigXema(TypedDict):
 
 # Keys are duplicated in the entry, using the linkElement property: so { "entry": {"linkElement": "entry", ...etc} }
 ConfigLinks = dict[str, ConfigLinksEntry]
+class ConfigSubbingEntry(TypedDict):
+    attributes: NotRequired[dict[str, str]]
+    """Name of attribute: required value of attribute (if empty value - only prescence of attribute is checked, any value is accepted)
+        Not required because this setting didn't always exist.
+    """
+
 ConfigSubbing = dict[str, dict[str, Any]] # values are empty dicts for now
 
 class ConfigIdent(TypedDict):
@@ -487,11 +493,9 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
     Returns:
         Tuple[int, List[SortableEntry]]: the total number of results, and the limited list of results.
     """    
-    
-    
     if not searchtext: 
         searchtext = ""
-        modifier = None
+        modifier = None # can't search parts of words when not searching at all.
     searchtext = searchtext.lower()
     
     if type(sortdesc) == str:
@@ -618,46 +622,6 @@ def get_entry_html(configs: Configs, xml: str, run_xslt: Any) -> str:
                 {json.dumps(configs["xema"])}
             ));
         </script>"""
-
-# REPLACED BY readEntries
-# def readEntry(db, configs, entryID):
-#     c = db.execute("select * from entries where id=?", (entryID,))
-#     row = c.fetchone()
-#     if not row:
-#         return 0, "", ""
-#     xml = setHousekeepingAttributes(entryID, row["xml"], configs["subbing"])
-#     if configs["subbing"]:
-#         xml = addSubentryParentTags(db, entryID, xml)
-#     if configs["links"]:
-#         xml = updateEntryLinkables(db, entryID, xml, configs, False, False)
-#     return entryID, xml, row["title"]
-
-# REPLACED BY createEntry
-# def createEntry(dictDB, configs, entryID, xml, email, historiography):
-#     xml = setHousekeepingAttributes(entryID, xml, configs["subbing"])
-#     xml = removeSubentryParentTags(xml)
-#     title = getEntryTitle(xml, configs["titling"])
-#     sortkey = getSortTitle(xml, configs["titling"])
-#     doctype = getDoctype(xml)
-#     needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
-#     needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
-#     # entry title already exists?
-#     c = dictDB.execute("select id from entries where title = ? and id <> ?", (title, entryID))
-#     r = c.fetchone()
-#     feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
-#     if entryID:
-#         sql = "insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values(?, ?, ?, ?, ?, ?, ?)"
-#         params = (entryID, xml, title, sortkey, needs_refac, needs_resave, doctype)
-#     else:
-#         sql = "insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values(?, ?, ?, ?, ?, ?)"
-#         params = (xml, title, sortkey, needs_refac, needs_resave, doctype)
-#     c = dictDB.execute(sql, params)
-#     entryID = c.lastrowid
-#     dictDB.execute("insert into searchables(entry_id, txt, level) values(?, ?, ?)", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
-#     dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "create", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
-#     dictDB.commit()
-#     return entryID, xml, feedback
-
 
 def fixup_namespaces(xml: Tag):
     xml.attrs['xmlns:lxnm'] = 'http://www.lexonomy.eu/'
@@ -914,7 +878,7 @@ def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs
     Load the xml from the database if not passed in. Otherwise it is assumed the xml is from the database (so not just some unprocessed/unvalidated user input).
     Returns the updated xml. 
     NOTE: If Tag is passed in - it is modified in place and returned.
-    NOTE: XML in Database is always updated on success.
+    NOTE: XML and flag column in Database are always updated on success.
     NOTE: A history entry is created on success.
     NOTE: You must commit() after doing this.
     """
@@ -1113,96 +1077,6 @@ def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], emai
     feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
 
     return id, xml, True, feedback
-
-
-# def updateEntry(dictDB, configs, entryID, xml, email, historiography):
-#     c = dictDB.execute("select id, xml from entries where id=?", (entryID, ))
-#     row = c.fetchone()
-#     xml = setHousekeepingAttributes(entryID, xml, configs["subbing"])
-#     xml = removeSubentryParentTags(xml)
-#     newxml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", xml)
-#     newxml = re.sub(r"(\=)\"([^\"]*)\"", r"\1'\2'", newxml)
-#     newxml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", newxml)
-#     newxml = re.sub(r" lxnm:linkable='[^']+'", "", newxml)
-#     if not row:
-#         adjustedEntryID, adjustedXml, feedback = createEntry(dictDB, configs, entryID, xml, email, historiography)
-#         if configs["links"]:
-#             adjustedXml = updateEntryLinkables(dictDB, adjustedEntryID, adjustedXml, configs, True, True)
-#         return adjustedEntryID, adjustedXml, True, feedback
-#     else:
-#         oldxml = row["xml"]
-#         oldxml = re.sub(r" xmlns:lxnm=[\"\']http:\/\/www\.lexonomy\.eu\/[\"\']", "", oldxml)
-#         oldxml = re.sub(r"(\=)\"([^\"]*)\"", r"\1'\2'", oldxml)
-#         oldxml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", oldxml)
-#         oldxml = re.sub(r" lxnm:linkable='[^']+'", "", oldxml)
-#         if oldxml == newxml:
-#             return entryID, xml, False, None
-#         else:
-#             dictDB.execute("update entries set needs_refresh=1 where id in (select parent_id from sub where child_id=?)", (entryID,))
-#             title = getEntryTitle(xml, configs["titling"])
-#             sortkey = getSortTitle(xml, configs["titling"])
-#             doctype = getDoctype(xml)
-#             needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
-#             needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
-#             # entry title already exists?
-#             c = dictDB.execute("select id from entries where title = ? and id <> ?", (title, entryID))
-#             r = c.fetchone()
-#             feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
-#             dictDB.execute("update entries set doctype=?, xml=?, title=?, sortkey=?, needs_refac=?, needs_resave=? where id=?", (doctype, xml, title, sortkey, needs_refac, needs_resave, entryID))
-#             dictDB.execute("update searchables set txt=? where entry_id=? and level=1", (getEntryTitle(xml, configs["titling"], True), entryID))
-#             dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
-#             dictDB.commit()
-#             if configs["links"]:
-#                 xml = updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
-#             return entryID, xml, True, feedback
-
-# def getEntryTitle(xml, titling, plaintext=False):
-#     if titling.get("headwordAnnotationsType") == "advanced" and not plaintext:
-#         ret = titling["headwordAnnotationsAdvanced"]
-#         advancedUsed = False
-#         for el in re.findall(r"%\([^)]+\)", titling["headwordAnnotationsAdvanced"]):
-#             text = ""
-#             extract = extractText(xml, el[2:-1])
-#             if len(extract) > 0:
-#                 text = extract[0]
-#                 advancedUsed = True
-#             ret = ret.replace(el, text)
-#         if advancedUsed:
-#             return ret
-#     ret = getEntryHeadword(xml, titling.get("headword"))
-#     if not plaintext:
-#         ret = "<span class='headword'>" + ret + "</span>"
-#     if titling.get("headwordAnnotations"):
-#         for hw in titling.get("headwordAnnotations"):
-#             ret += " " if ret != "" else ""
-#             ret += " ".join(extractText(xml, hw))
-#     return ret
-
-# def getEntryTitleID(dictDB, configs, entry_id, plaintext=False):
-#     eid, xml, title = readEntry(dictDB, configs, entry_id)
-#     return getEntryTitle(xml, configs["titling"], plaintext)
-
-# def getEntryHeadword(xml, headword_elem):
-#     ret = "?"
-#     arr = extractText(xml, headword_elem)
-#     if len(arr)>0:
-#         ret = arr[0]
-#     else:
-#         ret = extractFirstText(xml)
-#     if len(ret) > 255:
-#         ret = ret[0:255]
-#     return ret
-
-# def getDoctype(xml):
-#     pat = r"^<([^>\/\s]+)"
-#     for match in re.findall(pat, xml):
-#         return match
-#     return ""
-
-# def getSortTitle(xml, titling):
-#     if titling.get("headwordSorting"):
-#         return getEntryHeadword(xml, titling.get("headwordSorting"))
-#     return getEntryHeadword(xml, titling.get("headword"))
 
 def generateKey(size: int=32):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
@@ -2170,15 +2044,8 @@ def updateDictConfig(dictDB: Connection, dictID: str, configID: str, content: An
     elif configID == 'users':
         attachDict(dictDB, dictID)
         return content, False
-    elif configID == "titling" or configID == "searchability" or configID == "subbing":
+    elif configID == "titling" or configID == "searchability" or configID == "subbing" or configID == "flagging" or configID == "links":
         resaveNeeded = flagForUpdate(dictDB)
-        return content, resaveNeeded
-    elif configID == "links":
-        resaveNeeded = flagForUpdate(dictDB)
-        c = dictDB.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='linkables'")
-        if not c.fetchone():
-            dictDB.execute("CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT)")
-            dictDB.execute("CREATE INDEX link ON linkables (txt)")
         return content, resaveNeeded
     else:
         return content, False
@@ -2504,7 +2371,7 @@ def addAutoNumbers(dictDB: Connection, dictID: str, countElem: str, storeElem: s
                     n_elem.appendChild(doc.createTextNode(str(count)))
             process += 1
             xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
-            dictDB.execute("update entries set xml=?, needs_update=0 where id=?", (xml, entryID))
+            dictDB.execute("update entries set xml=? where id=?", (xml, entryID)) # do not update needs_update
     dictDB.commit()
     return process
 

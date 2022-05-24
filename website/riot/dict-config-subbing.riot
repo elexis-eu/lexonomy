@@ -50,9 +50,33 @@
             data: {elements: []}
          },
 
-         onRemoveElementClick(el, evt) {
-            evt.stopPropagation()
-            this.state.data.elements = this.state.data.elements.filter(val => val != el)
+         addAttribute(event) {
+            const context = event.target.closest('[data-element]');
+            const elementName = context.getAttribute('data-element');
+            const attributeName = context.querySelector('.new-attribute').value
+            // const attributeValue = context.find('.new-attribute-value').value
+            if (!attributeName) return;
+            this.configData[elementName].attributes = this.configData[elementName].attributes || {}; // init if the config is old format
+            this.configData[elementName].attributes[attributeName] = ""
+            this.update();
+         },
+         deleteAttribute(event) {
+            const elementName = event.target.closest('[data-element]').getAttribute('data-element');
+            const attributeName = event.target.closest('[data-attribute]').getAttribute('data-attribute');
+            delete this.configData[elementName].attributes[attributeName];
+            this.update();
+         },
+         changeAttribute(event) {
+            const elementName = event.target.closest('[data-element]').getAttribute('data-element');
+            const attributeName = event.target.closest('[data-attribute]').getAttribute('data-attribute');
+            const newValue = event.target.value;
+            this.configData[elementName].attributes[attributeName] = newValue; 
+            this.update();
+         },
+      
+         doDeleteEl(event) {
+            const elementName = event.target.closest('[data-element]').getAttribute('data-element');
+            delete this.configData[elementName]
             this.update()
          },
 

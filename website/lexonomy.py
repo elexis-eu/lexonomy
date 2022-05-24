@@ -223,9 +223,7 @@ def entryflag(dictID: str, user: User, dictDB: Connection, configs: Configs):
 @authDict(["canEdit"])
 def subget(dictID: str, user: User, dictDB: Connection, configs: Configs):
     """For use with searching for eligible subentries: given a doctype and a lemma, find matching entries. (it is implied the doctype allows the entry to become a subentry)"""
-    entryIds = ops.searchEntries(dictDB, configs, request.query.doctype, request.query.lemma, "wordstart")
-    total = len(entryIds)
-    entryIds = entryIds[0:100]
+    total, entryIds = ops.searchEntries(dictDB, configs, request.query.doctype, request.query.lemma, "wordstart", limit = 100)
     entries = ops.readEntries(dictDB, configs, entryIds, xml = False)
     return {"success": True, "total": total, "entries": entries}
 
@@ -706,10 +704,8 @@ def entrylist(dictID: str, doctype: str, user: User, dictDB: Connection, configs
             entries = ops.readEntries(dictDB, configs, int(request.forms.id))
             return {"success": True, "entries": entries}
     else:
-        entryIds = ops.searchEntries(dictDB, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.sortdesc)
-        total = len(entryIds)
         howmany = int(request.forms.howmany) if request.forms.howmany else 100
-        entryIds = entryIds[0:howmany]
+        total, entryIds = ops.searchEntries(dictDB, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.sortdesc, limit = howmany)
         entries = ops.readEntries(dictDB, configs, entryIds, xml=False)
         return {"success": True, "entries": entries, "total": total}
 
@@ -725,9 +721,7 @@ def publicsearch(dictID: str):
     searchtext = request.forms.searchtext
     doctype = configs['xema']['root']
 
-    entryIds = ops.searchEntries(dictDB, configs, doctype, searchtext, modifier, False)
-    total = len(entryIds)
-    entryIds = entryIds[0:howmany]
+    total, entryIds = ops.searchEntries(dictDB, configs, doctype, searchtext, modifier, False, limit = howmany)
     return {"success": True, "entries": ops.readEntries(dictDB, configs, entryIds, titlePlain=True), "total": total}
 
 
