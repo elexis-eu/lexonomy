@@ -42,9 +42,9 @@
                      </a>
                      <span if={dictData.config.flagging.flags.length}
                            onclick={onOpenFlagMenuClick.bind(this, entry)}
-                           class="flag {entry.flag && entry.flag[0] ? 'badge' : 'noFlag'}"
-                           style={getFlagStyle(entry.flag ? entry.flag[0] : '')}>
-                        {store.getFlagLabel(entry.flag && entry.flag[0]) || "no flag"}
+                           class="flag {entry.flag ? 'badge' : 'noFlag'}"
+                           style={getFlagStyle(entry.flag)}>
+                        {store.getFlagLabel(entry.flag) || entry.flag || "No flag"}
                      </span>
                   </div>
                   <div if={!dictData.entryList.length && !dictData.isEntryListLoading}

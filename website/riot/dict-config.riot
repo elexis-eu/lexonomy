@@ -1,6 +1,13 @@
 <dict-config>
    <dict-nav links={[["config", "Configure"]]}/>
-   <h1>Configuration</h1>
+   <h3>Configuration</h3>
+   <div class="row" if="{state.stats.needUpdate && !state.isResaving}">
+      Your dictionary needs to be re-indexed ({stats.needUpdate} entries). <button class="btn" style="margin-left: 15px;" onclick="{resave}">Do it now</button>
+   </div>
+   <div if="{state.isResaving}">
+      Re-indexing your dictionary, please wait...<br>
+      <span if={state.resaveProgressMessage}>{state.resaveProgressMessage}</span>
+   </div>
    <div class="columnContainer"
          style="margin-left: 20px;">
       <div>
@@ -88,7 +95,32 @@
 
    <script>
       export default {
-         bindings: [["store", "dictionaryChanged", "update"]]
+         bindings: [["store", "dictionaryChanged", "update"]],
+         state: {
+            stats: {},
+            isResaving: false,
+            resaveProgressMessage: '',
+         },
+         
+         onMounted() {
+            this.getStats();
+         },
+
+         getStats() {
+            $.get(`${this.dictData.dictId}/stats.json`).then(r => this.update({stats: r}));
+         },
+         async resave() {
+            if (this.state.isResaving) return;
+            this.update({isResaving: true});
+            while (true) {
+               const {progressMessage, finished, errors} = await $.get(`${this.dictId}/resave.json`);
+               if (finished) {
+                  this.update({isResaving: false});
+                  return;
+               }
+               this.update({resaveProgressMessage: progressMessage});
+            }
+         }
       }
    </script>
 </dict-config>
