@@ -852,6 +852,7 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
     # add dictionary titles
     dictUsed = {}
     for link in links:
+        dictTitle = link["sourceDict"]
         if link["sourceDict"] in dictUsed:
             dictTitle = dictUsed[link["sourceDict"]]
         else:
@@ -865,6 +866,7 @@ def getLinkList(headword, sourceLang, sourceDict, targetLang):
                     dictTitle = dictConf["ident"]["title"]
                 dictUsed[link["sourceDict"]] = dictTitle
         link["sourceDictTitle"] = dictTitle
+        dictTitle = link["targetDict"]
         if link["targetDict"] in dictUsed:
             dictTitle = dictUsed[link["targetDict"]]
         else:
