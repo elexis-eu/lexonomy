@@ -35,5 +35,9 @@ CREATE INDEX history_by_action ON history (
     "action",
     "when"
 );
+CREATE INDEX history_by_entry_id ON history (entry_id, "when");
+CREATE INDEX history_by_email ON history (email, "when");
+CREATE INDEX history_by_when ON history ("when");
+CREATE INDEX history_by_action ON history ("action", "when");
 CREATE INDEX sortkey ON entries (sortkey);
 CREATE INDEX needs_re ON entries (needs_resave, needs_refresh, needs_refac);
