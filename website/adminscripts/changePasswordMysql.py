@@ -27,7 +27,7 @@ email = sys.argv[1];
 password = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
 passhash = hashlib.sha1(password.encode("utf-8")).hexdigest();
 try:
-    cur.execute("update users set passwordHash=? where email=?", (passhash, email))
+    cur.execute("update users set passwordHash=%s where email=%s", (passhash, email))
     conn.commit()
     print("User %s now has a new password: %s" % (email, password))
 except :

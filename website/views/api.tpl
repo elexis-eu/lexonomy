@@ -14,7 +14,10 @@
 	<body>
 		<div class="invelope top">
 			<h1>Lexonomy API documentation and test</h1>
-			<p>{{siteconfig["baseUrl"]}}api</p>
+			<p>Lexonomy also supports <a href="https://elexis-eu.github.io/elexis-rest/">ELEXIS REST API</a> - calls <tt>dictionaries, about, list, lemma, tei</tt>. Use your API key as <tt>X-API-KEY</tt>.</p>
+			<hr/>
+			<p>Following calls are Lexonomy API with specific information.</p>
+			<p><b>API URL:</b> {{siteconfig["baseUrl"]}}api</p>
 
 			<hr/>
 			<h2>List languages used in dictionaries</h2>

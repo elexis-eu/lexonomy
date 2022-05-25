@@ -13,22 +13,22 @@
 		<meta property="og:url" content="{{siteconfig["baseUrl"]}}{{dictID}}/{{entryID}}/" />
 		<meta name="twitter:url" content="{{siteconfig["baseUrl"]}}{{dictID}}/{{entryID}}/" />
 		<meta property="og:image" content="{{siteconfig["baseUrl"]}}furniture/preview.gif" />
-		<script type="text/javascript" src="../../libs/screenful/screenful.js"></script>
-		<script type="text/javascript" src="../../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
-		<script type="text/javascript" src="../../libs/screenful/screenful-user.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-user.css" />
-		<link type="text/css" rel="stylesheet" href="../../libs/screenful/screenful-theme-blue.css" />
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}libs/screenful/screenful.js"></script>
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}libs/screenful/screenful-user.css" />
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}libs/screenful/screenful-theme-blue.css" />
 		<script type="text/javascript">
                 Screenful.User.loggedin={{!JSON(user["loggedin"])}};
                 Screenful.User.username="{{user['email']}}";
 		</script>
-		<script type="text/javascript">var rootPath="../../";</script>
-		<script type="text/javascript" src="../../furniture/screenful-user-config.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../furniture/public.css" />
-		<script type="text/javascript" src="../../widgets/xemplatron.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../widgets/xemplatron.css" />
-		<script type="text/javascript" src="../../widgets/gmedia.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../widgets/gmedia.css" />
+		<script type="text/javascript">var rootPath="{{siteconfig["baseUrl"]}}";</script>
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}furniture/public.css" />
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}widgets/xemplatron.js"></script>
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}widgets/xemplatron.css" />
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}widgets/gmedia.js"></script>
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}widgets/gmedia.css" />
 		<style>
 		{{!css}}
 		</style>
@@ -48,12 +48,12 @@
 
 		<div class="invelope">
 			<div id="dictheader">
-				<div class="titleContainer"><span class="dictTitle"><a class="dictTitle" href="../../{{dictID}}/">{{dictTitle}}</a>
+				<div class="titleContainer"><span class="dictTitle"><a class="dictTitle" href="{{siteconfig["baseUrl"]}}{{dictID}}/">{{dictTitle}}</a>
 %if user["dictAccess"]:
-<a href="../../{{dictID}}/edit/" class="editLink">Edit</a>
+<a href="{{siteconfig["baseUrl"]}}{{dictID}}/edit/" class="editLink">Edit</a>
 %end
 </span></div>
-				<form class="searchContainer" action="../../{{dictID}}/search/" method="GET"><span class="searchbox"><input class="searchbox" name="q"/><input type="submit" class="submit" value="&nbsp;"/></span></form>
+				<form class="searchContainer" action="{{siteconfig["baseUrl"]}}{{dictID}}/search/" method="GET"><span class="searchbox"><input class="searchbox" name="q"/><input type="submit" class="submit" value="&nbsp;"/></span></form>
 			</div>
 		</div>
 
@@ -62,7 +62,7 @@
 				<div id="viewer" class="viewer">{{!html}}</div>
 				<div id="nabes">
 					%for nabe in nabes:
-						<a {{"class=current" if nabe["id"]==entryID else ""}} href="../../{{dictID}}/{{nabe["id"]}}">{{!nabe["title"]}}</a>
+						<a {{"class=current" if nabe["id"]==entryID else ""}} href="{{siteconfig["baseUrl"]}}{{dictID}}/{{nabe["id"]}}">{{!nabe["title"]}}</a>
 					%end
 				</div>
 				<div class="clear"></div>
@@ -78,13 +78,13 @@
 
 		<div class="invelope bottom">
 			<div id="dictfooter">
-				<div class="right"><a href="../../">Lexonomy</a></div>
-				<div><a href="../../{{dictID}}/">{{dictTitle}}</a></div>
+				<div class="right"><a href="{{siteconfig["baseUrl"]}}">Lexonomy</a></div>
+				<div><a href="{{siteconfig["baseUrl"]}}{{dictID}}/">{{dictTitle}}</a></div>
                                 %if "licence" in publico and siteconfig["licences"][publico["licence"]]: 
                                         <a href="{{siteconfig["licences"][publico["licence"]]["url"]}}" target="_blank"><img src="{{siteconfig["baseUrl"]}}/{{siteconfig["licences"][publico["licence"]]["icon"]}}" alt="{{siteconfig["licences"][publico["licence"]]["title"]}}"/></a>
                                 %end
                                 %if "licence" in publico and siteconfig["licences"][publico["licence"]]["canDownloadXml"]:
-					<a class="xml" href="../../{{dictID}}/{{entryID}}.xml" target="_blank">XML</a>
+					<a class="xml" href="{{siteconfig["baseUrl"]}}{{dictID}}/{{entryID}}.xml" target="_blank">XML</a>
 				%end
 			</div>
 		</div>

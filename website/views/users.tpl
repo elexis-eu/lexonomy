@@ -24,7 +24,7 @@
 		Screenful.Navigator.stepSize=1000;
 		Screenful.Navigator.showNumbers=false;
 		Screenful.Navigator.sortDesc=false;
-		Screenful.Navigator.flags="[]";
+		Screenful.Navigator.flags=[];
 		Screenful.Navigator.editorUrl="../users/editor/";
 		Screenful.Navigator.renderer=function(div, entry, searchtext){
 			var text=entry.title;
