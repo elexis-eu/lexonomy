@@ -5,28 +5,28 @@
 	<head>
 		%include("head.tpl")
 		<title>{{dictTitle}}</title>
-		<script type="text/javascript" src="../../../libs/screenful/screenful.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
-		<script type="text/javascript" src="../../../libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
-		<script type="text/javascript" src="../../../libs/screenful/screenful-user.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-user.css" />
-		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-theme-blue.css" />
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}libs/screenful/screenful.js"></script>
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}libs/screenful/screenful.css" />
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}libs/screenful/screenful-user.js"></script>
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}libs/screenful/screenful-user.css" />
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}libs/screenful/screenful-theme-blue.css" />
 		<script type="text/javascript">
                 Screenful.User.loggedin={{!JSON(user["loggedin"])}};
                 Screenful.User.username="{{user['email']}}";
 		</script>
-		<script type="text/javascript">var rootPath="../../../";</script>
-		<script type="text/javascript" src="../../../furniture/screenful-user-config.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-navigator.css?2018-02-04" />
-		<script type="text/javascript" src="../../../libs/screenful/screenful-navigator.js?2018-02-04"></script>
-		<script type="text/javascript" src="../../../libs/js.cookie.js"></script>
+		<script type="text/javascript">var rootPath="{{siteconfig["baseUrl"]}}";</script>
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}furniture/screenful-user-config.js"></script>
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}libs/screenful/screenful-navigator.css?2018-02-04" />
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}libs/screenful/screenful-navigator.js?2018-02-04"></script>
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}libs/js.cookie.js"></script>
 		<script type="text/javascript">
-		Screenful.Navigator.listUrl="../../../{{dictID}}/{{doctype}}/entrylist.json";
-		Screenful.Navigator.listByIdUrl="../../../{{dictID}}/{{doctype}}/entrylist.json";
+		Screenful.Navigator.listUrl="{{siteconfig["baseUrl"]}}{{dictID}}/{{doctype}}/entrylist.json";
+		Screenful.Navigator.listByIdUrl="{{siteconfig["baseUrl"]}}{{dictID}}/{{doctype}}/entrylist.json";
 		Screenful.Navigator.stepSize={{!JSON(numberEntries)}};
 		Screenful.Navigator.showNumbers=false;
 		Screenful.Navigator.sortDesc=false;
-		Screenful.Navigator.editorUrl="../../../{{dictID}}/{{doctype}}/entryeditor/";
+		Screenful.Navigator.editorUrl="{{siteconfig["baseUrl"]}}{{dictID}}/{{doctype}}/entryeditor/";
 		Screenful.Navigator.modifiers=[
 			{value: "start", caption: Screenful.Loc["starts like this"]},
 			{value: "exact", caption: Screenful.Loc["is exactly"]},
@@ -60,10 +60,10 @@
 			}
 			$(div).html(text);
 		};
-		Screenful.Navigator.entryDeleteUrl="../../../{{dictID}}/entrydelete.json";
+		Screenful.Navigator.entryDeleteUrl="{{siteconfig["baseUrl"]}}{{dictID}}/entrydelete.json";
 
 		Screenful.Navigator.flags={{!JSON(flagging["flags"])}};
-		Screenful.Navigator.entryFlagUrl="../../../{{dictID}}/entryflag.json";
+		Screenful.Navigator.entryFlagUrl="{{siteconfig["baseUrl"]}}{{dictID}}/entryflag.json";
 
 		$(function() {
 			var selectedID = "{{selectedID}}";
@@ -83,21 +83,21 @@
 			}
 		});
 		</script>
-		<link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-aftersave.css" />
-		<script type="text/javascript" src="../../../libs/screenful/screenful-aftersave.js"></script>
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}libs/screenful/screenful-aftersave.css" />
+		<script type="text/javascript" src="{{siteconfig["baseUrl"]}}libs/screenful/screenful-aftersave.js"></script>
 		<script type="text/javascript">
 		Screenful.Aftersave.message="Indexing...";
-		Screenful.Aftersave.actionUrl="../../../{{dictID}}/resave.json";
-		Screenful.Aftersave.maximizeUrl="../../../{{dictID}}>/resave/";
+		Screenful.Aftersave.actionUrl="{{siteconfig["baseUrl"]}}{{dictID}}/resave.json";
+		Screenful.Aftersave.maximizeUrl="{{siteconfig["baseUrl"]}}{{dictID}}>/resave/";
 		</script>
 
-		<link type="text/css" rel="stylesheet" href="../../../furniture/ui.css" />
+		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}furniture/ui.css" />
 		%if siteconfig["rtl"]:
 			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />
 		%end
 	</head>
 	<body class="edit">
-                %include("header.tpl", i18n=i18n,user=user, dictID=dictID, dictTitle=dictTitle, current="edit", rootPath="../../../", doctype=doctype, doctypes=doctypes)
+                %include("header.tpl", i18n=i18n,user=user, dictID=dictID, dictTitle=dictTitle, current="edit", rootPath=siteconfig["baseUrl"], doctype=doctype, doctypes=doctypes)
 		<script>
 	    var mode=Cookies.get("xonomyMode_{{dictID}}") || "{{xonomyMode}}";
 			$(".doctypes").addClass(mode);

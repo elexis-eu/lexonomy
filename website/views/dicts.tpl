@@ -25,7 +25,7 @@
 		Screenful.Navigator.showNumbers=false;
 		Screenful.Navigator.sortDesc=false;
 		Screenful.Navigator.editorUrl="../dicts/editor/";
-		Screenful.Navigator.flags="[]";
+		Screenful.Navigator.flags=[];
 		Screenful.Navigator.renderer=function(div, entry, searchtext){
 			var title=entry.title;
 			var id=entry.id;
