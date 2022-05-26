@@ -3,8 +3,8 @@
     <section class="media-input" v-if="elementData.shown && !readOnly">
       <label v-if="isAttribute" class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
       <input :name="computedElementName" type="text" v-model="value">
-      <button class="button--sm secondary" @click="$refs.imageSearcher.toggleOpen()" style="margin-left: 8px">Search for
-        image
+      <button class="button--sm secondary" @click="$refs.imageSearcher.toggleOpen()" style="margin-left: 8px">
+        <img :src="iconUrl('search-image.svg')">
       </button>
     </section>
 
@@ -20,6 +20,7 @@
 import computedElementName from "@/shared-resources/mixins/computedElementName"
 import ImageSearcher from "@/components/ImageSearcher"
 import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
+import iconUrl from "@/shared-resources/mixins/iconUrl"
 
 export default {
   name: "MediaComponent",
@@ -32,7 +33,7 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName, forceReadOnly],
+  mixins: [computedElementName, forceReadOnly, iconUrl],
   computed: {
     isMultimediaAPI() {
       return true
@@ -82,6 +83,20 @@ export default {
     text-transform: capitalize;
     padding-right: 10px;
     color: inherit;
+  }
+
+  button {
+    font-size: 28px;
+
+    img {
+      filter: invert(56%) sepia(100%) saturate(7500%) hue-rotate(203deg) brightness(90%) contrast(101%);
+    }
+
+    &:hover {
+      img {
+        filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(268deg) brightness(104%) contrast(101%);
+      }
+    }
   }
 }
 
