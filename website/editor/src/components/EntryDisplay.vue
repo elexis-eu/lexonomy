@@ -75,7 +75,9 @@ export default {
     },
     areAnyChanges() {
 
-      let updatedContent = js2xml(this.dataStructure, this.state.xml2jsConfig)
+      let structureCopy = this.createDeepCopy()
+      this.fixElementNames(structureCopy)
+      let updatedContent = js2xml(structureCopy, this.state.xml2jsConfig)
       let initialContent = js2xml(this.state._initialContent, this.state.xml2jsConfig)
       return initialContent != updatedContent
     },

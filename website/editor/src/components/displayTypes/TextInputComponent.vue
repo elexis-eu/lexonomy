@@ -17,6 +17,7 @@
              v-model="value"
              :placeholder="(errors && errors.first(computedElementName)) || computedElementName"
              v-validate.continues="computedValidation"
+             @change="updateParent"
              :class="{'error': errors.has(computedElementName)}"
       >
       <button v-if="elementData.interactivity" class="button--sm tertiary" @click="previewValue"
@@ -54,24 +55,24 @@ export default {
 
     }
   },
-  watch: {
-    value(newVal) {
-      if (newVal === this.content.text) {
-        return
-      }
-      if (this.content.type === "attribute") {
-        this.$emit('input', {elementName: this.elementName, attributes: {[this.content.name]: newVal}})
-      } else {
-        let elements = Object.assign({}, this.content)
-        elements.text = newVal
-        this.$emit('input', {elementName: this.elementName, elements: [elements]})
-      }
-    }
-  },
   mounted() {
     this.value = this.content.text
   },
   methods: {
+    updateParent() {
+      this.$nextTick(() => {
+        if (this.value === this.content.text) {
+          return
+        }
+        if (this.content.type === "attribute") {
+          this.$emit('input', {elementName: this.elementName, attributes: {[this.content.name]: this.value}})
+        } else {
+          let elements = Object.assign({}, this.content)
+          elements.text = this.value
+          this.$emit('input', {elementName: this.elementName, elements: [elements]})
+        }
+      })
+    },
     previewValue() {
       window.open(this.value, "_blank")
     },

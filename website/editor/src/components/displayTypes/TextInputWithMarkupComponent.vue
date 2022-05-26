@@ -22,7 +22,7 @@
 
       </div>
       <div ref="markActionButton" class="dropdown">
-        <button class="secondary" @click="toggleMarkActions">Mark as</button>
+        <button class="secondary mark-as" @click="toggleMarkActions">Mark as</button>
         <div v-show="showMarkActions" class="vue-dropdown-content">
           <button v-for="(element, index) in markupElements"
                   :key="index"
@@ -106,6 +106,9 @@ export default {
           // Assign new content
           elements = Object.assign({}, this.content)
           elements.text = "" + newVal[0].text
+        }
+        if (JSON.stringify(elements) === JSON.stringify(this.content)) {
+          return
         }
         // Emit event with new data
         this.$emit('input', {elementName: this.elementName, elements: elements})
@@ -341,6 +344,10 @@ export default {
 
 button {
   margin-left: 8px;
+
+  &.mark-as {
+    width: 85px;
+  }
 }
 
 .dropdown {

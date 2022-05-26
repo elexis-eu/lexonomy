@@ -118,13 +118,22 @@ export default {
     },
     // Update only content of children to prevent re-rendering of whole structure
     updateContentInChildren(newContent) {
-      if (!newContent || !newContent.elements) {
+      if (!newContent || (!newContent.elements && !newContent.attributes)) {
         return
       }
       for (let elementType of this.renderedChildren) {
-        let newContentForChildType = newContent.elements.filter(element => {
-          return element.name === elementType.name
-        })
+        let newContentForChildType
+          if (elementType.children[0].props.isAttribute) {
+            if (newContent.attributes) {
+              newContentForChildType = [{type: "attribute", name: elementType.name, text: newContent.attributes[elementType.name]}]
+            }
+        } else {
+            if (newContent.elements) {
+              newContentForChildType = newContent.elements.filter(element => {
+                return element.name === elementType.name
+              })
+            }
+        }
         if (newContentForChildType.length === 0) {
           continue
         }

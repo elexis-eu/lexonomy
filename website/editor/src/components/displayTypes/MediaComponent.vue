@@ -2,7 +2,8 @@
   <div>
     <section class="media-input" v-if="elementData.shown && !readOnly">
       <label v-if="isAttribute" class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
-      <input :name="computedElementName" type="text" v-model="value">
+      <input :name="computedElementName" type="text" v-model="value"
+             @change="updateParent">
       <button class="button--sm secondary" @click="$refs.imageSearcher.toggleOpen()" style="margin-left: 8px">
         <img :src="iconUrl('search-image.svg')">
       </button>
@@ -45,26 +46,27 @@ export default {
 
     }
   },
-  watch: {
-    value(newVal) {
-      if (newVal === this.content.text) {
-        return
-      }
-      if (this.content.type === "attribute") {
-        this.$emit('input', {elementName: this.elementName, attributes: {[this.content.name]: newVal}})
-      } else {
-        let elements = Object.assign({}, this.content)
-        elements.text = newVal
-        this.$emit('input', {elementName: this.elementName, elements: [elements]})
-      }
-    }
-  },
   mounted() {
     this.value = this.content.text
   },
   methods: {
+    updateParent() {
+      this.$nextTick(() => {
+        if (this.value === this.content.text) {
+          return
+        }
+        if (this.content.type === "attribute") {
+          this.$emit('input', {elementName: this.elementName, attributes: {[this.content.name]: this.value}})
+        } else {
+          let elements = Object.assign({}, this.content)
+          elements.text = this.value
+          this.$emit('input', {elementName: this.elementName, elements: [elements]})
+        }
+      })
+    },
     updateValue(value) {
       this.value = value
+      this.updateParent()
     }
   }
 }
