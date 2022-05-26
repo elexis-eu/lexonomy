@@ -1,8 +1,8 @@
 <template>
   <div>
     <section v-if="elementData.shown">
-      <!--      <p>Read-only component</p>-->
-      <p class="text--md"> {{ computedElementNameWithColon }} {{ content.text }}</p>
+      <p :class="computedClass">{{ forceReadOnly ? computedElementNameWithColon : "" }} </p>
+      <span :class="computedClass"> {{ content.text }}</span>
     </section>
   </div>
 </template>

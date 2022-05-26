@@ -2,6 +2,14 @@
   <PopupDisplay z-index="10" :value="value" @input="$emit('input', $event)">
     <h2>Kontext search engine</h2>
     <div class="search-box">
+        <div class="switch type-toggle">
+            <label>
+                Headword
+                <input ref="searchTypeToggle" type="checkbox">
+                <span class="lever"></span>
+                CQL
+            </label>
+        </div>
       <input v-model="searchTerm" placeholder="Headword" type="text">
       <button @click="getExamples(1)">Search</button>
     </div>
@@ -26,7 +34,9 @@
     </div>
     <div class="actions">
       <button @click="$emit('input', false)">Cancel</button>
-      <button :disabled="!isAnyExampleChecked" @click="saveSelectedExamples">Save {{examples.filter(el => el.checked).length || ""}}</button>
+      <button :disabled="!isAnyExampleChecked" @click="saveSelectedExamples">Save
+        {{ examples.filter(el => el.checked).length || "" }}
+      </button>
     </div>
   </PopupDisplay>
 </template>
@@ -54,7 +64,7 @@ export default {
         this.searchTerm = headoword
       },
       immediate: true
-    },
+    }
   },
   computed: {
     isAnyExampleChecked() {
@@ -75,17 +85,18 @@ export default {
   methods: {
     saveSelectedExamples() {
       let selectedExamples = this.examples.filter(el => el.checked)
-      this.$emit("save", selectedExamples)
+      this.$emit("save", {type: "kontext", elements: selectedExamples})
       this.$emit("input", false)
     },
     toggleCheck(index) {
       this.examples[index].checked = !this.examples[index].checked
     },
     getExamples(page) {
-      let url = `http://localhost:8080/${this.state.entry.dictId}/kontext/conc/`
+      let url = `${window.location.origin}/${this.state.entry.dictId}/kontext/conc/`
+      let queryType = (this.$refs.searchTypeToggle.checked) ? "kontextcql" : "kontextsimple"
       axios.get(url, {
         params: {
-          querytype: "kontextsimple",
+          querytype: queryType,
           query: this.searchTerm,
           fromp: page
         }
@@ -128,10 +139,33 @@ export default {
 
 <style lang="scss" scoped>
 
+.corpus-managers {
+  .modal {
+    overflow: inherit;
+    max-height: 100%;
+  }
+
+  .modal-content {
+    height: 70%;
+
+  }
+}
+
 .search-box {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  .type-toggle {
+    margin-right: 16px;
+    .lever {
+      background-color: #005FCC !important;
+
+      &:after {
+        background-color: #F1F1F1 !important
+      }
+    }
+  }
 
   input {
     max-width: 400px;
@@ -145,6 +179,8 @@ export default {
 
 .examples {
   margin: 24px 0;
+  max-height: 600px;
+  overflow-Y: scroll;
 }
 
 .example {

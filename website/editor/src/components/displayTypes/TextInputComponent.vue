@@ -1,7 +1,7 @@
 <template>
   <div>
     <section class="text-input" v-if="elementData.shown && !readOnly">
-      <label class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
+      <label v-if="isAttribute" class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
       <textarea v-if="this.elementData.editorInputType === 'textarea'"
                 name="elementName"
                 cols="30"
@@ -24,7 +24,8 @@
       </button>
     </section>
     <section class="read-only" v-if="elementData.shown && readOnly">
-      <p :class="computedClass">{{ computedElementNameWithColon }} {{ value }}</p>
+      <p :class="computedClass">{{ computedElementNameWithColon }} </p>
+      <span :class="computedClass">{{ value }}</span>
     </section>
   </div>
 </template>

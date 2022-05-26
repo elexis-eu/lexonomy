@@ -1,7 +1,7 @@
 <template>
   <div>
     <section class="input-section" v-if="elementData.shown && !readOnly">
-      <label class="text--md">{{ computedElementNameWithColon }}</label>
+      <label v-if="isAttribute" class="text--md">{{ computedElementNameWithColon }}</label>
       <div ref="wholeInput" class="text-with-markup">
         <span
           v-for="(element, index) in values"
@@ -34,13 +34,14 @@
       </div>
     </section>
     <section class="read-only" v-if="elementData.shown && readOnly && readOnlyValues.length > 0">
-      <p :class="computedClass">
-        {{ computedElementNameWithColon }}
+
+      <p :class="computedClass">{{ computedElementNameWithColon }} </p>
+      <span :class="computedClass">
         <span v-for="(element, i) in readOnlyValues"
               :key="i + element.type"
               style="white-space: pre-wrap"
               v-html="element.text"/>
-      </p>
+      </span>
     </section>
   </div>
 </template>

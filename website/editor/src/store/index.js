@@ -16,6 +16,7 @@ var state = {
   _initialContent: null,
   headwordElement: null,
   headwordData: null,
+  openedPopups: []
 }
 export default {
   state: state

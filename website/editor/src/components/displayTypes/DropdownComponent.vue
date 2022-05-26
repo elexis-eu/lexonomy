@@ -1,13 +1,14 @@
 <template>
   <div>
     <section v-if="elementData.shown && !readOnly" class="dropdown">
-      <p class="text--md"> {{ computedElementNameWithColon }}</p>
+      <p class="text--md">{{ (isAttribute) ? computedElementNameWithColon : '' }}</p>
       <select v-model="value">
         <option v-for="option in options" :key="option.value" :value="option.value">{{ option.caption }}</option>
       </select>
     </section>
     <section v-if="elementData.shown && readOnly" class="read-only">
-      <p :class="computedClass">{{ computedElementNameWithColon }} {{ valueCaption }}</p>
+      <p :class="computedClass">{{ computedElementNameWithColon }} </p>
+      <span :class="computedClass">{{ valueCaption }}</span>
     </section>
   </div>
 </template>

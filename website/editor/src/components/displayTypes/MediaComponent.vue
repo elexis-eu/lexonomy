@@ -1,14 +1,17 @@
 <template>
   <div>
     <section class="media-input" v-if="elementData.shown && !readOnly">
-      <label class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
+      <label v-if="isAttribute" class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
       <input :name="computedElementName" type="text" v-model="value">
-      <button class="button--sm secondary" @click="$refs.imageSearcher.toggleOpen()" style="margin-left: 8px">Search for image</button>
+      <button class="button--sm secondary" @click="$refs.imageSearcher.toggleOpen()" style="margin-left: 8px">Search for
+        image
+      </button>
     </section>
 
     <ImageSearcher v-if="elementData.shown && !readOnly" ref="imageSearcher" @selected="updateValue"/>
     <section v-if="elementData.shown && readOnly" class="read-only">
-        <p :class="computedClass">{{computedElementNameWithColon}} {{value}}</p>
+      <p :class="computedClass">{{ computedElementNameWithColon }} </p>
+      <span :class="computedClass">{{ value }}</span>
     </section>
   </div>
 </template>

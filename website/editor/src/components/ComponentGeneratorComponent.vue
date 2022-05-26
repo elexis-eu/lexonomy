@@ -3,13 +3,15 @@
     <ul v-for="(typeElement) in renderedChildren"
         :key="typeElement.name"
     >
-<!--        :style="getEncompassingStyles(typeElement.name)"-->
-      <CorpusComponent v-if="useExampleEngine(typeElement.name)" @save="saveFromKontext(typeElement, $event)"></CorpusComponent>
+      <!--        :style="getEncompassingStyles(typeElement.name)"-->
+      <CorpusComponent v-if="useExampleEngine(typeElement.name)" :element-name="typeElement.name"
+                       @save="saveFromCorpus(typeElement, $event)"></CorpusComponent>
       <component v-for="element in typeElement.children"
                  :is="element.componentName"
                  :ref="element.props.elementName + element.props.editorChildNumber"
                  :key="element.props.key"
                  v-bind="element.props"
+                 :class="{'is-attribute': element.props.isAttribute}"
                  @input="handleChildUpdate"
                  @create-element="createElement"
                  @move-element="moveElement"
@@ -24,6 +26,7 @@
 <script>
 import {xml2js} from "xml-js"
 import CorpusComponent from "@/components/CorpusComponent"
+import corpusMixin from "@/shared-resources/mixins/corpusMixin"
 
 export default {
   name: "ComponentGeneratorComponent",
@@ -44,6 +47,9 @@ export default {
       default: false
     }
   },
+  mixins: [
+    corpusMixin
+  ],
   data() {
     return {
       displayTypeToComponentMap: {
@@ -72,24 +78,8 @@ export default {
     this.loadNewData(this.content)
   },
   methods: {
-    saveFromKontext(element, data) {
-      for (const elementData of data) {
-        let newObject = this.createElementTemplate(element.name)[0]
-        let newHeadword = this.createElementTemplate(this.state.entry.dictConfigs.kontext.markup)[0]
-        newHeadword.elements = [{type: "text", text: elementData.headword}]
-        newObject.elements = [
-          {type: "text", text: elementData.left},
-          newHeadword,
-          {type: "text", text: elementData.right},
-        ]
-        this.createElement({name: element.name, content: newObject})
-      }
-    },
-    useExampleEngine(elementName) {
-      if (this.forceReadOnlyElements) {
-        return false
-      }
-      return this.state.entry.dictConfigs.xampl.container === elementName
+    useExampleEngine() {
+      return !this.forceReadOnlyElements
     },
     getEncompassingStyles(elementName) {
       let gutter = this.state.entry.dictConfigs.xemplate[elementName].gutter
@@ -435,6 +425,9 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.is-attribute {
+  padding: 0 !important;
+  margin: 0;
+}
 </style>

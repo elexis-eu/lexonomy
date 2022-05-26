@@ -16,8 +16,6 @@ export default {
       let name = (structureConfig[this.elementName] && structureConfig[this.elementName].elementName) || this.elementName
       if (this.isAttribute) {
         try {
-          name = "@" + name
-
           let optionality = structureConfig[this.parentElementName].attributes[this.elementName].optionality
 
           if (optionality === "obligatory") {
@@ -39,8 +37,6 @@ export default {
       let name = (structureConfig[this.elementName] && structureConfig[this.elementName].elementName) || this.elementName
       if (this.isAttribute) {
         try {
-          name = "@" + name
-
           let optionality = structureConfig[this.parentElementName].attributes[this.elementName].optionality
 
           if (optionality === "obligatory") {

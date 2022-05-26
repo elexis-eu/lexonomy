@@ -91,9 +91,11 @@ $blue-600: #023672;
 
   .read-only {
     margin-bottom: 4px;
+    display: inline-flex;
 
     p {
       margin: 0;
+      margin-right: 4px;
       text-align: left;
       //font-size: 14px;
       //line-height: 18px;

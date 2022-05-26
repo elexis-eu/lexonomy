@@ -1,6 +1,6 @@
 <template>
   <div v-if="!isRootElement" ref="actionButton" class="dropdown">
-    <button class="button--sm secondary" @click.stop="toggleDropdown" :disabled="numberOfActions === 0">...</button>
+    <button class="button--sm secondary" @click.stop="toggleDropdown" :disabled="numberOfActions === 0">{{computedElementName}}</button>
     <div v-show="show" class="vue-dropdown-content">
       <button v-if="canMoveElementDown" class="tertiary" @click="triggerEvent('move-element-down')">Move {{ computedElementName }} down</button>
       <button v-if="canMoveElementUp" class="tertiary" @click="triggerEvent('move-element-up')">Move {{ computedElementName }} up</button>

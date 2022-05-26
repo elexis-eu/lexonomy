@@ -1,49 +1,95 @@
 <template>
-  <div class="corpus-managers">
-    <div ref="corpusManagers" class="dropdown" @click="toggleShow">
+  <div v-if="isAnyCorpusAvailable" class="corpus-managers">
+    <div ref="corpusManagers" class="dropdown" @click="openCorpuses">
       <button
         :class="{active: show}"
       >
-        <i class="material-icons right">arrow_drop_down</i>
-        <p>Corpus Managers</p>
+        <i v-if="numberOfCorpuses > 1" class="material-icons right">arrow_drop_down</i>
+        <p>Corpus search</p>
       </button>
       <ul v-show="show">
-        <button v-if="sketchEngineEnabled" class="tertiary" @click="openSketchEngine">Sketch Engine</button>
         <button v-if="kontextEnabled" class="tertiary" @click="openKontext">KonText</button>
+        <button v-if="isSkeAvailable" class="tertiary" @click="openSketchEngine">Sketch Engine</button>
       </ul>
     </div>
-      <KontextDisplay
-              v-model="showKontext"
-              @save="$emit('save', $event)"
-      />
+    <KontextDisplay
+      v-model="showKontext"
+      @save="$emit('save', $event)"
+    />
+    <SkeDisplay
+      v-model="showSke"
+      :search-type="skeSearchType"
+      @save="$emit('save', $event)"
+    />
   </div>
 </template>
 
 <script>
 import KontextDisplay from "@/components/corpusManagers/KontextDisplay"
+import SkeDisplay from "@/components/corpusManagers/SkeDisplay"
 
 export default {
   name: "CorpusComponent",
   components: {
+    SkeDisplay,
     KontextDisplay
   },
+  props: {
+    elementName: {
+      type: String,
+      required: true
+    }
+  },
   computed: {
-    sketchEngineEnabled() {
-      let xampl = this.state.entry.dictConfigs.xampl
-      let apiData = this.state.entry.dictConfigs.kex
-      return !!(xampl.container &&
-        xampl.markup &&
-        xampl.template &&
-        apiData.apiurl &&
-        apiData.url)
+    isAnyCorpusAvailable() {
+      return this.kontextEnabled || this.isSkeAvailable
+    },
+    skeConfig() {
+      return this.state.entry.dictConfigs.kex
+    },
+    isSkeConfigValid() {
+      return !!(this.skeConfig.corpus &&
+        this.skeConfig.apiurl &&
+        this.skeConfig.url)
+    },
+    isSkeAvailable() {
+      return this.skeXamplEnabled || this.skeCollxEnabled || this.skeThesEnabled || this.skeDefoEnabled
+    },
+    skeXamplEnabled() {
+      let settings = this.state.entry.dictConfigs.xampl
+      return !!(this.isSkeConfigValid &&
+        settings.container &&
+        settings.container === this.elementName &&
+        settings.markup)
 
+    },
+    skeCollxEnabled() {
+      let settings = this.state.entry.dictConfigs.collx
+      return !!(this.isSkeConfigValid &&
+        settings.container &&
+        settings.container === this.elementName)
+    },
+    skeThesEnabled() {
+      let settings = this.state.entry.dictConfigs.thes
+      return !!(this.isSkeConfigValid &&
+        settings.container &&
+        settings.container === this.elementName)
+    },
+    skeDefoEnabled() {
+      let settings = this.state.entry.dictConfigs.defo
+      return !!(this.isSkeConfigValid &&
+        settings.container &&
+        settings.container === this.elementName)
     },
     kontextEnabled() {
       let apiData = this.state.entry.dictConfigs.kontext
-      return apiData.container &&
+      return !!(apiData.container &&
+        apiData.container === this.elementName &&
         apiData.markup &&
-        apiData.template &&
-        apiData.url
+        apiData.url)
+    },
+    numberOfCorpuses() {
+      return [this.kontextEnabled, this.skeDefoEnabled, this.skeThesEnabled, this.skeCollxEnabled, this.skeXamplEnabled].filter(value => value === true).length
     }
   },
   watch: {
@@ -58,18 +104,43 @@ export default {
   data() {
     return {
       show: false,
-      showKontext: false
+      showKontext: false,
+      showSke: false,
+      skeSearchType: "xampl"
     }
   },
   methods: {
     toggleShow() {
       this.show = !this.show
     },
+    openCorpuses() {
+      if (this.numberOfCorpuses === 1) {
+        if (this.kontextEnabled) {
+          this.openKontext()
+        } else if (this.isSkeAvailable) {
+          this.openSketchEngine()
+        }
+      } else {
+        this.toggleShow()
+      }
+    },
     openKontext() {
       this.showKontext = true
     },
     openSketchEngine() {
-      alert("open sketch engine")
+      if (this.skeXamplEnabled) {
+        this.skeSearchType = "xampl"
+      }
+      if (this.skeCollxEnabled) {
+        this.skeSearchType = "collx"
+      }
+      if (this.skeThesEnabled) {
+        this.skeSearchType = "thes"
+      }
+      if (this.skeDefoEnabled) {
+        this.skeSearchType = "defo"
+      }
+      this.showSke = true
     },
     watchForOutsideClick(event) {
       if (this.$refs.corpusManagers && !this.$refs.corpusManagers.contains(event.target)) {
@@ -94,13 +165,13 @@ export default {
 
   .dropdown {
     position: absolute;
-    width: 190px;
+    width: 160px;
     right: 0;
     cursor: pointer;
 
     button {
       display: inline-block;
-      width: 190px;
+      width: 160px;
 
       i {
         margin-left: 0;
