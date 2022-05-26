@@ -114,8 +114,6 @@ export default {
 <style lang="scss" scoped>
 
 .popup {
-  padding: 8px 16px;
-  margin-bottom: 8px;
 
   .modal {
     display: block;

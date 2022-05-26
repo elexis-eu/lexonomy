@@ -1,5 +1,5 @@
 <template>
-  <div class="popup" :style="configStyles">
+  <div class="popup-component" :style="configStyles">
     <div>
       <!--      <button @click="openPopup">Open {{ elementName }}</button>-->
       <section v-if="elementData.shown" class="preview drop-shadow--100" @click="openPopup">
@@ -43,28 +43,28 @@
           />
         </section>
       </section>
-        <PopupDisplay v-model="showPopup">
-            <component
-                    v-if="elementData.shown"
-                    :is="valueComponent"
-                    :elementEditorConfig="elementData"
-                    :elementName="elementName"
-                    :elementData="elementData"
-                    :content="componentData"
-                    :isAttribute="isAttribute"
-                    :parentElementName="parentElementName"
-                    @hide-children="hideChildren"
-                    @input="handleValueUpdate"
-            />
-            <ComponentGeneratorComponent
-                    v-if="showChildren"
-                    :children="children"
-                    :elementEditorConfig="elementData"
-                    :elementName="elementName"
-                    :content="calculatedContent"
-                    @input="handleChildUpdate"
-            />
-        </PopupDisplay>
+      <PopupDisplay v-model="showPopup">
+        <component
+          v-if="elementData.shown"
+          :is="valueComponent"
+          :elementEditorConfig="elementData"
+          :elementName="elementName"
+          :elementData="elementData"
+          :content="componentData"
+          :isAttribute="isAttribute"
+          :parentElementName="parentElementName"
+          @hide-children="hideChildren"
+          @input="handleValueUpdate"
+        />
+        <ComponentGeneratorComponent
+          v-if="showChildren"
+          :children="children"
+          :elementEditorConfig="elementData"
+          :elementName="elementName"
+          :content="calculatedContent"
+          @input="handleChildUpdate"
+        />
+      </PopupDisplay>
     </div>
   </div>
 </template>
@@ -113,13 +113,13 @@ export default {
   methods: {
     openPopup() {
       this.showPopup = true
-    },
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.popup {
+.popup-component {
   padding: 8px 16px;
   margin-bottom: 8px;
 
