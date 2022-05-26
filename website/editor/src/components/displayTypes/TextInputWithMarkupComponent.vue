@@ -301,15 +301,16 @@ export default {
 
 <style lang="scss" scoped>
 .text-with-markup {
-  display: flex;
-  flex-flow: wrap;
   font-style: normal;
+  text-align: left;
 
 
   span[contenteditable] {
     margin: 0;
-    padding: 14px 0;
+    padding: 4px 0;
     border: 1px solid transparent;
+    border-radius: 0;
+    line-height: 24px;
     text-align: left;
 
     &:focus {
@@ -318,14 +319,7 @@ export default {
 
     &.empty-element {
       border: 1px solid #eee;
-    }
-
-    &:first-child {
-      padding-left: 8px;
-    }
-
-    &:last-child {
-      padding-right: 8px;
+      padding: 4px 16px;
     }
   }
 }
