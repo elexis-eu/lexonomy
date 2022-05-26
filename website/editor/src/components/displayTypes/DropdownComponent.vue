@@ -2,7 +2,11 @@
   <div>
     <section v-if="elementData.shown && !readOnly" class="dropdown">
       <p class="text--md">{{ (isAttribute) ? computedElementNameWithColon : '' }}</p>
-      <select v-model="value">
+      <select
+              :name="computedElementName"
+              v-model="value"
+              v-validate.continues="computedValidation"
+      >
         <option v-for="option in options" :key="option.value" :value="option.value">{{ option.caption }}</option>
       </select>
     </section>
@@ -17,9 +21,11 @@
 
 import computedElementName from "@/shared-resources/mixins/computedElementName"
 import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
+import computedValidation from "@/shared-resources/mixins/computedValidation"
 
 export default {
   name: "DropdownComponent",
+  inject: ['$validator'],
   props: {
     elementData: Object,
     elementName: String,
@@ -28,7 +34,7 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName, forceReadOnly],
+  mixins: [computedElementName, forceReadOnly, computedValidation],
   computed: {
     valueCaption() {
       let selectedOption = this.options.find(el => el.value === this.value)

@@ -74,7 +74,6 @@ export default {
       this.dirty = this.areAnyChanges()
     },
     areAnyChanges() {
-
       let structureCopy = this.createDeepCopy()
       this.fixElementNames(structureCopy)
       let updatedContent = js2xml(structureCopy, this.state.xml2jsConfig)
@@ -84,15 +83,24 @@ export default {
     getXmlData() {
       return this.$validator.validateAll().then(result => {
         if (!result) {
-          return null
+          let requiredFields = this.$validator.errors.items.map(item => item.field).join('\n')
+          if (confirm(`Are you sure you want to save despite some elements missing? \n \n Missing fields: \n${requiredFields}`) === true) {
+            return this.prepareXMLData()
+          } else {
+            return null
+          }
+        } else {
+          return this.prepareXMLData()
         }
-        let structureCopy = this.createDeepCopy()
-        delete structureCopy.declaration
-        this.fixElementNames(structureCopy)
-        let data = js2xml(structureCopy, this.state.xml2jsConfig)
-        console.log(data)
-        return data
       })
+    },
+    prepareXMLData() {
+      let structureCopy = this.createDeepCopy()
+      delete structureCopy.declaration
+      this.fixElementNames(structureCopy)
+      let data = js2xml(structureCopy, this.state.xml2jsConfig)
+      console.log(data)
+      return data
     },
     createDeepCopy() {
       let xml = js2xml(this.dataStructure, this.state.xml2jsConfig)

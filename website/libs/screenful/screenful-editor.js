@@ -366,7 +366,6 @@ Screenful.Editor={
     var content=Screenful.Editor.harvester(document.getElementById("editor"));
     content = await Promise.resolve(content)
     if (!content) {
-      alert("Something is wrong with entry. Is there an element or a required field missing?")
       return
     }
     $("#container").addClass("empty");

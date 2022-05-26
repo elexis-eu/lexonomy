@@ -3,7 +3,7 @@
     <section class="text-input" v-if="elementData.shown && !readOnly">
       <label v-if="isAttribute" class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
       <textarea v-if="this.elementData.editorInputType === 'textarea'"
-                name="elementName"
+                :name="computedElementName"
                 cols="30"
                 rows="10"
                 v-model="value"
