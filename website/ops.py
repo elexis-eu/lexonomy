@@ -505,12 +505,14 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
 
     # Special case: when searching wildcard (i.e. retrieve all entries) and the dictionary is large (>2000) entries. 
     # Don't read all entries before sorting and limiting, but use a shorter path.
-    if not searchtext or not modifier and (total := dictDB.execute("select count(*) as total from entries").fetchone()["total"]) > 2000:
-        results: list[SortableEntry] = []
-        for rf in dictDB.execute("select id, sortkey from entries order by sortkey limit 200").fetchall():
-            results.append({"id": rf["id"], "sortkey": rf["sortkey"]})
-        sortEntries(configs, results, reverse=sortdesc)
-        return total, results
+    if not searchtext or not modifier: 
+        total = dictDB.execute("select count(*) as total from entries").fetchone()["total"]
+        if total > 2000:
+            results: list[SortableEntry] = []
+            for rf in dictDB.execute("select id, sortkey from entries order by sortkey limit 200").fetchall():
+                results.append({"id": rf["id"], "sortkey": rf["sortkey"]})
+            sortEntries(configs, results, reverse=sortdesc)
+            return total, results
 
     if modifier == "start":
         sql1 = "select distinct e.id, e.sortkey from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by s.level"
@@ -626,15 +628,16 @@ def get_entry_html(configs: Configs, xml: str, run_xslt: Any) -> str:
 def fixup_namespaces(xml: Tag):
     xml.attrs['xmlns:lxnm'] = 'http://www.lexonomy.eu/'
 
-def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) -> int:
+def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) -> tuple[int, bool]:
     """
-    if an ID is passed, update the xml with that id.
-    Then: 
-    If the xml already defines an @lxnm:id (which could be set from the ID argument), ensure it is valid and present in the database, creating it in the dabase if needed.
-    Otherwise, reserve an id in the database, and attach it to the entry as @lxnm:id.
+    Ensure the entry has a row in the database, and the entry root points to that row with @lxnm:id.
 
-    If a fresh (to-be-indexed) entry may have an id that is already used, that is assumed to be a valid use-case.
-    If the id is already attached to an existing entry, that entry will be overwritten with the new entry.
+    The ID is determined as such (first match):
+    - 1. if an ID is passed, that will always be used, and the entry's xml will be updated to have that ID
+    - 2. if no ID is passed, but the xml root has an @lxnm:id attribute, that will be used
+    - 3. if no ID is passed and xml doesn't have @lxnm:id, a new id will be created and added to the xml.
+
+    Returns ID, is new ID in database
     """
     if maybeID is not None: # id is passed in - update the xml to reflect.
         xml.attrs["lxnm:id"] = str(maybeID)
@@ -649,13 +652,16 @@ def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) ->
             del xml.attrs["lxnm:id"]
             id = None
 
-    if id == None: # let db create one
+    isNewEntry = False
+    if id is None: # let db create one
         id = doSql(dictDB, "insert into entries(doctype, xml, title, sortkey) values(?, ?, ?, ?)", ("", "", "", "")).lastrowid
-    else: # ensure row exists
-        doSql(dictDB, "insert into entries(id, doctype, xml, title, sortkey) values(?,?,?,?,?) on conflict(id) do nothing", (id, "", "", "", ""))
+        isNewEntry = True
+    else: 
+        # ensure row exists
+        isNewEntry = doSql(dictDB, "insert into entries(id, doctype, xml, title, sortkey) values(?,?,?,?,?) on conflict(id) do nothing", (id, "", "", "", "")).rowcount > 0
 
     xml.attrs["lxnm:id"] = str(id)
-    return id
+    return id, isNewEntry
 
 def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entryID: int, email: str):
     """
@@ -1043,8 +1049,6 @@ def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], emai
     When ID is passed, it is used instead of whatever ID is contained in the xml. If no id is passed, extract the id from the xml, or, failing that, auto-assign an ID.
     """
 
-    isNewEntry: bool = True if id is None else dictDB.execute("""select id from entries where id = ?""", (id, )).rowcount > 0
-
     if isinstance(xml, str) or xml is None:
         try: 
             xml = parse(xml)
@@ -1055,7 +1059,7 @@ def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], emai
     
     # Specific order: reserve ID in the database, then extract subentries
     # So that any element matching after this does not go into subentries
-    id = get_entry_id(xml, dictDB, id)
+    id, isNewEntry = get_entry_id(xml, dictDB, id)
     presave_subentries(dictDB, configs, xml, id, email)
 
     doctype = get_entry_doctype(xml)
@@ -1322,11 +1326,13 @@ def makeDict(dictID: str, template: str, title: str, blurb: str, email: str):
         blurb = "Yet another Lexonomy dictionary."
     if dictID in prohibitedDictIDs or dictExists(dictID):
         return False
+    if not template:
+        template = "blank"
     if not template.startswith("/"):
         template = os.path.join("dictTemplates", template + ".sqlite.schema")
     #init db schema
     schema = open(template, 'r').read()
-    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], "dicts", dictID + ".sqlite"))
+    conn = sqlite3.connect("file:" + os.path.join(siteconfig["dataDir"], "dicts", dictID + ".sqlite?modeof=."), uri=True)
     conn.executescript(schema)
     conn.commit()
     #update dictionary info
@@ -1468,7 +1474,7 @@ def getPublicDicts() -> list[DictInfo]:
                 dictinfo["title"] = title
             if iso := configs["metadata"].get("dc.language.iso"):
                 langs = [t['lang'] for t in get_iso639_1() if t['code3'] == configs["metadata"]["dc.language.iso"][0]]
-                dictinfo["lang"] = langs[0] or dictinfo["lang"]
+                dictinfo["lang"] = langs[0] if len(langs) > 0 else dictinfo["lang"]
             if configs["metadata"].get("dc.rights") and configs["metadata"].get("dc.rights") != "":
                 dictinfo["licence"] = configs["metadata"].get("dc.rights")
             if configs["metadata"].get("dc.contributor.author") and len(configs["metadata"].get("dc.contributor.author")) > 0:
@@ -1817,8 +1823,10 @@ def exportEntryXml(dictDB: Connection, dictID: str, entryID: int, configs: Confi
 
 def export(dictID: str, dictDB: Connection, configs: Configs, clean: bool = True) -> Iterable[str]:
     "Export all entries, (optionally) cleaning all lexonomy things."
-    def prepare_for_export(xml: str) -> str:
-        """Pre-process the xml to remove all lexonomy bookkeeping."""
+    def prepare_for_export(xml: str) -> Tag:
+        """Pre-process the xml to replace subentry references with their contents, and optionally remove all lexonomy bookkeeping. 
+            Return tag so we don't stringify and re-parse subentries.
+        """
         tag = parse(xml)
         # Note: first search, THEN modify - don't modify while iterating.
         # 1. subentries - replace with their contents.
@@ -1826,7 +1834,7 @@ def export(dictID: str, dictDB: Connection, configs: Configs, clean: bool = True
         for sub in subs:
             subentryID = int(sub.attrs["id"])
             r = dictDB.execute("select * from entries where id = ?", (subentryID, )).fetchone()
-            sub.replace_with(parse(prepare_for_export(r["xml"])))
+            sub.replace_with(prepare_for_export(r["xml"]))
         if clean:
             # 2. linkables - remove the attribute
             for linkable in tag.find_all(attrs = {"lxnm:linkable": True}):
@@ -1839,14 +1847,15 @@ def export(dictID: str, dictDB: Connection, configs: Configs, clean: bool = True
             # 4. other bookkeeping attributes at the root - remove them.
             del tag.attrs["lxnm:id"]
             del tag.attrs["xmlns:lxnm"]
-        return tag.prettify()
+        return tag
 
     rootname = dictID.lstrip(" 0123456789") or "lexonomy"
     run_xslt = get_xslt_transformer(configs.get("download", {}).get("xslt", ""))
 
     yield "<"+rootname+">\n"
     for r in dictDB.execute("SELECT * FROM entries").fetchall():
-        result = run_xslt(prepare_for_export(r["xml"])) or re.sub("><",">\n<",r["xml"])
+        result = prepare_for_export(r["xml"]).prettify()
+        result = run_xslt(result) or re.sub("><",">\n<",result)
         yield result
         yield "\n"
     yield "</"+rootname+">\n"
@@ -1909,7 +1918,8 @@ def readRandoms(dictDB: Connection):
 
 def readRandomOne(dictDB: Connection, dictID: str, configs: Configs) -> EntryFromDatabase:
     id = dictDB.execute("select id from entries where doctype=? order by random() limit 1", (configs["xema"]["root"], )).fetchone()["id"]
-    return readEntries(dictDB, configs, id, xml = True)[0] or {
+    entries = readEntries(dictDB, configs, id, xml = True)
+    return entries[0] if len(entries) > 0 else {
         "flag": "",
         "id": 0,
         "parententries": [],
@@ -1946,7 +1956,7 @@ def importfile(dictID: str, filepath: str, user: str, purge: bool = False, saveS
     dbpath = os.path.join(siteconfig["dataDir"], "dicts", dictID+".sqlite")
     args: list[str] = []
     if purge:
-        args.append("-p")
+        args.append("-pp") # purge both entries AND history
     if saveSurroundingContent: 
         args.append("-a")
     args.append("-u")
@@ -1954,14 +1964,15 @@ def importfile(dictID: str, filepath: str, user: str, purge: bool = False, saveS
     args.append(dbpath)
     args.append(filepath)
 
-    return _startSubprocess(dictID, os.path.join("adminscripts", "import.py"), args)
+    return _startSubprocess(subProcessID = filepath, scriptPath = os.path.join("adminscripts", "import.py"), args = args)
 
-def _startSubprocess(dictID: str, scriptPath: str, args: list[str]) -> ExternalProcessStatus:
+def _startSubprocess(subProcessID: str, scriptPath: str, args: list[str]) -> ExternalProcessStatus:
+    "Start the subprocess if it is not already running or finished. Return the status of the process if is was already running." 
     import subprocess
     import sys
 
-    pidfile = dictID + ".pid"
-    errfile = dictID + ".err"
+    pidfile = subProcessID + ".pid"
+    errfile = subProcessID + ".err"
     if os.path.isfile(pidfile):
         return _getProcessStatus(pidfile, errfile)
 
