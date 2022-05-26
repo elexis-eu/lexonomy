@@ -1,20 +1,22 @@
 <template>
-<!--  <div v-if="!keepAlive">-->
-    <div ref="wrapper" v-if="!keepAlive && value" class="modal" @click="maybeClosePopup" :style="computedStyles">
-      <div ref="modalContent" class="modal-content">
-        <span class="close" @click="closePopup">&times;</span>
-        <slot></slot>
-      </div>
+  <!--  <div v-if="!keepAlive">-->
+  <div ref="wrapper" v-if="!keepAlive && value" class="modal" @click="maybeClosePopup"
+       :style="computedStyles">
+    <div ref="modalContent" class="modal-content">
+      <span class="close" @click="closePopup">&times;</span>
+      <slot></slot>
     </div>
-<!--  </div>-->
-<!--  <div v-else>-->
-    <div ref="wrapper" v-else-if="keepAlive" v-show="value" class="modal" @click="maybeClosePopup" :style="computedStyles">
-      <div ref="modalContent" class="modal-content">
-        <span class="close" @click="closePopup">&times;</span>
-        <slot></slot>
-      </div>
+  </div>
+  <!--  </div>-->
+  <!--  <div v-else>-->
+  <div ref="wrapper" v-else-if="keepAlive" v-show="value" class="modal" @click="maybeClosePopup"
+       :style="computedStyles">
+    <div ref="modalContent" class="modal-content">
+      <span class="close" @click="closePopup">&times;</span>
+      <slot></slot>
     </div>
-<!--  </div>-->
+  </div>
+  <!--  </div>-->
 </template>
 
 <script>
@@ -35,9 +37,28 @@ export default {
       default: false
     }
   },
+  watch: {
+    value: {
+      handler(newVal) {
+        if (newVal) {
+          if (!this.popupId) {
+            this.popupId = Math.random()
+          }
+          this.state.openedPopups.push(this.popupId)
+          document.addEventListener('keydown', this.handleEscKey)
+        }
+      },
+      immediate: true
+    },
+  },
   computed: {
     computedStyles() {
       return {zIndex: this.zIndex}
+    }
+  },
+  data() {
+    return {
+      popupId: null
     }
   },
   methods: {
@@ -48,6 +69,16 @@ export default {
     },
     closePopup() {
       this.$emit('input', false)
+    },
+    handleEscKey() {
+      this.$nextTick(() => {
+        if (this.state.openedPopups[this.state.openedPopups.length - 1] === this.popupId) {
+          document.removeEventListener('keydown', this.handleEscKey)
+          this.closePopup()
+          this.state.openedPopups.pop()
+        }
+      })
+
     }
   }
 }

@@ -34,6 +34,7 @@ export default {
   data() {
     return {
       show: false,
+      popupId: null,
       searchTerm: "",
       images: [],
       continue: null,
@@ -41,12 +42,36 @@ export default {
       gettingImagesInProcess: false
     }
   },
+  watch: {
+    show: {
+      handler(newVal) {
+        if (newVal) {
+          if (!this.popupId) {
+            this.popupId = Math.random()
+          }
+          this.state.openedPopups.push(this.popupId)
+          document.addEventListener('keydown', this.handleEscKey)
+        }
+      },
+      immediate: true
+    },
+  },
   methods: {
     toggleOpen() {
       this.show = !this.show
     },
     close() {
       this.show = false
+    },
+    handleEscKey() {
+      this.$nextTick(() => {
+        if (this.state.openedPopups[this.state.openedPopups.length - 1] === this.popupId) {
+          document.removeEventListener('keydown', this.handleEscKey)
+          this.close()
+          this.state.openedPopups.pop()
+        }
+      })
+
     },
     maybeClosePopup(event) {
       if (event.target === this.$refs.wrapper) {
