@@ -7,10 +7,13 @@ INSERT INTO configs VALUES('titling','{"headword": "headword"}');
 INSERT INTO configs VALUES('xampl','{	"container": "example",	"template": "<example><source>$text</source><target/></example>",	"markup": "h"}');
 INSERT INTO configs VALUES('xema','{	"root": "entry",	"elements": {		"entry": {			"filling": "chd",			"values": [],			"children": [				{					"name": "headword",					"min": "1",					"max": "1"				},				{					"name": "partOfSpeech",					"min": "0",					"max": "1"				},				{					"name": "sense",					"min": "1",					"max": "0"				}			],			"attributes": {}		},		"headword": {			"filling": "txt",			"values": [],			"children": [],			"attributes": {}		},		"partOfSpeech": {			"filling": "lst",			"values": [				{					"value": "n",					"caption": "noun"				},				{					"value": "v",					"caption": "verb"				},				{					"value": "adj",					"caption": "adjective"				}			],			"children": [],			"attributes": {}		},		"sense": {			"filling": "chd",			"values": [],			"children": [				{					"name": "translation",					"min": "0",					"max": "0"				},				{					"name": "example",					"min": "0",					"max": "0"				}			],			"attributes": {}		},		"translation": {			"filling": "txt",			"values": [],			"children": [],			"attributes": {}		},		"example": {			"filling": "chd",			"values": [],			"children": [				{					"name": "source",					"min": "1",					"max": "1"				},				{					"name": "target",					"min": "1",					"max": "0"				}			],			"attributes": {}		},		"source": {			"filling": "inl",			"values": [],			"children": [				{					"name": "h",					"min": "0",					"max": "0"				}			],			"attributes": {}		},		"h": {			"filling": "txt",			"values": [],			"children": [],			"attributes": {}		},		"target": {			"filling": "txt",			"values": [],			"children": [],			"attributes": {}		}	}}');
 INSERT INTO configs VALUES('xemplate','{        "entry": {                "shown": true,                "layout": "block"        },        "headword": {                "shown": true,                "layout": "inline",                "separation": "space",                "gutter": "",                "weight": "bold",                "slant": "",                "colour": "red"        },        "partOfSpeech": {                "shown": true,                "layout": "inline",                "separation": "space",                "gutter": "",                "weight": "",                "slant": "italic",                "colour": "green"        },        "sense": {                "shown": true,                "layout": "block",                "separation": "space",                "gutter": "sensenum1",                "weight": "",                "slant": "",                "colour": ""        },        "translation": {                "shown": true,                "layout": "inline",                "separation": "space",                "gutter": "",                "weight": "",                "slant": "",                "colour": "blue"        },        "example": {                "shown": true,                "layout": "block",                "separation": "space",                "gutter": "disk",                "weight": "",                "slant": "",                "colour": ""        },        "source": {                "shown": true,                "layout": "block",                "separation": "space",                "gutter": "",                "weight": "",                "slant": "",                "colour": ""        },        "h": {                "shown": true,                "layout": "inline",                "separation": "space",                "gutter": "",                "weight": "bold",                "slant": "",                "colour": ""        },        "target": {                "shown": true,                "layout": "block",                "separation": "space",                "gutter": "",                "weight": "",                "slant": "italic",                "colour": "grey"        }}');
-CREATE TABLE searchables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, level INTEGER);
-INSERT INTO searchables VALUES(1,1,'able',1);
-INSERT INTO searchables VALUES(2,3,'arm',1);
-INSERT INTO searchables VALUES(3,2,'ask',1);
+CREATE TABLE searchables (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    entry_id    INTEGER REFERENCES entries (id) ON DELETE CASCADE,
+    txt         TEXT,
+    level       INTEGER
+);
+CREATE INDEX search ON searchables (txt, level);
 CREATE TABLE history (
     id             INTEGER  PRIMARY KEY AUTOINCREMENT,
     entry_id       INTEGER,
@@ -20,27 +23,35 @@ CREATE TABLE history (
     xml            TEXT,
     historiography TEXT
 );
-CREATE TABLE sub (id INTEGER PRIMARY KEY AUTOINCREMENT, parent_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, child_id INTEGER REFERENCES entries (id) ON DELETE CASCADE);
-CREATE TABLE entries (id INTEGER PRIMARY KEY AUTOINCREMENT, doctype TEXT, xml TEXT, title TEXT, sortkey TEXT, needs_resave BOOLEAN DEFAULT (0), needs_refresh BOOLEAN DEFAULT (0), needs_refac BOOLEAN DEFAULT (0));
-INSERT INTO entries VALUES(1,'entry','<entry><headword xml:space="preserve">able</headword><partOfSpeech xml:space="preserve">adj</partOfSpeech><sense><translation xml:space="preserve">schopný</translation><translation xml:space="preserve">sto</translation><example><source xml:space="preserve">I''m busy tomorrow, so I won''t be <h xml:space="preserve">able</h> to see you.</source><target xml:space="preserve">Zítra toho mám hodně, takže se s tebou nebudu moci potkat.</target></example></sense><sense><translation xml:space="preserve">šikovný</translation><translation xml:space="preserve">schopný</translation><example><source xml:space="preserve">She is an <h xml:space="preserve">able</h> teacher.</source><target xml:space="preserve">Je to šikovná učitelka.</target></example></sense></entry>','<span class=''headword''>able</span>','_00000_00011_00053_00021',0,0,0);
-INSERT INTO entries VALUES(2,'entry','<entry><headword xml:space="preserve">ask</headword><partOfSpeech xml:space="preserve">v</partOfSpeech><sense><translation xml:space="preserve">zeptat se</translation><example><source xml:space="preserve">I don''t know, <h xml:space="preserve">ask</h> your mother.</source><target xml:space="preserve">Já nevím, zeptej se mámy.</target></example><example><source xml:space="preserve">I need to <h xml:space="preserve">ask</h> you a question.</source><target xml:space="preserve">Potřebuju se tě na něco zeptat.</target></example></sense><sense><translation xml:space="preserve">požádat</translation><translation xml:space="preserve">poprosit</translation><translation xml:space="preserve">říct si</translation><example><source xml:space="preserve">We will have to <h xml:space="preserve">ask</h> for more money.</source><target xml:space="preserve">Budeme muset požádat o víc peněz.</target></example><example><source xml:space="preserve">She <h xml:space="preserve">asked</h> me to help her.</source><target xml:space="preserve">Požádala mě, abych jí pomohl.</target></example></sense></entry>','<span class=''headword''>ask</span>','_00000_00081_00050',0,0,0);
-INSERT INTO entries VALUES(3,'entry','<entry><headword xml:space="preserve">arm</headword><partOfSpeech xml:space="preserve">n</partOfSpeech><sense><translation xml:space="preserve">paže</translation><translation xml:space="preserve">ruka</translation><example><source xml:space="preserve">You have very long <h xml:space="preserve">arms</h>.</source><target xml:space="preserve">Máš velmi dlouhé ruce.</target></example><example><source xml:space="preserve">My left <h xml:space="preserve">arm</h> hurts.</source><target xml:space="preserve">Bolí mě pravá paže.</target></example></sense><sense><translation xml:space="preserve">zbraň</translation><example><source xml:space="preserve">The <h xml:space="preserve">arms</h> dealer was arrested.</source><target xml:space="preserve">Obchodník se zbraněmi byl zatčen.</target></example></sense></entry>','<span class=''headword''>arm</span>','_00000_00077_00059',0,0,0);
-CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT);
+CREATE TABLE sub (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    parent_id   INTEGER REFERENCES entries (id) ON DELETE CASCADE,
+    child_id    INTEGER REFERENCES entries (id) ON DELETE CASCADE
+);
+CREATE TABLE entries (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    doctype         TEXT,
+    xml             TEXT,
+    title           TEXT,
+    sortkey         TEXT,
+    flag            TEXT DEFAULT "",
+    needs_update    BOOLEAN DEFAULT (0)
+);
+INSERT INTO entries VALUES(1,'entry','<entry lxnm:id="1" xmlns:lxnm="http://www.lexonomy.eu/"><headword xml:space="preserve">able</headword><partOfSpeech xml:space="preserve">adj</partOfSpeech><sense><translation xml:space="preserve">schopný</translation><translation xml:space="preserve">sto</translation><example><source xml:space="preserve">I''m busy tomorrow, so I won''t be <h xml:space="preserve">able</h> to see you.</source><target xml:space="preserve">Zítra toho mám hodně, takže se s tebou nebudu moci potkat.</target></example></sense><sense><translation xml:space="preserve">šikovný</translation><translation xml:space="preserve">schopný</translation><example><source xml:space="preserve">She is an <h xml:space="preserve">able</h> teacher.</source><target xml:space="preserve">Je to šikovná učitelka.</target></example></sense></entry>','<span class=''headword''>able</span>','_00000_00011_00053_00021','',0);
+INSERT INTO entries VALUES(2,'entry','<entry lxnm:id="2" xmlns:lxnm="http://www.lexonomy.eu/"><headword xml:space="preserve">ask</headword><partOfSpeech xml:space="preserve">v</partOfSpeech><sense><translation xml:space="preserve">zeptat se</translation><example><source xml:space="preserve">I don''t know, <h xml:space="preserve">ask</h> your mother.</source><target xml:space="preserve">Já nevím, zeptej se mámy.</target></example><example><source xml:space="preserve">I need to <h xml:space="preserve">ask</h> you a question.</source><target xml:space="preserve">Potřebuju se tě na něco zeptat.</target></example></sense><sense><translation xml:space="preserve">požádat</translation><translation xml:space="preserve">poprosit</translation><translation xml:space="preserve">říct si</translation><example><source xml:space="preserve">We will have to <h xml:space="preserve">ask</h> for more money.</source><target xml:space="preserve">Budeme muset požádat o víc peněz.</target></example><example><source xml:space="preserve">She <h xml:space="preserve">asked</h> me to help her.</source><target xml:space="preserve">Požádala mě, abych jí pomohl.</target></example></sense></entry>','<span class=''headword''>ask</span>','_00000_00081_00050','',0);
+INSERT INTO entries VALUES(3,'entry','<entry lxnm:id="3" xmlns:lxnm="http://www.lexonomy.eu/"><headword xml:space="preserve">arm</headword><partOfSpeech xml:space="preserve">n</partOfSpeech><sense><translation xml:space="preserve">paže</translation><translation xml:space="preserve">ruka</translation><example><source xml:space="preserve">You have very long <h xml:space="preserve">arms</h>.</source><target xml:space="preserve">Máš velmi dlouhé ruce.</target></example><example><source xml:space="preserve">My left <h xml:space="preserve">arm</h> hurts.</source><target xml:space="preserve">Bolí mě pravá paže.</target></example></sense><sense><translation xml:space="preserve">zbraň</translation><example><source xml:space="preserve">The <h xml:space="preserve">arms</h> dealer was arrested.</source><target xml:space="preserve">Obchodník se zbraněmi byl zatčen.</target></example></sense></entry>','<span class=''headword''>arm</span>','_00000_00077_00059','',0);
+CREATE TABLE linkables (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    entry_id    INTEGER REFERENCES entries (id) ON DELETE CASCADE,
+    txt         TEXT,
+    element     TEXT,
+    preview     TEXT
+);
 CREATE INDEX search ON searchables (txt, level);
-CREATE INDEX history_by_entry_id ON history (
-    entry_id,
-    "when"
-);
-CREATE INDEX history_by_email ON history (
-    email,
-    "when"
-);
-CREATE INDEX history_by_when ON history (
-    "when"
-);
-CREATE INDEX history_by_action ON history (
-    "action",
-    "when"
-);
+CREATE INDEX history_by_entry_id ON history (entry_id, "when");
+CREATE INDEX history_by_email ON history (email, "when");
+CREATE INDEX history_by_when ON history ("when");
+CREATE INDEX history_by_action ON history ("action", "when");
 CREATE INDEX sortkey ON entries (sortkey);
-CREATE INDEX needs_re ON entries (needs_resave, needs_refresh, needs_refac);
+CREATE INDEX needs_re ON entries (needs_update);
+CREATE INDEX flag ON entries (flag);

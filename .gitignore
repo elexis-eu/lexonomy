@@ -1,4 +1,4 @@
-data/lexonomy.sqlite
+data/*.sqlite
 data/dicts/*
 !data/dicts/README.md
 data/uploads/*

@@ -1424,6 +1424,7 @@ class DictInfo(TypedDict):
     broken: NotRequired[bool]
     author: NotRequired[str]
     licence: NotRequired[str]
+    favorite: NotRequired[bool]
 
 def getDictsByUser(email: str) -> list[DictInfo]:
     dicts: List[DictInfo] = []
@@ -1432,7 +1433,10 @@ def getDictsByUser(email: str) -> list[DictInfo]:
     favs = []
     c = conn.execute("SELECT * FROM dict_fav WHERE user_email=?", (email,))
     for r in c.fetchall():
-        info: DictInfo = {"id": r["id"], "title": r["title"], "hasLinks": False, "lang": "", "size": 0}
+        favs.append(r['dict_id'])
+    c = conn.execute("SELECT DISTINCT d.id, d.title FROM dicts AS d INNER JOIN user_dict AS ud ON ud.dict_id=d.id WHERE ud.user_email=? OR d.id IN (SELECT dict_id FROM dict_fav WHERE user_email=?) ORDER BY d.title", (email, email))
+    for r in c.fetchall():
+        info: DictInfo = {"id": r["id"], "title": r["title"], "hasLinks": False, "lang": "", "favorite": False}
         try:
             dictDB = getDB(r["id"])
             cc = dictDB.execute("select count(*) as total from entries")
@@ -2409,6 +2413,15 @@ def notifyUsers(configOld: ConfigUsers, configNew: ConfigUsers, dictInfo: Config
                 sendmail(user, mailSubject, mailText)
             except Exception as e:
                 pass
+
+def changeFavDict(userEmail: str, dictID: str, status: Literal["true"]):
+    if userEmail != '' and dictID != '':
+        conn = getMainDB()
+        conn.execute("DELETE FROM dict_fav WHERE user_email=? AND dict_id=?", (userEmail, dictID))
+        if status == 'true':
+            conn.execute("INSERT INTO dict_fav VALUES (?, ?)", (dictID, userEmail))
+        conn.commit()
+    return True
 
 def get_iso639_1() -> List[IsoCode]:
     codes = []
