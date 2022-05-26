@@ -3,51 +3,163 @@
    <dict-nav links={[["config", "Configure"], ["subbing", "Subentries"]]}/>
    <h1>Subentries</h1>
    <template if={!state.isLoading}>
-      <div>
-         <label>
-            Selected subentries
-         </label>
-         <div if={!state.data.elements.length}
-               class="grey-text">
-            <i>no subentry element selected</i>
-         </div>
-         <div if={state.data.elements.length}>
-            <div each={ element in state.data.elements }
-                  class="chip">
-               { element }
-               <i class="close material-icons"
-                     onclick={onRemoveElementClick.bind(this, element)}>close</i>
-            </div>
-            <br>
-         </div>
-         <br>
-      </div>
-      <template if={selectOptions.length}>
-         <label for="new-element">Add subentry element</label>
-         <div class="input-field">
-            <div class="buttons"
-                  style="max-width: 500px;">
-               <select id="new-element"></select>
-               <a class="btn"
-                     onclick={ doAddEl }
-                     style="margin-top: 4px;">
-                  add
-                  <i class="material-icons right">add</i>
-               </a>
-            </div>
-            <span class="helper-text">Elements listed here function as subentries which can be shared by multiple entries.</span>
-         </div>
-      </template>
-   </template>
-   <br><br>
-   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
+
+
+   <dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title } configId={ this.configId } configTitle={ this.configTitle }/>
+
+   <div each={ element in this.activeSubentries } data-element={ element.name } class={ element.valid ? "element-info" : "element-info text-red" } >
+      <div class="header">
+         <h5>{element.name} {element.valid ? ''  : '(unknown element)!'}</h5>
+         <button type="button" class="btn btn-small red lighten-1" title="Remove subentry" style="margin-right: 15px;" onclick={ doDeleteEl }><i class="material-icons">delete</i></button>
+      </div>
+
+      <div each={att in element.activeAttributes} data-attribute={att.name} class="att">
+         <label for={`${att.name}-value`} class="name blue-text flow-text">@{att.name}</label>
+         
+         <select if={att.values} class="value" onchange={changeAttribute} value={att.value} name={`${att.name}-value`}>
+            <option value="" selected={!att.value}>[any value]</option>
+            <option each={v in att.values} value={v.value} selected={v.value === att.value}>{v.value}</option>
+         </select>
+         <input if={!att.values} type="text" class="value" value={att.value} onchange={changeAttribute} placeholder="Value">
+         
+         <button type="button" class="btn btn-small red lighten-1" title="Remove attribute" onclick={deleteAttribute}><i class="material-icons">delete</i></button>
+      </div>
+
+      <div if={element.inactiveAttributes.length} class="att-new">
+         <label style="width: 100%">(Optional) - Attributes this element should have to be a subentry: </label>
+         <select class="name new-attribute" name="new-attribute">
+            <option each={att in element.inactiveAttributes} value={att.name}>{att.name}</option>
+         </select>
+         <button class="btn btn-small" type="button" onclick={addAttribute}><i class="material-icons">add</i></button>
+      </div>
+   </div>
+   
+   <div class="row" if={inactiveSubentries.length} style="margin-top: 15px;">
+      <div class="input-field col s6">
+         <select id="new-element">
+            <option each={elementName in inactiveSubentries} value={elementName}>{elementName}</option>
+         </select>
+         <label for="new-element">Subentry element</label>
+         <span class="helper-text">Elements listed here function as subentries which can be shared by multiple entries.</span>
+      </div>
+      <div class="input-field col s1">
+         <a class="btn btn-small" onclick={ doAddEl }><i class="material-icons">add</i></a>
+      </div>
+   </div>
+
+   <button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i></button>
+   </template>
+
+   <style>
+      .element-info {
+         display: flex;
+         flex-direction: column;
+
+         border: 1px solid #CCC;
+         margin: 15px 0;
+         border-radius: 3px;
+         padding: 15px 30px;
+      }
+
+      .element-info > .header {
+         display: flex;
+         flex-direction: row;
+         flex-wrap: nowrap;
+         align-items: baseline;
+         justify-content: space-between;
+         border-bottom: 1px solid #9e9e9e;
+         margin-bottom: 25px;
+      }
+
+      .element-info > .att,
+      .element-info > .att-new {
+         margin-left: 25px;
+         padding-top: 25px;
+         display: flex;
+         flex-direction: row;
+         align-items: baseline;
+         flex-wrap: nowrap;
+         width: 66.66%;
+      }
+
+      .att > * {
+         margin-right: 15px!important;
+         flex: none;
+      }
+      .att > .name {
+         min-width: 16.667%
+      }
+      .att > .value,
+      .att > .select-wrapper {
+         flex: auto;
+      }
+
+      .att + .att-new {
+         border-top: 1px solid #9e9e9e;
+      }
+      .element-info > .att-new {
+         flex-wrap: wrap;
+         justify-content: stretch;
+      }
+      .att-new > * {
+         margin-right: 15px!important;
+         flex: none;
+      }
+      .att-new > .name,
+      .att-new > .select-wrapper {
+         flex: auto;
+      }
+
+   </style>
    <script>
+      // @ts-check
       export default {
          state: {
             isLoading: true,
             isSaving: false,
-            data: {elements: []}
+         },
+         dictId: '',
+         configId: '',
+         configTitle: 'Subentries', 
+         
+         /** @type {{
+          * 		[elementName: string]: {
+          * 			attributes: { 
+          * 				[attributeName: string]: string;
+          * 			}
+          * 		}
+          * }} */
+         configData: {
+         },
+
+         get xema() { return this.props.dictConfigs?.xema; },
+         get elements() { return Object.keys(this.xema?.elements || {}); },
+         get activeSubentries() {
+            if (!this.xema) return [];
+            return Object
+               .entries(this.configData)
+               .map(([elementName, value]) => ({
+                  name: elementName,
+                  valid: !!this.xema.elements[elementName], // mark invalid subentry configurations (element is not in the entry schema - maybe it changed?)
+                  activeAttributes: Object
+                     .entries(value.attributes)
+                     .map(([attributeName, attributeValue]) => ({
+                        name: attributeName, 
+                        value: attributeValue,
+                     })),
+                  inactiveAttributes: Object
+                     .entries(this.xema.elements[elementName]?.attributes || {})
+                     .filter(([name]) => !(name in value.attributes))
+                     .map(([attributeName, {values}]) => ({
+                        name: attributeName, 
+                        values
+                     }))
+                  })
+               )
+         },
+         get inactiveSubentries() {
+            return this.elements.filter(name => !this.configData[name])
          },
 
          addAttribute(event) {
@@ -81,51 +193,34 @@
          },
 
          doAddEl(event) {
-            this.state.data.elements.push($('#new-element').val())
-            this.update()
+            const elementName = document.getElementById('new-element').value;
+            if (!elementName) return;
+            this.configData[elementName] = { attributes: {} }
+            this.update();
          },
 
          onMounted() {
-            this.store.loadDictionaryConfig("subbing")
-                  .done(response => {
-                     this.state.data = {elements: Object.keys(response.content)}
-                  })
-                  .always(() => {
-                     this.update({isLoading: false})
-                  })
-         },
+            this.dictId = this.props.dictId;
+            this.configId = this.props.configId;
 
-         onBeforeUpdate(){
-            this.selectOptions = Object.keys(this.dictData.config.xema.elements).filter(key => {
-               return !this.state.data.elements.includes(key)
-            })
+            this.store
+               .loadDictionaryConfig("subbing")
+               .done(response => this.configData = response.content)
+               .always(() => this.update({isLoading: false}))
          },
 
          onUpdated() {
-            if (this.dictData.config.xema && this.dictData.config.xema.elements) {
-               var $select = $('select')
-               if(this.selectOptions.length && $select.length){
-                  var instance = M.FormSelect.getInstance($select)
-                  instance && instance.destroy()
-                  $select.empty()
-                  this.selectOptions.forEach(key => {
-                     $('#new-element').append('<option value="' + key + '">' + key + '</option>')
-                  })
-                  $select.formSelect()
-               }
-            }
+            $('select').formSelect();
          },
 
          saveData() {
-            let data = {}
-            this.state.data.elements.forEach(el => {
-               data[el] = {}
-            })
             this.update({isSaving: true})
-            this.store.updateDictionaryConfig("subbing", data)
-                  .always(() => this.update({isSaving: false}))
+            this.store
+               .updateDictionaryConfig("subbing", this.configData)
+               .always(() => this.update({isSaving: false}))
          }
       }
    </script>
-
+   
 </dict-config-subbing>
+
