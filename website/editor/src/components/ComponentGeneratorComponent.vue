@@ -135,8 +135,12 @@ export default {
             }
         }
         if (newContentForChildType.length === 0) {
+          if (elementType.children.length > 0) {
+            this.loadNewData(newContent)
+          }
           continue
         }
+        let childrenToRemove = []
         for (let i in elementType.children) {
           let renderedChild = elementType.children[i]
 
@@ -153,8 +157,19 @@ export default {
             renderedChildRef.updateContent(newContent)
           }
           if (renderedChildRef && !newContent) {
-            elementType.children.splice(Number(i), 1)
+            // Save indexes of children to remove
+            childrenToRemove.push(Number(i))
           }
+        }
+        if (childrenToRemove.length > 0) {
+          while (childrenToRemove.length > 0) {
+            // pop from array to guarantee elements are on proper index
+            let indexToRemove = childrenToRemove.pop()
+            elementType.children.splice(indexToRemove, 1)
+          }
+          elementType.children.forEach((child, i) => {
+            child.props.editorChildNumber = i
+          })
         }
       }
     },
