@@ -494,6 +494,7 @@ def clonedict(dictID: str, user: User, dictDB: Connection, configs: Configs):
 @post(siteconfig["rootPath"]+"<dictID>/destroy.json")
 @authDict(["canConfig"])
 def destroydict(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    dictDB.close()
     res = ops.destroyDict(dictID)
     return {"success": res, "dicts": ops.getDictsByUser(user["email"])}
 
@@ -676,8 +677,7 @@ def uploadhtml(dictID: str, user: User, dictDB: Connection, configs: Configs):
         temppath = tempfile.mkdtemp()
         upload.save(temppath)
         filepath = os.path.join(temppath, upload.filename)
-        if request.forms.purge == "on":
-            ops.purge(dictDB, user["email"], { "uploadStart": uploadStart, "filename": filepath })
+        ops.importfile(dictID, filepath, user["email"], purge=request.forms.purge == "on") # leave purging to import script.
         return {"file": filepath,  "uploadStart": uploadStart, "success": True}
 
 @get(siteconfig["rootPath"]+"<dictID>/import.json")
