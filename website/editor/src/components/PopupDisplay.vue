@@ -70,7 +70,10 @@ export default {
     closePopup() {
       this.$emit('input', false)
     },
-    handleEscKey() {
+    handleEscKey(event) {
+      if (event.key !== "Escape") {
+        return
+      }
       this.$nextTick(() => {
         if (this.state.openedPopups[this.state.openedPopups.length - 1] === this.popupId) {
           document.removeEventListener('keydown', this.handleEscKey)
