@@ -1,13 +1,39 @@
 <template>
   <div v-if="!isRootElement" ref="actionButton" class="dropdown">
-    <button class="button--sm secondary" @click.stop="toggleDropdown" :disabled="numberOfActions === 0">{{computedElementName}}</button>
+    <button class="button--sm secondary" @click.stop="toggleDropdown" :disabled="numberOfActions === 0">
+      {{ computedElementName }}
+    </button>
     <div v-show="show" class="vue-dropdown-content">
-      <button v-if="canMoveElementDown" class="tertiary" @click="triggerEvent('move-element-down')">Move {{ computedElementName }} <img :src="iconUrl('arrow-down.svg')"></button>
-      <button v-if="canMoveElementUp" class="tertiary" @click="triggerEvent('move-element-up')">Move {{ computedElementName }} <img :src="iconUrl('arrow-up.svg')"></button>
-      <button v-if="canAddElement" class="tertiary" @click="triggerEvent('add-element')">Create new {{ computedElementName }}</button>
-      <button v-if="canAddElement && elementEditorConfig.enableCopying" class="tertiary" @click="triggerEvent('clone-element')">Duplicate
-        {{ computedElementName }}</button>
-      <button v-if="canRemoveElement" class="tertiary" @click="triggerEvent('remove-element')">Remove selected {{ computedElementName }}</button>
+      <button v-if="canMoveElementDown"
+              class="tertiary"
+              @click="triggerEvent('move-element-down')">
+        Move {{ computedElementName }} <img :src="iconUrl('arrow-down.svg')">
+      </button>
+      <button v-if="canMoveElementUp"
+              class="tertiary"
+              @click="triggerEvent('move-element-up')">
+        Move {{ computedElementName }} <img :src="iconUrl('arrow-up.svg')">
+      </button>
+      <button v-if="canAddElement && elementEditorConfig.enableCopying"
+              class="tertiary"
+              @click="triggerEvent('select-new-parent')">
+        Change parent of {{ computedElementName }}
+      </button>
+      <button v-if="canAddElement"
+              class="tertiary"
+              @click="triggerEvent('add-element')">
+        Create new {{ computedElementName }}
+      </button>
+      <button v-if="canAddElement && elementEditorConfig.enableCopying"
+              class="tertiary"
+              @click="triggerEvent('clone-element')">
+        Duplicate {{ computedElementName }}
+      </button>
+      <button v-if="canRemoveElement"
+              class="tertiary"
+              @click="triggerEvent('remove-element')">
+        Remove selected {{ computedElementName }}
+      </button>
     </div>
   </div>
 </template>

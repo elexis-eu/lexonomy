@@ -12,6 +12,7 @@
         @move-element-down="moveElementDown"
         @move-element-up="moveElementUp"
         @add-element="createSibling"
+        @select-new-parent="selectNewParent"
         @clone-element="cloneElement"
         @remove-element="deleteElement"
       />

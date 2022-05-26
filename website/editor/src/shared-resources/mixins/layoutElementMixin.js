@@ -126,6 +126,13 @@ export default {
     },
     cloneElement() {
       this.$emit("clone-element", {name: this.elementName, content: this.content})
+    },
+    selectNewParent() {
+      // Generate list of possible new parents
+      // Create array of possible parents with props to render them as readOnly parts for PopupComponent
+      //  Add click listener to props to trigger change
+      //  Try emitting just update values and look at magic, otherwise call loadNewData
+
     }
   }
 }
