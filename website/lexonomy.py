@@ -853,6 +853,21 @@ def dictsearch(dictID):
         nabes = ops.readNabesByText(dictDB, dictID, configs, request.query.q)
         return template("dict-search.tpl", **{"siteconfig": siteconfig, "i18n": i18n, "i18nDump": i18nDump, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes})
 
+@get(siteconfig["rootPath"]+"<dictID>/search.json")
+def dictsearch(dictID):
+    if not ops.dictExists(dictID):
+        return {"ok": False}
+    dictDB = ops.getDB(dictID)
+    user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
+    if not configs["publico"]["public"]:
+        return {"ok": False}
+    entries = ops.listEntriesPublic(dictDB, dictID, configs, request.query.q)
+    if len(entries) == 1 and entries[0]["exactMatch"]:
+        return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes}
+    else:
+        nabes = ops.readNabesByText(dictDB, dictID, configs, request.query.q)
+        return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes}
+
 @get(siteconfig["rootPath"]+"<dictID>/resave")
 @authDict(["canEdit","canConfig","canUpload"])
 def resave(dictID, user, dictDB, configs):

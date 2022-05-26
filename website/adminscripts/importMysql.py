@@ -14,7 +14,7 @@ import ops
 ops.DB = 'mysql'
 
 if len(sys.argv) < 3:
-    print("Usage: ./import.py [-p] PATH_TO_DICTIONARY.sqlite FILE_TO_IMPORT.xml [AUTHOR_EMAIL]")
+    print("Usage: ./import.py [-p] DICTIONARY_ID FILE_TO_IMPORT.xml [AUTHOR_EMAIL]")
     print("       -p   purge dictionary before importing")
     sys.exit()
 
@@ -128,7 +128,7 @@ for entry in re.findall(re_entry, xmldata):
             sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype, title, sortkey) values(%s, %s, %s, %s, %s, %s, %s)"
             params = (entry, needs_refac, needs_resave, 0, entryTag, title, sortkey)
         c = cur.execute(sql, params)
-        if entryID == None:
+        if entryID == None and c:
             entryID = c.lastrowid
         cur.execute(f"insert into history(entry_id, action, `when`, email, xml, historiography) values(%s, %s, %s, %s, %s, %s)", (entryID, action, str(datetime.datetime.utcnow()), email, entry, json.dumps(historiography)))
         cur.execute("delete from searchables where entry_id=%s and level=%s", (entryID, 1))
