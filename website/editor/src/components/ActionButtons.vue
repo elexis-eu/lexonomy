@@ -2,8 +2,8 @@
   <div v-if="!isRootElement" ref="actionButton" class="dropdown">
     <button class="button--sm secondary" @click.stop="toggleDropdown" :disabled="numberOfActions === 0">{{computedElementName}}</button>
     <div v-show="show" class="vue-dropdown-content">
-      <button v-if="canMoveElementDown" class="tertiary" @click="triggerEvent('move-element-down')">Move {{ computedElementName }} down</button>
-      <button v-if="canMoveElementUp" class="tertiary" @click="triggerEvent('move-element-up')">Move {{ computedElementName }} up</button>
+      <button v-if="canMoveElementDown" class="tertiary" @click="triggerEvent('move-element-down')">Move {{ computedElementName }} <img :src="iconUrl('arrow-down.svg')"></button>
+      <button v-if="canMoveElementUp" class="tertiary" @click="triggerEvent('move-element-up')">Move {{ computedElementName }} <img :src="iconUrl('arrow-up.svg')"></button>
       <button v-if="canAddElement" class="tertiary" @click="triggerEvent('add-element')">Create new {{ computedElementName }}</button>
       <button v-if="canAddElement && elementEditorConfig.enableCopying" class="tertiary" @click="triggerEvent('clone-element')">Duplicate
         {{ computedElementName }}</button>
@@ -14,6 +14,7 @@
 
 <script>
 import computedElementName from "@/shared-resources/mixins/computedElementName"
+import iconUrl from "@/shared-resources/mixins/iconUrl"
 
 export default {
   name: "ActionButtons",
@@ -25,7 +26,8 @@ export default {
     editorChildNumber: Number
   },
   mixins: [
-    computedElementName
+    computedElementName,
+    iconUrl
   ],
   data() {
     return {
@@ -99,20 +101,10 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-}
 
-button {
-  //height: fit-content;
-  //background-color: #3498DB;
-  //color: white;
-  //font-size: 16px;
-  //border: none;
-  //cursor: pointer;
-  //
-  //&:hover,
-  //&:focus {
-  //  background-color: #2980B9;
-  //}
+  img {
+    filter: invert(56%) sepia(100%) saturate(7500%) hue-rotate(203deg) brightness(90%) contrast(101%);
+  }
 }
 
 .vue-dropdown-content {
