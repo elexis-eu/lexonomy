@@ -14,7 +14,9 @@ import media
 import bottle
 from bottle import (hook, route, get, post, run, template, error, request,
                     response, static_file, abort, redirect, install)
+from camel_tools.disambig.mle import MLEDisambiguator
 
+mle = MLEDisambiguator.pretrained()
 i18nDump = json.dumps(i18n, ensure_ascii=False);
 # configuration
 app = bottle.default_app()
@@ -861,12 +863,27 @@ def dictsearch(dictID):
     user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
     if not configs["publico"]["public"]:
         return {"ok": False}
-    entries = ops.listEntriesPublic(dictDB, dictID, configs, request.query.q)
+    sentence = request.query.q.split()
+    lemma=disam(sentence)
+    entries = ops.listEntriesPublic(dictDB, dictID, configs, lemma)
     if len(entries) == 1 and entries[0]["exactMatch"]:
         return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes}
     else:
-        nabes = ops.readNabesByText(dictDB, dictID, configs, request.query.q)
+        nabes = ops.readNabesByText(dictDB, dictID, configs, lemma)
         return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes}
+
+def disam(type, sentence):
+
+    # We expect a sentence to be whitespace/punctuation tokenized beforehand.
+    # We provide a simple whitespace and punctuation tokenizer as part of camel_tools.
+    # See camel_tools.tokenizers.word.simple_word_tokenize.
+    disambig = mle.disambiguate(sentence)
+
+    # Let's, for example, use the top disambiguations to generate a diacritized
+    # version of the above sentence.
+    # Note that, in practice, you'll need to make sure that each word has a
+    # non-zero list of analyses.
+    return [(d.analyses[0].analysis[type] if len(d.analyses) > 0 else None) for d in disambig];
 
 @get(siteconfig["rootPath"]+"<dictID>/resave")
 @authDict(["canEdit","canConfig","canUpload"])

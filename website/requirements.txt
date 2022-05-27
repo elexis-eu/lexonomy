@@ -8,3 +8,4 @@ PyICU>=2.2
 requests
 PyJWT==1.7.1
 mysql-connector-python
+camel_tools
