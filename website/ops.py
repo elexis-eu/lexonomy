@@ -566,12 +566,20 @@ def destroyDict(dictID):
     conn.execute("delete from user_dict where dict_id=?", (dictID,))
     conn.commit()
     os.remove(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite"))
+    if os.path.exists(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite-wal")):
+        os.remove(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite-wal"))
+    if os.path.exists(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite-shm")):
+        os.remove(os.path.join(siteconfig["dataDir"], "dicts/" + dictID + ".sqlite-shm"))
     return True
 
 def moveDict(oldID, newID):
     if newID in prohibitedDictIDs or dictExists(newID):
         return False
     shutil.move(os.path.join(siteconfig["dataDir"], "dicts/" + oldID + ".sqlite"), os.path.join(siteconfig["dataDir"], "dicts/" + newID + ".sqlite"))
+    if os.path.exists(os.path.join(siteconfig["dataDir"], "dicts/" + oldID + ".sqlite-wal")):
+        os.remove(os.path.join(siteconfig["dataDir"], "dicts/" + oldID + ".sqlite-wal"))
+    if os.path.exists(os.path.join(siteconfig["dataDir"], "dicts/" + oldID + ".sqlite-shm")):
+        os.remove(os.path.join(siteconfig["dataDir"], "dicts/" + oldID + ".sqlite-shm"))
     conn = getMainDB()
     conn.execute("delete from dicts where id=?", (oldID,))
     conn.commit()
