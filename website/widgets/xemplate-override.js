@@ -1,4 +1,4 @@
-var XemplateOverride={};
+window.XemplateOverride={};
 XemplateOverride.change=function(){};
 
 XemplateOverride.render=function(div, json){

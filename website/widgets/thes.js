@@ -1,4 +1,4 @@
-var Thes={};
+window.Thes={};
 Thes.change=function(){};
 
 Thes.render=function(div, json){

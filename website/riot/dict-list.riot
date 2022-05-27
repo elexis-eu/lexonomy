@@ -1,100 +1,309 @@
 <dict-list>
-   <div if={isLoading} class="grey-text center-align">
-      <h3>loading dictionaries...</h3>
-   </div>
-   <template if={!isLoading}>
-      <div if={userdicts.length}>
-         <h3>your dictionaries</h3>
-         <ul class="collection">
-            <li each={ dict in userdicts } class="collection-item ">
+   <loading-overlay if={state.isLoading || dictData.isDictionaryListLoading}/>
+   <template if={!dictData.isDictionaryListLoading}>
+      <div if={dictData.dictionaryList.length}>
+         <h1>your dictionaries</h1>
+         <div style="display: flex; align-items: center; flex-wrap: wrap;">
+            <span if={dictData.dictionaryList.length}
+                  class="searchBox input-field">
+                  <i class="material-icons prefix grey-text">search</i>
+               <input id="searchBox"
+                     oninput={onSearchInput}>
+               <i onclick={onClearFilterClick}
+                  class="material-icons clearFilterIcon grey-text clickable">close</i>
+            </span>
+            <span style="margin-left: auto;">
+               <a href="#/make"
+                     class="btn waves-effect waves-light">
+                  <i class="material-icons left">add</i>
+                  create new dictionary
+               </a>
+            </span>
+         </div>
+         <ul if={state.visibleDictionaries.length}
+               class="collection">
+            <li each={ (dict, idx) in state.visibleDictionaries }
+                  id="r_{idx}"
+                  class="collection-item {dict.selected ? 'selected' : ''}"
+                  key={dict.id}>
                <div>
-                  <a href="#/{ dict.id }" style="cursor: pointer">{ dict.title }</a>
-                  <span if={ dict.lang } class="dict-lang">{ dict.lang }</span>
-                  <span class="dict-lang">{ dict.size } entries</span>
-                  <a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="delete dictionary" onclick={ doDeleteDict }><i class="material-icons">delete</i></a>
-                  <a style="cursor: pointer" class="secondary-content" data-dict-id={ dict.id } title="clone dictionary" onclick={ doCloneDict }><i class="material-icons">content_copy</i></a>
-                  <a style="cursor: pointer" if={ dict.currentUserCanDelete } class="secondary-content" data-dict-id={ dict.id } data-dict-title={ dict.title } title="config dictionary" onclick={ doConfigDict }><i class="material-icons">settings</i></a>
-                  <a style="cursor: pointer" if={ dict.currentUserCanEdit } class="secondary-content" data-dict-id={ dict.id } title="edit dictionary" onclick={ doEditDict }><i class="material-icons">edit</i></a>
+                  <label if={dict.currentUserCanDelete}
+                           class="checkbox">
+                     <input id="chb_{idx}"
+                           type="checkbox"
+                           idx={idx}
+                           checked={dict.selected}
+                           onclick={onCheckboxClick}/>
+                     <span></span>
+                  </label>
+                  <a href="#/{ dict.id }"
+                        id="t_{idx}"
+                        class="title">{ dict.title }</a>
+                  <span if={ dict.lang }
+                        class="dict-lang">{ dict.lang }</span>
+                  <span class="dict-lang grey-text">{ dict.size } entries</span>
+                  <a if={ dict.currentUserCanDelete }
+                        class="secondary-content clickable"
+                        title="delete dictionary"
+                        onclick={ doDeleteDict.bind(this, dict.id) }>
+                     <i class="material-icons">delete</i>
+                  </a>
+                  <a class="secondary-content clickable"
+                        title="clone dictionary"
+                        onclick={ doCloneDict.bind(this, dict.id) }>
+                     <i class="material-icons">content_copy</i>
+                  </a>
+                  <a  if={ dict.currentUserCanDelete }
+                        class="secondary-content clickable"
+                        title="config dictionary"
+                        onclick={ doConfigDict.bind(this, dict.id) }>
+                     <i class="material-icons">settings</i>
+                  </a>
+                  <a if={ dict.currentUserCanEdit }
+                        class="secondary-content clickable"
+                        data-dict-id={ dict.id }
+                        title="edit dictionary"
+                        onclick={ doEditDict.bind(this, dict.id) }>
+                     <i class="material-icons">edit</i>
+                  </a>
                </div>
             </li>
          </ul>
-         <a href="#/make" class="btn waves-effect waves-light">
-            <i class="material-icons left">add</i>
-            create new dictionary
-         </a>
+         <div if={!state.visibleDictionaries.length}
+               class="center"
+               style="margin: 10vh auto;">
+            <h1 class="grey-text lighten-2">Nothing found</h1>
+         </div>
+         <div id="deleteAllBox"
+               class="deleteAllBox z-depth-5"
+               if={state.selectedCount}>
+               <div>
+                  Delete selected dictionaries ({state.selectedCount})?
+                  <button class="btn"
+                        onclick={onDeleteSelectedClick}>
+                     delete
+                  </button>
+                  <button class="btn btn-secondary"
+                        onclick={onDeselectAll}>
+                     cancel
+                  </button>
+               </div>
+
+         </div>
+
       </div>
-      <div if={!userdicts.length} class="grey-text center-align">
-         <h3>no dictionaries</h3>
+      <div if={!dictData.dictionaryList.length}
+            class="grey-text center-align">
+         <h1>no dictionaries</h1>
          <div>
             You have no dictionary yet. Create one using button below.
          </div>
          <br>
-         <a href="#/make" class="btn waves-effect waves-light">
+         <a href="#/make"
+               class="btn waves-effect waves-light">
             <i class="material-icons left">add</i>
             create new dictionary
          </a>
       </div>
    </template>
 
+   <style>
+      .searchBox{
+         max-width: 200px;
+         display: inline-block;
+         margin: 0 15px 0 0;
+      }
+      .searchBox input{
+         padding-right: 27px;
+      }
+      .clearFilterIcon{
+         position: absolute;
+         right: 5px;
+         top: 11px;
+      }
+      .dict-lang {
+         padding-left: 0.5em;
+      }
+      ul li{
+         position: relative;
+      }
+      ul li:hover{
+         background-color: #f8f8f8f2!important;
+      }
+      ul li.selected{
+         background-color: #fffde7 !important;
+      }
+      .title{
+         padding-left: 35px;
+      }
+      .checkbox{
+         display: inline-block;
+         vertical-align: middle;
+         position: absolute;
+         left: 20px;
+      }
+      .checkbox span{
+         opacity: 0.2;
+      }
+      .checkbox:hover span{
+         opacity: 1;
+      }
+      .checkbox input:checked + span{
+         opacity: 1;
+      }
+      .deleteAllBox{
+         text-align: center;
+         position: fixed;
+         bottom: 0;
+         left: 0;
+         right: 0;
+         padding: 20px;
+         background-color: white;
+         font-size: 1.2rem;
+         z-index: 9999;
+      }
+      .deleteAllBox button{
+         margin-left: 20px;
+      }
+   </style>
+
    <script>
       export default {
-         isLoading: true,
-         userdicts: [],
-         onMounted() {
-            $.ajax({
-               url: window.API_URL + "userdicts.json",
-               type: "GET",
-               success: (response) => {
-                  this.userdicts = response.dicts || [];
-               },
-               error: () => {
-                  M.toast("Dictionary list could not be loaded.")
-               },
-               complete: () => {
-                  this.isLoading = false;
-                  this.update();
+         bindings: [["store", "dictionaryListChanged", "update"],
+                    ["store", "dictionaryListLoadingChanged", "onDictionaryListLoadingChange"]],
+         state: {
+            isLoading: false,
+            lastCheckedIdx: null,
+            visibleDictionaries: [],
+            selectedCount: 0,
+            query: ""
+         },
+
+         onDictionaryListLoadingChange(){
+            if(this.dictData.isDictionaryListLoaded){
+               this.state.visibleDictionaries = this.dictData.dictionaryList
+            }
+            this.update()
+         },
+
+         onSearchInput(evt){
+            this.state.query = evt.target.value
+            this.filter()
+         },
+
+         onClearFilterClick(evt){
+            if($('#searchBox').val()){
+               $('#searchBox').val("")
+               this.state.query = ""
+               this.filter()
+            }
+         },
+
+         onCheckboxClick(evt){
+            let idx = $(evt.currentTarget).attr("idx")
+            this.toggleLineSelection(idx, evt.shiftKey)
+            this.state.lastCheckedIdx = idx
+         },
+
+         toggleLineSelection(idx, shiftKey){
+            let selected = $("#chb_" + idx).prop("checked")
+            let fromIdx = shiftKey ? Math.min(idx, this.state.lastCheckedIdx) : idx
+            let toIdx = shiftKey ? Math.max(idx, this.state.lastCheckedIdx) : idx
+            for(let i = fromIdx; i <= toIdx; i++){
+               this.state.visibleDictionaries[i].selected = selected
+            }
+            this.update()
+         },
+
+         onDeleteSelectedClick(){
+            if (confirm("Are you sure you want to delete selected dictionaries? You will not be able to undo this.")) {
+               this.update({isLoading: true})
+               let toDelete = this.state.visibleDictionaries.filter(dict => dict.selected).map(dict => dict.id)
+               this.deleteNextSelected(toDelete)
+            }
+         },
+
+         filter(){
+            this.dictData.dictionaryList.forEach(c => {
+               delete c.h_title
+            })
+            this.state.visibleDictionaries = this.dictData.dictionaryList
+            if(this.state.query !== ""){
+               let sortResult = FuzzySort.go(this.state.query, this.state.visibleDictionaries, {
+                  key: "id",
+                  keys: ["title"]
+               })
+               this.state.visibleDictionaries = sortResult.map(fs => {
+                  fs.obj.h_title = FuzzySort.highlight(fs[0], '<b class="red-text">', "</b>")
+                  fs.obj.score = fs.score
+                  return fs.obj
+               }).sort((a, b) => {
+
+                  return (a.score == b.score) ? a.title.localeCompare(b.title) : Math.sign(b.score - a.score)
+               })
+            }
+            this.update()
+            this.highlightOccurrences()
+         },
+
+         highlightOccurrences(){
+            let el, row
+            this.state.visibleDictionaries.forEach((c, idx) => {
+               row = this.$(`#r_${idx}`)
+               if(row){
+                  el = this.$(`#t_${idx}`)
+                  el.innerHTML = c.h_title ? c.h_title : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
                }
-            });
+            }, this)
          },
 
-         doEditDict(event) {
-            var dictId = event.target.parentNode.getAttribute('data-dict-id');
-            route(dictId + "/edit");
+         deleteNextSelected(toDelete){
+            if(toDelete.length){
+               this.store.deleteDictionary(toDelete.pop())
+                     .always(this.deleteNextSelected.bind(this, toDelete))
+            } else {
+               this.state.visibleDictionaries = this.dictData.dictionaryList
+               this.state.isLoading = false
+               this.filter()
+            }
          },
 
-         doConfigDict(event) {
-            var dictId = event.target.parentNode.getAttribute('data-dict-id');
-            route(dictId + "/config");
+         onDeselectAll(){
+            this.state.visibleDictionaries.forEach(dict => {dict.selected = false})
+            this.update()
          },
 
-         doCloneDict(event) {
-            var dictId = event.target.parentNode.getAttribute('data-dict-id');
-            $.post(window.API_URL + dictId + "/clone.json", (response) => {
-               if (response.success) {
-                  this.userdicts = response.dicts;
-                  this.update();
-               }
-            });
+         doEditDict(dictId) {
+            route(dictId + "/edit")
          },
 
-         doDeleteDict(event) {
-            var dictId = event.target.parentNode.getAttribute('data-dict-id');
-            var dictTitle = event.target.parentNode.getAttribute('data-dict-title');
+         doConfigDict(dictId) {
+            route(dictId + "/config")
+         },
+
+         doCloneDict(dictId) {
+            this.update({isLoading: true})
+            this.store.cloneDictionary(dictId)
+         },
+
+         doDeleteDict(dictId) {
+            var dictTitle = this.store.getDictionary(dictId).title
             if (confirm("Are you sure you want to delete dictionary " + dictTitle + "? You will not be able to undo this.")) {
-               $.post(window.API_URL + dictId + "/destroy.json", (response) => {
-                  if (response.success) {
-                     this.userdicts = response.dicts;
-                     this.update();
-                  }
-               });
+               this.update({isLoading: true})
+               this.store.deleteDictionary(dictId)
+                     .always(() => {this.update({isLoading: false})})
+            }
+         },
+
+         onBeforeUpdate(){
+            this.state.selectedCount = this.state.visibleDictionaries.filter(dict => dict.selected).length
+         },
+
+         onBeforeMount() {
+            if(this.dictData.isDictionaryListLoaded){
+               this.state.visibleDictionaries = this.dictData.dictionaryList
             }
          }
       }
    </script>
-
-   <style>
-      .dict-lang {
-         padding-left: 0.5em;
-      }
-   </style>
 </dict-list>

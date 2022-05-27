@@ -1,4 +1,4 @@
-var XemplateDesigner={};
+window.XemplateDesigner={};
 XemplateDesigner.xemplate=null;
 XemplateDesigner.dictID = null;
 
@@ -37,7 +37,7 @@ XemplateDesigner.renderPreview=function(){
 };
 XemplateDesigner.previewXml="";
 XemplateDesigner.reloadPreviewXml=function(){
-	$.ajax({url: "/"+this.dictID+"/randomone.json", dataType: "json", method: "POST"}).done(function(data){
+	$.ajax({url: window.API_URL + "/" + this.dictID + "/randomone.json", dataType: "json", method: "POST"}).done(function(data){
 		if(data.id>0) {
       var doc = (new DOMParser()).parseFromString(data.xml, 'text/xml');
 			XemplateDesigner.previewXml=doc;

@@ -1,58 +1,110 @@
 <dict-public-entry>
-   <h3 class="header">
-      <a href="#/{ this.props.dictId }">{ this.props.dictDetails.title }</a>
-   </h3>
-   <template if={ this.props.dictDetails.public }>
-      <div class="divider"></div>
+   <loading-overlay if={dictData.isDictionaryLoading || (dictData.isEntryListLoading && !dictData.isEntryListLoaded)}/>
+   <dict-nav links={[[dictData.entryId, "View"]]}/>
+   <h1 if={dictData.title}
+         class="header">
+      { dictData.title }
+   </h1>
+   <template if={ dictData.public && dictData.isEntryListLoaded}>
       <div class="row">
-         <div class="col s9">
-            <entry-view is="entry-view" dict-id={ this.props.dictId } entry-id={ this.props.entryId }></entry-view>
+         <div class="col s4 leftCol">
+            <loading-overlay if={dictData.isEntryListLoading && dictData.isEntryListLoaded}/>
+            <template if={dictData.isEntryListLoaded}>
+               <dict-entry-filter search-func={store.searchEntryList.bind(store)}/>
+               <div if={dictData.openEntryCount > dictData.entryList.length}
+                     class="entriesCountInfo">
+                  Showing {dictData.entryList.length} of {dictData.openEntryCount} entries.
+               </div>
+               <div class="entry-list collection">
+                  <div each={ (entry, idx) in dictData.entryList }
+                        class="collection-item {entry.id == dictData.entryId ? 'selected' : ''}">
+                     <span class="lineNum">{idx + 1}.</span>
+                     <a href="#/{ dictData.dictId }/{ entry.id }"
+                           class="headword-link {entry.id == dictData.entryId ? 'red-text' : ''}">
+                        <raw-html content={entry.title || "&nbsp;"}></raw-html>
+                     </a>
+                  </div>
+                  <div if={dictData.entryList && !dictData.entryList.length}
+                        class="noEntries">
+                     <h2 class="grey-text center-align">No entries</h2>
+                  </div>
+               </div>
+            </template>
          </div>
-         <div class="col s3">
-            <ul class="nabes">
-               <li each={ entry in this.moreEntries} active={entry.id == this.props.entryId}><a href="#/{ this.props.dictId }/{ entry.id }">{ entry.titlePlain }</a></li>
-            </ul>
+         <div class="col s8">
+            <div class="divider"></div>
+            <entry-view/>
          </div>
       </div>
       <div class="divider"></div>
       <div class="section">
-         { this.props.dictDetails.licence }
+         { dictData.licence }
       </div>
    </template>
 
+   <style>
+      .infoIcon{
+         margin-left: 1.5rem;
+      }
+      .infoIcon a{
+         font-size: 1.8rem;
+      }
+      .leftCol{
+         position: relative;
+         display: block;
+         min-height: calc(100vh - 260px);
+      }
+      .entry-list {
+         max-height: 80vh;
+         overflow-y: auto;
+      }
+      .collection-item{
+         position: relative;
+         display: flex;
+         border-left: 5px solid white;
+         padding-left: 0.2rem;
+      }
+      .collection-item .headword-link{
+         text-decoration: none;
+         font-size: 1.2rem;
+         letter-spacing: 1px;
+         margin-right: auto;
+      }
+      .collection-item.selected{
+         border-left-color: #000;
+      }
+      .collection-item.focused{
+         background-color: #eceff1;
+      }
+      .lineNum{
+         font-size: 0.8rem;
+         color: #b8b8b8;
+         margin-right: 10px;
+         min-width: 30px;
+         text-align: right;
+      }
+      .noEntries{
+         padding-top: 10vh;
+      }
+   </style>
+
    <script>
       export default {
-         moreEntries: [],
-         entryId: '',
+         bindings: [["store", "entryIdChanged", "entryIdChanged"],
+                    ["store", "isDictionaryLoadingChanged", "update"],
+                    ["store", "entryListLoadingChanged", "update"],
+                    ["store", "isEntryLoadingChanged", "update"]],
 
-         loadMoreEntries() {
-            $.get(window.API_URL + this.props.dictId + "/" + this.props.entryId + "/nabes.json", (response) => {
-               if (response.nabes) {
-                  this.moreEntries = response.nabes;
-                  this.update();
-               }
-            });
-         },
-         onMounted() {
-            console.log('list dict entry '+ this.props.dictId+'-'+this.props.entryId)
-            this.entryId = this.props.entryId;
-            this.props.loadDictDetail();
-            this.loadMoreEntries();
-            console.log(this.props)
+         entryIdChanged(){
+            this.store.loadEntry()
          },
 
-         onUpdated() {
-            if (this.entryId != this.props.entryId) {
-               this.entryId = this.props.entryId;
-               this.loadMoreEntries();
+         onMounted(){
+            if (this.dictData.dictId && !this.dictData.isEntryLoading) {
+               this.store.loadEntry()
             }
          }
       }
    </script>
-
-   <style>
-      .nabes li a:hover {text-decoration: underline;}
-      .nabes li[active=active] a {background-color: #ffccbc;}
-   </style>
 </dict-public-entry>
 

@@ -1,152 +1,415 @@
 <dict-edit>
-  <h3 class="header">{ this.props.dictDetails.title }</h3>
-  <div if={ this.doctypes.length > 1 } class="row doctypes">
-    <div class="col s12">
-      <ul class="tabs">
-        <li each={ type in this.doctypes } active={ type == this.doctype } class="tab col s2"><a
-          onclick={ doChangeDoctype } doctype={ type }>{ type }</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col s3">
-      <div style="display: flex; gap: 10px">
-        <input type="text" id="searchBox" placeholder="search" class="input-field" onkeypress={ runSearch }
-               style="width: 100px;"/>
-        <select id="searchType">
-          <option value="" disabled selected>?</option>
-          <option value="start">starts like this</option>
-          <option value="exact">is exactly</option>
-          <option value="wordstart">contains a word that starts like this</option>
-          <option value="substring">contains this sequence of characters</option>
-        </select>
+   <loading-overlay if={dictData.isDictionaryListLoading || dictData.isDictionaryLoading}/>
+   <dict-nav links={[["edit", "Edit"]]}/>
+   <h1 class="header">
+      { dictData.title }
+      <span if={dictData.entryCount}
+            class="totalEntries">total {dictData.entryCount} entries</span>
+   </h1>
+   <template if={dictData.isDictionaryLoaded && !dictData.isDictionaryListLoading}>
+      <div if={ dictData.doctypes.length > 1 }
+            class="doctypes">
+         <ul class="tabs">
+            <li each={ type in dictData.doctypes }
+                  active={ type == dictData.doctype }
+                  class="tab col s2">
+               <a onclick={ doChangeDoctype.bind(this, type) }>{ type }</a>
+            </li>
+         </ul>
       </div>
-
-      <div class="entry-list collection">
-        <list-headword each={ entry in this.entryList } entryData={ entry } active={entry.id == entryId}
-                       link="#{dictId}/edit/{doctype}/{entry.id}/view" change-entry-edit={ changeEntryEdit }/>
+      <div id="dictEditContainer" >
+         <div class="dictLeftCol"
+               style="width: max({dictData.config.flagging.flags.length ? '25vw' : '20vw'}, 250px);">
+            <div if={dictData.isEntryListLoading}>
+               <loading-overlay/>
+            </div>
+            <template if={dictData.isEntryListLoaded}>
+               <dict-entry-filter search-func={store.searchEntryList.bind(store)}/>
+               <div if={dictData.entryCount > dictData.entryList.length}
+                     class="entriesCountInfo">
+                  Showing {dictData.entryList.length} of {dictData.entryCount} entries.
+               </div>
+               <div class="entry-list collection">
+                  <div each={ (entry, idx) in dictData.entryList }
+                        data-idx={idx}
+                        class="collection-item {entry.isSaving ? 'saving' : ''} {entry.id == dictData.entryId ? 'selected' : ''}"
+                        onclick={onHeadwordClick.bind(this, entry.id)}>
+                     <span class="lineNum">{idx + 1}.</span>
+                     <a href="#{dictData.dictId}/edit/{dictData.doctype}/{entry.id}/view"
+                           class="headword-link {entry.id == dictData.entryId ? 'red-text' : ''}"
+                           onclick={onHeadwordLinkClick.bind(this, entry.id)}>
+                        <raw-html content={entry.title || "&nbsp;"}/>
+                     </a>
+                     <span if={dictData.config.flagging.flags.length}
+                           onclick={onOpenFlagMenuClick.bind(this, entry)}
+                           class="flag {entry.flag ? 'badge' : 'noFlag'}"
+                           style={getFlagStyle(entry.flag)}>
+                        {store.getFlagLabel(entry.flag) || entry.flag || "No flag"}
+                     </span>
+                  </div>
+                  <div if={!dictData.entryList.length && !dictData.isEntryListLoading}
+                        style="padding-top: 10vh;">
+                     <h2 class="grey-text center-align">No entries</h2>
+                  </div>
+               </div>
+               <ul if={dictData.config.flagging.flags.length}
+                     id="flagDropdown"
+                     class="dropdown-content flagDropdown">
+                  <li data-flag="">
+                     <i class="material-icons"
+                           style="color: grey">label_outline</i>
+                     <div>no flag</div>
+                     <div class="right flagKey">delete</div>
+                  </li>
+                  <li each={flag in dictData.config.flagging.flags}
+                        data-flag={flag.name}>
+                     <i class="material-icons"
+                           style="color: {flag.color}">label</i>
+                     <div>{flag.label}</div>
+                     <div class="right flagKey">{flag.key}</div>
+                  </li>
+               </ul>
+            </template>
+         </div>
+         <div class="resizeHandle"
+               onmousedown={onResizeHandleMouseDown}></div>
+         <div class="dictRightCol">
+            <dict-edit-entry></dict-entry-edit>
+         </div>
       </div>
-    </div>
-    <div class="col s9">
-      <dict-edit-entry
-        entryId={ this.entryId }
-        mode={ this.mode }
-        dictId={ this.dictId }
-        dictConfigs={ this.props.dictConfigs }
-        userAccess={ this.props.userAccess }
-        userInfo={ this.props.userInfo }
-        userDicts={ this.userDicts }
-      ></dict-edit-entry>
-    </div>
-  </div>
+   </template>
 
-  <script>
-    export default {
-      dictId: '',
-      dictConfigs: {},
-      doctype: 'entry',
-      doctypes: ['entry'],
-      entryList: [],
-      entryCount: 0,
-      //selectedEntry: '',
-      entryId: '',
-      userDicts: [],
 
-      loadList() {
-        var searchtext = ''
-        var modifier = 'start'
-        if ($('#searchType').val() != null) {
-          modifier = $('#searchType').val()
-        }
-        if ($('#searchBox').val() != '') {
-          searchtext = $('#searchBox').val()
-        }
-        $.post(window.API_URL + this.dictId + "/" + this.doctype + "/entrylist.json", {
-          searchtext: searchtext,
-          modifier: modifier,
-          howmany: 100
-        }, (response) => {
-          console.log(response)
-          this.entryList = response.entries
-          this.entryCount = response.total
-          //this.selectedEntry = this.entryList.length ? this.entryList[0].id : ""
-          this.update()
-        })
-      },
+   <style>
+      #dictEditContainer{
+         display: flex;
+      }
+      .totalEntries{
+         font-size: 0.85rem;
+         color: #b8b8b8;
+         margin-left: 1.3rem;
+         text-transform: none;
+      }
+      ul.select-dropdown,
+      ul.dropdown-content {
+         width: 200% !important;
+      }
+      li > span {
+         white-space: nowrap;
+      }
+      .resizeHandle{
+         cursor: ew-resize;
+         width: 5px;
+         min-height: 100%;
+         background-color: whitesmoke;
+         margin: 0 10px;
+      }
+      .resizeHandle:hover{
+         background-color: #cfcfcf;
+      }
+      .entry-list {
+         max-height: 80vh;
+         overflow-y: auto;
+      }
+      .dictLeftCol{
+         min-width: 200px;
+         min-height: 50vh;
+         position: relative;
+      }
+      .dictRightCol{
+         min-width: 500px;
+         flex: 1;
+      }
+      .entriesCountInfo{
+         font-size: 0.85rem;
+         color: #b8b8b8;
+      }
+      .collection-item{
+         position: relative;
+         display: flex;
+         border-left: 5px solid white;
+         padding-left: 0.2rem;
+      }
+      .collection-item.selected{
+         border-left-color: #000;
+      }
+      .collection-item .headword-link{
+         text-decoration: none;
+         font-size: 1.2rem;
+         letter-spacing: 1px;
+         margin-right: auto;
+      }
+      .collection-item .flag{
+         cursor: pointer;
+      }
+      .collection-item .flagKey{
+         font-family: monospace;
+      }
+      .collection-item .badge{
+         font-weight: bold;
+         font-size: 1rem;
+         color: #fff;
+         white-space: nowrap;
+         min-width: auto;
+         border-radius: 2px;
+         box-shadow: 0 2px 2px 0 rgb(0 0 0 / 14%),
+            0 3px 1px -2px rgb(0 0 0 / 12%),
+            0 1px 5px 0 rgb(0 0 0 / 20%);
+      }
+      .collection-item .noFlag{
+         font-size: 1rem;
+         color: grey;
+      }
+      .collection-item.saving::before{
+         content: '';
+         position: absolute;
+         left: 0;
+         right: 0;
+         top: 0;
+         bottom: 0;
+         background-color: #ffffffe8;
+         line-height: 100%;
+         z-index: 500;
+      }
+      .collection-item.saving::after{
+         content: 'saving...';
+         position: absolute;
+         transform: translateX(-50%) translateY(-50%);
+         left: 50%;
+         top: 50%;
+         color: #6e6e6e;
+         z-index: 501;
+         font-size: 1.3rem;
+         text-transform: uppercase;
+      }
+      .collection-item.focused{
+         background-color: #eceff1;
+      }
+      .lineNum{
+         font-size: 0.8rem;
+         color: #b8b8b8;
+         margin-right: 10px;
+         min-width: 30px;
+         text-align: right;
+      }
+   </style>
 
-      changeEntryEdit(entryId) {
-        console.log('onclick')
-        console.log(entryId)
-        //$('#editor').html(i)
-        //this.selectedEntry = i;
-        this.entryId = entryId
-        // this.update()
-      },
+   <script>
+      export default {
+         bindings: [["store", "dictionaryListLoadingChanged", "update"],
+                    ["store", "entryListChanged", "update"],
+                    ["store", "entryListLoadingChanged", "update"],
+                    ["store", "entryIdChanged", "update"]],
 
-      runSearch(e) {
-        if (e.keyCode == 13) {
-          this.loadList()
-        }
-      },
+         state: {
+            focused: false,
+            size: 10,
+            mousePos: null,
+            cursorPosition: null
+         },
 
-      doChangeDoctype(e) {
-        var newdoctype = e.target.getAttribute('doctype')
-        if (newdoctype != this.doctype) {
-          this.doctype = newdoctype
-          route(this.dictId + "/edit/" + newdoctype)
-          this.loadList()
-          this.update()
-        }
-      },
+         getFlagStyle(flag){
+            let bgColor = this.store.getFlagColor(flag) || 'initial'
+            let color = this.store.getFlagTextColor(bgColor)
+            return `color: ${color}; background-color: ${bgColor}`
+         },
 
-      onMounted() {
-        this.dictId = this.props.dictId
-        this.doctype = this.props.doctype
-        this.doctypes = this.props.doctypes
-        console.log('list edit dict ' + this.dictId + this.doctype + this.props.entryId)
-        this.props.loadDictDetail()
-        this.loadList()
-        $.get(window.API_URL + "userdicts.json", (response) => {
-          this.userDicts = response.dicts
-        })
-      },
-      onBeforeUpdate() {
-        this.doctypes = this.props.doctypes
-        this.entryId = this.props.entryId
-        console.log('list edit dict update' + this.dictId + this.doctype + this.props.entryId)
-        $('select').formSelect({dropdownOptions: {coverTrigger: false, constrainWidth: false}})
-      },
-    }
-  </script>
+         onHeadwordClick(entryId, evt){
+            this.store.changeEntryId(entryId)
+         },
 
-  <style>
-    ul.select-dropdown,
-    ul.dropdown-content {
-      width: 200% !important;
-    }
+         onHeadwordLinkClick(entryId, evt){
+            evt.preventDefault()
+            this.onDocumentClick(evt)
+            this.store.changeEntryId(entryId)
+         },
 
-    li > span {
-      white-space: nowrap;
-    }
+         onOpenFlagMenuClick(entry, evt){
+            evt.stopPropagation()
+            let id = "ts_" + Date.now() + Math.floor((Math.random() * 10000))
+            // creating copy of list. Without copy, UL is moved as child of target node and after riot update is destroyed
+            let menuNode = $(evt.target)//.closest(".collection-item")
+            $("#flagDropdown").clone()
+                 .attr({id: id})
+                 .data("entryid", entry.id)
+                 .appendTo($("body"))
+                 .find("li").each(function(idx, elem){
+                     $(elem).click(this.onFlagMenuItemClick.bind(this, entry.id, $(elem).data("flag")))
 
-    .entry-list {
-      max-height: 80%;
-      overflow-y: auto;
-    }
+                 }.bind(this))
+             menuNode.attr("data-target", id)
+                 .dropdown({
+                     constrainWidth: false,
+                     coverTrigger: false,
+                     container: $("body")
+                 })
+                 .dropdown("open")
+         },
 
-    .doctypes {
-      margin-bottom: 0px;
-    }
+         onFlagMenuItemClick(entryId, flag, evt){
+            this.store.setEntryFlag(entryId, flag)
+         },
 
-    li.tab[active] {
-      background-color: transparent;
-      color: #ee6e73;
-      border-bottom: 2px solid;
-    }
+         onDocumentClick(evt){
+            let entryList = $(".entry-list")[0]
+            if(entryList && evt.target.parentNode){ // no parent -> probably detached element by comoponent update()
+               let inComponent = entryList.contains(evt.target)
+               if(inComponent || inComponent != this.state.focused){
+                  this.state.focused = inComponent
+                  this.state.cursorPosition = inComponent ? $(evt.target).closest(".collection-item").data("idx") + 1 : null
+                  this.updateCursor()
+               }
+            }
+         },
 
-    li.tab a {
-      cursor: pointer;
-    }
-  </style>
+         onDocumentKeyDown(evt){
+            if([38, 40, 33, 34, 13].includes(evt.keyCode)){
+               evt.preventDefault()
+               if(evt.keyCode == 38){
+                this.moveCursorUp(1)
+               } else if(evt.keyCode == 40){
+                   this.moveCursorDown(1)
+               } else if(evt.keyCode == 33){
+                   this.moveCursorUp(this.state.size) //pgUp
+               } else if(evt.keyCode == 34){
+                   this.moveCursorDown(this.state.size) // pgDown
+               } else if(evt.keyCode == 13){
+                  if(this.state.cursorPosition){
+                     let entry = this.dictData.entryList[this.state.cursorPosition - 1]
+                     if(entry){
+                        this.store.changeEntryId(entry.id)
+                        this.updateCursor()
+                     }
+                  }
+               }
+            } else if(this.dictData.config.flagging.flags.length && this.state.cursorPosition){
+               if(evt.keyCode == 46){
+                  this.store.setEntryFlag(this.dictData.entryList[this.state.cursorPosition - 1].id, '')
+               } else if(this.dictData.config.flagging.flags.map(f => f.key).includes(evt.key)){
+                  let flag = this.dictData.config.flagging.flags.find(f => f.key == evt.key)
+                  if(flag){
+                     this.store.setEntryFlag(this.dictData.entryList[this.state.cursorPosition - 1].id, flag.name)
+                  }
+               }
+            }
+         },
+
+         onResizeHandleMouseDown(evt){
+            this.state.mousePos = evt.x
+            document.addEventListener("mouseup", this.onDocumentMouseUp, false)
+            document.addEventListener("mousemove", this.resizeColumn, false)
+            $("body").css("user-select", "none")
+         },
+
+         onDocumentMouseUp(){
+            document.removeEventListener("mousemove", this.resizeColumn, false)
+            document.removeEventListener("mouseup", this.onDocumentMouseUp, false)
+            $("body").css("user-select", "")
+         },
+
+         doChangeDoctype(newdoctype) {
+            if (newdoctype != this.dictData.doctype) {
+               this.dictData.doctype = newdoctype
+               this.dictData.searchtext = ""
+               this.dictData.modifier = "start"
+               route(this.dictData.dictId + "/edit/" + newdoctype)
+               this.store.loadEntryList()
+                  .done(() => {
+                     if(this.dictData.entryList.length){
+                        this.store.changeEntryId(this.dictData.entryList[0].id)
+                     } else {
+                        $("#container").html("").addClass("empty")
+                        Screenful.Editor.updateToolbar()
+                     }
+                  })
+               this.update()
+            }
+         },
+
+         moveCursorDown(step){
+            if(!this.state.cursorPosition){
+               this.state.cursorPosition = 1
+            } else{
+               this.state.cursorPosition = Math.min(this.state.cursorPosition + (step || 1), this.dictData.entryList.length)
+            }
+            this.updateCursor()
+         },
+
+         moveCursorUp(step){
+            if(!this.state.cursorPosition){
+              this.state.cursorPosition = this.dictData.entryList.length - 1
+            } else {
+               this.state.cursorPosition = Math.max(1,  this.state.cursorPosition - (step || 1))
+            }
+            this.updateCursor()
+         },
+
+         updateCursor(){
+            $(".collection-item.focused", this.root).removeClass("focused")
+            if(this.state.cursorPosition){
+               const node = $(".collection-item:nth-child(" + this.state.cursorPosition + ")")
+               $(node).addClass("focused")
+               if(node){
+                  this.scrollSelectedIntoView()
+               }
+            }
+         },
+
+         scrollSelectedIntoView(){
+            let list = $(".entry-list")[0]
+            if(!list){
+               return
+            }
+            let selectedItem = $(".entry-list .focused")[0]
+            if(selectedItem){
+               let offsetTop = selectedItem.offsetTop
+               let rowHeight = selectedItem.clientHeight
+               let min = list.scrollTop
+               let max = list.scrollTop + list.clientHeight - rowHeight
+               if(offsetTop < min){
+                  list.scrollTop = offsetTop
+               } else if(offsetTop > max){
+                  list.scrollTop = offsetTop - list.clientHeight + rowHeight
+               }
+            }
+         },
+
+         resizeColumn(evt){
+            const distance = evt.x - this.state.mousePos
+            this.state.mousePos = evt.x
+            let leftColWidth = $(".dictLeftCol").width()
+            $(".dictLeftCol").css("width", leftColWidth + distance + "px")
+         },
+
+         setCursorByEntryId(){
+            if(this.dictData.entryId){
+               let idx = this.dictData.entryList.findIndex(e => e.id == this.dictData.entryId)
+               if(idx != -1){
+                  this.state.cursorPosition = idx + 1
+                  this.updateCursor()
+               }
+            }
+         },
+
+         onMounted(){
+            document.addEventListener('click', this.onDocumentClick)
+            document.addEventListener('keydown', this.onDocumentKeyDown)
+            if(this.dictData.isEntryListLoaded){
+               this.setCursorByEntryId()
+            } else {
+               this.store.one("entryListChanged", this.setCursorByEntryId.bind(this))
+            }
+         },
+
+         onBeforeUnmount(){
+            document.removeEventListener('click', this.onDocumentClick)
+            document.removeEventListener('keydown', this.onDocumentKeyDown)
+         },
+
+         onUpdated() {
+            this.updateCursor()
+         }
+      }
+   </script>
 </dict-edit>
 

@@ -1,4 +1,4 @@
-var Subbing={};
+window.Subbing={};
 
 Subbing.change=function(){};
 

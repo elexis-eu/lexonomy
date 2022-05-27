@@ -1,4 +1,4 @@
-var Searchability={};
+window.Searchability={};
 Searchability.change=function(){};
 
 Searchability.render=function(div, json){

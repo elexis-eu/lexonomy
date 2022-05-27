@@ -1,10 +1,7 @@
 <dict-config-publico>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
-   <h3>Publishing</h3>
-   <div if={isLoading}
-         class="center-align grey-text">
-      <h3>Loading...</h3>
-   </div>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["publico", "Publishing"]]}/>
+   <h1>Publishing</h1>
    <template if={!isLoading}>
       <div class="row">
          <div class="input-field">
@@ -14,7 +11,7 @@
                         type="radio"
                         class="with-gap"
                         value="0"
-                        checked={ !configData.public }
+                        checked={ !state.data.public }
                         onchange={onCheckboxChange}/>
                   <span>Private</span>
                </label>
@@ -23,7 +20,7 @@
                         type="radio"
                         class="with-gap"
                         value="1"
-                        checked={ configData.public }
+                        checked={ state.data.public }
                         onchange={onCheckboxChange} />
                   <span>Public</span>
                </label>
@@ -33,7 +30,7 @@
             </span>
          </div>
       </div>
-      <div if={configData.public}
+      <div if={state.data.public}
             class="row">
          <div class="input-field"
                id="publico_licence_info"
@@ -42,23 +39,23 @@
                <option each={ licence in licences }
                      value={ licence.id }
                      data-url={ licence.url }
-                     selected={ configData.licence == licence.id }>{ licence.title }</option>
+                     selected={ state.data.licence == licence.id }>{ licence.title }</option>
             </select>
             <label>Licence</label>
             <span class="helper-text"></span>
          </div>
       </div>
-      <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+      <dict-config-buttons save-data={saveData}></dict-config-buttons>
    </template>
 
 
    <script>
       export default {
-         isLoading: true,
-         dictId: '',
-         configId: '',
-         configTitle: 'Publishing',
-         configData: {},
+         state: {
+            isLoading: true,
+            isSaving: false,
+            data: {}
+         },
          licences: [
             {
                id: 'cc-by-4.0',
@@ -78,45 +75,41 @@
          ],
 
          onCheckboxChange(evt){
-            this.configData.public = evt.target.value == "1"
-            if(!this.configData.public){
-               this.configData.licence = ""
+            this.state.data.public = evt.target.value == "1"
+            if(!this.state.data.public){
+               this.state.data.licence = ""
             } else {
-               this.configData.licence = "cc-by-4.0"
+               this.state.data.licence = "cc-by-4.0"
             }
             this.update()
          },
 
          onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            this.props.loadDictDetail();
-            this.fillConfigForm();
+            this.store.loadDictionaryConfig("publico")
+                  .done(response => {
+                     this.state.data = response.content
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                  })
          },
 
          refreshLicenceInfo(){
             var url = $('#publico_licence option:selected').data('url')
-            $('#publico_licence_info .helper-text').html('More information about this licence: <a target="_blank" href="' + url + '">' + url + "</a>.");
+            $('#publico_licence_info .helper-text').html('More information about this licence: <a target="_blank" href="' + url + '">' + url + "</a>.")
          },
 
          onUpdated(){
             $('#publico_licence').formSelect()
                   .off("change")
-                  .on('change', this.refreshLicenceInfo.bind(this));;
+                  .on('change', this.refreshLicenceInfo.bind(this))
             this.refreshLicenceInfo()
          },
 
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then(response=>{
-               this.isLoading = false;
-               this.configData = response;
-               this.update();
-            });
-         },
-
          saveData() {
-            $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, this.configData);
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("publico", this.state.data)
+                  .always(() => this.update({isSaving: false}))
          }
       }
    </script>

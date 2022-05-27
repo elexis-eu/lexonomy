@@ -1,29 +1,44 @@
-#toolbar { /*position: absolute;*/ top: 0px; left: 0px; right: 0px; height: 52px; box-shadow: -2px 2px 2px #999999; overflow-x: hidden; white-space: nowrap; overflow-y: hidden; z-index: 1; padding: 0px 10px; }
-#container { /*position: absolute;*/ top: 54px; bottom: 0px; left: 15px; right: 0px; overflow-x: hidden; overflow-y: auto; padding: 5px 20px 5px 0px; }
+#toolbar { /*position: absolute;*/ user-select: none;/* top: 0px; left: 0px; right: 0px; height: 52px; box-shadow: -2px 2px 2px #999999; overflow-x: hidden;*/ white-space: nowrap; /*overflow-y: hidden; z-index: 1; padding: 0px; */}
+#container {flex: 1; /*position: absolute; top: 54px; bottom: 0px; left: 15px; right: 0px; overflow-x: hidden; overflow-y: auto; */padding: 5px 20px 5px 0px; }
 #container.withHistory {right: 350px; margin-right: 10px; width: calc(100% - 260px); float: left;}
 #container.withSourceCode {left: 0px;}
 #container #editor { margin-bottom: 20px; /*padding-bottom: 300px;*/ }
 #container.empty {}
 
 /*override positioning of Xonomy's layby*/
-#container .xonomy > div.layby {top: 55px}
+#container .xonomy > div.layby {top: 80px}
 
-#toolbar span.divider {font: inherit; border-left: 2px dotted #cccccc; padding: 2px 0px; margin: 8px 5px; min-height: 2em; display: inline-block; vertical-align: middle; }
-#toolbar span#idlabel {font: inherit; border-radius: 4px 0px 0px 4px; background-color: #eeeeee; color: #666666; text-shadow: 1px 1px 0px #ffffff; padding: 6px 10px 5px 10px; margin: 0px 5px; min-height: 1.3em; display: inline-block; /*width: 20px;*/ vertical-align: middle; z-index: 1; position: relative; text-align: center;}
-#toolbar input#idbox {font: inherit; border: 1px inset #cccccc; border-radius: 4px; background-color: #ffffff; color: #333333; padding: 0px 35px 0px 50px; margin: 8px 5px; min-height: 1.3em; display: inline-block; width: 3em; vertical-align: middle; margin-left: -46px;}
-#toolbar button.iconYes#butNew {background-image: url(lightning.png);}
-#toolbar button.iconOnly#butOpen {background-image: url(resultset_next.png);}
-#toolbar button.iconYes#butSave {background-image: url(disk.png);}
+#toolbar span.divider {font: inherit; border-left: 2px dotted #cccccc; padding: 2px 0px; margin: 3px 5px; min-height: 1.5rem; display: inline-block; vertical-align: middle; }
+/*#toolbar span#idlabel {font: inherit; border-radius: 4px 0px 0px 4px; background-color: #eeeeee; color: #666666; text-shadow: 1px 1px 0px #ffffff; padding: 6px 10px 5px 10px; margin: 0px 5px; min-height: 1.3em; display: inline-block; vertical-align: middle; z-index: 1; position: relative; text-align: center;}*/
+/*#toolbar input#idbox {font: inherit; border: 1px inset #cccccc; border-radius: 4px; background-color: #ffffff; color: #333333; padding: 0px 35px 0px 50px; margin: 8px 5px; min-height: 1.3em; display: inline-block; width: 3em; vertical-align: middle; margin-left: -46px;}*/
+#toolbar .btn{height: 1.8rem; line-height: 1.8rem; padding: 0 0.5rem;}
+
+#toolbar .buttons{gap: 7px;}
+@media screen and (max-width: 1300px){
+  #toolbar #butNew i,
+  #toolbar #butSave i,
+  #toolbar #butEdit i,
+  #toolbar #butView i,
+  #toolbar #butLeave i,
+  #toolbar #butNonew i,
+  #toolbar #butDelete i,
+  #toolbar #butClone i{
+    display: none;
+  }
+}
+#toolbar button.iconYes#butNew {background-image: url(./furniture/lightning.png);}
+#toolbar button.iconOnly#butOpen {background-image: url(./furniture/resultset_next.png);}
+#toolbar button.iconYes#butSave {background-image: url(./furniture/disk.png);}
 #toolbar button.iconYes#butSave span.star {color: #ff0000; position: relative; top: 2px;}
-#toolbar button.iconYes#butEdit {background-image: url(cut.png);}
-#toolbar button.iconYes#butView {background-image: url(arrow_left.png);}
-#toolbar button.iconYes#butLeave {background-image: url(arrow_left.png);}
-#toolbar button.iconYes#butNonew {background-image: url(arrow_left.png);}
-#toolbar button.iconYes#butDelete {background-image: url(delete.png);}
-#toolbar button.iconYes#butClone {background-image: url(lightning.png);}
-#toolbar button.iconOnly#butSourceCode {background-image: url(page_white_text.png); float: right;}
-#toolbar button.iconOnly#butHistory {background-image: url(time.png); float: right;}
-#toolbar button.iconOnly#butLink {background-image: url(/furniture/link.png); float: right;}
+#toolbar button.iconYes#butEdit {background-image: url(./furniture/cut.png);}
+#toolbar button.iconYes#butView {background-image: url(./furniture/arrow_left.png);}
+#toolbar button.iconYes#butLeave {background-image: url(./furniture/arrow_left.png);}
+#toolbar button.iconYes#butNonew {background-image: url(./furniture/arrow_left.png);}
+#toolbar button.iconYes#butDelete {background-image: url(./furniture/delete.png);}
+#toolbar button.iconYes#butClone {background-image: url(./furniture/lightning.png);}
+#toolbar button.iconOnly#butSourceCode {background-image: url(./furniture/page_white_text.png); float: right;}
+#toolbar button.iconOnly#butHistory {background-image: url(./furniture/time.png); float: right;}
+#toolbar button.iconOnly#butLink {background-image: url(./furniture/link.png); float: right;}
 #toolbar span#errorMessage {float: right; padding: 6px 10px; margin: 10px 5px; min-height: 1.3em; display: inline-block; color: #aa0000; font-size: 0.85em;}
 
 #toolbar a {color: var(--link); padding: 5px 0px; margin: 10px 5px; min-height: 1.3em; display: inline-block; padding-left: 35px; background-position: left+10px center; background-repeat: no-repeat; text-decoration: none;}
@@ -34,7 +49,7 @@
 #toolbar label input {position: relative; top: 2px;}
 
 #waiter {
-  background-image: url(loader.gif); background-position: 30px 28px; background-repeat: no-repeat; padding: 30px 30px 30px 90px;
+  background-image: url(./furniture/loader.gif); background-position: 30px 28px; background-repeat: no-repeat; padding: 30px 30px 30px 90px;
   position: absolute; top: 300px; left: 30%; width: 40%; background-color: #ffffff; box-shadow: 0px 0px 5px #666666; border-radius: 4px; z-index: 10;
   line-height: 1.75em;
 }

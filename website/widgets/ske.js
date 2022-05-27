@@ -1,6 +1,5 @@
-var Ske={};
+window.Ske={};
 Ske.htmID="";
-
 Ske.settings={
   headwordElement: "",
   examples: {containerElement: "", textElement: "", markupElement: ""}

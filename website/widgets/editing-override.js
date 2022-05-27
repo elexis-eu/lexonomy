@@ -1,4 +1,4 @@
-var EditingOverride={};
+window.EditingOverride={};
  EditingOverride.change=function(){};
 
  EditingOverride.render=function(div, json){

@@ -20,7 +20,7 @@ indent_size = 4
 
 # Indentation override for all JS (to make call-back hell more readable)
 [*.{js,riot,html}]
-indent_size = 2
+indent_size = 3
 
 # in md double space at end-of-line has special meaning
 [*.md]

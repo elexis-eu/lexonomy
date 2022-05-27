@@ -1,8 +1,8 @@
 VERSION=$(shell git describe --tags --always)
 INSTALLDIR=/opt/lexonomy
 SOURCE_RIOT=$(wildcard website/riot/*.riot)
-SOURCE_JS=website/app.js $(SOURCE_RIOT)
-INSTALL_JS=app.js bundle.js
+SOURCE_JS=website/app.js website/app.static.js website/app.css.js $(SOURCE_RIOT)
+INSTALL_JS=bundle.js bundle.css bundle.static.js
 SOURCE_PY=lexonomy.py ops.py bottle.py media.py
 SOURCE_CONF=siteconfig.json.template package.json rollup.config.js config.js.template
 SOURCE_WEBDIRS=adminscripts css dictTemplates docs furniture img js libs widgets

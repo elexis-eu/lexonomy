@@ -1,0 +1,186 @@
+<dict-links>
+   <loading-overlay if={state.isLoading}></loading-overlay>
+   <dict-nav links={[["links", "links"]]}/>
+   <h1>Links</h1>
+   <template if={!state.isLoading}>
+      <div if={!Object.values(state.dictionaries).length}
+            class="grey-text">
+         <h2>No links</h2>
+      </div>
+      <div each={dict in Object.values(state.dictionaries)}>
+         <div>
+            <h2 class="dictName">
+               {dict.title}
+               <i if={dict.blurb}
+                     class="material-icons clickable"
+                     onclick={openDictInfo.bind(this, dict)}>
+                  info_outline
+               </i>
+               <a href="#/{dict.dictId}"
+                     class="btn right">open</a>
+            </h2>
+         </div>
+         <div class="dictLinks">
+            <div>
+               <h3 class="title">Outgoing links</h3>
+               <div if={!dict.to.length}>
+                  <h4 class="grey-text">No links</h4>
+               </div>
+               <table if={dict.to.length}>
+                  <tr each={link in dict.to}>
+                     <td>
+                        <a href="#/{dictData.dictId}/edit/entry/view/{link.source_entry}">
+                           {link.source_hw || link.source_id}
+                        </a>
+                     </td>
+                     <td class="grey-text">
+                        {link.source_hw ? ('(' + link.source_id + ')') : ''}
+                     </td>
+                     <td class="arrowCell">
+                        <i class="material-icons">arrow_forward</i>
+                     </td>
+                     <td>
+                        <a href="#/{link.target_dict}/edit/entry/view/{link.target_entry}">
+                           {link.target_hw || (link.target_el + ' ' + link.target_id)}
+                        </a>
+                     </td>
+                     <td class="grey-text">
+                        {link.target_hw ? (link.target_el + ' ' + link.target_id) : ''}
+                     </td>
+                  </tr>
+               </table>
+            </div>
+
+            <div>
+               <h3 class="title">Incoming links</h3>
+               <div if={!dict.from.length}>
+                     <h4 class="grey-text">No links</h4>
+                  </div>
+               <table if={dict.from.length}>
+                  <tr each={link in dict.from}>
+                     <td>
+                        <a href="#/{link.source_dict}/edit/entry/view/{link.source_entry}">
+                           {link.source_hw || (link.source_el + ' ' + link.source_id)}
+                        </a>
+                     </td>
+                     <td class="grey-text">
+                        {link.source_hw ? (link.source_el + ' ' + link.source_id) : ''}
+                     </td>
+                     <td style="padding: 0 20px;"
+                           class="grey-text">
+                        <i class="material-icons">arrow_forward</i>
+                     </td>
+                     <td>
+                        <a href="#/{dictData.dictId}/edit/entry/view/{link.target_entry}">
+                           {link.target_hw || link.target_id}
+                        </a>
+                     </td>
+                     <td class="grey-text">
+                        {link.target_hw ? ('(' + link.target_id + ')') : ''}
+                     </td>
+                  </tr>
+               </table>
+            </div>
+         </div>
+      </div>
+   </template>
+   <div id="modalDictionary"
+         class="modal">
+      <div class="modal-content">
+         <h2 id="modalTitle"></h2>
+         <div id="modalContent">
+         </div>
+      </div>
+      <div class="modal-footer">
+         <a class="btn modal-close waves-effect waves-green">Close</a>
+      </div>
+   </div>
+
+   <style>
+      .dictName{
+         border-bottom: 1px solid #d9d9d8;
+      }
+      .dictName i{
+         margin-left: 10px;
+      }
+      .dictLinks{
+         display: flex;
+         column-gap: 6vw;
+         padding-left: 10px;
+      }
+      .arrowCell{
+         color: #cbcbcb ;
+         padding: 0 20px;
+      }
+   </style>
+
+   <script>
+      export default {
+         state: {
+            dictionaries: {},
+            isLoading: true
+         },
+
+         processLinks(links, direction){
+            links[direction].forEach(link => {
+               let dictId = direction == "from" ? link.source_dict : link.target_dict
+               if(!this.state.dictionaries[dictId]){
+                  this.state.dictionaries[dictId] = {
+                     dictId: dictId,
+                     from: [],
+                     to: []
+                  }
+               }
+               this.state.dictionaries[dictId][direction].push(link)
+            })
+         },
+
+         openDictInfo(dict){
+            $("#modalTitle").html(dict.title)
+            $("#modalContent").html(dict.blurb)
+            let instance = M.Modal.getInstance($("#modalDictionary"))
+            instance.open()
+         },
+
+         checkAllLoaded(){
+            let isLoading = Object.values(this.state.dictionaries).some(d => d.isLoading)
+            if(!isLoading){
+               this.update({isLoading: false})
+            }
+         },
+
+         onMounted() {
+            $('.modal').modal()
+            this.state.dictionaries = {}
+            this.store.loadDictionaryLinks()
+                  .done(response => {
+                     this.processLinks(response.links, "to")
+                     this.processLinks(response.links, "from")
+                     for(let dictId in this.state.dictionaries){
+                        if(dictId != this.dictData.dictId){
+                           this.state.dictionaries[dictId].isLoading = true
+                           this.store.loadDictionary(dictId)
+                                 .done(function(dictId, response) {
+                                    if(response.success){
+                                       Object.assign(this.state.dictionaries[dictId], {
+                                          title: response.publicInfo.title,
+                                          blurb: response.publicInfo.blurb,
+                                          isLoading: false
+                                       })
+                                    }
+                                 }.bind(this, dictId))
+                                 .always(this.checkAllLoaded.bind(this))
+                        } else {
+                           Object.assign(this.state.dictionaries[dictId], {
+                              isLoading: false,
+                              title: this.dictData.title,
+                              blurb: this.dictData.blurb
+                           })
+                        }
+                     }
+                     this.checkAllLoaded()
+                  })
+         }
+      }
+   </script>
+</dict-links>

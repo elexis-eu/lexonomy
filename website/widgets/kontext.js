@@ -1,4 +1,4 @@
-var Kontext={};
+window.Kontext={};
 
 Kontext.change=function(){};
 
@@ -187,7 +187,7 @@ Kontext.harvest=function(div){
   });
   ret.container=$(".pillarform .block.container select").val();
   ret.template=$(".pillarform .block.template textarea").val();
-  ret.markup=$(".pillarform .block.markup select").val();  
+  ret.markup=$(".pillarform .block.markup select").val();
   return ret;
 };
 

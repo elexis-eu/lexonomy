@@ -1,4 +1,4 @@
-var Autonumber={};
+window.Autonumber={};
 Autonumber.change=function(){};
 
 Autonumber.render=function(div, json){

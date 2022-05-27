@@ -1,55 +1,62 @@
 <dict-config-flagging>
-   <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId } configTitle={ configTitle }/>
-   <h3>Entry flags</h3>
-   <div if={isLoading} class="center-align grey-text">
-      <h3>Loading entry flags...</h3>
-   </div>
-   <template if={!isLoading}>
-      <div if={!configData.flags.length} class="center-align grey-text">
-         <h3>no entry flags</h3>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["flagging", "Entry flags"]]}/>
+   <h1>Entry flags</h1>
+   <template if={!state.isLoading}>
+      <div if={!state.data.flags.length}
+            class="center-align grey-text">
+         <h1>no entry flags</h1>
          <br>
-         <a class="btn btn-primary waves-effect waves-light" onclick={ doAddEl }>
+         <a class="btn btn-primary waves-effect waves-light"
+               onclick={ doAddEl }>
             add flag
             <i class="material-icons right">add</i>
          </a>
       </div>
 
-      <template if={configData.flags.length}>
+      <template if={state.data.flags.length}>
          <table>
             <thead>
                <tr>
-                  <th>
-                     Keyboard shortcut
-                  </th>
-                  <th>
-                     Value
-                  </th>
-                  <th>
-                     Label
-                  </th>
-                  <th>
-                     Color
-                  </th>
-                  <th>
-                  </th>
+                  <th>Keyboard shortcut</th>
+                  <th>Value</th>
+                  <th>Label</th>
+                  <th>Color</th>
+                  <th></th>
                </tr>
             </thead>
             <tbody>
-               <tr each={ (flag, index) in configData.flags } class="flag-info">
+               <tr each={ (flag, index) in state.data.flags }
+                     class="flag-info">
                   <td>
-                     <input type="text" value={ flag.key } placeholder="key" class="flag-key"/>
+                     <input type="text"
+                           value={ flag.key }
+                           placeholder="key"
+                           class="flag-key"/>
                   </td>
                   <td>
-                     <input type="text" value={ flag.name } placeholder="value" class="flag-name"/>
+                     <input type="text"
+                           value={ flag.name }
+                           placeholder="value"
+                           class="flag-name"/>
                   </td>
                   <td>
-                     <input type="text" value={ flag.label } placeholder="label" class="flag-label"/>
+                     <input type="text"
+                           value={ flag.label }
+                           placeholder="label"
+                           class="flag-label"/>
                   </td>
                   <td>
-                     <input type="text" value={ flag.color } placeholder="color"  class="flag-color" id="flag-color{index}" style="background-color: {flag.color}"/>
+                     <input type="text"
+                           value={ flag.color }
+                           placeholder="color"
+                           class="flag-color"
+                           id="flag-color{index}"
+                           style="color: {store.getFlagTextColor(flag.color)};background-color: {flag.color}"/>
                   </td>
                   <td>
-                     <a class="btn btn-floating delete-el" onclick={ doDeleteEl.bind(this, index) }>
+                     <a class="btn btn-flat"
+                           onclick={ doDeleteEl.bind(this, index) }>
                         <i class="material-icons">delete</i>
                      </a>
                   </td>
@@ -57,28 +64,27 @@
             </tbody>
          </table>
          <div>
-            <a class="btn waves-effect waves-light" onclick={ doAddEl }>
+            <a class="btn waves-effect waves-light"
+                  onclick={ doAddEl }>
                add flag
                <i class="material-icons right">add</i>
             </a>
          </div>
          <br>
          <br>
-         <div class="input-field" style="max-width: 400px;">
-            <select id="flag-element">
-            </select>
+         <div class="input-field"
+               style="max-width: 400px;">
+            <select id="flag-element"></select>
             <label for="flag-element">Flag element</label>
             <span class="helper-text">Select the element which the flags should be put into.</span>
          </div>
       </template>
    </template>
    <br><br>
-   <dict-config-buttons save-data={saveData} dict-id={dictId} show-save={configData.flags.length}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData}
+         show-save={state.data.flags.length}></dict-config-buttons>
 
    <style>
-      .delete-el {
-         float: right;
-      }
       tr{
          border-bottom: none;
       }
@@ -86,86 +92,84 @@
          padding: 3px 10px 3px 0;
       }
    </style>
+
    <script>
       export default {
-         isLoading: true,
-         dictId: '',
-         configId: '',
-         configTitle: 'Entry flags',
-         configData: {flag_elements: "", flags: []},
+         state: {
+            isLoading: true,
+            isSaving: false,
+            data: {flag_elements: "", flags: []}
+         },
 
          doDeleteEl(idx) {
-            this.configData = this.getConfigData();
-            this.configData.flags.splice(idx, 1);
+            this.state.data = this.getConfigData()
+            this.state.data.flags.splice(idx, 1)
             this.update()
          },
 
          doAddEl(event) {
-            this.configData.flags.push({key: "", name: "", label: "", color: ""});
-            this.update();
+            this.state.data.flags.push({key: "", name: "", label: "", color: ""})
+            this.update()
          },
 
          addColor() {
-            $('.flag-color').each(function() {
-               var cid = $(this)[0].id;
-               $('#'+cid).colorpicker().on('changeColor', function(ev) {
-                  $(this).css('background-color',ev.color.toHex());
-               });
-            });
+            $('.flag-color').each(function(idx, elem) {
+               var cid = $(elem)[0].id
+               $('#' + cid).colorpicker().on('changeColor', function(ev) {
+                  let bgColor = ev.color.toHex()
+                  let color = this.store.getFlagTextColor(bgColor)
+                  $(elem).css({
+                     'background-color': bgColor,
+                     'color': color
+                  })
+               }.bind(this))
+            }.bind(this))
          },
 
          onMounted() {
-            this.dictId = this.props.dictId;
-            this.configId = this.props.configId;
-            console.log('config dict '+ this.dictId + '-' + this.configId)
-            this.props.loadDictDetail();
-            this.fillConfigForm();
-            M.updateTextFields();
-            console.log(this.props);
-            this.addColor();
+            this.store.loadDictionaryConfig("flagging")
+                  .done(response => {
+                     if (response.content.flag_element) {
+                        this.state.data = response.content
+                     }
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                  })
          },
 
          onUpdated() {
-            if (this.props.dictConfigs.xema && this.props.dictConfigs.xema.elements) {
+            if (this.dictData.config.xema && this.dictData.config.xema.elements) {
                if ($('#flag-element option').length == 0) {
-                  Object.entries(this.props.dictConfigs.xema.elements).forEach(([key, info]) => {
-                     $('#flag-element').append('<option value="' + key + '">' + key + '</option>');
-                  });
+                  Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
+                     if(key != this.dictData.config.xema.root){
+                        $('#flag-element').append('<option value="' + key + '"' + (key == this.state.data.flag_element ? 'selected' : '') +  '>' + key + '</option>')
+                     }
+                  })
                }
-               $('select').formSelect();
+               $('select').formSelect()
             }
-            M.updateTextFields();
-            this.addColor();
-         },
-
-         async fillConfigForm() {
-            this.props.loadConfigData(this.configId).then((response)=>{
-               this.configData = {flag_element: "", flags: []}
-               if (response.flag_element && response.flag_element != "") {
-                  this.configData = response;
-               }
-               this.isLoading = false;
-               this.update();
-            });
+            M.updateTextFields()
+            this.addColor()
          },
 
          getConfigData() {
-            var newData = {flag_element: $('#flag-element').val(), flags: []};
+            var newData = {flag_element: $('#flag-element').val(), flags: []}
             $('.flag-info').each(function() {
                newData.flags.push({
                   key: $(this).find('.flag-key').val(),
                   name: $(this).find('.flag-name').val(),
                   label: $(this).find('.flag-label').val(),
                   color: $(this).find('.flag-color').val()
-               });
-            });
-            return newData;
+               })
+            })
+            return newData
          },
 
          saveData() {
-            console.log(this.getConfigData())
-            $('#submit_button').html('Saving...');
-            this.props.saveConfigData(this.configId, this.getConfigData());
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("flagging", this.getConfigData())
+                  .always(() => this.update({isSaving: false}))
          }
       }
    </script>

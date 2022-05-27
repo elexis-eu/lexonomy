@@ -4,5 +4,5 @@
 #aftersave div.meter {display: inline-block; width: 200px; height: 1em; background-color: #ffffff; border: 1px inset #ffffff; position: relative; top: 3px;}
 #aftersave div.meter div.done {background-color: rgb(38, 122, 181); width: 0; height: 1em;}
 #aftersave div.meter.faded {background-color: #e3e3e3;}
-#aftersave a.maximize {display: inline-block; width: 20px; height: 1em; border: 1px solid transparent; position: relative; top: 3px; background-image: url(maximize.png); background-position: center center; background-repeat: no-repeat;}
+#aftersave a.maximize {display: inline-block; width: 20px; height: 1em; border: 1px solid transparent; position: relative; top: 3px; background-image: url(./furniture/maximize.png); background-position: center center; background-repeat: no-repeat;}
 #aftersave a.maximize:hover {border: 1px outset #ffffff;}

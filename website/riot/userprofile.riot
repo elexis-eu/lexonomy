@@ -1,25 +1,33 @@
 <userprofile>
-   <h3>Account settings</h3>
+   <h1>Account settings</h1>
    <!-- Sketch Engine account -->
-   <div class="row">
+   <div if={dictData.siteconfig && !dictData.isSiteconfigLoading}
+         class="row">
       <label>Sketch Engine login</label>
-      <div if={siteconfig.sketchengineLoginPage && props.userInfo.ske_username}>
-         <p>Your Lexonomy account is linked to your Sketch Engine account <b>{ this.props.userInfo.ske_username }</b>
+      <div if={dictData.siteconfig.sketchengineLoginPage && authData.ske_username}>
+         <p>Your Lexonomy account is linked to your Sketch Engine account <b>{ authData.ske_username }</b>
             <br/>
-            <a href={ this.siteconfig.sketchengineLoginPage }>Link to a different Sketch Engine account&nbsp;»</a>
+            <a href={ dictData.siteconfig.sketchengineLoginPage }>Link to a different Sketch Engine account&nbsp;»</a>
          </p>
       </div>
-      <div if={this.siteconfig.sketchengineLoginPage && !props.userInfo.ske_username}>
+      <div if={dictData.siteconfig.sketchengineLoginPage && !authData.ske_username}>
          <p><strong>Sketch Engine login</strong></p>
-         <p><a href={ this.siteconfig.sketchengineLoginPage }>Link Lexonomy to your Sketch Engine account&nbsp;»</a>
+         <p><a href={ dictData.siteconfig.sketchengineLoginPage }>Link Lexonomy to your Sketch Engine account&nbsp;»</a>
          </p>
       </div>
-      <div if={ !siteconfig.sketchengineLoginPage }>
-         <p if={ this.skeuserMessage != '' }>{ this.skeuserMessage }</p>
-         <div class="input-field" style="margin-top: 0;">
+      <div if={ !dictData.siteconfig.sketchengineLoginPage }>
+         <p if={ state.skeuserMessage != '' }>{ state.skeuserMessage }</p>
+         <div class="input-field"
+               style="margin-top: 0;">
             <div style="display: flex; gap: 10px; align-items: center;">
-               <input id="skeusername" type="text" class="validate" value={ this.props.userInfo.ske_username } style="width: 350px;" />
-               <button class="btn waves-effect waves-light" type="submit" onclick={ doChangeUser } style="margin-bottom: 10px;">Change username
+               <input id="skeusername"
+                     type="text"
+                     class="validate"
+                     value={ authData.ske_username }
+                     style="width: 350px;" />
+               <button class="btn waves-effect waves-light"
+                     onclick={ doChangeUser }
+                     style="margin-bottom: 10px;">Change username
                   <i class="material-icons right">send</i>
                </button>
             </div>
@@ -31,14 +39,21 @@
    <!-- Sketch Engine API key -->
    <div class="row">
       <label>Sketch Engine API key</label>
-      <p if={ this.skeapiMessage != '' }>{ this.skeapiMessage }</p>
-      <p if={ 'sketchengineLoginPage' in this.siteconfig && this.siteconfig.sketchengineLoginPage != "" }>
-         Unless you need special setup, Please, <a href={ this.siteconfig.sketchengineLoginPage }>login via Sketch Engine</a> to set API key automatically.
+      <p if={ state.skeapiMessage}>{ state.skeapiMessage }</p>
+      <p if={ dictData.siteconfig.sketchengineLoginPage}>
+         Unless you need special setup, Please, <a href={ dictData.siteconfig.sketchengineLoginPage }>login via Sketch Engine</a> to set API key automatically.
       </p>
-      <div class="input-field" style="margin-top: 0;">
+      <div class="input-field"
+            style="margin-top: 0;">
          <div style="display: flex; gap: 10px; align-items: center;">
-            <input id="skeapi" type="text" class="validate" value={ this.props.userInfo.ske_apiKey } style="width: 350px;"/>
-            <button class="btn waves-effect waves-light" type="submit" onclick={ doChangeKey } style="margin-bottom: 10px;">Change API key
+            <input id="skeapi"
+                  type="text"
+                  class="validate"
+                  value={ authData.ske_apiKey }
+                  style="width: 350px;"/>
+            <button class="btn waves-effect waves-light"
+                  onclick={ doChangeKey }
+                  style="margin-bottom: 10px;">Change API key
                <i class="material-icons right">send</i>
             </button>
          </div>
@@ -48,16 +63,25 @@
 
    <!-- Lexonomy API key -->
    <div class="row">
-      <p>{ this.apiMessage }</p>
+      <p>{ state.apiMessage }</p>
       <label>Lexonomy API key</label>
-      <div class="input-field" style="margin-top: 0;">
+      <div class="input-field"
+            style="margin-top: 0;">
          <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="text" value={this.props.userInfo.apiKey ? this.props.userInfo.apiKey : "not set"} disabled style="width: 350px;">
-
-            <button class="btn waves-effect waves-light" type="submit" onclick={ doNewKey } style="margin-bottom: 10px;">Generate new API key
+            <input type="text"
+                  value={authData.apiKey || "not set"}
+                  disabled
+                  style="width: 350px;">
+            <button class="btn waves-effect waves-light"
+                  onclick={ doNewKey }
+                  style="margin-bottom: 10px;">
+               Generate new API key
                <i class="material-icons right">autorenew</i>
             </button>
-            <button class="btn waves-effect waves-light" type="submit" onclick={ doDeleteKey } style="margin-bottom: 10px;">Remove API key
+            <button class="btn waves-effect waves-light"
+                  onclick={ doDeleteKey }
+                  style="margin-bottom: 10px;">
+               Remove API key
                <i class="material-icons right">delete</i>
             </button>
          </div>
@@ -67,12 +91,18 @@
 
    <!-- set new password -->
    <div class="row">
-      <p>{ this.passMessage }</p>
+      <p>{ state.passMessage }</p>
       <label>New password</label>
-      <div class="input-field" style="margin-top: 0;">
+      <div class="input-field"
+            style="margin-top: 0;">
          <div style="display: flex; gap: 10px; align-items: center;">
-            <input id="password" type="password" class="validate" style="width: 350px;"/>
-            <button class="btn waves-effect waves-light" type="submit" onclick={ doChangePass } style="margin-bottom: 10px;">Change password
+            <input id="password"
+                  type="password"
+                  class="validate"
+                  style="width: 350px;"/>
+            <button class="btn waves-effect waves-light"
+                  onclick={ doChangePass }
+                  style="margin-bottom: 10px;">Change password
                <i class="material-icons right">send</i>
             </button>
          </div>
@@ -80,40 +110,34 @@
       </div>
    </div>
    <div>
-      <a class="btn" href="#/" onclick="window.history.back()">Back</a>
+      <a class="btn"
+            href="#/"
+            onclick="window.history.back()">Back</a>
    </div>
 
    <script>
       export default {
-         passMessage: '',
-         apiMessage: '',
-         skeuserMessage: '',
-         skeapiMessage: '',
-         siteconfig: {},
+         state: {
+            passMessage: '',
+            apiMessage: '',
+            skeuserMessage: '',
+            skeapiMessage: ''
+         },
+
          onMounted() {
-            if (Object.keys(this.props.siteconfig) == 0) {
-               $.get(window.API_URL + "siteconfigread.json", (response) => {
-                  this.siteconfig = response;
-                  this.update();
-               });
-            } else {
-               this.siteconfig = this.props.siteconfig;
-               this.update();
-            }
-            M.updateTextFields();
+            M.updateTextFields()
          },
 
          doChangePass(event) {
             if ($('#password').val() != '') {
                $.post(window.API_URL + "changepwd.json", {password: $('#password').val()}, (response) => {
                   if (response.success) {
-                     this.passMessage = 'Password changed.';
-                     this.update();
+                     this.passMessage = 'Password changed.'
                   } else {
-                     this.passMessage = 'There was an error saving the password.';
-                     this.update();
+                     this.passMessage = 'There was an error saving the password.'
                   }
-               });
+                  this.update()
+               })
             }
          },
 
@@ -121,13 +145,12 @@
             if ($('#skeusername').val() != '') {
                $.post(window.API_URL + "changeskeusername.json", {ske_userName: $('#skeusername').val()}, (response) => {
                   if (response.success) {
-                     this.skeuserMessage = 'Username changed.';
-                     this.update();
+                     this.state.skeuserMessage = 'Username changed.'
                   } else {
-                     this.skeuserMessage = 'There was an error saving the username.';
-                     this.update();
+                     this.state.skeuserMessage = 'There was an error saving the username.'
                   }
-               });
+                  this.update()
+               })
             }
          },
 
@@ -135,51 +158,48 @@
             if ($('#skeapi').val() != '') {
                $.post(window.API_URL + "changeskeapi.json", {ske_apiKey: $('#skeapi').val()}, (response) => {
                   if (response.success) {
-                     this.skeapiMessage = 'API key changed.';
-                     this.update();
+                     this.state.skeapiMessage = 'API key changed.'
                   } else {
-                     this.skeapiMessage = 'There was an error saving the API key.';
-                     this.update();
+                     this.state.skeapiMessage = 'There was an error saving the API key.'
                   }
-               });
+                  this.update()
+               })
             }
          },
 
          doNewKey(event) {
-            var newkey = this.generateKey();
+            var newkey = this.generateKey()
             $.post(window.API_URL + "changeoneclickapi.json", {apiKey: newkey}, (response) => {
                if (response.success) {
-                  this.apiMessage = 'API key changed.';
-                  this.props.userInfo.apiKey = newkey;
-                  this.update();
+                  this.state.apiMessage = 'API key changed.'
+                  this.authData.apiKey = newkey
                } else {
-                  this.apiMessage = 'There was an error saving the API key.';
-                  this.update();
+                  this.state.apiMessage = 'There was an error saving the API key.'
                }
-            });
+               this.update()
+            })
          },
 
          doDeleteKey(event) {
             $.post(window.API_URL + "changeoneclickapi.json", {apiKey: ""}, (response) => {
                if (response.success) {
-                  this.apiMessage = 'API key deleted.';
-                  this.props.userInfo.apiKey = "";
-                  this.update();
+                  this.state.apiMessage = 'API key deleted.'
+                  this.authData.apiKey = ""
                } else {
-                  this.apiMessage = 'There was an error saving the API key.';
-                  this.update();
+                  this.state.apiMessage = 'There was an error saving the API key.'
                }
-            });
+               this.update()
+            })
          },
 
          generateKey() {
-            var alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var key="";
+            var alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            var key=""
             while(key.length<32) {
-               var i=Math.floor(Math.random() * alphabet.length);
-               key+=alphabet[i];
+               var i=Math.floor(Math.random() * alphabet.length)
+               key+=alphabet[i]
             }
-            return key;
+            return key
          }
       }
    </script>

@@ -1,111 +1,111 @@
 <dict-upload>
-   <nav class="nav-breadcrumbs">
-      <div class="nav-wrapper">
-         <a href="#/{ this.props.dictId }" class="breadcrumb">{ this.props.dictDetails.title }</a>
-         <a href="#/{ this.props.dictId }/upload" class="breadcrumb">Upload</a>
+   <loading-overlay if={state.isUploading}/>
+   <dict-nav links={[["upload", "Upload"]]}/>
+   <h1>Upload</h1>
+   <div class="file-field input-field buttons"
+         style="max-width: 700px;">
+      <div class="btn">
+         <span>Choose XML file</span>
+         <input type="file"
+               id="file">
       </div>
-   </nav>
-   <h3>Upload</h3>
-   <div>
-      <div class="file-field input-field buttons" style="max-width: 700px;">
-         <div class="btn">
-            <span>Choose XML file</span>
-            <input type="file" id="file">
-         </div>
-         <div class="file-path-wrapper">
-            <input class="file-path validate" type="text">
-         </div>
-         <div>
-            <a class="waves-effect waves-light btn btn-primary" onclick={ doUpload } id="startButton">
-               <i class="material-icons left">file_upload</i>Upload file
-            </a>
-         </div>
+      <div class="file-path-wrapper">
+         <input class="file-path validate"
+               type="text">
+      </div>
+      <div>
+         <a class="waves-effect waves-light btn btn-primary {state.isUploading || state.isImporting ? 'disabled' : ''}"
+               onclick={ doUpload }
+               id="startButton">
+            <i class="material-icons left">file_upload</i>Upload file
+         </a>
       </div>
    </div>
    <div>
       <label>
-         <input type="checkbox" id="purge" />
+         <input type="checkbox"
+               id="purge" />
          <span>Purge dictionary before upload</span>
       </label>
    </div>
    <br><br>
 
-   <div>
-      <div class="col s10" id="info">
+
+   <template if={state.infoMessage || state.errorMessage}>
+      <h3>Progress</h3>
+      <div if={state.infoMessage}
+            classs="message messageInfo">
+         <raw-html content={state.infoMessage}></raw-html>
       </div>
-   </div>
-   <div>
-      <div class="col s10" id="errors">
-         <pre>
-         </pre>
+      <div if={state.errorMessage}
+            class="message messageError">
+         <raw-html content={state.errorMessage}></raw-html>
       </div>
-   </div>
+   </template>
 
    <script>
       export default {
-         dictId: '',
-         onMounted() {
-            this.dictId = this.props.dictId;
-            console.log('upload dict '+ this.dictId)
-            this.props.loadDictDetail();
-            console.log(this.props)
-            this.update()
+         state: {
+            isUploading: false,
+            isImporting: false,
+            showProgress: false,
+            errorMessage: "",
+            infoMessage: ""
          },
 
          doUpload() {
-            var purge = $('#purge').is(':checked');
-            console.log($('#file'))
-            console.log($('#file').val())
-            console.log(purge)
-            var fd = new FormData();
+            var fd = new FormData()
             var files = $('#file')[0].files[0];
-            fd.append('myfile', files);
-            if (purge) fd.append('purge', 'on');
-            $('#startButton').attr('disabled', 'disabled');
-            $('#info').html('Upload started, please keep the window open.');
-            $.ajax({
-               url: window.API_URL + this.dictId + '/upload.html',
-               data: fd,
-               processData: false,
-               contentType: false,
-               type: 'POST',
-               success: function(response) {
-                  console.log(response)
-                  if (response.success) {
-                     $('#info').data('file', response.file);
-                     $('#info').data('uploadStart', response.uploadStart);
-                  } else {
-                     $('#info').html('Error while uploading file');
-                  }
-               }
-            });
-            this.startImport(this.dictId);
+            fd.append('myfile', files)
+            if ($('#purge').is(':checked')) fd.append('purge', 'on')
+            this.update({
+               isUploading: true,
+               errorMessage: "",
+               infoMessage: "Upload started, please keep the window open."
+            })
+            this.store.uploadXML(fd)
+                  .done((response) => {
+                        if (response.success) {
+                           this.startImport(response.file, response.uploadStart)
+                        } else {
+                           this.update({infoMessage: 'Error while uploading file'})
+                        }
+                     })
+                  .always(() => {
+                     this.update({isUploading: false})
+                  })
          },
 
-         startImport(dictId) {
-            var importTimer = setInterval(checkImport, 500);
-            function checkImport() {
-               var file = $('#info').data('file');
-               var uploadStart = $('#info').data('uploadStart');
-               if (file != '') {
-                  $.get(window.API_URL + dictId + '/import.json', {filename: file, uploadStart: uploadStart}, (response) => {
-                     console.log(response)
-                     $('#info').html(response.progressMessage);
-                     if (response.finished) {
-                        $('#info').html(response.progressMessage + '<br/>Dictionary import finished. <a href="/#'+dictId+'/edit">See dictionary</a>');
-                        clearInterval(importTimer);
-                        $('#startButton').removeAttr('disabled');
-                     }
-                     if (response.errors) {
-                        $('#info').html('There were some errors during XML parsing');
-                        $.get(window.API_URL + dictId + '/import.json', {filename: file, uploadStart: uploadStart, showErrors: true, truncate: 10000}, (response) => {
-                           $('#errors pre').html(response.errorData)
-                        });
-                        clearInterval(importTimer);
-                        $('#startButton').removeAttr('disabled');
-                     }
-                  });
-               }
+         startImport(file, uploadStart) {
+            if (file != '') {
+               this.update({isImporting: true})
+               this.store.importXML({
+                  filename: file,
+                  uploadStart: uploadStart
+               })
+                     .done(response => {
+                        clearTimeout(this.state.timeutHandle)
+                        this.state.infoMessage = response.progressMessage
+                        if (response.finished) {
+                           this.state.isImporting = false
+                           this.state.infoMessage += ' Dictionary import finished. <a href="#/' + this.dictData.dictId + '">See dictionary</a>'
+                        } else if (response.errors) {
+                           this.state.infoMessage = 'There were some errors during XML parsing'
+                           this.store.importXML({
+                              filename: file,
+                              uploadStart: uploadStart,
+                              showErrors: true,
+                              truncate: 10000
+                           })
+                                 .done(response => {
+                                    this.update({errorMessage: response.errorData})
+                                 })
+                           this.state.isImporting = false
+                        } else {
+                           this.state.timeutHandle = setTimeout(this.startImport.bind(this, file, uploadStart), 2000)
+                        }
+                        this.update()
+                     })
             }
          }
       }

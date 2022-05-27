@@ -1,4 +1,4 @@
-var Publico={};
+window.Publico={};
 
 Publico.wrapChange=function(){
     Publico.change();

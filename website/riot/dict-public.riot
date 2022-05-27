@@ -1,73 +1,201 @@
 <dict-public>
-   <h3 class="header">
-      { this.props.dictDetails.title }
-      <div class="buttons right" style="margin-top: 5px;">
-         <a if={props.userAccess.canEdit} href="#/{dictId}/edit" class="btn">edit</a>
-         <a if={props.userAccess.canConfig} href="#/{dictId}/config" class="btn">config</a>
-         <a if={props.userAccess.canUpload} href="#/{dictId}/upload" class="btn">upload</a>
-         <a if={props.userAccess.canDownload} href="#/{dictId}/download" class="btn">download</a>
+   <dict-nav/>
+   <loading-overlay if={dictData.isDictionaryLoading || state.isEntryListLoading}/>
+   <template if={!dictData.isDictionaryLoading}>
+      <h1 class="header">
+         { dictData.title }
+         <div class="dictBtns buttons">
+            <a if={dictData.userAccess.canEdit}
+                  href="#/{dictData.dictId}/edit"
+                  class="btn">edit</a>
+            <a if={dictData.userAccess.canConfig}
+                  href="#/{dictData.dictId}/config"
+                  class="btn">config</a>
+            <a if={dictData.userAccess.canUpload}
+                  href="#/{dictData.dictId}/upload"
+                  class="btn">upload</a>
+            <a if={dictData.userAccess.canDownload}
+                  href="#/{dictData.dictId}/download"
+                  class="btn">download</a>
+            <a if={authData.authorized} href="#/{dictData.dictId}/links"
+                  class="btn">links</a>
+         </div>
+      </h1>
+
+      <div class="firstRowContainer">
+         <div class="firstRowCol description">
+            <h3>Description</h3>
+            <raw-html content={dictData.blurb}></raw-html>
+         </div>
+         <template if={dictData.public || dictData.userAccess}>
+            <div class="sectionDivider"></div>
+            <div class="firstRowCol">
+               <h3>Search</h3>
+               <dict-entry-filter search-func={search}/>
+               <div if={!state.isEntryListLoading && state.showFoundEntries && dictData.entryList}
+                     class="searchResult">
+                  <ul if={dictData.entryList.length}
+                        class="entry-list found-entries">
+                     <li each={entry in dictData.entryList}>
+                        <a href={getEntryUrl(entry)}>
+                           <raw-html content={entry.title}></raw-html>
+                        </a>
+                     </li>
+                  </ul>
+                  <div if={dictData.entryCount > 20}
+                        class="serchResultNote grey-text">
+                        Showing first 20 entries of {dictData.entryCount}.
+                  </div>
+                  <div if={!dictData.entryList.length}
+                        class="noEntries">
+                      <h2 class="grey-text center-align">No entries</h2>
+                  </div>
+               </div>
+            </div>
+         </template>
       </div>
-   </h3>
-   <p class="blurb">{ this.props.dictDetails.blurb }</p>
-   <div if={ this.props.dictDetails.public } class="section">
-      <br>
-      <div class="divider"></div>
-      <a class="btn btn-floating waves-effect waves-light right" onclick={ onReloadExamplesClick } style="margin-top: 15px;"><i class="material-icons">refresh</i></a>
-      <h5 style="margin-left: 8px;">Examples</h5>
-      <div if={loadingExamples} class="grey-text" style="min-height: 20px; margin: 15px 10px;">
-         Loading...
+
+      <div if={ dictData.public }>
+         <div class="divider"></div>
+         <a if={dictData.dictionaryExamplesHasMore}
+               class="refreshExamplesBtn btn btn-floating waves-effect waves-light right"
+               onclick={ onReloadExamplesClick }>
+            <i class="material-icons">refresh</i>
+         </a>
+         <h3>Examples</h3>
+         <div if={dictData.isDictionaryExamplesLoading}
+               class="loadingExamples grey-text">
+            Loading...
+         </div>
+         <ul if={ !dictData.isDictionaryExamplesLoading && dictData.dictionaryExamples }
+               class="entry-list random-entries">
+            <li each={ entry in dictData.dictionaryExamples }>
+               <a href="#/{ dictData.dictId }/{ entry.id }">{ entry.titlePlain }</a>
+            </li>
+         </ul>
+         <div class="divider"></div>
+         <div class="licence section right">
+            { dictData.licence }
+         </div>
       </div>
-      <ul class="random-entries s10" if={ !loadingExamples && randomEntries }>
-         <li each={ entry in randomEntries }><a href="#/{ this.dictId }/{ entry.id }">{ entry.titlePlain }</a></li>
-      </ul>
-      <div class="divider"></div>
-      <div class="section right" style="opacity: .5;">
-         { this.props.dictDetails.licence }
-      </div>
-   </div>
+   </template>
+
+   <style>
+      .dictBtns{
+         margin-top: 5px;
+      }
+      .firstRowContainer{
+         display: flex;
+      }
+      .sectionDivider{
+         width: 1px;
+         border-left: 1px solid #e0e0e0;
+         padding-left: 30px;
+         margin-left: 30px;
+      }
+      .firstRowCol{
+         flex: 1;
+         padding-bottom: 30px;
+      }
+      .description{
+         word-break: break-word;
+      }
+      dict-entry-filter{
+         max-width: 500px;
+      }
+      .searchResult{
+         min-height: max(15vh, 200px);
+      }
+      .searchResultNote{
+         font-size: 0.8rem;
+         margin-left: 10px;
+      }
+      .noEntries{
+         padding-top: 30px;
+      }
+      .entry-list li {
+         display: inline-block;
+         padding: 3px 10px;
+      }
+      .entry-list li a:hover {
+         text-decoration: underline;
+      }
+      .refreshExamplesBtn{
+         margin-top: 15px;
+      }
+      .loadingExamples{
+         min-height: 20px;
+         margin: 15px 10px;
+      }
+      .licence{
+         opacity: .5;
+      }
+   </style>
 
    <script>
       export default {
-         dictId: '',
-         randomEntries: [],
-         loadingExamples: true,
+         bindings: [["store", "dictionaryChanged", "onDictionaryChanged"],
+                    ["store", "isDictionaryExamplesLoading", "update"]],
+
+         state: {
+            isEntryListLoading: false,
+            showFoundEntries: false
+         },
+
+         reloadDictionaryExamples(){
+            if(this.dictData.public || this.authData.authorized){
+               this.store.reloadDictionaryExamples()
+            }
+         },
+
+         search(){
+            this.update({isEntryListLoading: true})
+            this.store.loadEntryList(20)
+                  .done(() =>{
+                     this.state.showFoundEntries = true
+                  })
+                  .always(() => {
+                     this.update({isEntryListLoading: false})
+                  })
+         },
 
          onReloadExamplesClick(){
-            this.reloadRandom()
+            this.reloadDictionaryExamples()
             this.update()
          },
 
-         reloadRandom() {
-            this.loadingExamples = true
-            $.post(window.API_URL + this.dictId + "/random.json", (response) => {
-               console.log(response)
-               this.loadingExamples = false
-               this.randomEntries = response.entries;
-               this.update();
-            });
+         onDictionaryChanged(){
+            this.reloadDictionaryExamples()
          },
 
-         onMounted() {
-            this.dictId = this.props.dictId;
-            console.log('list dict '+ this.dictId)
-            this.props.loadDictDetail().then(()=>{
-               if (this.props.dictDetails.public && this.randomEntries.length == 0) {
-                  this.reloadRandom();
-               }
-            });
-            console.log(this.props)
+         onCloseSearchResultClick(){
+            this.update({showFoundEntries: false})
          },
 
-         onUpdated() {
-            console.log('list dict update'+ this.dictId)
-            $('.blurb').html(this.props.dictDetails.blurb);
+         getEntryUrl(entry){
+            if(this.dictData.userAccess && this.dictData.userAccess.canEdit){
+               return `#/${this.dictData.dictId}/edit/${this.dictData.doctype}/${entry.id}/view`
+            } else {
+               return `#/${this.dictData.dictId}/${entry.id}`
+            }
+         },
+
+         onUpdated(){
+            // make all items in list same width to create columns
+            [".entry-list li", ".random-entries li"].forEach(selector => {
+               let maxWidth = 0;
+               $(selector).each((i, e) => {maxWidth = Math.max(maxWidth, $(e).width())})
+               $(selector).each((i, e) => {$(e).css("width", Math.min(300, maxWidth + 20) + "px")})
+            })
+         },
+
+         onMounted(){
+            this.dictData.searchtext = ""
+            if(!this.dictData.dictionaryExamples && !this.dictData.isDictionaryExamplesLoading){
+               this.reloadDictionaryExamples()
+            }
          }
       }
    </script>
-
-   <style>
-      .random-entries li {display: inline; padding: 5px 10px;}
-      .random-entries li a:hover {text-decoration: underline;}
-   </style>
 </dict-public>
 

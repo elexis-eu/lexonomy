@@ -1,4 +1,4 @@
-data/lexonomy.sqlite
+data/*.sqlite
 data/dicts/*
 !data/dicts/README.md
 data/uploads/*
@@ -7,4 +7,10 @@ website/siteconfig.json
 website/node_modules/*
 website/package-lock.json
 website/__pycache__/*
+website/config.js
+website/bundle.js
+website/bundle.static.js
+website/bundle.css
+/node_modules/
+node_modules
 .vscode

@@ -1,0 +1,17 @@
+<raw-html class="raw-html">
+   <script>
+      export default {
+         upd () {
+            this.root.innerHTML = this.props.content
+         },
+
+         onMounted(){
+            this.upd()
+         },
+
+         onUpdated() {
+            this.upd()
+         }
+      }
+   </script>
+</raw-html>

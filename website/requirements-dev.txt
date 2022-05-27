@@ -12,3 +12,4 @@ wrapt==1.11.1
 express==1.0
 Markdown>=3.1.0
 PyJWT==1.7.1
+beautifulsoup4>=4.4.0

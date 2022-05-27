@@ -1,4 +1,4 @@
-var Xemplatron={};
+window.Xemplatron={};
 Xemplatron.xema=null;
 Xemplatron.xemplate=null;
 
@@ -132,7 +132,7 @@ Xemplatron.styles={ //the dimensions are ordered from innermost to outermost
   },
   interactivity: {
     "title": "Interactivity",
-    "xref": {toHtml: function(ly, html, n, isF, isL){return "<a class='xref' onclick='route(\""+dictId+(document.location.hash.includes("/edit/")?"/edit":"")+"/"+n.nodeName+"/view"+(n.getAttribute('lxnm:subentryID'))+"\");' data-text='"+n.textContent.replace("'", "&apos;")+"'>"+html+"</a>"}, title: "Clickable cross-reference"},
+    "xref": {toHtml: function(ly, html, n, isF, isL){return "<a class='xref' href=\"" + window.location.hash.split("?")[0] + "?s=" + encodeURIComponent(n.textContent) + "&m=substring\">"+html+"</a>"}, title: "Clickable cross-reference"},
     "xlink": {toHtml: function(ly, html, n, isF, isL){return "<a class='xlink' target='_blank' href='"+n.textContent.replace("'", "&apos;")+"'>"+n.textContent+"</a>"}, title: "External URL link"},
   },
   innerPunc: {
@@ -159,10 +159,10 @@ Xemplatron.styles={ //the dimensions are ordered from innermost to outermost
   },
   colour: {
     "title": "Text colour",
-    "red": {toHtml: function(ly, html, n, isF, isL){return "<span class='red'>"+html+"</span>"}, title: "Red"},
-    "blue": {toHtml: function(ly, html, n, isF, isL){return "<span class='blue'>"+html+"</span>"}, title: "Blue"},
-    "green": {toHtml: function(ly, html, n, isF, isL){return "<span class='green'>"+html+"</span>"}, title: "Green"},
-    "grey": {toHtml: function(ly, html, n, isF, isL){return "<span class='grey'>"+html+"</span>"}, title: "Grey"},
+    "red": {toHtml: function(ly, html, n, isF, isL){return "<span class='xema_red'>"+html+"</span>"}, title: "Red"},
+    "blue": {toHtml: function(ly, html, n, isF, isL){return "<span class='xema_blue'>"+html+"</span>"}, title: "Blue"},
+    "green": {toHtml: function(ly, html, n, isF, isL){return "<span class='xema_green'>"+html+"</span>"}, title: "Green"},
+    "grey": {toHtml: function(ly, html, n, isF, isL){return "<span class='xema_grey'>"+html+"</span>"}, title: "Grey"},
   },
   outerPunc: {
     "title": "Outer punctuation",
@@ -175,9 +175,9 @@ Xemplatron.styles={ //the dimensions are ordered from innermost to outermost
   },
   background: {
     "title": "Background colour",
-    "yellow": {toHtml: function(ly, html, n, isF, isL){return "<"+(ly=="block"?"div":"span")+" class='background yellow'>"+html+"</"+(ly=="block"?"div":"span")+">"}, title: "Yellow"},
-    "blue": {toHtml: function(ly, html, n, isF, isL){return "<"+(ly=="block"?"div":"span")+" class='background blue'>"+html+"</"+(ly=="block"?"div":"span")+">"}, title: "Blue"},
-    "grey": {toHtml: function(ly, html, n, isF, isL){return "<"+(ly=="block"?"div":"span")+" class='background grey'>"+html+"</"+(ly=="block"?"div":"span")+">"}, title: "Grey"},
+    "yellow": {toHtml: function(ly, html, n, isF, isL){return "<"+(ly=="block"?"div":"span")+" class='background xema_yellow'>"+html+"</"+(ly=="block"?"div":"span")+">"}, title: "Yellow"},
+    "blue": {toHtml: function(ly, html, n, isF, isL){return "<"+(ly=="block"?"div":"span")+" class='background xema_blue'>"+html+"</"+(ly=="block"?"div":"span")+">"}, title: "Blue"},
+    "grey": {toHtml: function(ly, html, n, isF, isL){return "<"+(ly=="block"?"div":"span")+" class='background xema_grey'>"+html+"</"+(ly=="block"?"div":"span")+">"}, title: "Grey"},
   },
   border: {
     "title": "Box border",

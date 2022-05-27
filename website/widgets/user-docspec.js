@@ -1,4 +1,4 @@
-var docSpec={
+window.docSpec={
 	onchange: function(jsSurrogate){
 		//console.log(jsSurrogate.parent());
 	},

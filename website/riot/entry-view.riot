@@ -1,33 +1,44 @@
 <entry-view>
-   <div class="viewer" id="viewer">
-   </div>
+   <loading-overlay if={dictData.isEntryLoading}
+         fulscreen={false}/>
+   <div class="viewer"
+         id="viewer"></div>
+
+   <style>
+      :host{
+         position: relative;
+         display: block;
+         min-height: calc(100vh - 260px);
+      }
+      .voicetts {
+         display: inline-block;
+         vertical-align: top;
+      }
+      .voicetts-icon img {
+         width: 30px;
+         cursor: pointer;
+         margin-left: 1em;
+      }
+   </style>
+
    <script>
       export default {
-         entryId: '',
+         bindings: [["store", "isEntryLoadingChanged", "update"]],
 
-         readEntry() {
-            if (this.props.dictId != '') {
-               $.post(window.API_URL + this.props.dictId + "/entryread.json", {id: this.props.entryId}, (response) => {
-                  console.log(response)
-                  if (response.success) {
-                     $('.viewer').html(response.contentHtml);
-                  }
-               });
+         initViewer(){
+            if(this.dictData.entry && this.dictData.entry.content){
+               let html = Xemplatron.xml2html(this.dictData.entry.content, this.dictData.config.xemplate, this.dictData.config.xema)
+               $('#viewer').html(html)
+               Gmedia.addVoicePublic(this.dictData.entry, this.dictData.config.gapi, this.dictData.config.titling);
             }
+         },
+
+         onUpdated(){
+            this.initViewer()
          },
 
          onMounted() {
-            this.entryId = this.props.entryId;
-            console.log('view '+this.props.dictId+'-'+this.props.entryId)
-            this.readEntry();
-         },
-
-         onUpdated() {
-            console.log('up view '+this.props.dictId+'-'+this.props.entryId+'-'+this.entryId)
-            if (this.entryId != this.props.entryId) {
-               this.entryId = this.props.entryId;
-               this.readEntry();
-            }
+            this.initViewer()
          }
       }
    </script>

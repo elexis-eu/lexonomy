@@ -1,47 +1,63 @@
 <forgot>
-   <div if={ !messageSent }  class="section">
+   <loading-overlay if={state.isResetting}/>
+   <div if={ state.messageSent }
+         class="section message messageSuccess">
+      We have sent you an e-mail with instructions on how to reset your password.
+   </div>
+
+   <div if={ state.errorMessage}
+         class="section message messageError">
+      { state.errorMessage }
+   </div>
+
+   <div if={ !state.messageSent }
+         class="section">
       <div class="input-field">
-         <input id="email" type="email" onkeypress={ doLogin }/>
+         <input id="email"
+               type="email"
+               onkeyup={ onKeyUp }/>
          <label for="email">Your e-mail</label>
          <span class="helper-text">If you have forgotten your password, enter your e-mail address and we will send you instructions on how to create a new one.</span>
       </div>
-      <div>
-         <button class="btn waves-effect waves-light" type="submit" name="login" id="loginButton" onclick={ doLogin }>Get a new password
+      <div class="buttons">
+         <a href="#/"
+               class="btn btn-secondary waves-effect waves-light">
+            Back
+         </a>
+         <button class="btn waves-effect waves-light"
+               name="login"
+               id="loginButton"
+               onclick={ requestResetPassword }>Get a new password
             <i class="material-icons right">send</i>
          </button>
       </div>
    </div>
 
-   <div if={ messageSent } class="section">
-      <p>We have sent you an e-mail with instructions on how to reset your password.</p>
-   </div>
-   <div if={ errorMessage != ''} class="row">
-      <div class="col s6">
-         <div class="card red darken-2">
-            <div class="card-content white-text">
-               <p>{ errorMessage }</p>
-            </div>
-         </div>
-      </div>
-   </div>
-
    <script>
       export default {
-         messageSent: false,
-         errorMessage: '',
+         state: {
+            messageSent: false,
+            errorMessage: '',
+            isResetting: false
+         },
 
-         doLogin(event) {
-            if ((event.target.id == "email") && event.keyCode != 13) return false;
-            this.props.accountOps('forgot').then((result)=>{
-               if (result.success) {
-                  this.messageSent = true;
-                  this.update();
-               } else {
-                  this.messageSent = false;
-                  this.errorMessage = result.errorMessage;
-                  this.update()
-               }
-            });
+         onKeyUp(evt){
+            evt.keyCode == 13 && this.requestResetPassword()
+         },
+
+         requestResetPassword(event) {
+            let email = $("#email").val()
+            if(email){
+               this.update({isResetting: true})
+               this.auth.requestResetPassword(email)
+                     .always(response => {
+                        this.update({
+                           isResetting: false,
+                           messageSent: response.success,
+                           errorMessage: !response.success ? "Incorrect e-mail." : ""
+                        })
+                     })
+            }
          }
       }
    </script>

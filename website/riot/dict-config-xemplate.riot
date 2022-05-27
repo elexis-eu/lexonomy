@@ -1,106 +1,99 @@
 <dict-config-xemplate>
-  <dict-config-nav dictId={ dictId } dictTitle={ props.dictDetails.title } configId={ configId }
-                   configTitle={ configTitle }/>
-  <h3>Entry formatting</h3>
-  <div
-    if={ (!this.configData._xsl || this.configData._xsl == "") && (!this.configData._css || this.configData._css == "") && !this.override }>
-    <div style="display: flex">
-      <!-- TODO fixup styles so we don't need this sillyness. -->
-      <div
-        style="flex-basis: 0; width: auto; position: static; overflow: initial!important; margin-right: 15px;!important"
-        id="editor" class="designer">
-        <div class="list">
-          <dict-config-element-in-tree each={root in state.roots}
-                                       data={root}
-                                       xema={props.dictConfigs.xema}
-                                       current-element={elementName}
-                                       current-attribute={attributeName}
-                                       selectElementOrAttribute={selectElementOrAttribute}
-          />
-        </div>
+   <loading-overlay if={state.isLoading || state.isSaving}/>
+   <dict-nav links={[["config", "Configure"], ["xemplate", "Entry formatting"]]}/>
+   <h1>Entry formatting</h1>
+   <div if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
+      <div class="row designer"
+            id="editor"></div>
+      <div class="row">
+         <div class="col s10">
+            <button class="btn waves-effect waves-light"
+                  onclick={ startOverride } >
+               Use your own stylesheet
+               <i class="material-icons right">edit</i>
+            </button>
+         </div>
       </div>
-
-      <display-styles if={this.elementName}
-                      name="displayStylesComponent"
-                      elementName={this.elementName}
-                      attributeName={attributeName}
-                      elementConfigData={this.configData[elementName]}
-                      config={this.props.dictConfigs}
-                      loadConfigData={this.props.loadConfigData}
-                      configId={this.props.configId}
-                      save-data={handleElementData}
-      />
-    </div>
-
-    <div class="row">
-      <div class="col s10">
-        <button class="btn waves-effect waves-light" onclick={ startOverride }>Use your own stylesheet <i
-          class="material-icons right">edit</i>
-        </button>
+   </div>
+   <div if={ (state.data._xsl && state.data._xsl != "") || (state.data._css && state.data._css != "") || state.override }>
+      <div class="row">
+         <div class="input-field col s10">
+            <textarea id="editor_xsl"
+                  class="materialize-textarea">{ state.data._xsl }</textarea>
+            <label for="editor_xsl">XSL</label>
+            <span class="helper-text">Custom XSL stylesheet. If you would like to see an example,
+               <a onclick={ exampleXsl }>click here to load a sample XSL</a>.
+            </span>
+         </div>
       </div>
-    </div>
-  </div>
-  <div
-    if={ (this.configData._xsl && this.configData._xsl != "") || (this.configData._css && this.configData._css != "") || this.override }>
-    <div class="row">
-      <div class="input-field col s10">
-        <textarea id="editor_xsl" class="materialize-textarea" placeholder="">{ this.configData._xsl }</textarea>
-        <label for="editor_xsl">XSL</label>
-        <span class="helper-text">Custom XSL stylesheet. If you would like to see an example, <a onclick={ exampleXsl }>click here to load a sample XSL</a>.</span>
-      </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s10">
-        <textarea id="editor_css" class="materialize-textarea" placeholder="">{ this.configData._css }</textarea>
-        <label for="editor_css">CSS</label>
-        <span class="helper-text">Custom CSS stylesheet. If you would like to see an example, <a onclick={ exampleCss }>click here to load a sample CSS</a>.</span>
+      <div class="row">
+         <div class="input-field col s10">
+            <textarea id="editor_css"
+                  class="materialize-textarea">{ state.data._css }</textarea>
+            <label for="editor_css">CSS</label>
+            <span class="helper-text">Custom CSS stylesheet. If you would like to see an example,
+               <a onclick={ exampleCss }>click here to load a sample CSS</a>.
+            </span>
+         </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col s10">
-        <button class="btn waves-effect waves-light" onclick={ stopOverride }>Stop using your own stylesheet <i
-          class="material-icons right">edit</i>
-        </button>
+      <div class="row">
+         <div class="col s10">
+            <button class="btn waves-effect waves-light"
+                  onclick={ stopOverride } >
+               Stop using your own stylesheet
+               <i class="material-icons right">edit</i>
+            </button>
+         </div>
       </div>
-    </div>
-  </div>
-  <dict-config-buttons save-data={saveData} dict-id={dictId}></dict-config-buttons>
+   </div>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
-  <script>
-    import displayStyles from "./entry-formatting/display-styles.riot"
+   <style>
+      #editor {
+         position: relative !important;
+         min-height: 1050px;
+      }
+      #editor .list {
+         width: 25% !important;
+      }
+      #editor .details {
+         left: 25% !important;
+         width: 35% !important;
+      }
+      #editor .preview {
+         left: 60% !important;
+         width: 40% !important;
+      }
+      #editor.designer input[type=radio] {
+         opacity: 1 !important;
+      }
+   </style>
 
-    export default {
-      components: {
-        displayStyles
-      },
+   <script>
+      export default {
+         state: {
+            isLoading: true,
+            isSaving: false,
+            override: false,
+            data: {}
+         },
 
-      state: {},
+         startOverride() {
+            this.update({override: true})
+         },
 
-      dictId: '',
-      configId: '',
-      configTitle: 'Entry formatting',
-      override: false,
-      configData: {},
-      elementName: null,
-      attributeName: null,
+         stopOverride() {
+            delete this.state.data._xsl
+            delete this.state.data._css
+            this.update({override: false})
+            XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId)
+         },
 
-      startOverride() {
-        this.override = true
-        this.update()
-      },
-
-      stopOverride() {
-        this.override = false
-        delete this.configData._xsl
-        delete this.configData._css
-        this.update()
-        XemplateDesigner.start(this.props.dictConfigs.xema, this.configData, this.dictId, true)
-      },
-
-      exampleXsl() {
-        $('#editor_xsl').val(
-          `<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+         exampleXsl() {
+            $('#editor_xsl').val(
+`<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    <xsl:template match="entry">
       <div class='myEntry'><xsl:apply-templates/></div>
    </xsl:template>
@@ -109,91 +102,58 @@
    </xsl:template>
 </xsl:stylesheet>
 `)
-        M.textareaAutoResize($('#editor_xsl'))
-        M.updateTextFields()
-      },
+            M.textareaAutoResize($('#editor_xsl'))
+            M.updateTextFields()
+         },
 
-      exampleCss() {
-        $('#editor_css').val(
-          `div.myEntry {font-family: serif; font-size: 1.25em}
+         exampleCss() {
+            $('#editor_css').val(
+`div.myEntry {font-family: serif; font-size: 1.25em}
 div.myEntry span.myHeadword {font-weight: bold}
 `)
-        M.textareaAutoResize($('#editor_css'))
-        M.updateTextFields()
-      },
-
-      onMounted() {
-        this.dictId = this.props.dictId
-        this.configId = this.props.configId
-        this.props.loadDictDetail()
-        this.fillConfigForm()
-        // document.addEventListener("selectedXMLElement", this.handleSelectedXMLElement)
-      },
-
-      onBeforeUpdate() {
-        const xema = (this.props.dictConfigs || {}).xema
-        if (!xema || !xema.elements) return
-        const roots = new Set(Object.keys(xema.elements))
-        Object.values(xema.elements).forEach(el => el.children.forEach(c => roots.delete(c.name)))
-        this.state.roots = [...roots].map(id => ({...xema.elements[id], id})) // add ID so tree renderer knows the id of every element
-      },
-
-      async fillConfigForm() {
-        this.props.loadConfigData(this.configId).then((response) => {
-          this.configData = response
-          this.override = !!(this.configData._xsl || this.configData._css)
-          if (this.override) {
-            this.update()
-            M.updateTextFields()
             M.textareaAutoResize($('#editor_css'))
-            M.textareaAutoResize($('#editor_xsl'))
-          } else {
-            this.update()
-          }
-        })
-      },
+            M.updateTextFields()
+         },
 
-      getConfigData() {
-        var newData = {}
-        if (XemplateDesigner.xemplate) {
-          newData = XemplateDesigner.xemplate
-        }
-        if (this.override) {
-          if ($('#editor_css').val() != "") newData._css = $('#editor_css').val()
-          if ($('#editor_xsl').val() != "") newData._xsl = $('#editor_xsl').val()
-        }
-        return newData
-      },
+         onMounted() {
+            this.store.loadDictionaryConfig("xemplate")
+                  .done(response => {
+                     this.state.data = response.content
+                     this.state.override = this.state.data._xsl || this.state.data._css
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                     if(this.state.override){
+                        M.updateTextFields()
+                        M.textareaAutoResize($('#editor_css'))
+                        M.textareaAutoResize($('#editor_xsl'))
+                     }
+                  })
+         },
 
-      selectElementOrAttribute(elementId, attributeId) {
-        this.elementName = elementId
-        this.attributeName = attributeId || null
-        this.update()
-      },
-
-      handleElementData(elementName, attributeName, attribute, value) {
-        if (attributeName) {
-          let elementAttributes = this.configData[elementName].attributes
-          if (elementAttributes) {
-            if (elementAttributes[attributeName]) {
-              elementAttributes[attributeName][attribute] = value
-            } else {
-              elementAttributes[attributeName] = {[attribute]: value}
+         onUpdated() {
+            if (this.dictData.dictConfigs.xema && this.state.data != {} && !this.state.override) {
+               XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId)
             }
-          } else {
-            this.configData[elementName].attributes = {[attribute]: value}
-          }
-        } else {
-          if (!this.configData[elementName]) {
-            this.configData[elementName] = {}
-          }
-          this.configData[elementName][attribute] = value
-        }
-      },
+         },
 
-      saveData() {
-        $('#submit_button').html('Saving...')
-        this.props.saveConfigData(this.configId, this.configData)
+         getConfigData() {
+            var newData = {}
+            if (XemplateDesigner.xemplate) {
+               newData = XemplateDesigner.xemplate
+            }
+            if (this.state.override) {
+               if ($('#editor_css').val() != "") newData._css = $('#editor_css').val()
+               if ($('#editor_xsl').val() != "") newData._xsl = $('#editor_xsl').val()
+            }
+            return newData
+         },
+
+         saveData() {
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("xemplate", this.getConfigData())
+                  .always(() => this.update({isSaving: false}))
+         }
       }
     }
   </script>

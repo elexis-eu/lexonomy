@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
 import os
+from sqlite3 import Connection
 import sys
 import functools
+from typing import Any, TYPE_CHECKING
 import ops
 import re
 import jwt
@@ -14,6 +16,13 @@ import media
 import bottle
 from bottle import (hook, route, get, post, run, template, error, request,
                     response, static_file, abort, redirect, install)
+
+from ops import Configs, User, get_entry_html
+
+if TYPE_CHECKING:
+    request: Any
+    body: Any
+    response: Any
 
 # configuration
 app = bottle.default_app()
@@ -38,8 +47,8 @@ if not cgi and len(sys.argv) > 1:
     my_url = sys.argv[1]
 
 # serve static files
-@route('/<path:re:(widgets|furniture|libs|index.*\.html|config\.js|bundle\.js|riot|img|js|css|docs|node_modules).*>')
-def server_static(path):
+@route('/<path:re:(widgets|furniture|libs|index.*\.html|config\.js|bundle\.js|bundle\.static\.js|bundle\.css|riot|img|js|css|docs|version\.txt).*>')
+def server_static(path: str):
     return static_file(path, root="./")
 
 # ignore trailing slashes, urldecode cookies
@@ -76,7 +85,7 @@ install(profiler)
 # to ensure that user has appropriate access to the dictionary. Empty list checks read access only.
 # assumes <dictID> in route and "dictID", "user", "dictDB", "configs" as parameters in the decorated function
 # <dictID> gets open and passed as dictDB alongside the configs
-def authDict(checkRights, errorRedirect=False):
+def authDict(checkRights: list[str], errorRedirect: bool=False):
     def wrap(func):
         @functools.wraps(func)
         def wrapper_verifyLoginAndDictAccess(*args, **kwargs):
@@ -101,7 +110,7 @@ def authDict(checkRights, errorRedirect=False):
 # authentication decorator
 # use @auth to check that user is authenticated
 # assumes that the decorated function has a "user" parameter which is used to pass the user info
-def auth(func):
+def auth(func: Any):
     @functools.wraps(func)
     def wrapper_verifyLogin(*args, **kwargs):
         res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
@@ -114,7 +123,7 @@ def auth(func):
 # admin authentication decorator
 # use @auth to check that user is authenticated and admin
 # assumes that the decorated function has a "user" parameter which is used to pass the user info
-def authAdmin(func):
+def authAdmin(func: Any):
     @functools.wraps(func)
     def wrapper_verifyLoginAdmin(*args, **kwargs):
         res = ops.verifyLogin(request.cookies.email, request.cookies.sessionkey)
@@ -131,12 +140,7 @@ def home():
 
 @get(siteconfig["rootPath"] + "siteconfigread.json")
 def lexonomyconfig():
-    version = ""
-    if os.path.isfile("version.txt"):
-        with open("version.txt", "r") as version_file:
-            version = version_file.read()
     configData = {
-        "version": version,
         "licences": siteconfig['licences'],
         "baseUrl": siteconfig['baseUrl']
     }
@@ -148,120 +152,93 @@ def lexonomyconfig():
 
 @get(siteconfig["rootPath"] + "userdicts.json")
 @auth
-def listuserdicts(user):
+def listuserdicts(user: User):
     dicts = ops.getDictsByUser(user["email"])
     return {"dicts": dicts}
 
+@get(siteconfig["rootPath"] + "<dictID>/stats.json")
+@authDict(["canEdit"])
+def getStats(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    return ops.getDictStats(dictDB)
+
 @post(siteconfig["rootPath"] + "<dictID>/entrydelete.json")
 @authDict(["canEdit"])
-def entrydelete(dictID, user, dictDB, configs):
-    ops.deleteEntry(dictDB, request.forms.id, user["email"])
-    return {"success": True, "id": request.forms.id}
+def entrydelete(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    entryID = int(request.forms.id)
+    ops.deleteEntry(dictDB, configs, entryID, user["email"])
+    return {"success": True, "id": entryID}
 
 @post(siteconfig["rootPath"]+"<dictID>/entryread.json")
 @authDict([])
-def entryread(dictID, user, dictDB, configs):
-    adjustedEntryID, xml, _title = ops.readEntry(dictDB, configs, request.forms.id)
-    adjustedEntryID = int(adjustedEntryID)
-    xml = xml.replace(">\n<", "><")
-    html = ""
-    if xml:
-        if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
-            import lxml.etree as ET
-            dom = ET.XML(xml.encode("utf-8"))
-            xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
-            html = str(ET.XSLT(xslt)(dom))
-        elif configs["xemplate"].get("_css") and configs["xemplate"]["_css"] != "":
-            html = xml
-        else:
-            html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('" + xml.replace("'","\\'").replace("\n","").replace("\r","") + "', " + json.dumps(configs["xemplate"]) + ", " + json.dumps(configs["xema"]) + "));</script>"
-    return {"success": (adjustedEntryID > 0), "id": adjustedEntryID, "content": xml, "contentHtml": html}
+def entryread(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    entryID = int(request.forms.id)
+    entry = ops.readEntries(dictDB, configs, entryID, html = True, titlePlain = True)[0]
+    if entry:
+        # interop between database and old frontend code
+        entry["success"] = True
+        entry["contentHtml"] = entry["html"]
+        entry["content"] = entry["xml"]
+
+    return entry if entry else {"success": False, "id": entryID, "content": "", "contentHtml": ""}
 
 @post(siteconfig["rootPath"]+"<dictID>/entryupdate.json")
 @authDict(["canEdit"])
-def entryupdate(dictID, user, dictDB, configs):
-    adjustedEntryID, adjustedXml, changed, feedback = ops.updateEntry(dictDB, configs, request.forms.id, request.forms.content, user["email"], {})
-    html = ""
-    if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
-        import lxml.etree as ET
-        dom = ET.XML(adjustedXml.encode("utf-8"))
-        xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
-        html = str(ET.XSLT(xslt)(dom))
-    elif configs["xemplate"].get("_css") and configs["xemplate"]["_xsl"] != "":
-        html = adjustedXml
-    else:
-        entrydata = re.sub(r"'", "\\'", adjustedXml)
-        entrydata = re.sub(r"[\n\r]", "", entrydata)
-        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
-    result = {"success": True, "id": adjustedEntryID, "content": adjustedXml, "contentHtml": html}
-    if len(configs['subbing']) > 0:
-        ops.refresh(dictDB, dictID, configs)
-    if feedback:
-        result["feedback"] = feedback
+def entryupdate(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    entryID = int(request.forms.id ) if request.forms.id else None
+    id, xml, success, feedback = ops.createEntry(dictDB, configs, xml = request.forms.content, email=user["email"], id=entryID)
+    dictDB.commit()
+    result = {"success": success, "id": id, "content": "", "contentHtml": "", "feedback": feedback}
+    if success:
+        entry = ops.readEntries(dictDB, configs, id, html = True, titlePlain = True)[0]
+        # interop between database and old frontend code
+        result["success"] = True
+        result["content"] = entry["xml"]
+        result["contentHtml"] = entry["html"]
+
     return result
 
 @post(siteconfig["rootPath"]+"<dictID>/entrycreate.json")
 @authDict(["canEdit"])
-def entrycreate(dictID, user, dictDB, configs):
-    adjustedEntryID, adjustedXml, feedback = ops.createEntry(dictDB, configs, None, request.forms.content, user["email"], {})
-    html = ""
-    if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
-        import lxml.etree as ET
-        dom = ET.XML(adjustedXml.encode("utf-8"))
-        xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
-        html = str(ET.XSLT(xslt)(dom))
-    elif configs["xemplate"].get("_css") and configs["xemplate"]["_css"] != "":
-        html = adjustedXml
-    else:
-        entrydata = re.sub(r"'", "\\'", adjustedXml)
-        entrydata = re.sub(r"[\n\r]", "", entrydata)
-        html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
-    result = {"success": True, "id": adjustedEntryID, "content": adjustedXml, "contentHtml": html}
-    if feedback:
-        result["feedback"] = feedback
+def entrycreate(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    id, xml, success, feedback = ops.createEntry(dictDB, configs, xml = request.forms.content, email=user["email"])
+    dictDB.commit()
+    result = {"success": success, "id": id, "content": "", "contentHtml": "", "feedback": feedback}
+    if success:
+        entry = ops.readEntries(dictDB, configs, id, html = True, titlePlain = True)[0]
+        result["success"] = True
+        result["content"] = entry["xml"]
+        result["contentHtml"] = entry["html"]
+
     return result
 
 @post(siteconfig["rootPath"]+"<dictID>/entryflag.json")
 @authDict(["canEdit"])
-def entryflag(dictID, user, dictDB, configs):
-    ops.flagEntry(dictDB, dictID, configs, request.forms.id, request.forms.flag, user["email"], {})
-    return {"success": True, "id": request.forms.id}
+def entryflag(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    entryID = int(request.forms.id)
+    xml, feedback = ops.set_entry_flag(dictDB, entryID, request.forms.flag, configs, user["email"])
+    dictDB.commit()
+    return {"success": feedback is None, "id": entryID, "feedback": feedback}
 
 @get(siteconfig["rootPath"]+"<dictID>/subget")
 @authDict(["canEdit"])
-def subget(dictID, user, dictDB, configs):
-    total, entries, first = ops.listEntries(dictDB, dictID, configs, request.query.doctype, request.query.lemma, "wordstart", 100, False, False, True)
+def subget(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    """For use with searching for eligible subentries: given a doctype and a lemma, find matching entries. (it is implied the doctype allows the entry to become a subentry)"""
+    total, entryIds = ops.searchEntries(dictDB, configs, request.query.doctype, request.query.lemma, "wordstart", limit = 100)
+    entries = ops.readEntries(dictDB, configs, entryIds, xml = False)
     return {"success": True, "total": total, "entries": entries}
 
 @post(siteconfig["rootPath"]+"<dictID>/history.json")
-def history(dictID):
+def history(dictID: str):
     if not ops.dictExists(dictID):
         return redirect("/")
     user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
-    history = ops.readDictHistory(ops.getDB(dictID), dictID, configs, request.forms.id)
-    res_history = []
-    for item in history:
-        xml = item["content"]
-        html = ""
-        if xml:
-            if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
-                import lxml.etree as ET
-                dom = ET.XML(xml.encode("utf-8"))
-                xslt = ET.XML(configs["xemplate"]["_xsl"].encode("utf-8"))
-                html = str(ET.XSLT(xslt)(dom))
-            elif configs["xemplate"].get("_css") and configs["xemplate"]["_css"] != "":
-                html = xml
-            else:
-                entrydata = re.sub(r"'", "\\'", xml)
-                entrydata = re.sub(r"[\n\r]", "", entrydata)
-                html = "<script type='text/javascript'>$('#viewer').html(Xemplatron.xml2html('"+entrydata+"', "+json.dumps(configs["xemplate"])+", "+json.dumps(configs["xema"])+"));</script>"
-        item["contentHtml"] = html
-        res_history.append(item)
-    return {"history":res_history}
+    entryID = int(request.forms.id)
+    history = ops.readDictHistory(ops.getDB(dictID), dictID, configs, entryID)
+    return {"history":history}
 
 @post(siteconfig["rootPath"] + "consent.json")
 @auth
-def save_consent(user):
+def save_consent(user: User):
     res = ops.setConsent(user["email"], request.forms.consent)
     return {"success": res}
 
@@ -284,7 +261,7 @@ def skeget_corpora(user):
 @get(siteconfig["rootPath"] + "<dictID>/skeget/xampl")
 @authDict(["canEdit"])
 def skeget_xampl(dictID, user, dictDB, configs):
-    url = request.query.url
+    url: str = request.query.url
     url += "/first"
     url += "?corpname=" + urllib.parse.quote_plus(request.query.corpus)
     url += "&username=" + request.query.username
@@ -306,7 +283,7 @@ def skeget_xampl(dictID, user, dictDB, configs):
 @get(siteconfig["rootPath"] + "<dictID>/skeget/thes")
 @authDict(["canEdit"])
 def skeget_thes(dictID, user, dictDB, configs):
-    url = request.query.url
+    url: str = request.query.url
     url += "/thes"
     url += "?corpname=" + urllib.parse.quote_plus(request.query.corpus)
     url += "&username=" + request.query.username
@@ -323,7 +300,7 @@ def skeget_thes(dictID, user, dictDB, configs):
 @get(siteconfig["rootPath"] + "<dictID>/skeget/collx")
 @authDict(["canEdit"])
 def skeget_collx(dictID, user, dictDB, configs):
-    url = request.query.url
+    url: str = request.query.url
     url += "/wsketch"
     url += "?corpname=" + urllib.parse.quote_plus(request.query.corpus)
     url += "&username=" + request.query.username
@@ -340,8 +317,8 @@ def skeget_collx(dictID, user, dictDB, configs):
 
 @get(siteconfig["rootPath"] + "<dictID>/skeget/defo")
 @authDict(["canEdit"])
-def skeget_defo(dictID, user, dictDB, configs):
-    url = request.query.url
+def skeget_defo(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    url: str = request.query.url
     url += "/view"
     url += "?corpname=" + urllib.parse.quote_plus(request.query.corpus)
     url += "&username=" + request.query.username
@@ -358,7 +335,7 @@ def skeget_defo(dictID, user, dictDB, configs):
 
 @get(siteconfig["rootPath"] + "<dictID>/kontext/corpora")
 @authDict([])
-def kontext_corpora(dictID, user, dictDB, configs):
+def kontext_corpora(dictID: str, user: User, dictDB: Connection, configs: Configs):
     kontexturl = "https://www.clarin.si/kontext/"
     if configs.get("kontext") and configs["kontext"].get("url") != "":
         kontexturl = configs["kontext"].get("url")
@@ -378,7 +355,7 @@ def kontext_corpora(dictID, user, dictDB, configs):
 
 @get(siteconfig["rootPath"] + "<dictID>/kontext/conc")
 @authDict([])
-def kontext_xampl(dictID, user, dictDB, configs):
+def kontext_xampl(dictID: str, user: User, dictDB: Connection, configs: Configs):
     kontexturl = configs["kontext"].get("url") + "query_submit?format=json"
     corpus = configs["kontext"].get("corpus")
     if request.query.querytype == "kontextcql":
@@ -447,7 +424,7 @@ def check_login():
 
 @post(siteconfig["rootPath"] + "logout.json")
 @auth
-def do_logout(user):
+def do_logout(user: User):
     ops.logout(user)
     response.delete_cookie("email", path="/")
     response.delete_cookie("sessionkey", path="/")
@@ -455,7 +432,7 @@ def do_logout(user):
 
 @get(siteconfig["rootPath"] + "logout")
 @auth
-def logout(user):
+def logout(user: User):
     ops.logout(user)
     if not "Referer" in request.headers:
         referer = "/"
@@ -498,60 +475,61 @@ def do_recover_pwd():
 
 @get(siteconfig["rootPath"] + "makesuggest.json")
 @auth
-def makedict(user):
+def makedict(user: User):
     return {"baseUrl": siteconfig['baseUrl'], "suggested": ops.suggestDictId()}
 
 @post(siteconfig["rootPath"] + "make.json")
 @auth
-def makedictjson(user):
+def makedictjson(user: User):
     res = ops.makeDict(request.forms.url, request.forms.template, request.forms.title, "", user["email"])
     return {"success": res, "url": request.forms.url}
 
 @post(siteconfig["rootPath"]+"<dictID>/clone.json")
 @authDict(["canConfig"])
-def clonedict(dictID, user, dictDB, configs):
+def clonedict(dictID: str, user: User, dictDB: Connection, configs: Configs):
     res = ops.cloneDict(dictID, user["email"])
     res["dicts"] = ops.getDictsByUser(user["email"])
     return res
 
 @post(siteconfig["rootPath"]+"<dictID>/destroy.json")
 @authDict(["canConfig"])
-def destroydict(dictID, user, dictDB, configs):
+def destroydict(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    dictDB.close()
     res = ops.destroyDict(dictID)
     return {"success": res, "dicts": ops.getDictsByUser(user["email"])}
 
 @post(siteconfig["rootPath"]+"<dictID>/move.json")
 @authDict(["canConfig"])
-def movedict(dictID, user, dictDB, configs):
+def movedict(dictID: str, user: User, dictDB: Connection, configs: Configs):
     res = ops.moveDict(dictID, request.forms.url)
     return {"success": res}
 
 @post(siteconfig["rootPath"] + "changepwd.json")
 @auth
-def changepwd(user):
+def changepwd(user: User):
     res = ops.changePwd(user["email"], request.forms.password)
     return {"success": res}
 
 @post(siteconfig["rootPath"] + "changeskeusername.json")
 @auth
-def changeskeusername(user):
+def changeskeusername(user: User):
     res = ops.changeSkeUserName(user["email"], request.forms.ske_userName)
     return {"success": res}
 
 @post(siteconfig["rootPath"] + "changeskeapi.json")
 @auth
-def changeskeapi(user):
+def changeskeapi(user: User):
     res = ops.changeSkeApiKey(user["email"], request.forms.ske_apiKey)
     return {"success": res}
 
 @post(siteconfig["rootPath"] + "changeoneclickapi.json")
 @auth
-def changeoneclickapi(user):
+def changeoneclickapi(user: User):
     res = ops.updateUserApiKey(user, request.forms.apiKey)
     return {"success": res}
 
 @get(siteconfig["rootPath"] + "skelogin.json/<token>")
-def skelogin(token):
+def skelogin(token: str):
     secret = siteconfig["sketchengineKey"]
     try:
         jwtdata = jwt.decode(token, secret, audience="lexonomy.eu", algorithms="HS256")
@@ -569,31 +547,31 @@ def skelogin(token):
 
 @post(siteconfig["rootPath"] + "users/userlist.json")
 @authAdmin
-def userelist(user):
+def userelist(user: User):
     res = ops.listUsers(request.forms.searchtext, request.forms.howmany)
     return {"success": True, "entries": res["entries"], "total": res["total"]}
 
 @post(siteconfig["rootPath"] + "users/userupdate.json")
 @authAdmin
-def userupdate(user):
+def userupdate(user: User):
     res = ops.updateUser(request.forms.id, request.forms.content)
     return {"success": True, "id": res["email"], "content": res["xml"]}
 
 @post(siteconfig["rootPath"] + "users/usercreate.json")
 @authAdmin
-def usercreate(user):
+def usercreate(user: User):
     res = ops.createUser(request.forms.content)
     return {"success": True, "id": res["entryID"], "content": res["adjustedXml"]}
 
 @post(siteconfig["rootPath"] + "users/userdelete.json")
 @authAdmin
-def userdelete(user):
+def userdelete(user: User):
     res = ops.deleteUser(request.forms.id)
     return {"success": True, "id": request.forms.id}
 
 @post(siteconfig["rootPath"] + "users/userread.json")
 @authAdmin
-def userread(user):
+def userread(user: User):
     res = ops.readUser(request.forms.id)
     if res["email"] == "":
         return {"success": False}
@@ -602,13 +580,13 @@ def userread(user):
 
 @post(siteconfig["rootPath"] + "dicts/dictlist.json")
 @authAdmin
-def dictlist(user):
+def dictlist(user: User):
     res = ops.listDicts(request.forms.searchtext, request.forms.howmany)
     return {"success": True, "entries": res["entries"], "total": res["total"]}
 
 @post(siteconfig["rootPath"] + "dicts/dictread.json")
 @authAdmin
-def dictread(user):
+def dictread(user: User):
     res = ops.readDict(request.forms.id)
     if res["id"] == "":
         return {"success": False}
@@ -616,19 +594,19 @@ def dictread(user):
         return {"success": True, "id": res["id"], "content": res["xml"]}
 
 @get(siteconfig["rootPath"]+"<dictID>/config.json")
-def dictconfig(dictID):
+def dictconfig(dictID: str):
     if not ops.dictExists(dictID):
         return {"success": False}
     else:
         user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
         doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys())
         doctypes = list(set(doctypes))
-        res = {"success": True, "publicInfo": {**configs["ident"], **configs["publico"]}, "userAccess": user["dictAccess"], "configs": {"xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "kontext": configs["kontext"], "subbing": configs["subbing"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "flagging": configs["flagging"], "linking": configs["links"], "editing": configs["editing"], "metadata": configs["metadata"]}, "doctype": configs["xema"]["root"], "doctypes": doctypes}
+        res = {"success": True, "publicInfo": {**configs["ident"], **configs["publico"]}, "userAccess": user["dictAccess"], "configs": {"xema": configs["xema"], "xemplate": configs["xemplate"], "kex": configs["kex"], "kontext": configs["kontext"], "subbing": configs["subbing"], "xampl": configs["xampl"], "thes": configs["thes"], "collx": configs["collx"], "defo": configs["defo"], "titling": configs["titling"], "flagging": configs["flagging"], "linking": configs["links"], "editing": configs["editing"], "metadata": configs["metadata"], "gapi": configs["gapi"]}, "doctype": configs["xema"]["root"], "doctypes": doctypes}
         res["publicInfo"]["blurb"] = ops.markdown_text(str(configs["ident"]["blurb"] or ""))
         return res
 
 @get(siteconfig["rootPath"]+"<dictID>/doctype.json")
-def dictconfig(dictID):
+def dictconfig(dictID: str):
     if not ops.dictExists(dictID):
         return {"success": False}
     else:
@@ -639,14 +617,14 @@ def dictconfig(dictID):
         return res
 
 @get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>/nabes.json")
-def publicentrynabes(dictID, entryID):
+def publicentrynabes(dictID: str, entryID: int):
     dictDB = ops.getDB(dictID)
     user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
     nabes = ops.readNabesByEntryID(dictDB, dictID, entryID, configs)
     return {"nabes": nabes}
 
 @get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>.xml")
-def publicentryxml(dictID, entryID):
+def publicentryxml(dictID: str, entryID: int):
     if not ops.dictExists(dictID):
         return redirect("/")
     dictDB = ops.getDB(dictID)
@@ -662,7 +640,7 @@ def publicentryxml(dictID, entryID):
     return res["xml"]
 
 @post(siteconfig["rootPath"]+"<dictID>/random.json")
-def publicrandom(dictID):
+def publicrandom(dictID: str):
     if not ops.dictExists(dictID):
         return redirect("/")
     dictDB = ops.getDB(dictID)
@@ -674,22 +652,22 @@ def publicrandom(dictID):
 
 @post(siteconfig["rootPath"]+"<dictID>/randomone.json")
 @authDict(["canConfig"])
-def randomone(dictID, user, dictDB, configs):
+def randomone(dictID: str, user: User, dictDB: Connection, configs: Configs):
     return ops.readRandomOne(dictDB, dictID, configs)
 
 @get(siteconfig["rootPath"]+"<dictID>/download.xml")
 @authDict(["canDownload"], True)
-def downloadxml(dictID, user, dictDB, configs):
+def downloadxml(dictID: str, user: User, dictDB: Connection, configs: Configs):
     clean = False
     if request.query.clean and request.query.clean == "true":
         clean = True
     response.content_type = "text/xml; charset=utf-8"
     #response.set_header("Content-Disposition", "attachment; filename="+dictID+".xml")
-    return ops.download(dictDB, dictID, configs, clean)
+    return ops.export(dictID, dictDB, configs, clean)
 
 @post(siteconfig["rootPath"]+"<dictID>/upload.html")
 @authDict(["canUpload"])
-def uploadhtml(dictID, user, dictDB, configs):
+def uploadhtml(dictID: str, user: User, dictDB: Connection, configs: Configs):
     import tempfile
     if not request.files.get("myfile"):
         return {"success": False}
@@ -699,13 +677,12 @@ def uploadhtml(dictID, user, dictDB, configs):
         temppath = tempfile.mkdtemp()
         upload.save(temppath)
         filepath = os.path.join(temppath, upload.filename)
-        if request.forms.purge == "on":
-            ops.purge(dictDB, user["email"], { "uploadStart": uploadStart, "filename": filepath })
+        ops.importfile(dictID, filepath, user["email"], purge=request.forms.purge == "on") # leave purging to import script.
         return {"file": filepath,  "uploadStart": uploadStart, "success": True}
 
 @get(siteconfig["rootPath"]+"<dictID>/import.json")
 @authDict(["canUpload"])
-def importjson(dictID, user, dictDB, configs):
+def importjson(dictID: str, user: User, dictDB: Connection, configs: Configs):
     truncate = 0
     if request.query.truncate:
         truncate = int(request.query.truncate)
@@ -718,23 +695,41 @@ def importjson(dictID, user, dictDB, configs):
 
 @post(siteconfig["rootPath"]+"<dictID>/<doctype>/entrylist.json")
 @authDict(["canEdit"])
-def entrylist(dictID, doctype, user, dictDB, configs):
+def entrylist(dictID: str, doctype: str, user: User, dictDB: Connection, configs: Configs):
     if request.forms.id:
         if request.forms.id == "last":
             entryID = ops.getLastEditedEntry(dictDB, user["email"])
             return {"success": True, "entryID": entryID}
         else:
-            entries = ops.listEntriesById(dictDB, request.forms.id, configs)
+            entries = ops.readEntries(dictDB, configs, int(request.forms.id))
             return {"success": True, "entries": entries}
     else:
-        total, entries, first = ops.listEntries(dictDB, dictID, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.howmany, request.forms.sortdesc, False)
-        return {"success": True, "entries": entries, "total": total, "firstRun": first}
+        howmany = int(request.forms.howmany) if request.forms.howmany else 100
+        total, entryIds = ops.searchEntries(dictDB, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.sortdesc, limit = howmany)
+        entries = ops.readEntries(dictDB, configs, entryIds, xml=False)
+        return {"success": True, "entries": entries, "total": total}
+
+@post(siteconfig["rootPath"]+"<dictID>/search.json")
+def publicsearch(dictID: str):
+    dictDB = ops.getDB(dictID)
+    configs = ops.readDictConfigs(dictDB)
+    if not configs["publico"]["public"]:
+        return {"success": False}
+
+    modifier = request.forms.modifier or "start"
+    howmany = request.forms.howmany or 100
+    searchtext = request.forms.searchtext
+    doctype = configs['xema']['root']
+
+    total, entryIds = ops.searchEntries(dictDB, configs, doctype, searchtext, modifier, False, limit = howmany)
+    return {"success": True, "entries": ops.readEntries(dictDB, configs, entryIds, titlePlain=True), "total": total}
+
 
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
 @authDict(["canConfig"])
-def configread(dictID, user, dictDB, configs):
+def configread(dictID: str, user: User, dictDB: Connection, configs: Configs):
     if request.forms.id == 'ske':
-        config_data = {'kex': configs['kex'], 'collx': configs['collx'], 'xampl': configs['xampl'], 'thes': configs['thes'], 'defo': configs['defo']}
+        config_data: Any = {'kex': configs['kex'], 'collx': configs['collx'], 'xampl': configs['xampl'], 'thes': configs['thes'], 'defo': configs['defo']}
     else:
         config_data = configs[request.forms.id]
     if request.forms.id == 'ident':
@@ -745,7 +740,7 @@ def configread(dictID, user, dictDB, configs):
 
 @post(siteconfig["rootPath"]+"<dictID>/configupdate.json")
 @authDict(["canConfig"])
-def configupdate(dictID, user, dictDB, configs):
+def configupdate(dictID: str, user: User, dictDB: Connection, configs: Configs):
     if request.forms.id == 'ske':
         adjustedJson = {}
         jsonData = json.loads(request.forms.content)
@@ -766,19 +761,19 @@ def configupdate(dictID, user, dictDB, configs):
 
 @post(siteconfig["rootPath"]+"<dictID>/autonumber.json")
 @authDict(["canConfig"])
-def autonumber(dictID, user, dictDB, configs):
+def autonumber(dictID: str, user: User, dictDB: Connection, configs: Configs):
     process = ops.addAutoNumbers(dictDB, dictID, request.forms.countElem, request.forms.storeElem)
     return {"success": True, "processed": process}
 
 @post(siteconfig["rootPath"]+"<dictID>/autoimage.json")
 @authDict(["canEdit"])
-def autoimage(dictID, user, dictDB, configs):
+def autoimage(dictID: str, user: User, dictDB: Connection, configs: Configs):
     res = ops.autoImage(dictDB, dictID, configs, request.forms.addElem, request.forms.addNumber)
     return res
 
 @get(siteconfig["rootPath"]+"<dictID>/autoimageprogress.json")
 @authDict([])
-def autoimagestatus(dictID, user, dictDB, configs):
+def autoimagestatus(dictID: str, user: User, dictDB: Connection, configs: Configs):
     res = ops.autoImageStatus(dictDB, dictID, request.query.jobid)
     if not res:
         abort(400, "Invalid job")
@@ -786,20 +781,17 @@ def autoimagestatus(dictID, user, dictDB, configs):
 
 @post(siteconfig["rootPath"]+"<dictID>/resave.json")
 @authDict(["canEdit","canConfig","canUpload"])
-def resavejson(dictID, user, dictDB, configs):
+def resavejson(dictID: str, user: User, dictDB: Connection, configs: Configs):
     count = 0
     stats = ops.getDictStats(dictDB)
-    while stats["needResave"] and count <= 127:
-        if len(configs['subbing']) > 0:
-            ops.refac(dictDB, dictID, configs)
-            ops.refresh(dictDB, dictID, configs)
-        ops.resave(dictDB, dictID, configs)
-        stats = ops.getDictStats(dictDB)
+    while count < stats["needUpdate"] and count <= 127:
+        entry = dictDB.execute("select id, xml from entries where needs_update=1 limit 1").fetchone()
+        ops.createEntry(dictDB, configs, entry["xml"], "system@lexonomy", entry["id"])
         count += 1
-    return {"todo": stats["needResave"]}
+    return {"todo": ops.getDictStats(dictDB)["needUpdate"]}
 
 @post(siteconfig["rootPath"] + "<dictID>/<doctype>/ontolex.api")
-def ontolex(dictID, doctype):
+def ontolex(dictID: str, doctype: str):
     data = json.loads(request.body.getvalue().decode('utf-8'))
     if not data.get("email") or not data.get("apikey"):
         return {"success": False, "message": "missing email or api key"}
@@ -956,6 +948,13 @@ def linksdelete(dictID, linkID, user, dictDB, configs):
     res = ops.links_delete(dictID, linkID)
     return {"success": res}
 
+@get(siteconfig["rootPath"] + "<dictID>/links.json")
+@authDict([])
+def linksdict(dictID, user, dictDB, configs):
+    resto = ops.links_get(dictID, '', '', '', '', '')
+    resfrom = ops.links_get('', '', '', dictID, '', '')
+    return {"links": {"to": resto, "from": resfrom}}
+
 @get(siteconfig["rootPath"] + "<dictID>/links/from")
 @authDict([])
 def linksfrom(dictID, user, dictDB, configs):
@@ -1016,6 +1015,44 @@ def linking(dictID, user, dictDB, configs):
 def entrylinks(dictID, user, dictDB, configs):
     res = ops.getEntryLinks(dictDB, dictID, request.query.id)
     return {"links": res}
+
+@post(siteconfig["rootPath"] + "changefavdict.json")
+@auth
+def changefavdict(user):
+    res = ops.changeFavDict(user['email'], request.forms.dictId, request.forms.status)
+    return {"success": res}
+
+@get(siteconfig["rootPath"]+"<dictID>")
+def publicdict(dictID):
+    if ops.dictExists(dictID):
+        return redirect("/#" + dictID)
+    else:
+        return redirect("/")
+
+@get(siteconfig["rootPath"]+"<dictID>/<entryID:re:\d+>")
+def publicentry(dictID, entryID):
+    if ops.dictExists(dictID):
+        return redirect("/#" + dictID + '/' + entryID)
+    else:
+        return redirect("/")
+
+@get(siteconfig["rootPath"]+"<dictID>/edit")
+def dictedit(dictID):
+    if ops.dictExists(dictID):
+        return redirect("/#" + dictID + '/edit')
+    else:
+        return redirect("/")
+
+@get(siteconfig["rootPath"]+"<dictID>/edit/<doctype>")
+def dicteditdoc(dictID, doctype):
+    if ops.dictExists(dictID):
+        return redirect("/#" + dictID + '/edit/' + doctype)
+    else:
+        return redirect("/")
+
+@get(siteconfig["rootPath"]+"docs/intro")
+def docintro():
+    return redirect("/#docs/intro")
 
 # ELEXIS REST API https://elexis-eu.github.io/elexis-rest/
 @get(siteconfig["rootPath"] + "dictionaries")

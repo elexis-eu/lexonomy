@@ -1,43 +1,62 @@
 <register>
-   <div if={ !messageSent } class="section">
+   <loading-overlay if={state.isRegistering} fullscreen=1/>
+   <div if={ state.messageSent }
+         class="section message messageSuccess">
+      <p>We have sent you an e-mail with instructions on how to create a new account.</p>
+   </div>
+   <div if={ state.errorMessage}
+         class="section message messageError">
+      { state.errorMessage }
+   </div>
+   <div if={ !state.messageSent }
+         class="section">
       <div class="input-field">
-         <input id="email" type="email" class="validate" onkeypress={ doLogin }/>
+         <input id="email"
+               type="email"
+               class="validate"
+               onkeyup={ onKeyUp }/>
          <label for="email">Your e-mail</label>
          <span class="helper-text">To get a new account, enter your e-mail address and we will send you instructions.</span>
       </div>
-      <button class="btn waves-effect waves-light" type="submit" name="login" id="loginButton" onclick={ doLogin }>Register
-         <i class="material-icons right">send</i>
-      </button>
-   </div>
-   <div if={ messageSent }>
-      <p>We have sent you an e-mail with instructions on how to create a new account.</p>
-   </div>
-   <div if={ errorMessage != ''}>
-      <div class="card red darken-2">
-         <div class="card-content white-text">
-            <p>{ errorMessage }</p>
-         </div>
+      <div class="buttons">
+         <a href="#/"
+               class="btn btn-secondary waves-effect waves-light">
+            Back
+         </a>
+         <button class="btn waves-effect waves-light"
+               name="login"
+               id="loginButton"
+               onclick={ doRegister }>Register
+            <i class="material-icons right">send</i>
+         </button>
       </div>
    </div>
 
    <script>
       export default {
-         messageSent: false,
-         errorMessage: '',
+         state: {
+            messageSent: false,
+            errorMessage: '',
+            isRegistering: false
+         },
 
-         doLogin(event) {
-            if ((event.target.id == "email") && event.keyCode != 13) return false;
+         onKeyUp(evt){
+            evt.keyCode == 13 && this.doRegister()
+         },
 
-            this.props.accountOps('register').then((result)=>{
-               if (result.success) {
-                  this.messageSent = true;
-                  this.update();
-               } else {
-                  this.messageSent = false;
-                  this.errorMessage = result.errorMessage;
-                  this.update()
-               }
-            });
+         doRegister() {
+            let email = $("#email").val()
+            if(email){
+               this.update({isRegistering: true})
+               this.auth.register(email)
+                        .always(response => {
+                           this.update({
+                              messageSent: response.success,
+                              errorMessage: !response.success ? "Incorrect e-mail." : "",
+                              isRegistering: false
+                           })
+                        })
+            }
          }
       }
    </script>
