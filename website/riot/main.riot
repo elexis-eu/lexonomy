@@ -72,10 +72,26 @@
             return true
          },
 
+         routeParser(path, filter){
+            // remove trailing slashes
+            path = path.replace(/\/+$/, "")
+            var f = filter
+               .replace(/\?/g, '\\?')
+               .replace(/\*/g, '([^/?#]+?)')
+               .replace(/\.\./, '.*')
+            var re = new RegExp(("^" + f + "$"))
+            var args = path.match(re)
+
+            if (args) {
+               return args.slice(1)
+            }
+         },
+
          onBeforeMount() {
             $.ajaxSetup({
                xhrFields: { withCredentials: true }
             })
+            route.parser(undefined, this.routeParser)
             this.auth.checkAuthCookie()
             this.store.loadSiteconfig().always(this.update.bind(this))
             let appUpdater = new window.AppUpdaterClass({
