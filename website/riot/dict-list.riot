@@ -169,8 +169,8 @@
 
    <script>
       export default {
-         bindings: [["store", "dictionaryListChanged", "update"],
-                    ["store", "dictionaryListLoadingChanged", "onDictionaryListLoadingChange"]],
+         bindings: [["store", "dictionaryListChanged", "onDictionaryListChange"],
+                    ["store", "dictionaryListLoadingChanged", "update"]],
          state: {
             isLoading: false,
             lastCheckedIdx: null,
@@ -179,11 +179,9 @@
             query: ""
          },
 
-         onDictionaryListLoadingChange(){
-            if(this.dictData.isDictionaryListLoaded){
-               this.state.visibleDictionaries = this.dictData.dictionaryList
-            }
+         onDictionaryListChange(){
             this.update()
+            this.filter()
          },
 
          onSearchInput(evt){
