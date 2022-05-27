@@ -7,3 +7,4 @@ Markdown>=3.1.0
 PyICU>=2.2
 requests
 beautifulsoup4>=4.4.0
+typing-extensions
