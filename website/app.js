@@ -19,8 +19,6 @@ import './widgets/ske.js'
 import './widgets/kontext.js'
 import './widgets/gmedia.js'
 import './widgets/sub.js'
-import './widgets/xema-designer.js'
-import './widgets/xemplate-designer.js'
 
 import App from './riot/main.riot'
 import api from './riot/api.riot'

@@ -526,7 +526,7 @@ Screenful.Editor={
     Screenful.Editor.updateToolbar();
   },
   /*getDirectLink: function(fullLink) {
-    var link = window.location.protocol + '//' + window.location.host + '/index.html';
+    var link = window.location.protocol + '//' + window.location.host;
     var paths = window.location.hash.split('/');
     link += paths[0] + '/edit/' + paths[2] + '/';
     if (fullLink) {
