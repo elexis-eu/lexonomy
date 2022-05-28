@@ -414,7 +414,6 @@ export default {
         return
       }
       let elementToMoveIndex = this.getPositionOfElementInContent(name, position, this.content)
-
       var element = elements[elementToMoveIndex]
       elements.splice(elementToMoveIndex, 1)
       elements.splice(elementToMoveIndex + direction, 0, element)
@@ -464,7 +463,7 @@ export default {
           consecutiveNumber++
         }
       }
-      return elementToMoveIndex
+      return Number(elementToMoveIndex)
     }
   }
 }
