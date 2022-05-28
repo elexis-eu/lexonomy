@@ -42,7 +42,7 @@ export default {
       return this.elementData.readOnly || this.forceReadOnlyElements
     },
     componentData() {
-      if (this.elementData.valueRenderType === "text-input-with-markup") {
+      if (this.valueComponent === "TextInputWithMarkupComponent") {
         return this.calculatedContent.elements
           || []
       }

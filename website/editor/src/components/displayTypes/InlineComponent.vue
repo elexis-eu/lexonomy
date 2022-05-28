@@ -46,7 +46,7 @@
       />
     </section>
     <ComponentGeneratorComponent
-      v-if="elementData.valueType !== 'text-input-with-markup'"
+      v-if="valueComponent !== 'TextInputWithMarkupComponent'"
       :children="children"
       :elementEditorConfig="elementData"
       :elementName="elementName"
