@@ -30,7 +30,7 @@ export default {
     },
     zIndex: {
       type: String,
-      default: "1"
+      default: "2"
     },
     keepAlive: {
       type: Boolean,
@@ -91,7 +91,7 @@ export default {
 .modal {
   display: block;
   position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  z-index: 2; /* Sit on top */
   left: 0;
   top: 0;
   width: 100%; /* Full width */

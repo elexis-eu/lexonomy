@@ -7,6 +7,7 @@
 <script>
 import {xml2js} from "xml-js"
 import EntryDisplay from "@/components/EntryDisplay"
+import {Validator} from "vee-validate"
 
 export default {
   name: 'App',
@@ -17,6 +18,7 @@ export default {
   created() {
     let data = window.entryData
     this.updateEntry(data)
+    this.addDropdownValidator()
   },
   methods: {
     updateEntry(data) {
@@ -69,6 +71,20 @@ export default {
           }
         }
       }
+    },
+    addDropdownValidator() {
+      Validator.extend("requiredDropdown", {
+        getMessage: (field) =>
+          "The " +
+          field +
+          " value is required.",
+        validate: (value) => {
+          if (typeof value === "undefined" || !value) {
+            return false
+          }
+          return true
+        }
+      })
     }
   }
 }
@@ -323,6 +339,22 @@ $blue-600: #023672;
 }
 
 #editor {
+  .error {
+    input,
+    textarea {
+      color: #637383 !important;
+      border-color: #FB4646 !important;
+      background-color: #FFF2F2 !important;
+      &::placeholder {
+        color: #637383;
+      }
+    }
+    .select-wrapper {
+      .caret {
+        z-index: 1;
+      }
+    }
+  }
 
   input,
   textarea {

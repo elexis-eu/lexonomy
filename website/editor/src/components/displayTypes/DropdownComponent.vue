@@ -1,12 +1,21 @@
 <template>
   <div>
-    <section v-if="elementData.shown && !readOnly" class="dropdown">
+    <section v-if="elementData.shown && !readOnly"
+             class="dropdown"
+             :class="{'error': errors.has(computedElementName)}">
       <p class="text--md">{{ (isAttribute) ? computedElementNameWithColon : '' }}</p>
       <select
-              :name="computedElementName"
-              v-model="value"
-              v-validate.continues="computedValidation"
+        :name="computedElementName"
+        v-model="value"
+        v-validate.continues="computedValidation"
       >
+        <option
+          value=""
+          disabled
+          selected
+        >
+          Choose {{ this.computedElementName }}
+        </option>
         <option v-for="option in options" :key="option.value" :value="option.value">{{ option.caption }}</option>
       </select>
     </section>
@@ -71,9 +80,13 @@ export default {
     this.value = this.content.text
   },
   mounted() {
-    var elems = document.querySelectorAll('select')
-    // eslint-disable-next-line no-undef
-    M.FormSelect.init(elems, {})
+    this.initSelect()
+  },
+  methods: {
+    initSelect() {
+      // eslint-disable-next-line no-undef
+      M.FormSelect.init(document.querySelectorAll('select'), {})
+    }
   }
 }
 </script>

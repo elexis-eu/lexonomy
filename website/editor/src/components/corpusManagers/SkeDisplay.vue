@@ -55,7 +55,7 @@ export default {
     },
     zIndex: {
       type: String,
-      default: "1"
+      default: "2"
     },
     searchType: {
       type: String
