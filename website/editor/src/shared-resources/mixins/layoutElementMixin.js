@@ -35,6 +35,9 @@ export default {
       // if (!this.elementData.color) {
       //   output.color = "#767676"
       }
+      if (this.forceReadOnlyElements) {
+        return
+      }
       return output
 
     },
