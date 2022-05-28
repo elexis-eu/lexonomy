@@ -35,7 +35,6 @@
             v-if="showChildren"
             class="preview-components"
             :children="children"
-            :elementEditorConfig="elementData"
             :elementName="elementName"
             :content="calculatedContent"
             :forceReadOnlyElements="true"
@@ -59,13 +58,20 @@
         <ComponentGeneratorComponent
           v-if="showChildren"
           :children="children"
-          :elementEditorConfig="elementData"
           :elementName="elementName"
           :content="calculatedContent"
           @input="handleChildUpdate"
         />
       </PopupDisplay>
     </div>
+    <SelectElementFromArray
+      v-if="showSelectNewParent"
+      v-model="showSelectNewParent"
+      :element-name="elementName"
+      :possible-parent-elements="newPossibleParents"
+      :parentElementName="parentElementName"
+      @selected-element="handleSelectedNewParent"
+    />
   </div>
 </template>
 
@@ -74,6 +80,7 @@ import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponen
 import ActionButtons from "@/components/ActionButtons"
 import layoutElementMixin from "@/shared-resources/mixins/layoutElementMixin"
 import PopupDisplay from "@/components/PopupDisplay"
+import SelectElementFromArray from "@/components/SelectElementFromArray"
 
 export default {
   name: "PopupComponent",
@@ -81,7 +88,8 @@ export default {
   components: {
     ComponentGeneratorComponent,
     ActionButtons,
-    PopupDisplay
+    PopupDisplay,
+    SelectElementFromArray
   },
   mixins: [
     layoutElementMixin

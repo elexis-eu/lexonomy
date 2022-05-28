@@ -36,7 +36,6 @@ export default {
   },
   props: {
     children: Array,
-    elementEditorConfig: Object,
     elementName: String,
     content: {
       type: [Object, Array],
@@ -45,6 +44,10 @@ export default {
     forceReadOnlyElements: {
       type: Boolean,
       default: false
+    },
+    maxDisplayedChildren: {
+      type: Number,
+      default: -1
     }
   },
   mixins: [
@@ -61,6 +64,7 @@ export default {
         "media": "MediaComponent"
       },
       renderedChildren: [],
+      numberOfRenderedChildren: 0,
       actualContent: {}
 
     }
@@ -123,22 +127,24 @@ export default {
       }
       for (let elementType of this.renderedChildren) {
         let newContentForChildType
-          if (elementType.children[0].props.isAttribute) {
-            if (newContent.attributes) {
-              newContentForChildType = [{type: "attribute", name: elementType.name, text: newContent.attributes[elementType.name]}]
-            }
-        } else {
-            if (newContent.elements) {
-              newContentForChildType = newContent.elements.filter(element => {
-                return element.name === elementType.name
-              })
-            }
-        }
-        if (newContentForChildType.length === 0) {
-          if (elementType.children.length > 0) {
-            this.loadNewData(newContent)
+        if (elementType.children[0].props.isAttribute) {
+          if (newContent.attributes) {
+            newContentForChildType = [{
+              type: "attribute",
+              name: elementType.name,
+              text: newContent.attributes[elementType.name]
+            }]
           }
-          continue
+        } else {
+          if (newContent.elements) {
+            newContentForChildType = newContent.elements.filter(element => {
+              return element.name === elementType.name
+            })
+          }
+        }
+        if (newContentForChildType.length !== elementType.children.length) {
+          this.loadNewData(newContent)
+          return
         }
         let childrenToRemove = []
         for (let i in elementType.children) {
@@ -175,11 +181,15 @@ export default {
     },
     loadNewData(XMLContent) {
       this.renderedChildren = []
+      this.numberOfRenderedChildren = 0
       if (!this.children) {
         return
       }
 
-      this.children.forEach(child => {
+      for (const child of this.children) {
+        if (this.numberOfRenderedChildren === this.maxDisplayedChildren) {
+          break
+        }
         // Get element name
         let elementName = child.name
 
@@ -208,10 +218,10 @@ export default {
           }
         }
         // Decide if multiple instances need to be made and push children to array to be rendered
-
         let sameTypeChildren = []
         if (Array.isArray(content)) {
-          content.forEach((contentInstance, index) => {
+          for (const index in content) {
+            const contentInstance = content[index]
             // Add elements to render list
             sameTypeChildren.push({
               componentName: componentName,
@@ -220,7 +230,7 @@ export default {
                 children: this.getElementChildren(elementName, contentInstance),
                 content: contentInstance,
                 elementData: elementData,
-                editorChildNumber: index,
+                editorChildNumber: Number(index),
                 parentElementName: this.elementName,
                 numberOfElements: content.length,
                 isAttribute: child.isAttribute,
@@ -228,7 +238,11 @@ export default {
                 key: Math.random()
               }
             })
-          })
+            this.numberOfRenderedChildren++
+            if (this.numberOfRenderedChildren === this.maxDisplayedChildren) {
+              break
+            }
+          }
         } else {
           // content._editorChildNumber = 0
           sameTypeChildren.push({
@@ -246,13 +260,17 @@ export default {
               key: Math.random()
             }
           })
+          this.numberOfRenderedChildren++
+          if (this.numberOfRenderedChildren === this.maxDisplayedChildren) {
+            break
+          }
         }
 
         this.renderedChildren.push({
           name: elementName,
           children: sameTypeChildren
         })
-      })
+      }
     },
 
     createElementTemplate(elementName) {
@@ -369,7 +387,7 @@ export default {
 
     appendElementAfterSameNameSiblings(data, content, newContent) {
       let elements = content.elements || []
-      let locationOfLastElement = elements.map(el => el.name).lastIndexOf(data.name)
+      let locationOfLastElement = elements.map(el => el.name).lastIndexOf(data)
       if (locationOfLastElement >= 0) {
 
         elements.splice(locationOfLastElement + 1, 0, newContent)
@@ -409,7 +427,7 @@ export default {
     deleteElement({name, position}) {
       let elements = this.content.elements || []
       let consecutiveNumber = 0
-      let elementToDeleteIndex
+      let elementToDeleteIndex = -1
       for (const i in elements) {
         if (elements[i].name === name) {
           elements[i]._index = consecutiveNumber
@@ -418,6 +436,9 @@ export default {
           }
           consecutiveNumber++
         }
+      }
+      if (elementToDeleteIndex === -1) {
+        return
       }
       elements.splice(elementToDeleteIndex, 1)
 

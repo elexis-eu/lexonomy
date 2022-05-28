@@ -62,10 +62,18 @@ export default {
     return {
       showChildren: true,
       updatedContent: null,
-      isHeadword: false
+      isHeadword: false,
+      newPossibleParents: [],
+      showSelectNewParent: false
     }
   },
   created() {
+    if (this.forceReadOnlyElements) {
+      return
+    }
+    if (this.children && this.children.length > 0) {
+      this.bus.$on("is-parent-to-element", this.handleIsParentToElement)
+    }
     if (this.state.headwordElement === this.elementName) {
       this.isHeadword = true
       try {
@@ -74,6 +82,13 @@ export default {
         console.error(e)
       }
     }
+  },
+  beforeDestroy() {
+    // if (this.children && this.children.length > 0) {
+      this.bus.$off("is-parent-to-element", this.handleIsParentToElement)
+      this.bus.$off('possible-new-parent', this.handlePossibleNewParent)
+      this.bus.$off('add-element-to-self', this.addElementToSelf)
+    // }
   },
   methods: {
     getHeadwordValue(data) {
@@ -106,7 +121,7 @@ export default {
       this.$emit('input', {elementName: this.elementName, editorChildNumber: this.editorChildNumber, content: content})
     },
     handleChildUpdate(data) {
-      let content = {...this.content, ...data.content}
+      let content = {...this.calculatedContent, ...data.content}
       this.$emit('input', {elementName: this.elementName, editorChildNumber: this.editorChildNumber, content: content})
     },
     updateContent(newContent) {
@@ -125,14 +140,78 @@ export default {
       this.$emit("delete-element", {name: this.elementName, position: this.editorChildNumber})
     },
     cloneElement() {
-      this.$emit("clone-element", {name: this.elementName, content: this.content})
+      this.$emit("clone-element", {name: this.elementName, content: this.calculatedContent})
     },
     selectNewParent() {
       // Generate list of possible new parents
-      // Create array of possible parents with props to render them as readOnly parts for PopupComponent
-      //  Add click listener to props to trigger change
-      //  Try emitting just update values and look at magic, otherwise call loadNewData
 
+      // let xema = this.state.entry.dictConfigs.xema
+      this.newPossibleParents = []
+      this.bus.$on('possible-new-parent', this.handlePossibleNewParent)
+      this.bus.$emit('is-parent-to-element', {emitEvent: "possible-new-parent", elementName: this.elementName})
+      setTimeout(() => {
+        this.showSelectNewParent = true
+      }, 50)
+    },
+    //  ------------ MOVE BETWEEN ELEMENTS ----------------
+    handleSelectedNewParent(element) {
+      this.bus.$emit('add-element-to-self', {
+        name: element.props.elementName,
+        editorChildNumber: element.props.content.editorChildNumber,
+        content: this.calculatedContent
+      })
+      this.deleteElement()
+    },
+    addElementToSelf(data) {
+      if (this.elementName === data.name && this.editorChildNumber === data.editorChildNumber) {
+        let newContent = Object.assign({}, data.content)
+        delete newContent._index
+        let content = Object.assign({}, this.calculatedContent)
+        if (!content.elements) {
+          content.elements = this.createElementTemplate(newContent.name)
+        } else if (!content.elements.find(el => {
+          return el.name === newContent.name
+        })) {
+          content.elements.push(newContent)
+          this.updatedContent = content
+          this.handleChildUpdate({content: content})
+          return
+        }
+        content = this.appendElementAfterSameNameSiblings(newContent.name, content, newContent)
+        this.updatedContent = content
+        this.handleChildUpdate({content: content})
+      }
+      this.bus.$off('add-element-to-self', this.addElementToSelf)
+    },
+    //  ------------ EVENT HANDLERS ----------------
+    handlePossibleNewParent(data) {
+      console.log(data)
+      this.newPossibleParents.push(data.content)
+    },
+    handleIsParentToElement(data) {
+      if (this.children.find(el => el.name === data.elementName)) {
+        this.bus.$emit(data.emitEvent, {
+          content: {
+            ...this.calculatedContent, ...{
+              parentName: this.parentElementName,
+              editorChildNumber: this.editorChildNumber
+            }
+          }
+        })
+        this.bus.$on('add-element-to-self', this.addElementToSelf)
+      }
+    },
+
+    appendElementAfterSameNameSiblings(data, content, newContent) {
+      let elements = content.elements || []
+      let locationOfLastElement = elements.map(el => el.name).lastIndexOf(data)
+      if (locationOfLastElement >= 0) {
+        elements.splice(locationOfLastElement + 1, 0, newContent)
+      } else {
+        elements.push(newContent)
+      }
+      content.elements = elements
+      return content
     }
   }
 }

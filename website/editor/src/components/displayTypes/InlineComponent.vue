@@ -16,8 +16,8 @@
         @clone-element="cloneElement"
         @remove-element="deleteElement"
       />
-<!--     for ActionButton   :class="{'hide': isAttribute}"-->
-        <component :is="valueComponent"
+      <!--     for ActionButton   :class="{'hide': isAttribute}"-->
+      <component :is="valueComponent"
                  class="value-display"
                  :elementEditorConfig="elementData"
                  :elementName="elementName"
@@ -48,12 +48,21 @@
     <ComponentGeneratorComponent
       v-if="valueComponent !== 'TextInputWithMarkupComponent'"
       :children="children"
-      :elementEditorConfig="elementData"
       :elementName="elementName"
       :content="calculatedContent"
       :forceReadOnlyElements="forceReadOnlyElements"
+      :maxDisplayedChildren="maxDisplayedChildren"
       @input="handleChildUpdate"
     />
+    <SelectElementFromArray
+      v-if="showSelectNewParent"
+      v-model="showSelectNewParent"
+      :element-name="elementName"
+      :possible-parent-elements="newPossibleParents"
+      :parentElementName="parentElementName"
+      @selected-element="handleSelectedNewParent"
+    />
+
   </div>
 </template>
 
@@ -62,11 +71,13 @@
 import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponent"
 import ActionButtons from "@/components/ActionButtons"
 import layoutElementMixin from "@/shared-resources/mixins/layoutElementMixin"
+import SelectElementFromArray from "@/components/SelectElementFromArray"
 
 export default {
   name: "InlineComponent",
   inject: ['$validator'],
   components: {
+    SelectElementFromArray,
     ActionButtons,
     ComponentGeneratorComponent
   },
@@ -89,6 +100,10 @@ export default {
     forceReadOnlyElements: {
       type: Boolean,
       default: false
+    },
+    maxDisplayedChildren: {
+      type: Number,
+      default: -1
     }
   }
 }
