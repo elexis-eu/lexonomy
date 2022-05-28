@@ -339,6 +339,12 @@ $blue-600: #023672;
 }
 
 #editor {
+  .select-wrapper {
+    flex: 1;
+    ul {
+      width: 100% !important;
+    }
+  }
   .error {
     input,
     textarea {
