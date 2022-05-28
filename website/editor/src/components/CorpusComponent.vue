@@ -9,7 +9,11 @@
       </button>
       <ul v-show="show">
         <button v-if="kontextEnabled" class="tertiary" @click="openKontext">KonText</button>
-        <button v-if="isSkeAvailable" class="tertiary" @click="openSketchEngine">Sketch Engine</button>
+        <button v-if="isSkeAvailable & numberOfSkeCorpuses === 1" class="tertiary" @click="openSketchEngine">Sketch Engine</button>
+        <button v-if="numberOfSkeCorpuses > 1 && skeXamplEnabled" class="tertiary" @click="openSketchEngine('xampl')">Ske - Examples</button>
+        <button v-if="numberOfSkeCorpuses > 1 && skeCollxEnabled" class="tertiary" @click="openSketchEngine('collx')">Ske - Collocations</button>
+        <button v-if="numberOfSkeCorpuses > 1 && skeDefoEnabled" class="tertiary" @click="openSketchEngine('defo')">Ske - Definitions</button>
+        <button v-if="numberOfSkeCorpuses > 1 && skeThesEnabled" class="tertiary" @click="openSketchEngine('thes')">Ske - Thesauruses</button>
       </ul>
     </div>
     <KontextDisplay
@@ -90,7 +94,11 @@ export default {
     },
     numberOfCorpuses() {
       return [this.kontextEnabled, this.skeDefoEnabled, this.skeThesEnabled, this.skeCollxEnabled, this.skeXamplEnabled].filter(value => value === true).length
-    }
+    },
+    numberOfSkeCorpuses() {
+      return [this.skeDefoEnabled, this.skeThesEnabled, this.skeCollxEnabled, this.skeXamplEnabled].filter(value => value === true).length
+    },
+
   },
   watch: {
     show(show) {
@@ -127,7 +135,7 @@ export default {
     openKontext() {
       this.showKontext = true
     },
-    openSketchEngine() {
+    openSketchEngine(searchType = null) {
       if (this.skeXamplEnabled) {
         this.skeSearchType = "xampl"
       }
@@ -139,6 +147,9 @@ export default {
       }
       if (this.skeDefoEnabled) {
         this.skeSearchType = "defo"
+      }
+      if (searchType) {
+        this.skeSearchType = searchType
       }
       this.showSke = true
     },
