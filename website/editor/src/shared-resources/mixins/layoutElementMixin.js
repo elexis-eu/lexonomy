@@ -8,17 +8,17 @@ export default {
   computed: {
     configStyles() {
       let output = {}
-      // for (const [style, value] of Object.entries(this.elementData)) {
-      //   switch (style) {
+      for (const [style, value] of Object.entries(this.elementData)) {
+        switch (style) {
       //     case "background":
       //       output[style] = value
       //       break
       //     case "colour":
       //       output.color = value
       //       break
-      //     case "border":
-      //       output.border = `1px ${value} #767676`
-      //       break
+          case "border":
+            output.border = `1px ${value} #B3D6FF`
+            break
       //     case "slant":
       //       output.fontStyle = value
       //       break
@@ -31,10 +31,10 @@ export default {
       //       }
       //       break
       //   }
-      // }
+      }
       // if (!this.elementData.color) {
       //   output.color = "#767676"
-      // }
+      }
       return output
 
     },
@@ -84,11 +84,9 @@ export default {
     }
   },
   beforeDestroy() {
-    // if (this.children && this.children.length > 0) {
-      this.bus.$off("is-parent-to-element", this.handleIsParentToElement)
-      this.bus.$off('possible-new-parent', this.handlePossibleNewParent)
-      this.bus.$off('add-element-to-self', this.addElementToSelf)
-    // }
+    this.bus.$off("is-parent-to-element", this.handleIsParentToElement)
+    this.bus.$off('possible-new-parent', this.handlePossibleNewParent)
+    this.bus.$off('add-element-to-self', this.addElementToSelf)
   },
   methods: {
     getHeadwordValue(data) {

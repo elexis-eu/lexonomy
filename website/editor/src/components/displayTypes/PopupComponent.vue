@@ -1,5 +1,5 @@
 <template>
-  <div class="popup-component" :style="configStyles">
+  <div class="popup-component">
     <div>
       <!--      <button @click="openPopup">Open {{ elementName }}</button>-->
       <section v-if="elementData.shown" class="preview drop-shadow--100" @click="openPopup">
