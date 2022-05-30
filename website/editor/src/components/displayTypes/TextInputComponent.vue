@@ -3,22 +3,22 @@
     <section class="text-input" v-if="elementData.shown && !readOnly">
       <label v-if="isAttribute" class="text--md" :for="computedElementName">{{ computedElementNameWithColon }}</label>
       <textarea v-if="this.elementData.editorInputType === 'textarea'"
-                :name="computedElementName"
+                :name="computedElementName || elementName"
                 cols="30"
                 rows="10"
                 v-model="value"
-                :placeholder="(errors && errors.first(computedElementName)) || computedElementName"
+                :placeholder="(errors && errors.first(computedElementName || elementName)) || computedElementName || elementName"
                 v-validate.continues="computedValidation"
-                :class="{'error': errors.has(computedElementName)}"
+                :class="{'error': errors.has(computedElementName || elementName)}"
       />
       <input v-else
-             :name="computedElementName"
+             :name="computedElementName || elementName"
              :type="getInputType()"
              v-model="value"
-             :placeholder="(errors && errors.first(computedElementName)) || computedElementName"
+             :placeholder="(errors && errors.first(computedElementName || elementName)) || computedElementName || elementName"
              v-validate.continues="computedValidation"
              @change="updateParent"
-             :class="{'error': errors.has(computedElementName)}"
+             :class="{'error': errors.has(computedElementName || elementName)}"
       >
       <button v-if="elementData.interactivity" class="button--sm tertiary" @click="previewValue"
               style="margin-left: 8px;">Preview

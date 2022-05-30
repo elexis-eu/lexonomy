@@ -5,7 +5,7 @@
              :class="{'error': errors.has(computedElementName)}">
       <p class="text--md">{{ (isAttribute) ? computedElementNameWithColon : '' }}</p>
       <select
-        :name="computedElementName"
+        :name="computedElementName || elementName"
         v-model="value"
         v-validate.continues="computedValidation"
       >
@@ -14,7 +14,7 @@
           disabled
           selected
         >
-          Choose {{ this.computedElementName }}
+          Choose {{ this.computedElementName || elementName }}
         </option>
         <option v-for="option in options" :key="option.value" :value="option.value">{{ option.caption }}</option>
       </select>

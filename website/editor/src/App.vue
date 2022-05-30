@@ -102,7 +102,7 @@ $blue-600: #023672;
   font-family: 'Cairo', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  text-align: left;
   color: #2c3e50;
 
   .read-only {
@@ -339,22 +339,30 @@ $blue-600: #023672;
 }
 
 #editor {
+  .content {
+    min-height: 0;
+  }
+
   .select-wrapper {
     flex: 1;
+
     ul {
       width: 100% !important;
     }
   }
+
   .error {
     input,
     textarea {
       color: #637383 !important;
       border-color: #FB4646 !important;
       background-color: #FFF2F2 !important;
+
       &::placeholder {
         color: #637383;
       }
     }
+
     .select-wrapper {
       .caret {
         z-index: 1;
