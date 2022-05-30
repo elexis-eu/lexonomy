@@ -106,11 +106,13 @@
       },
       editorConfigOptions: [],
       onMounted() {
-        this.setInitialData()
+         this.configData = this.props.configData
+         this.resetElementData()
+         this.update()
       },
       onBeforeUpdate(prop, state) {
         if (this.props.elementName !== this.elementName || this.props.attributeName !== this.attributeName) {
-          this.elementName = this.props.elementName
+           this.elementName = this.props.elementName
           this.attributeName = this.props.attributeName
           this.resetElementData()
         }

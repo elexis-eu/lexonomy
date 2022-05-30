@@ -2,24 +2,58 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["xemplate", "Entry formatting"]]}/>
    <h1>Entry formatting</h1>
-   <div if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
-      <div class="row designer"
-            id="editor"></div>
+   <div
+      if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
+      <div style="display: flex">
+         <!-- TODO fixup styles so we don't need this sillyness. -->
+         <div
+            id="editor"
+            class="designer"
+            style="
+            flex-basis: 0;
+            width: auto;
+            position: static;
+            overflow: initial!important;
+            margin-right: 15px!important"
+         >
+            <div class="list">
+               <dict-config-element-in-tree each={root in state.roots}
+                                            data={root}
+                                            xema={dictData.dictConfigs.xema}
+                                            current-element={elementName}
+                                            current-attribute={attributeName}
+                                            selectElementOrAttribute={selectElementOrAttribute}
+               />
+            </div>
+         </div>
+
+         <display-styles if={this.elementName}
+                         name="displayStylesComponent"
+                         elementName={this.elementName}
+                         attributeName={attributeName}
+                         elementConfigData={this.state.data[elementName]}
+                         configData={this.state.data}
+                         config={this.dictData.dictConfigs}
+                         save-data={handleElementData}
+         />
+      </div>
+
       <div class="row">
          <div class="col s10">
             <button class="btn waves-effect waves-light"
-                  onclick={ startOverride } >
+                    onclick={ startOverride }>
                Use your own stylesheet
                <i class="material-icons right">edit</i>
             </button>
          </div>
       </div>
    </div>
-   <div if={ (state.data._xsl && state.data._xsl != "") || (state.data._css && state.data._css != "") || state.override }>
+   <div
+      if={ (state.data._xsl && state.data._xsl != "") || (state.data._css && state.data._css != "") || state.override }>
       <div class="row">
          <div class="input-field col s10">
             <textarea id="editor_xsl"
-                  class="materialize-textarea">{ state.data._xsl }</textarea>
+                      class="materialize-textarea">{ state.data._xsl }</textarea>
             <label for="editor_xsl">XSL</label>
             <span class="helper-text">Custom XSL stylesheet. If you would like to see an example,
                <a onclick={ exampleXsl }>click here to load a sample XSL</a>.
@@ -29,7 +63,7 @@
       <div class="row">
          <div class="input-field col s10">
             <textarea id="editor_css"
-                  class="materialize-textarea">{ state.data._css }</textarea>
+                      class="materialize-textarea">{ state.data._css }</textarea>
             <label for="editor_css">CSS</label>
             <span class="helper-text">Custom CSS stylesheet. If you would like to see an example,
                <a onclick={ exampleCss }>click here to load a sample CSS</a>.
@@ -40,7 +74,7 @@
       <div class="row">
          <div class="col s10">
             <button class="btn waves-effect waves-light"
-                  onclick={ stopOverride } >
+                    onclick={ stopOverride }>
                Stop using your own stylesheet
                <i class="material-icons right">edit</i>
             </button>
@@ -49,35 +83,22 @@
    </div>
    <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
-   <style>
-      #editor {
-         position: relative !important;
-         min-height: 1050px;
-      }
-      #editor .list {
-         width: 25% !important;
-      }
-      #editor .details {
-         left: 25% !important;
-         width: 35% !important;
-      }
-      #editor .preview {
-         left: 60% !important;
-         width: 40% !important;
-      }
-      #editor.designer input[type=radio] {
-         opacity: 1 !important;
-      }
-   </style>
-
    <script>
+      import displayStyles from "./entry-formatting/display-styles.riot"
+
       export default {
+         components: {
+            displayStyles
+         },
          state: {
             isLoading: true,
             isSaving: false,
             override: false,
             data: {}
          },
+
+         elementName: null,
+         attributeName: null,
 
          startOverride() {
             this.update({override: true})
@@ -87,12 +108,11 @@
             delete this.state.data._xsl
             delete this.state.data._css
             this.update({override: false})
-            XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId)
          },
 
          exampleXsl() {
             $('#editor_xsl').val(
-`<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+               `<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    <xsl:template match="entry">
       <div class='myEntry'><xsl:apply-templates/></div>
    </xsl:template>
@@ -107,7 +127,7 @@
 
          exampleCss() {
             $('#editor_css').val(
-`div.myEntry {font-family: serif; font-size: 1.25em}
+               `div.myEntry {font-family: serif; font-size: 1.25em}
 div.myEntry span.myHeadword {font-weight: bold}
 `)
             M.textareaAutoResize($('#editor_css'))
@@ -115,31 +135,36 @@ div.myEntry span.myHeadword {font-weight: bold}
          },
 
          onMounted() {
-            this.store.loadDictionaryConfig("xemplate")
-                  .done(response => {
-                     this.state.data = response.content
-                     this.state.override = this.state.data._xsl || this.state.data._css
-                  })
-                  .always(() => {
-                     this.update({isLoading: false})
-                     if(this.state.override){
-                        M.updateTextFields()
-                        M.textareaAutoResize($('#editor_css'))
-                        M.textareaAutoResize($('#editor_xsl'))
-                     }
-                  })
+            this.fillConfigForm()
+         },
+         onBeforeUpdate() {
+            const xema = (this.dictData.dictConfigs || {}).xema
+            if (!xema || !xema.elements) return
+            const roots = new Set(Object.keys(xema.elements))
+            Object.values(xema.elements).forEach(el => el.children.forEach(c => roots.delete(c.name)))
+            this.state.roots = [...roots].map(id => ({...xema.elements[id], id})) // add ID so tree renderer knows the id of every element
          },
 
-         onUpdated() {
-            if (this.dictData.dictConfigs.xema && this.state.data != {} && !this.state.override) {
-               XemplateDesigner.start(this.dictData.dictConfigs.xema, this.state.data, this.dictData.dictId)
-            }
+         async fillConfigForm() {
+            this.store.loadDictionaryConfig("xemplate")
+               .done(response => {
+                  this.state.data = response.content
+                  this.state.override = this.state.data._xsl || this.state.data._css
+               })
+               .always(() => {
+                  this.update({isLoading: false})
+                  if (this.state.override) {
+                     M.updateTextFields()
+                     M.textareaAutoResize($('#editor_css'))
+                     M.textareaAutoResize($('#editor_xsl'))
+                  }
+               })
          },
 
          getConfigData() {
             var newData = {}
-            if (XemplateDesigner.xemplate) {
-               newData = XemplateDesigner.xemplate
+            if (this.state.data) {
+               newData = this.state.data
             }
             if (this.state.override) {
                if ($('#editor_css').val() != "") newData._css = $('#editor_css').val()
@@ -148,12 +173,44 @@ div.myEntry span.myHeadword {font-weight: bold}
             return newData
          },
 
+         selectElementOrAttribute(elementId, attributeId) {
+            this.elementName = elementId
+            this.attributeName = attributeId || null
+            this.update()
+         },
+
+         handleElementData(elementName, attributeName, attribute, value) {
+            if (attributeName) {
+               let elementAttributes = this.state.data[elementName].attributes
+               if (elementAttributes) {
+                  if (elementAttributes[attributeName]) {
+                     elementAttributes[attributeName][attribute] = value
+                  } else {
+                     elementAttributes[attributeName] = {[attribute]: value}
+                  }
+               } else {
+                  this.state.data[elementName].attributes = {[attribute]: value}
+               }
+            } else {
+               if (!this.state.data[elementName]) {
+                  this.state.data[elementName] = {}
+               }
+               this.state.data[elementName][attribute] = value
+            }
+         },
+
          saveData() {
             this.update({isSaving: true})
             this.store.updateDictionaryConfig("xemplate", this.getConfigData())
-                  .always(() => this.update({isSaving: false}))
+               .always(() => this.update({isSaving: false}))
          }
       }
    </script>
 
+   <style>
+
+      #editor.designer input[type=radio] {
+         opacity: 1 !important;
+      }
+   </style>
 </dict-config-xemplate>

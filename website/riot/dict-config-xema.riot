@@ -152,7 +152,8 @@
          },
 
          async onBeforeMount(props, state) {
-            this.state.xema = (await this.store.loadDictionaryConfig('xema')).content;
+            let xema = (await this.store.loadDictionaryConfig('xema')).content
+            this.state.xema = xema;
             this.state.isLoading = false;
             this.state.override = !!(this.state.xema._xonomyDocSpec || this.state.xema._dtd);
             this.state.currentElement = this.state.xema.root;
