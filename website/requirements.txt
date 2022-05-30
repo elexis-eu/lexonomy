@@ -1,5 +1,4 @@
 bottle==0.12.19
-express==1.0
 lxml>=4.3.4
 Paste==3.0.8
 six==1.12.0
@@ -8,3 +7,5 @@ PyICU>=2.2
 requests
 beautifulsoup4>=4.4.0
 typing-extensions
+PyJWT==1.7.1
+
