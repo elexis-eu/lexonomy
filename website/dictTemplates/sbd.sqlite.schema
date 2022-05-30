@@ -34,7 +34,7 @@ CREATE TABLE entries (
     xml             TEXT,
     title           TEXT,
     sortkey         TEXT,
-    flag            TEXT DEFAULT "",
+    flag            TEXT NOT NULL DEFAULT (''),
     needs_update    BOOLEAN DEFAULT (0)
 );
 INSERT INTO entries VALUES(1,'entry','<entry lxnm:id="1" xmlns:lxnm="http://www.lexonomy.eu/"><headword xml:space="preserve">able</headword><partOfSpeech xml:space="preserve">adj</partOfSpeech><sense><translation xml:space="preserve">schopný</translation><translation xml:space="preserve">sto</translation><example><source xml:space="preserve">I''m busy tomorrow, so I won''t be <h xml:space="preserve">able</h> to see you.</source><target xml:space="preserve">Zítra toho mám hodně, takže se s tebou nebudu moci potkat.</target></example></sense><sense><translation xml:space="preserve">šikovný</translation><translation xml:space="preserve">schopný</translation><example><source xml:space="preserve">She is an <h xml:space="preserve">able</h> teacher.</source><target xml:space="preserve">Je to šikovná učitelka.</target></example></sense></entry>','<span class=''headword''>able</span>','_00000_00011_00053_00021','',0);

@@ -37,7 +37,7 @@ CREATE TABLE entries (
     xml             TEXT,
     title           TEXT,
     sortkey         TEXT,
-    flag            TEXT DEFAULT "",
+    flag            TEXT NOT NULL DEFAULT (''),
     needs_update    BOOLEAN DEFAULT (0)
 );
 CREATE TABLE linkables (
