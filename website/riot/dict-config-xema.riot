@@ -1,7 +1,7 @@
 <dict-config-xema>
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["xema", "Entry structure"]]}/>
-   
+
    <h1>Entry structure</h1>
    <div if={ !state.xema }>Loading...</div>
 
@@ -9,8 +9,8 @@
 
       <div if={ !state.override } id="editor" class="editor designer">
          <div class="list">
-            <dict-config-element-in-tree each={root in state.roots} 
-               data={root} 
+            <dict-config-element-in-tree each={root in state.roots}
+               data={root}
                xema={state.xema}
                current-element={state.currentElement}
                current-attribute={state.currentAttribute}
@@ -18,8 +18,8 @@
             />
          </div>
          <div class="details">
-            <dict-config-xema-element if={state.currentElement && !state.currentAttribute} 
-               elementId={state.currentElement} 
+            <dict-config-xema-element if={state.currentElement && !state.currentAttribute}
+               elementId={state.currentElement}
                xema={state.xema}
                config={state.xema.elements[state.currentElement]}
                applyLocalData={onXemaElementUpdated}
@@ -27,10 +27,10 @@
                selectElementOrAttribute={selectElementOrAttribute}
                deleteElement={onXemaElementDeleted}
             />
-   
-            <dict-config-xema-attribute if={state.currentElement && state.currentAttribute} 
-               elementId={state.currentElement} 
-               attributeId={state.currentAttribute} 
+
+            <dict-config-xema-attribute if={state.currentElement && state.currentAttribute}
+               elementId={state.currentElement}
+               attributeId={state.currentAttribute}
                xema={state.xema}
                config={state.xema.elements[state.currentElement].attributes[state.currentAttribute]}
 
@@ -39,7 +39,7 @@
             />
          </div>
       </div>
- 
+
       <div if={ state.override }>
          <div class="row">
             <div class="col s10">
@@ -93,7 +93,7 @@
       #editor .details {flex-grow: 1;}
 
       .editor .list { flex-basis: 0; }
-      
+
       #editor.designer input.textbox.cap {
          width: 15em !important;
       }
@@ -124,7 +124,7 @@
           * @typedef {Object} XemaAttribute
           * @property {'optional'|'obligatory'} optionality
           * @property {'txt'|'lst'} filling - text for any text, lst if only a predefined set of values is allowed, which is defined in the values property
-          * @property {XemaAttributeValue[]} [values] (optional) list of values. Check filling property 
+          * @property {XemaAttributeValue[]} [values] (optional) list of values. Check filling property
           */
 
          /**
@@ -141,13 +141,13 @@
           * @property {string} root the id of the root element
           * @property {Object.<string, XemaElement>} elements
          */
-         
+
          state: {
             isLoading: true,
             isSaving: false,
             override: false,
-            currentElement = undefined, // initialize in beforeMount
-            currentAttribute = undefined,
+            currentElement: null, // initialize in beforeMount
+            currentAttribute: null,
             xema: undefined, // initialized in beforeMount
          },
 
@@ -227,10 +227,10 @@
             this.state.currentAttribute = newName;
             this.update();
          },
-         
+
          exampleDoc() {
             this.state.xema._xonomyDocSpec = JSON.stringify({ elements: { "entry": {}, "headword": {hasText: true} }}, undefined, 2);
-            this.update();   
+            this.update();
          },
          exampleXML() {
             this.state.xema._xml = `<entry><headword></headword></entry>`;
