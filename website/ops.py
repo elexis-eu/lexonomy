@@ -423,6 +423,7 @@ def parse(xml: str) -> Tag:
     return list(b.children)[0]
 
 def doSql(db: Connection, sql: str, param: Any = None):
+    """Convenience to enable easy logging of sql statements during development"""
     return db.execute(sql, param)
 
 def deleteEntry(dictDB: Connection, configs: Configs, id: int, email: Optional[str]):
@@ -549,6 +550,7 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
         dictDB (Connection): 
         configs (Configs): 
         ids (Tuple[int, List[int]]): either a single id or list of ids to retrieve. Maxes out at something like 500k, due to statement length limitations.
+        xml (bool, optional): Also return the xml as string. Defaults to True.
         tag (bool, optional): Also return the xml as parsed. Defaults to False.
         html (bool, optional): Also return the html. This runs the xslt from the config, or otherwise generates a <script> tag that will transform the xml to html on the client side. Defaults to False.
         titlePlain (bool, optional): Also include the plain text of the entry. This requires the xml to be parsed, so is slow.
@@ -582,8 +584,8 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
         where id in ({",".join("?" * len(ids))})
     """, ids).fetchall()
 
-    # First try xslt, if that doesn't work just set it to be the script tag.
-    run_xslt = get_xslt_transformer(configs.get("xemplate", {}).get("_xsl", ""))
+    # If required, load transformer outside of loop
+    run_xslt = get_xslt_transformer(configs.get("xemplate", {}).get("_xsl", "")) if html else None
 
     entries: List[EntryFromDatabase] = []
     for row in rows:
@@ -601,10 +603,10 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
             ret["content"] = row["xml"] # type: ignore - compatibility with screenful. TODO remove
         if tag or titlePlain:
             parsedXml = parse(row["xml"])
-        if tag:
-            ret["tag"] = parsedXml
-        if titlePlain:
-            ret["titlePlain"] = get_entry_title(parsedXml, configs["titling"])[0]
+            if tag:
+                ret["tag"] = parsedXml
+            if titlePlain:
+                ret["titlePlain"] = get_entry_title(parsedXml, configs["titling"])[0]
         if html:
             ret["html"] = get_entry_html(configs, row["xml"], run_xslt)
         entries.append(ret)
@@ -647,12 +649,12 @@ def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) ->
     if id != None:
         try: 
             id = int(id)
-        except Exception as e:
+        except:
             print(f"Invalid ID (non-number) {id} in to-be-imported entry: replacing...")
             del xml.attrs["lxnm:id"]
             id = None
 
-    isNewEntry = False
+    isNewEntry: bool = False
     if id is None: # let db create one
         id = doSql(dictDB, "insert into entries(doctype, xml, title, sortkey) values(?, ?, ?, ?)", ("", "", "", "")).lastrowid
         isNewEntry = True
@@ -874,8 +876,8 @@ def get_entry_flag(xml: Union[str, Tag], configs: Configs) -> Optional[str]:
         xml = parse(xml)
 
     flag_element = configs.get("flagging", {}).get("flag_element")
-    return get_text(xml, flag_element) if flag_element else None
-
+    flag_text = (get_text(xml, flag_element) or "") if flag_element else ""
+    return flag_text
 
 def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs, email: str, xml: Optional[Union[Tag, str]] = None) -> Tuple[Optional[Tag], Optional[str]]:
     """

@@ -37,7 +37,7 @@ CREATE TABLE entries (
     xml             TEXT,
     title           TEXT,
     sortkey         TEXT,
-    flag            TEXT DEFAULT "",
+    flag            TEXT NOT NULL DEFAULT (''),
     needs_update    BOOLEAN DEFAULT (0)
 );
 INSERT INTO entries VALUES(1,'entry','<entry lxnm:id="1" xmlns:lxnm="http://www.lexonomy.eu/"><headword xml:space="preserve">able</headword><partOfSpeech xml:space="preserve">adj</partOfSpeech><sense><definition xml:space="preserve">If someone is able to do something, they can do it.</definition><example xml:space="preserve">I''m busy tomorrow, so I won''t be <h xml:space="preserve">able</h> to see you.</example></sense><sense><definition xml:space="preserve">If a person is able, they are good or skillful at what they do.</definition><example xml:space="preserve">She is an <h xml:space="preserve">able</h> teacher.</example></sense></entry>','<span class=''headword''>able</span>','_00000_00011_00053_00021','',0);

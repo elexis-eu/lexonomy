@@ -102,7 +102,7 @@ class StoreClass {
       })
             .done(function(flag, response) {
                if(response.success){
-                  entry.flag = [flag]
+                  entry.flag = flag
                }
             }.bind(this, flag))
             .fail(response => {
