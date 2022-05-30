@@ -8,7 +8,7 @@ from typing import Any, Callable, Optional, TypedDict, Union
 import ops
 from bs4 import Tag
 
-from website.ops import Configs
+from ops import Configs
 
 
 # Run a bunch of tests to check whether import functions behave as expected
@@ -48,7 +48,7 @@ class Test(TypedDict):
     """Same as ID, but for the searchables, this will usually only be the headword and title, but more can be specified by the user"""
     subentries: list[str]
     """List of IDS for the entry's subentries. These are validated against the database."""
-    subentrytests: dict[int, Test]
+    subentrytests: dict[int, Any] # really another Test instance
     """Keyed by subentry ID: tests/comparisons for the subentry's properties (such as sortkey, title, doctype, etc). This may contain more subentrytests for the subentry's subentries, because they can be recursive."""
     
     configs: Configs
@@ -140,7 +140,7 @@ testables = [{
     "sortkey": "this is the title", # sortkey is headword
     "searchables": ["this is the title"] # searchables are headword + title (which is first text if not headword)
 }, {
-    "description": "HeadwordAnnotations works, extra searchable elements work",
+    "description": "HeadwordAnnotations works, extra searchable elements work (also when xema is using elementName).",
 
     "configs": {
         "titling": {
@@ -148,7 +148,41 @@ testables = [{
             "headwordAnnotations": ["text"]
         },
         "searchability": {
-            "searchableElements": ["text"]
+            "searchableElements": ["text", "searchable_element_id"]
+        },
+        "xema": {
+            "elements": {
+                "searchable_element_id": {"elementName": "searchable_element"}
+            }
+        }
+    },
+
+    "entry": """
+    <entry id="10">
+        <text>this is some text</text>
+        <content>
+            <title>this is the title</title>
+        </content>
+        <text>this is some other text</text>
+        <searchable_element>content of the searchable_element</searchable_element>
+    </entry>""",
+
+    "title": "<span class='headword'>this is the title</span> this is some text",
+    "sortkey": "this is the title",
+    # headword, title (headword + content of the first text node, because of headwordAnnotations), contents of the two text elements.
+    "searchables": ["this is the title", "this is the title this is some text", "this is some text", "this is some other text", "content of the searchable_element"]
+}, {
+    "description": "titling headwordAnnotations works also when elementName is used in the xema.",
+
+    "configs": {
+        "titling": {
+            "headword": "title",
+            "headwordAnnotations": ["text_id"]
+        },
+        "xema": {
+            "elements": {
+                "text_id": {"elementName": "text"}
+            }
         }
     },
 
@@ -162,9 +196,6 @@ testables = [{
     </entry>""",
 
     "title": "<span class='headword'>this is the title</span> this is some text",
-    "sortkey": "this is the title",
-    # headword, title (headword + content of the first text node, because of headwordAnnotations), contents of the two text elements.
-    "searchables": ["this is the title", "this is the title this is some text", "this is some text", "this is some other text"]
 }, {
     "description": "HeadwordAnnotationsAdvanced works",
 
@@ -216,7 +247,7 @@ testables = [{
         <sub lxnm:id="102"><headword>subentry headword 2</headword></sub>
     </entry>""",
 
-    "sortkey": "headword", # NOTE: not the text of a headword in one of the subentries
+    "sortkey": "headword", # NOTE: ensure the extracted headword is the one actually inside the entry itself - not the headword of one of its subentries
     "searchables": ["headword", "headword some other text in the entry", "some other text in the entry"],
     "xml": """
     <entry lxnm:id="100" xmlns:lxnm="http://www.lexonomy.eu/">
@@ -229,8 +260,7 @@ testables = [{
     "subentries": [101, 102] # created during import.
 },  {
     "description": "Applying a flag works when not configured",
-    "debug": True,
-
+    
     "configs": {
         "flagging": {
             "flag_element": "flag",
@@ -329,8 +359,46 @@ testables = [{
         <flag>test</flag></entry>
     """,
 }, {
-    "description": "Subentry in subentry works.",
+    "description": "Applying a flag creates the correct elements when the xema uses elementName properties",
+    "configs": {
+        "xema": {
+            "root": "entry",
+            "elements": {
+                "entry": { "children": [{"name": "a"}, {"name": "b"}] },
+                "a": { "children": [{"name": "c"}, {"name": "d"}], "elementName": "a_name" },
+                "c": { "children": [{"name": "e"}, {"name": "f"}], "elementName": "c_name" },
+                "f": { "children": [{"name": "flag"}], "elementName": "f_name" },
+                "flag": { "elementName": "flag_name" }
+            }
+        },
+        "flagging": {
+            "flag_element": "flag",
+            "flags": [{
+                "key": "", # keyboard shortcut
+                "name": "test", # flag element content
+                "label": "", # clientside tooltip
+                "color": ""
+            }]
+        }
+    },
 
+    "actions": ["create", ["flag", "test"]],
+
+    "entry": """
+    <entry lxnm:id="999">
+        <text>some content</text>
+    </entry>""",
+
+    "xml": """
+    <entry lxnm:id="999" xmlns:lxnm="http://www.lexonomy.eu/">
+        <text>some content</text>
+        <a_name><c_name><f_name><flag_name>test</flag_name></f_name></c_name></a_name>
+    </entry>
+    """,
+    "flag": "test"
+}, {
+    "description": "Subentry in subentry works.",
+    
     "configs": {
         "subbing": {
             "subentry": {}
@@ -363,7 +431,7 @@ testables = [{
     }
 }, {
     "description": "Subentry reference to unknown entry is removed. (there are constraints in the database that make this necessary)",
-
+    
     "entry": """
     <entry lxnm:id="5">
         <text>title</text>
@@ -372,6 +440,28 @@ testables = [{
 
     "xml": """<entry lxnm:id="5" xmlns:lxnm="http://www.lexonomy.eu/"><text>title</text></entry>""",
     "subentries": []
+}, {
+    "description": "Subentry works with attribute constraints",
+    
+    "configs": {
+        "subbing": {
+            "subentry": {
+                "attributes": {
+                    "att": "true" # @att must be "true"
+                }
+            }
+        },
+    },
+
+    "entry": """
+    <entry lxnm:id="5">
+        <text>title</text>
+        <subentry att="false"><text>ignored subentry</text></subentry>
+        <subentry lxnm:id="100" att="true"><text>processed subentry</text></subentry>
+    </entry>""",
+
+    "xml": """<entry lxnm:id="5" xmlns:lxnm="http://www.lexonomy.eu/"><text>title</text><subentry att="false"><text>ignored subentry</text></subentry><lxnm:subentryParent id="100"></lxnm:subentryParent></entry>""",
+    "subentries": [100]
 }, {
     "description": "Creating entry with a subentry, then deleting that subentry: the link with the subentry is removed.",
 
@@ -523,6 +613,7 @@ for tests in testables:
         print(f"PASS {description}")
 
     except Exception as e:
+        breakpoint()
         if type(e) == Exception:
             print(e)
         else:
