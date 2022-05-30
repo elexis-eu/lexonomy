@@ -113,12 +113,15 @@ def migrate():
     for dict in mainDB.execute("select * from dicts").fetchall():
         id = dict["id"]
         title = dict["title"]
-        dictDB = ops.getDB(id)
-        configs = ops.readDictConfigs(dictDB)
-        print(f"Migrating dictionary {title} ({id}) ...")
-        for migration in migrations:
-            migration(dictDB, configs)
-        print(f"Migration of {title} ({id}) finished!")
+        try:
+            dictDB = ops.getDB(id)
+            configs = ops.readDictConfigs(dictDB)
+            print(f"Migrating dictionary {title} ({id}) ...")
+            for migration in migrations:
+                migration(dictDB, configs)
+            print(f"Migration of {title} ({id}) finished!")
+        except Exception as ex:
+            print(ex)
     mainDB.execute(f"PRAGMA user_version={current_version}")
 
 migrate()
