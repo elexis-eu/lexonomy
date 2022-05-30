@@ -10,7 +10,7 @@
                <span class="text">(ALERT)</span>
                <span class="right clickable closeIcon">
                   <i class="material-icons"
-                        onclick={onAlertCloseClick}>close</i>
+                     onClick={onAlertCloseClick}>close</i>
                </span>
             </div>
             <span class="statusmessage"></span>
@@ -20,43 +20,51 @@
    </div>
 
    <style>
-      .editorContainer{
+      .editorContainer {
          position: relative;
          margin-bottom: 0;
       }
-      .editorContainer #toolbar{
+
+      .editorContainer #toolbar {
          box-shadow: none;
          border-bottom: 1px solid #d9d9d8;
       }
-      .editorContainer #container{
-          z-index: 5;
-          background-color: white;
+
+      .editorContainer #container {
+         z-index: 5;
+         background-color: white;
          transition-delay: 1s;
       }
-      .editorContainer #container #editor.laic{
+
+      .editorContainer #container #editor.laic {
          padding-left: 30px;
       }
-      .editorContainer #container .viewer{
+
+      .editorContainer #container .viewer {
          padding: 0;
       }
-      .editorContainer #history{
+
+      .editorContainer #history {
          position: absolute;
          top: 45px;
          border-left: 1px solid #d9d9d8;
          background-color: #f2f2f2;
       }
-      .xonomy div.modeSwitcher{
+
+      .xonomy div.modeSwitcher {
          position: absolute;
          bottom: 26px;
       }
-      #sourceCode{
+
+      #sourceCode {
          position: absolute;
          top: 60px;
          left: 10px;
          right: 10px;
          bottom: 40px;
       }
-      #sourceCode textarea{
+
+      #sourceCode textarea {
          border: none;
          box-shadow: none;
          background-color: #f2f2f2;
@@ -65,17 +73,21 @@
    </style>
 
    <script>
+      // import xonomy from "@kcmertens/xonomy"
       export default {
          bindings: [["store", "entryIdChanged", "onEntryIdChanged"]],
 
-         onEntryIdChanged(){
+         graphicalEditorLoading: false,
+         graphicalEditorLoaded: false,
+
+         onEntryIdChanged() {
             this.initEditorIfNeeded()
             this.updateUrl()
             Screenful.Editor[this.dictData.mode](null, this.dictData.entryId)
          },
 
-         initEditorIfNeeded(){
-            if(this.dictData.dictId && this.dictData.config && !Screenful.Editor.editor){
+         initEditorIfNeeded() {
+            if (this.dictData.dictId && this.dictData.config && !Screenful.Editor.editor) {
                Screenful.Editor.createUrl = `${window.API_URL}${this.dictData.dictId}/entrycreate.json`
                Screenful.Editor.readUrl = `${window.API_URL}${this.dictData.dictId}/entryread.json`
                Screenful.Editor.updateUrl = `${window.API_URL}${this.dictData.dictId}/entryupdate.json`
@@ -104,18 +116,18 @@
                var customizeEditor = "";
                var usingOwnEditor = false;
                if (editing._js) {
-                  try{
+                  try {
                      customizeEditor = new Function("return " + editing._js)();
                      usingOwnEditor = customizeEditor.editor && customizeEditor.harvester;
-                  } catch(e){
+                  } catch (e) {
                      M.toast({html: "Invalid custom editor code."})
                   }
                }
                $("#editorStyle").html(editing._css ? `<style>${editing._css}</style>` : '')
                if (!xemplate[xema.root]) xemplate[xema.root] = {shown: false};
                if (xemplate[xema.root].shown == "false") xemplate[xema.root].shown = false;
-               Screenful.Editor.viewer=null;
-               if(xemplate._xsl || xemplate._css || xemplate[xema.root].shown) {
+               Screenful.Editor.viewer = null;
+               if (xemplate._xsl || xemplate._css || xemplate[xema.root].shown) {
                   Screenful.Editor.viewer = function (div, entry) {
                      if (entry.contentHtml.length == 0) {
                         var doc = (new DOMParser()).parseFromString(entry.content, 'text/xml');
@@ -123,7 +135,7 @@
                      }
                      $(div).addClass("viewer").html(entry.contentHtml);
                      Gmedia.addVoice(entry);
-                     $(div).find("a.xref").on("click", function(e){
+                     $(div).find("a.xref").on("click", function (e) {
                         var text = $(e.delegateTarget).attr("data-text");
                         window.parent.$("#searchbox").val(text);
                         window.parent.Screenful.Navigator.list();
@@ -160,10 +172,15 @@
                      window.parent.$(".doctypes").addClass(mode);
                   }.bind(this);
                   if (!uneditable) {
-                     docSpec.allowLayby=true;
-                     docSpec.laybyMessage="This is your temporary lay-by for entry fragments. You can drag and drop XML elements here.";
+                     docSpec.allowLayby = true;
+                     docSpec.laybyMessage = "This is your temporary lay-by for entry fragments. You can drag and drop XML elements here.";
                   }
-                  Xonomy.setMode(Cookies.get("xonomyMode_" + this.dictData.dictId) || editing.xonomyMode);
+
+                  if (editing["xonomyMode"] !== "graphical") {
+                     Xonomy.setMode(Cookies.get("xonomyMode_" + this.dictData.dictId) || editing.xonomyMode);
+                  } else {
+                     Xonomy.setMode(editing["xonomyMode"])
+                  }
                   Xrefs.extendDocspec(docSpec, xema);
                   Ske.extendDocspec(docSpec, xema);
                   Kontext.extendDocspec(docSpec, xema);
@@ -171,10 +188,10 @@
                   docSpec.onchange = Screenful.Editor.changed;
                   if (uneditable) {
                      for (elName in docSpec.elements) docSpec.elements[elName].isReadOnly = true;
-                     if (docSpec.unknownElement && typeof(docSpec.unknownElement) == "object") docSpec.unknownElement.isReadOnly = true;
-                     if (docSpec.unknownElement && typeof(docSpec.unknownElement) == "function") {
+                     if (docSpec.unknownElement && typeof (docSpec.unknownElement) == "object") docSpec.unknownElement.isReadOnly = true;
+                     if (docSpec.unknownElement && typeof (docSpec.unknownElement) == "function") {
                         var func = docSpec.unknownElement;
-                        docSpec.unknownElement = function(elName){
+                        docSpec.unknownElement = function (elName) {
                            var ret = func(elName);
                            ret.isReadOnly = true;
                            return ret;
@@ -184,15 +201,27 @@
 
                   if (!usingOwnEditor) {
                      if (customizeEditor && customizeEditor.adjustDocSpec) customizeEditor.adjustDocSpec(docSpec);
-                     Xonomy.render((entry ? entry.content : newXml), div, docSpec);
-                     if(!Xonomy.keyNav) Xonomy.startKeyNav($("#container")[0], document.getElementById("container"));
+                     if (editing.xonomyMode === "graphical") {
+                        // Destroy Vue editor so we only keep 1 instance - prevents from multiple watch calls because they don't remove themselves properly when removing dom element
+                        if (window.editor._isVue) {
+                           editor.$destroy()
+                        }
+                        this.openGraphicalEditor(entry ? entry.content : newXml)
+                        return
+                     } else {
+                        Xonomy.render((entry ? entry.content : newXml), div, docSpec);
+                     }
+                     if (!Xonomy.keyNav) Xonomy.startKeyNav($("#container")[0], document.getElementById("container"));
                      Gmedia.addVoice();
                   } else {
                      customizeEditor.editor(div, entry ? entry : {content: newXml, id: 0}, uneditable);
                   }
                }.bind(this);
-               Screenful.Editor.harvester=function(div){
-                  if(!usingOwnEditor){
+               Screenful.Editor.harvester = function (div) {
+                  if (!usingOwnEditor) {
+                     if (editing["xonomyMode"] === "graphical") {
+                        return window.harvestGraphicalEditorData()
+                     }
                      return Xonomy.harvest();
                   } else {
                      return customizeEditor.harvester(div);
@@ -204,27 +233,27 @@
                Screenful.Editor.cleanupSourceCode = Screenful.cleanupXml
 
                // history
-               Screenful.History.historyUrl = window.API_URL + this.dictData.dictId+"/history.json";
+               Screenful.History.historyUrl = window.API_URL + this.dictData.dictId + "/history.json";
                Screenful.History.isDeletion = revision => revision.action == "delete" || revision.action == "purge"
                Screenful.History.getRevisionID = revision => revision.revision_id
-               Screenful.History.printAction = function(revision) {
+               Screenful.History.printAction = function (revision) {
                   var content = "";
                   //actions: delete | create | update | purge
                   //historiography: {apikey: apikey} | {uploadStart: uploadStart, filename: filename}
                   content += "<div style='white-space: nowrap'>";
-                  if (revision.action=="create") content += "<b>Created</b>";
-                  else if (revision.action=="update") content += "<b>Changed</b>";
-                  else if (revision.action=="delete") content += "<b>Deleted</b>";
-                  else if (revision.action=="purge") content += "<b>Bulk-deleted</b>";
+                  if (revision.action == "create") content += "<b>Created</b>";
+                  else if (revision.action == "update") content += "<b>Changed</b>";
+                  else if (revision.action == "delete") content += "<b>Deleted</b>";
+                  else if (revision.action == "purge") content += "<b>Bulk-deleted</b>";
                   if (revision.historiography.uploadStart) content += " while uploading";
                   if (revision.historiography.apikey) content += " through API";
-                  if (revision.historiography.refactoredFrom) content += " as a subentry of <a href='javascript:void(null)' onclick='parent.Screenful.Editor.open(null, "+revision.historiography.refactoredFrom+")'>"+revision.historiography.refactoredFrom+"</a>";
+                  if (revision.historiography.refactoredFrom) content += " as a subentry of <a href='javascript:void(null)' onclick='parent.Screenful.Editor.open(null, " + revision.historiography.refactoredFrom + ")'>" + revision.historiography.refactoredFrom + "</a>";
                   content += "</div>";
-                  if (revision.email) content += "<div style='white-space: nowrap'><b>By:</b> "+revision.email+"</div>";
-                  content += "<div style='white-space: nowrap'><b>When:</b> "+revision.when+"</div>";
+                  if (revision.email) content += "<div style='white-space: nowrap'><b>By:</b> " + revision.email + "</div>";
+                  content += "<div style='white-space: nowrap'><b>When:</b> " + revision.when + "</div>";
                   return content;
                };
-               Screenful.History.fakeEntry = function(revision) {
+               Screenful.History.fakeEntry = function (revision) {
                   return {id: revision.entry_id, content: revision.content, contentHtml: revision.contentHtml};
                };
                Screenful.Editor.onListChange = this.onListChange
@@ -235,46 +264,88 @@
                Screenful.Editor.updateToolbar();
                Screenful.status(Screenful.Loc.ready);
 
-               if(this.dictData.entryId){
-                  Screenful.Editor[this.dictData.mode](null,this.dictData.entryId);
+               if (this.dictData.entryId) {
+                  Screenful.Editor[this.dictData.mode](null, this.dictData.entryId);
                }
             }
          },
+         loadGraphicalEditorDevServer() {
+            this.graphicalEditorLoading = true
+            if (!document.getElementById("editor-app-chunk-vendors") || !document.getElementById("editor-app-script")) {
+               fetch('http://localhost:8081/js/chunk-vendors.js').then(r => r.text()).then(vendorContent => {
+                  const newScript = document.createElement("script")
+                  newScript.setAttribute("id", "editor-app-chunk-vendors")
+                  newScript.append(document.createTextNode(vendorContent))
+                  document.querySelector('body').appendChild(newScript)
+                  fetch('http://localhost:8081/js/app.js').then(r => r.text()).then(content => {
+                     const newScript = document.createElement("script")
+                     newScript.setAttribute("id", "editor-app-script")
+                     newScript.append(document.createTextNode(content))
+                     document.querySelector('body').appendChild(newScript)
+                     this.graphicalEditorLoaded = true
+                  })
+               })
+            }
+         },
 
-         onAlertCloseClick(){
+         openGraphicalEditor(entry) {
+            if (!this.graphicalEditorLoaded) {
+               if (this.graphicalEditorLoading) {
+                  setTimeout(() => {
+                     this.openGraphicalEditor(entry)
+                  }, 500)
+               } else {
+                  this.loadGraphicalEditorDevServer()
+               }
+            } else {
+               // console.log(this.dictData)
+               window.entryData = {
+                  entryId: this.dictData.entryId,
+                  dictId: this.dictData.dictId,
+                  dictConfigs: this.dictData.dictConfigs,
+                  userAccess: this.dictData.userAccess,
+                  userInfo: this.dictData.userInfo,
+                  content: entry || ""
+               }
+               window.mountGraphicalEditor()
+            }
+         },
+
+         onAlertCloseClick() {
             $(".alertmessage").hide()
          },
 
-         onListChange(){
+         onListChange() {
             this.store.loadEntryList()
          },
 
-         onEntryIdChange(entryId){
+         onEntryIdChange(entryId) {
             this.dictData.entryId = entryId
             this.updateUrl()
          },
 
-         onModeChange(mode){
+         onModeChange(mode) {
             this.dictData.mode = mode
             this.updateUrl()
          },
 
-         updateUrl(){
+         updateUrl() {
             let newUrl = `${window.location.href.split("#")[0]}#/${this.dictData.dictId}/edit/${this.dictData.doctype}/${this.dictData.entryId}/${this.dictData.mode}${url.stringifyQuery(route.query())}`
-            if(newUrl != window.location.href){
+            if (newUrl != window.location.href) {
                history.pushState(null, null, newUrl)
             }
          },
 
          onMounted() {
+            this.loadGraphicalEditorDevServer()
             this.initEditorIfNeeded()
          },
 
-         onUpdated(){
+         onUpdated() {
             this.initEditorIfNeeded()
          },
 
-         onBeforeUnmount(){
+         onBeforeUnmount() {
             Screenful.Editor.editor = null
          }
       }
