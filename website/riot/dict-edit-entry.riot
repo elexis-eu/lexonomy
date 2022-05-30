@@ -289,15 +289,15 @@
          },
 
          openGraphicalEditor(entry) {
-            if (!this.graphicalEditorLoaded) {
-               if (this.graphicalEditorLoading) {
-                  setTimeout(() => {
-                     this.openGraphicalEditor(entry)
-                  }, 500)
-               } else {
-                  this.loadGraphicalEditorDevServer()
-               }
-            } else {
+            // if (!this.graphicalEditorLoaded) {
+            //    if (this.graphicalEditorLoading) {
+            //       setTimeout(() => {
+            //          this.openGraphicalEditor(entry)
+                  // }, 500)
+               // } else {
+               //    this.loadGraphicalEditorDevServer()
+               // }
+            // } else {
                // console.log(this.dictData)
                window.entryData = {
                   entryId: this.dictData.entryId,
@@ -308,7 +308,7 @@
                   content: entry || ""
                }
                window.mountGraphicalEditor()
-            }
+            // }
          },
 
          onAlertCloseClick() {
@@ -337,7 +337,7 @@
          },
 
          onMounted() {
-            this.loadGraphicalEditorDevServer()
+            // this.loadGraphicalEditorDevServer()
             this.initEditorIfNeeded()
          },
 
