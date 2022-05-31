@@ -2120,17 +2120,14 @@ def updateDictConfig(dictDB: Connection, dictID: str, configID: str, content: An
             conn = getMainDB()
             conn.execute("UPDATE dicts SET language=? WHERE id=?", (lang, dictID))
             conn.commit()
-        return content, False
     elif configID == 'users':
         attachDict(dictDB, dictID)
-        return content, False
     elif configID == "titling" or configID == "searchability" or configID == "subbing" or configID == "flagging" or configID == "links":
-        resaveNeeded = flagForUpdate(dictDB)
-        return content, resaveNeeded
-    else:
-        return content, False
+        flagForUpdate(dictDB) # Something changed that influences entries xml or metadata (headwod)
 
-def flagForUpdate(dictDB: Connection): 
+    return content
+
+def flagForUpdate(dictDB: Connection) -> int: 
     "Flag all entries in the dictionary for an update"
     c = dictDB.execute("update entries set needs_update=1")
     dictDB.commit()

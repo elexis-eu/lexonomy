@@ -1,12 +1,15 @@
 <dict-config>
    <dict-nav links={[["config", "Configure"]]}/>
    <h1>Configuration</h1>
-   <div class="row" if="{state.stats.needUpdate && !state.isResaving}">
-      Your dictionary needs to be re-indexed ({stats.needUpdate} entries). <button class="btn" style="margin-left: 15px;" onclick="{resave}">Do it now</button>
+   <div class="row" if="{!state.isResaving}">
+      Your dictionary needs to be re-indexed ({state.stats.needUpdate} entries). <button class="btn" style="margin-left: 15px;" onclick="{resave}">Do it now </button>
+      <br>
+      <span style="opacity: 75%; font-size: 80%;">You don't have to do this right now. But your dictionary may take longer to load, and searching entries may not always return the results you expect, until you re-index.</span>
    </div>
    <div if="{state.isResaving}">
-      Re-indexing your dictionary, please wait...<br>
       <span if={state.resaveProgressMessage}>{state.resaveProgressMessage}</span>
+      <br>
+      <span style="opacity: 75%; font-size: 80%;">You may close or leave this window at any time to pause the process, and return later to resume.</span>
    </div>
    <div class="columnContainer"
          style="margin-left: 20px;">
@@ -113,12 +116,17 @@
             if (this.state.isResaving) return;
             this.update({isResaving: true});
             while (true) {
-               const {progressMessage, finished, errors} = await $.get(`${this.dictId}/resave.json`);
-               if (finished) {
+               try {
+                  const {progressMessage, finished, errors} = await $.post(`${this.dictData.dictId}/resave.json`);
+                  if (finished) {
+                     this.update({isResaving: false});
+                     return;
+                  }
+                  this.update({resaveProgressMessage: progressMessage});
+               } catch (e) {
                   this.update({isResaving: false});
-                  return;
+                  break
                }
-               this.update({resaveProgressMessage: progressMessage});
             }
          }
       }
