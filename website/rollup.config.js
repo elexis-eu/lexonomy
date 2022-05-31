@@ -27,7 +27,7 @@ export default [{
   },
   plugins: [
     riot(options),
-    uglify(),
+    ...(process.env.ROLLUP_WATCH ? [] : [uglify]), // only enable the slow uglify if creating production build (i.e. not in watch mode)
     nodeResolve()
   ]
 }, {

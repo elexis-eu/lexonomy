@@ -37,7 +37,7 @@ CREATE TABLE entries (
     xml             TEXT,
     title           TEXT,
     sortkey         TEXT,
-    flag            TEXT DEFAULT "",
+    flag            TEXT NOT NULL DEFAULT (''),
     needs_update    BOOLEAN DEFAULT (0)
 );
 CREATE TABLE linkables (
@@ -47,7 +47,6 @@ CREATE TABLE linkables (
     element     TEXT,
     preview     TEXT
 );
-CREATE INDEX search ON searchables (txt, level);
 CREATE INDEX history_by_entry_id ON history (entry_id, "when");
 CREATE INDEX history_by_email ON history (email, "when");
 CREATE INDEX history_by_when ON history ("when");

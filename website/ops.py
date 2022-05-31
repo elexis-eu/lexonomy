@@ -26,11 +26,11 @@ from icu import Locale, Collator
 import requests
 
 class ConfigTitling(TypedDict):
-    headword: str
-    """tagName to use as entry headword"""
+    headword: NotRequired[str]
+    """(xema) Element ID whose text to use as entry headword. Use the first text content in the entry if not supplied"""
 
-    headwordSorting: str
-    """(optional) alternative tagName to use for sorting."""
+    headwordSorting: NotRequired[str]
+    """(optional) alternative (xema) ID for element to use for sorting."""
     
     sortDesc: bool
     """invert sort order?"""
@@ -45,7 +45,7 @@ class ConfigTitling(TypedDict):
     """"Which of headwordAnnotations or headwordAnnotationsAdvanced to use. If advanced and headwordAnnotationsAdvanced is empty, fall back to normal headwordAnnotations property"""
 
     headwordAnnotations: NotRequired[List[str]]
-    """List of element names whose text to put in the entry's title"""
+    """List of element IDs (not names!) whose text to put in the entry's title"""
     
     headwordAnnotationsAdvanced: NotRequired[str]
     """a format string like "<some_html>%(element_name)</some_html><some_more_html>%(another_element_name)</some_more_html>"
@@ -89,6 +89,7 @@ class ConfigXemaElementChild(TypedDict):
     min: int
     max: Optional[int]
     name: str
+    """An ID in xema["elements"] where the child info is held."""
 
 class ConfigXemaAttributeValue(TypedDict):
     value: str
@@ -101,6 +102,20 @@ class ConfigXemaAttribute(TypedDict):
 
 class ConfigXemaElement(TypedDict):
     elementName: Optional[str]
+    """When supplied, use this as xml tag instead of the key in the xema["elements"].
+        This can be useful when the xml contains elements with the same name that require a different configuration.
+
+        E.G.: 
+        xema = {
+            elements: {
+                some_element: { }, # no name is set, so we use the key as xml element: <some_element>...</some_element>
+                some_other_element: { elementName: "some_element" } # now we have an elementName property, so use that: <some_element>...</some_element>
+            }
+        }
+
+        But now how to know which ID matches with an element, since multiple configured elements can set the same elementName?
+        Check the parent. Only one of a parent children (i.e. siblings) should ever have a given elementName.
+     """
     filling: Literal["inl", "txt", "chd", "emp"]
     values: List[str]
     children: List[ConfigXemaElementChild]
@@ -115,8 +130,8 @@ class ConfigXema(TypedDict):
 ConfigLinks = dict[str, ConfigLinksEntry]
 class ConfigSubbingEntry(TypedDict):
     attributes: NotRequired[dict[str, str]]
-    """Name of attribute: required value of attribute (if empty value - only prescence of attribute is checked, any value is accepted)
-        Not required because this setting didn't always exist.
+    """A dictionary containing: { [name of attribute]: "required value of attribute" } (if empty value - only prescence of attribute is checked, any value is accepted)
+        The attributes property is NotRequired because this setting didn't always exist, and so it won't be there in old configs.
     """
 
 ConfigSubbing = dict[str, dict[str, Any]] # values are empty dicts for now
@@ -381,6 +396,39 @@ DEFAULT_HEADWORD = "?"
 
 # utils
 
+def xema_get_element_name_from_id(xema: ConfigXema, elementID: str) -> str:
+    """Xema elements no longer keyed by their xml tag name. Now keyed by an arbitrary ID. Util function to convert one to the other."""
+    return xema["elements"].get(elementID, {}).get("elementName", elementID)
+
+def xema_get_id_from_element_name(xema: ConfigXema, elementName: str, parentElementID: Optional[str] = None) -> str:
+    """Xema elements no longer keyed by their xml tag name. Now keyed by an arbitrary ID. Util function to convert one to the other. 
+    Parent is used to disambiguate (because multiple elements may specify the same elementName value, but elementName is unique among siblings.
+    That means if you use this without specifying the parent, and the elementName is not the entry's root node, you're doing it wrong.
+    """
+
+    # Since there mayb be multiple elements where this is true, use the parent to disambiguate (if supplied). 
+    parentElement: Optional[ConfigXemaElement] = xema["elements"].get(parentElementID) if parentElementID else None
+    if parentElement:
+        for childConfig in parentElement["children"]:
+            childElementID = childConfig["name"]
+            childElementName = xema["elements"].get(childElementID, {}).get("elementName") or childElementID # use name if supplied, ID becomes fallback name otherwise
+            if childElementName == elementName:
+                return childElementID
+    
+    # No parent supplied, or not found: return the root if it matches
+    if root := xema.get("root"):
+        if xema["elements"].get(root, {}).get("elementName", root) == elementName:
+            return root
+    
+    # Root also didn't match: check all elements to see which it is (maybe an orphan element? (not the root, but no parent either.))
+    for thisElementID, thisElement in xema["elements"].items():
+        thisElementName = thisElement.get("elementName", thisElementID) # again, use name of this element if supplied in the config, use the ID otherwise
+        if thisElementName == elementName:
+            return thisElementID
+
+    # Nothing in the entire Xema uses the requested elementName - so the config is technically in an invalid state. Use a sensible default I guess.
+    return elementName
+
 def parse(xml: str) -> Tag:
     """Parse the xml and return the entry its root node. Expects to be passed xml with a single root node."""
     # We roll our own builder because all existing beatifulsoup parsers have some drawback that make them unusable in our context:
@@ -423,6 +471,7 @@ def parse(xml: str) -> Tag:
     return list(b.children)[0]
 
 def doSql(db: Connection, sql: str, param: Any = None):
+    """Convenience to enable easy logging of sql statements during development"""
     return db.execute(sql, param)
 
 def deleteEntry(dictDB: Connection, configs: Configs, id: int, email: Optional[str]):
@@ -549,6 +598,7 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
         dictDB (Connection): 
         configs (Configs): 
         ids (Tuple[int, List[int]]): either a single id or list of ids to retrieve. Maxes out at something like 500k, due to statement length limitations.
+        xml (bool, optional): Also return the xml as string. Defaults to True.
         tag (bool, optional): Also return the xml as parsed. Defaults to False.
         html (bool, optional): Also return the html. This runs the xslt from the config, or otherwise generates a <script> tag that will transform the xml to html on the client side. Defaults to False.
         titlePlain (bool, optional): Also include the plain text of the entry. This requires the xml to be parsed, so is slow.
@@ -582,8 +632,8 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
         where id in ({",".join("?" * len(ids))})
     """, ids).fetchall()
 
-    # First try xslt, if that doesn't work just set it to be the script tag.
-    run_xslt = get_xslt_transformer(configs.get("xemplate", {}).get("_xsl", ""))
+    # If required, load transformer outside of loop
+    run_xslt = get_xslt_transformer(configs.get("xemplate", {}).get("_xsl", "")) if html else None
 
     entries: List[EntryFromDatabase] = []
     for row in rows:
@@ -601,10 +651,10 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
             ret["content"] = row["xml"] # type: ignore - compatibility with screenful. TODO remove
         if tag or titlePlain:
             parsedXml = parse(row["xml"])
-        if tag:
-            ret["tag"] = parsedXml
-        if titlePlain:
-            ret["titlePlain"] = get_entry_title(parsedXml, configs["titling"])[0]
+            if tag:
+                ret["tag"] = parsedXml
+            if titlePlain:
+                ret["titlePlain"] = get_entry_title(parsedXml, configs)[0]
         if html:
             ret["html"] = get_entry_html(configs, row["xml"], run_xslt)
         entries.append(ret)
@@ -630,7 +680,7 @@ def fixup_namespaces(xml: Tag):
 
 def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) -> tuple[int, bool]:
     """
-    Ensure the entry has a row in the database, and the entry root points to that row with @lxnm:id.
+    Ensure the entry has a row in the database, and the entry root has an attribute @xml:id with the row ID.
 
     The ID is determined as such (first match):
     - 1. if an ID is passed, that will always be used, and the entry's xml will be updated to have that ID
@@ -647,12 +697,12 @@ def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) ->
     if id != None:
         try: 
             id = int(id)
-        except Exception as e:
+        except:
             print(f"Invalid ID (non-number) {id} in to-be-imported entry: replacing...")
             del xml.attrs["lxnm:id"]
             id = None
 
-    isNewEntry = False
+    isNewEntry: bool = False
     if id is None: # let db create one
         id = doSql(dictDB, "insert into entries(doctype, xml, title, sortkey) values(?, ?, ?, ?)", ("", "", "", "")).lastrowid
         isNewEntry = True
@@ -688,12 +738,6 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
     """
 
     config = configs["subbing"]
-    def isInsideOtherSubentry(el: Tag) -> bool:
-        while (el := el.parent) != None and el is not entryXml: # entry xml may not be root of doc, avoid looking at its parents (might happen in subentries)!
-            if el.name in config: # TODO and matches attributes
-                return True
-        return False
-
     def turnChildElementIntoSubentry(parentEntry: Tag, subentry: Tag) -> int:
         """
             Save the child in the database, giving it an ID automatically. 
@@ -705,26 +749,34 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
         subentry.replaceWith(new_tag)
         return subentryID
 
-    def matchesAttributes(el: Tag, attributes: dict[str, str]):
+    def matchesAttributes(el: Tag, element_id: str):
         """Return True if any of the attributes is present with the correct value."""
-        attributes = attributes.items()
-        if not(len(attributes)):
+        required_attributes = config.get(element_id, {}).get("attributes", {}).items()
+        if not(len(required_attributes)):
             return True # no attributes required - always good.
         # Find a matching attribute
-        for name, requiredValue in attributes:
+        for name, requiredValue in required_attributes:
             if el.has_attr(name) and (not requiredValue or el.attrs.get(name) == requiredValue):
                 return True 
         # No matching attributes (but at least one should be present defined)
         return False
-
+    
+    def isInsideOtherSubentry(el: Tag) -> bool:
+        ancestor = el
+        while (ancestor := ancestor.parent) != None and ancestor is not entryXml: # entry xml may not be root of doc, avoid looking at its parents (might happen in subentries)!
+            ancestor_id = xema_get_id_from_element_name(configs["xema"], ancestor.name)
+            if ancestor_id in config and matchesAttributes(ancestor, ancestor_id):
+                return True
+        return False
 
     # 1. Replace subentries with subentryParent placeholder/standin elements
     # NOTE: gather first - then replace, as to avoid modifying the xml while we're iterating and throwing off BeatifulSoup
     nodesToTurnIntoSubentries: List[Tag] = []
     newSubentries: List[int] = []
-    for elementName in config:
-        for subentryElement in entryXml.select(elementName):
-            if not isInsideOtherSubentry(subentryElement) and matchesAttributes(subentryElement, config[elementName].get("attributes", {})):
+    for element_id in config:
+        element_name = xema_get_element_name_from_id(configs["xema"], element_id)
+        for subentryElement in entryXml.select(element_name):
+            if not isInsideOtherSubentry(subentryElement) and matchesAttributes(subentryElement, element_id):
                 nodesToTurnIntoSubentries.append(subentryElement)
     for subentryElement in nodesToTurnIntoSubentries:
         subentryID = turnChildElementIntoSubentry(entryXml, subentryElement)
@@ -805,20 +857,23 @@ def get_text_all(xml: Tag, tagName: str) -> List[str]:
             ret.append(textContent)
     return ret
 
-def get_entry_headword(xml: Tag, config: ConfigTitling) -> str:
+def get_entry_headword(xml: Tag, configs: Configs) -> str:
     """
     Get the entry's headword.
     If no text is found at the element, the first non-whitespace text content of the document will be returned.
     If there is no text at all, a default placeholder is returned.
     """
-    if config.get("headword") and (val := get_text(xml, config["headword"])):
+    config: ConfigTitling = configs["titling"]
+    headword_id = config.get("headword")
+    headword_element_name = xema_get_element_name_from_id(configs["xema"], headword_id) if headword_id else None
+    if headword_element_name and (val := get_text(xml, headword_element_name)):
         return val[0:255]
     elif val := get_text(xml):
         return val[0:255]
     else:
         return DEFAULT_HEADWORD
 
-def get_entry_title(xml: Tag, config: ConfigTitling) -> Tuple[str, str]:
+def get_entry_title(xml: Tag, configs: Configs) -> Tuple[str, str]:
     """
     Returns [title as plaintext, title as html]
     This will usually be the headword (and optionally some other things), unless specifically configured by the user (by using advanced mode).
@@ -830,6 +885,7 @@ def get_entry_title(xml: Tag, config: ConfigTitling) -> Tuple[str, str]:
     # advanced process; do string-replacement in a format-string
     # format string looks like "some text %(elementName) some more text maybe %(anotherElementName)"
     # replace the %() sequences with the contents of the first (non-whitespace) element of the name.
+    config: ConfigTitling = configs["titling"]
     titleParts: List[str] = []
     if (formatString := config.get("headwordAnnotationsAdvanced", "")) and config.get("headwordAnnotationsType") == "advanced":
         asHtml: str = formatString  # start with the format string as-is, replace placeholders as we go
@@ -841,11 +897,12 @@ def get_entry_title(xml: Tag, config: ConfigTitling) -> Tuple[str, str]:
         
         if len(titleParts):
             return ' '.join(titleParts), asHtml
-        
+
     # Run simple mode if we haven't returned yet (because advanced mode either disabled or didn't match anything)
     # start with the headword.
-    headword = get_entry_headword(xml, config)
-    for elementName in config.get("headwordAnnotations", []):
+    headword = get_entry_headword(xml, configs)
+    for element_id in config.get("headwordAnnotations", []):
+        elementName = xema_get_element_name_from_id(configs["xema"], element_id)
         if (text := get_text(xml, elementName)) != None:
             titleParts.append(text)
 
@@ -854,7 +911,7 @@ def get_entry_title(xml: Tag, config: ConfigTitling) -> Tuple[str, str]:
     return ' '.join(stringParts), ' '.join(htmlParts)
 
 
-def get_entry_sortkey(xml: Tag, config: ConfigTitling) -> str: 
+def get_entry_sortkey(xml: Tag, configs: Configs) -> str: 
     """
     Get the entry's sort key as defined by configs.titling.headwordSorting
     Fallbacks are in order:
@@ -862,20 +919,21 @@ def get_entry_sortkey(xml: Tag, config: ConfigTitling) -> str:
     - the first text content in the entry
     - a placeholder string
     """
-    # need an elif tree because both the config can be missing, and the result of the check can be missing.
+    config = configs["titling"]
     if config.get("headwordSorting") and (val := get_text(xml, config["headwordSorting"])):
         return val
     else:
-        return get_entry_headword(xml, config)
+        return get_entry_headword(xml, configs)
 
 def get_entry_flag(xml: Union[str, Tag], configs: Configs) -> Optional[str]:
     """Read the flag from an entry, assumes the xml is from the database, and not from the user (and so has no unexpected issues)."""
     if isinstance(xml, str):
         xml = parse(xml)
 
-    flag_element = configs.get("flagging", {}).get("flag_element")
-    return get_text(xml, flag_element) if flag_element else None
-
+    flag_element_id = configs.get("flagging", {}).get("flag_element")
+    flag_element_name = configs.get("xema", {}).get("elements", {}).get(flag_element_id, {}).get("elementName", flag_element_id)
+    flag_text = (get_text(xml, flag_element_name) or "") if flag_element_name else ""
+    return flag_text
 
 def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs, email: str, xml: Optional[Union[Tag, str]] = None) -> Tuple[Optional[Tag], Optional[str]]:
     """
@@ -888,39 +946,15 @@ def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs
     NOTE: A history entry is created on success.
     NOTE: You must commit() after doing this.
     """
-    def updateFlag(entryRoot: Tag, the_flag_element: Tag):
-        the_flag_element.clear()
-        the_flag_element.append(flag) # add the string
-        xmlstr = str(entryRoot)
-        doSql(dictDB, "update entries set xml=?, flag=? where id=?", (xmlstr, flag, entryID))
-        doSql(dictDB, "insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xmlstr, json.dumps({})))
-
-        if flag_element in configs["searchability"].get("searchableElements", []):
-            titleText, titleHtml = get_entry_title(entryRoot, configs["titling"])
-            presave_searchables(dictDB, configs, entryRoot, entryID, titleText)
-
-    def path_to_element(xema: ConfigXema, current_element: str, target_element: str) -> Optional[list[str]]:
-        """
-        Find the (first) path to to the target element. The list is returned with the target element at the end.
-        The initial starting point element is not returned in the list.
-        If any of the encountered elements have no config in the xema it is not considered further.
-        """
-        if elementConfig := xema["elements"].get(current_element): # if element has a definition in xema, check the children
-            for c in elementConfig.get("children", []):
-                childName = c["name"]
-                if childName == target_element:
-                    return [childName]
-                elif path_to_target := path_to_element(xema, childName, target_element):
-                    return [childName] + path_to_target
-                # doesn't lead to target, next child
-            # nothing leads to target - dead-end.
 
     # Gather all basic info: parsed xml, flag element name
-    flag_element: str = configs["flagging"].get("flag_element")
-    if not flag_element:
+    flag_element_id: str = configs["flagging"].get("flag_element")
+    if not flag_element_id:
         return None, "Cannot set flag as no flags are configured."
-    
-    if not xml: # not passed in (or empty string - what are you doing???), read from db
+    flag_element_name = xema_get_element_name_from_id(configs["xema"], flag_element_id)
+    xema: ConfigXema = configs.get("xema", {"elements": {}})
+
+    if not xml: # read xml from db if not supplied
         row = doSql(dictDB, "select id, xml from entries where id=?", (entryID,)).fetchone()
         if not row:
             return None, "Entry not found"
@@ -928,17 +962,47 @@ def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs
     elif isinstance(xml, str):
         xml = parse(xml)
 
+
+    def updateFlag(entryRoot: Tag, the_flag_element: Tag):
+        the_flag_element.clear()
+        the_flag_element.append(flag) # add the string
+        xmlstr = str(entryRoot)
+        doSql(dictDB, "update entries set xml=?, flag=? where id=?", (xmlstr, flag, entryID))
+        doSql(dictDB, "insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xmlstr, json.dumps({})))
+
+        if flag_element_id in configs["searchability"].get("searchableElements", []):
+            titleText, titleHtml = get_entry_title(entryRoot, configs)
+            presave_searchables(dictDB, configs, entryRoot, entryID, titleText)
+
+    def path_to_element(current_element_id: str, target_element_id: str) -> Optional[list[str]]:
+        """
+        Find the (first) path to to the target element. 
+        The list is returned with the target element at the end. The list contains the xml names of the elements, not their IDS.
+        The initial starting point element is not returned in the list.
+        If any of the encountered elements have no config in the xema it is not considered further.
+        """
+        if elementConfig := xema["elements"].get(current_element_id): # if element has a definition in xema, check the children
+            for c in elementConfig.get("children", []):
+                child_id = c["name"] # confusing, but alas.. the child.name property is the key in the xema.elements object, so it is actually the ID of the child.
+                child_name= xema_get_element_name_from_id(xema, c["name"])
+                if child_id == target_element_id:
+                    return [child_name]
+                elif path_to_target := path_to_element(child_id, target_element_id):
+                    return [child_name] + path_to_target
+                # doesn't lead to target, next child
+            # nothing leads to target - dead-end.
+
     # Note, we do not check the path to the flag element here. 
     # We assume that when it exists, it is valid to use it, and the exact location does not matter very much
-    # TODO: add history entry so user can undo later.
-    if the_flag_element := xml.find(flag_element):
+    if the_flag_element := xml.find(flag_element_name):
         updateFlag(xml, the_flag_element)
         return xml, None
 
     # flag not present. try and find where we should insert it, and do so.
     # Start looking from the actual entry root instead of schema root, 
     # as it is possible this entry does not start at the schema root (such as when this is a subentry).
-    path_to_flag = (path_to_element(configs.get("xema", {"elements": {}}), xml.name, flag_element) or [flag_element]) # if we can't find a path, add the flag directly below the root.
+    root_element_id = xema_get_id_from_element_name(xema, xml.name)
+    path_to_flag = (path_to_element(root_element_id, flag_element_id) or [flag_element_name]) # if we can't find a path, add the flag directly below the root.
     flag_or_nearest_ancestor = xml
     
     # Find the element closest to the flag in the xml, adding unfound elements as we run across them.
@@ -967,9 +1031,10 @@ def presave_searchables(dictDB: Connection, configs: Configs, entryXml: Tag, ent
 
     # Level 2 searchables: headword, plus everything in config - do this first so we can check we don't have duplicates.
     searchablesLevel2: Set[str] = set()
-    searchablesLevel2.add(get_entry_headword(entryXml, configs["titling"]))
-    for sel in configs["searchability"].get("searchableElements", []):
-        for txt in get_text_all(entryXml, sel):
+    searchablesLevel2.add(get_entry_headword(entryXml, configs))
+    for element_id in configs["searchability"].get("searchableElements", []):
+        element_name = xema_get_element_name_from_id(configs["xema"], element_id)
+        for txt in get_text_all(entryXml, element_name):
             searchablesLevel2.add(txt)
 
     # Level 1: title and title lowercase - insofar as those are not in level 2
@@ -1063,8 +1128,8 @@ def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], emai
     presave_subentries(dictDB, configs, xml, id, email)
 
     doctype = get_entry_doctype(xml)
-    titleText, titleHtml = get_entry_title(xml, configs["titling"])
-    sortKey = get_entry_sortkey(xml, configs["titling"])
+    titleText, titleHtml = get_entry_title(xml, configs)
+    sortKey = get_entry_sortkey(xml, configs)
     flag = get_entry_flag(xml, configs)
 
     presave_searchables(dictDB, configs, xml, id, titleText)
@@ -1332,7 +1397,7 @@ def makeDict(dictID: str, template: str, title: str, blurb: str, email: str):
         template = os.path.join("dictTemplates", template + ".sqlite.schema")
     #init db schema
     schema = open(template, 'r').read()
-    conn = sqlite3.connect("file:" + os.path.join(siteconfig["dataDir"], "dicts", dictID + ".sqlite?modeof=."), uri=True)
+    conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], "dicts", dictID + ".sqlite"))
     conn.executescript(schema)
     conn.commit()
     #update dictionary info
@@ -2469,7 +2534,7 @@ def listOntolexEntries(dictDB: Connection, dictID: str, configs: Configs, doctyp
     c = dictDB.execute(sql, params)
     for r in c.fetchall():
         xml = parse(r["xml"])
-        headword = get_entry_headword(xml, configs["titling"])
+        headword = get_entry_headword(xml, configs)
         headword = headword.replace('"', "'")
         lang = configs["ident"].get("lang", "") or "en"
         entryId = re.sub("[\W_]", "",  headword) + "_" + str(r["id"])

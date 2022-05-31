@@ -1,5 +1,5 @@
 bundle.js: $(wildcard riot/*.riot)
-	[ -d node_modules ] || npm install
+	[ -d node_modules ] || npm install --legacy-peer-deps
 	npm run build
 bundle.min.js: bundle.js
 	npm run minify
