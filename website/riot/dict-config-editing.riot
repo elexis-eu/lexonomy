@@ -23,6 +23,15 @@
                      onchange={ changeInfo }/>
                <span>Laic mode</span>
             </label>
+            <label style="margin-left: 30px;">
+               <input name="xonomyMode"
+                     id="xonomyMode_graphical"
+                     type="radio"
+                     class="with-gap"
+                     checked={ state.data.xonomyMode == "graphical" }
+                     onchange={ changeInfo }/>
+               <span>Graphical mode</span>
+            </label>
          </p>
          <span class="helper-text">Choose what the entry editor will look like.</span>
       </div>
@@ -42,6 +51,12 @@
             </div>
             <br/>
             Individual users can overide this setting by clicking an icon in the bottom-left corner of their screen.
+         </p>
+      </div>
+      <div id="info_graphical" style="padding-left: 50px;">
+         <p>When editing an entry in <b>graphical mode</b> the XML source code is hidden and the entry uses settings configuration to display a more graphically friendly interface.
+ <!--          <div class='instro'><img src='docs/mode-laic.png' alt='Illustration'/></div>-->
+           <div class='instro'>Image of graphical editor</div>
          </p>
       </div>
       <br>
@@ -84,6 +99,7 @@
             </div>
          </p>
       </div>
+      <br>
       <div>
          <br>
          <button class="btn waves-effect waves-light"
@@ -176,9 +192,15 @@
             if ($("#xonomyMode_laic").is(":checked")) {
                $('#info_nerd').hide();
                $('#info_laic').show();
-            } else {
+              $('#info_graphical').hide();
+            } else if ($("#xonomyMode_nerd").is(":checked")) {
                $('#info_nerd').show();
                $('#info_laic').hide();
+               $('#info_graphical').hide();
+            } else {
+              $('#info_nerd').hide();
+              $('#info_laic').hide();
+              $('#info_graphical').show();
             }
             if ($("#xonomyTextEditor_longstring").is(":checked")) {
                $('#info_string').hide();
@@ -276,6 +298,9 @@ div.myEditor input {font-weight: bold}`
             };
             if ($("#xonomyMode_laic").is(":checked")) {
                newData.xonomyMode = "laic";
+            }
+            if ($("#xonomyMode_graphical").is(":checked")) {
+               newData.xonomyMode = "graphical";
             }
             if ($("#xonomyTextEditor_longstring").is(":checked")) {
                newData.xonomyTextEditor = "askLongString";

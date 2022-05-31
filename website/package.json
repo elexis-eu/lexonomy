@@ -9,8 +9,8 @@
   "devDependencies": {
     "@riotjs/cli": "^6.0.5",
     "@rollup/plugin-node-resolve": "^13.1.3",
-    "node-sass": "^7.0.1",
     "riot": "^6.1.2",
+    "sass": "^1.51.0",
     "rollup-plugin-import-css": "^3.0.3",
     "rollup-plugin-uglify": "^6.0.4",
     "terser": "^5.12.1"
@@ -34,5 +34,8 @@
   "bugs": {
     "url": "https://github.com/elexis-eu/lexonomy/issues"
   },
-  "homepage": "https://github.com/elexis-eu/lexonomy#readme"
+  "homepage": "https://github.com/elexis-eu/lexonomy#readme",
+  "dependencies": {
+    "@kcmertens/xonomy": "^0.1.1"
+  }
 }

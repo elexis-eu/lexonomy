@@ -1,0 +1,574 @@
+<display-styles>
+  <div class="display-styles">
+    <div>
+      <h4>
+        Configuration for {elementName}
+      </h4>
+      <div class="toggle-input">
+        <label>Visibility</label>
+        <div class="switch">
+          <label>
+            Off
+            <input
+              id="shown"
+              type="checkbox"
+              onchange={toggleVisibility}
+              checked={state.elementData.shown === true}
+            >
+            <span class="lever"></span>
+            On
+          </label>
+        </div>
+      </div>
+      <div
+        if={state.elementData.shown}
+        each={setting in possibleToggles}
+        class="toggle-input"
+      >
+        <label>{setting.label}</label>
+        <div class="switch">
+          <label>
+            Off
+            <input
+              id={setting.type}
+              type="checkbox"
+              onchange={sendData}
+              checked={state.elementData[setting.type] === true}
+            >
+            <span class="lever"></span>
+            On
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="break"/>
+    <div if={state.elementData.shown}>
+      <div
+        each={style in possibleStyles}
+        if={this.shouldRenderStyle(style.type)}
+        class="select-input"
+      >
+        <label for={style.type}>{style.title}</label>
+        <select
+          id={style.type}
+          name={style.type}
+          value={state.elementData[style.type]}
+          required
+          onchange={sendData}
+          style="display: block"
+        >
+          <option
+            selected={state.elementData[style.type] == null}
+            value=""
+          >
+            Select option
+          </option>
+          <option
+            each={option in style.values}
+            value={option.value}
+            selected={option.value === state.elementData[style.type]}
+          >
+            {option.label}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <script>
+    export default {
+      configData: null,
+      elementName: "",
+      attributeName: null,
+
+      state: {
+        elementData: {
+          shown: false,
+          enablePositionChange: false,
+          enableParentChange: false,
+          enableCopying: false,
+          readOnly: false,
+          hideElementName: false,
+          displayType: null,
+          popupDetails: null,
+          valueRenderType: null,
+          captioning: null,
+          interactivity: null,
+          innerPunc: null,
+          textsize: null,
+          weight: null,
+          slant: null,
+          color: null,
+          outerPunc: null,
+          background: null,
+          border: null,
+          gutter: null,
+          separation: null
+        }
+      },
+      editorConfigOptions: [],
+      onMounted() {
+         this.configData = this.props.configData
+         this.resetElementData()
+         this.update()
+      },
+      onBeforeUpdate(prop, state) {
+        if (this.props.elementName !== this.elementName || this.props.attributeName !== this.attributeName) {
+           this.elementName = this.props.elementName
+          this.attributeName = this.props.attributeName
+          this.resetElementData()
+        }
+      },
+      onUpdated() {
+
+      },
+      toggleVisibility() {
+        this.state.elementData.shown = !this.state.elementData.shown
+        this.props.saveData(this.elementName, this.attributeName, "shown", this.state.elementData.shown)
+        this.update()
+
+      },
+      sendData(event) {
+        let attribute = event.srcElement.id
+        let value = $("#" + attribute).val()
+        if (event.srcElement.type === "checkbox") {
+          value = !this.state.elementData[attribute]
+        }
+
+        this.state.elementData[attribute] = value
+        this.props.saveData(this.elementName, this.attributeName, attribute, value)
+
+        if (attribute === "displayType") {
+          this.update()
+        }
+      },
+
+      setInitialData() {
+        this.props.loadConfigData(this.props.configId).then((response) => {
+          this.configData = response
+          this.resetElementData()
+          this.update()
+        })
+      },
+
+      resetElementData() {
+        if (!this.configData || !this.props.elementName) {
+          return
+        }
+        let existingData = this.configData[this.elementName]
+        let elementConfigData = this.props.elementConfigData
+        if (this.attributeName) {
+          existingData = existingData && existingData.attributes && existingData.attributes[this.attributeName]
+          elementConfigData = elementConfigData.attributes && elementConfigData.attributes[this.attributeName]
+        }
+        if (!existingData) {
+          existingData = {}
+        }
+        if (!elementConfigData) {
+          elementConfigData = {}
+        }
+        for (const key of Object.keys(this.state.elementData)) {
+          let value = existingData[key] || null
+          if (elementConfigData[key] != null) {
+            value = elementConfigData[key]
+          }
+          this.state.elementData[key] = value
+        }
+      },
+
+      shouldRenderStyle(style) {
+        if (!this.props.config.xema || !this.elementName) {
+          return false
+        }
+        const structureConfig = this.props.config.xema
+        if (style === "editorInputType" && this.props.config.editing.xonomyMode === "graphical") {
+          if (this.props.attributeName) {
+            return structureConfig.elements[this.elementName].attributes[this.props.attributeName].filling === "txt"
+          } else {
+            return structureConfig.elements[this.elementName].filling === "txt"
+          }
+        }
+
+        if (style === "popupDetails") {
+          return this.state.elementData.displayType === "popup"
+        }
+
+        if ((style === "separation" || style === "gutter")
+          && structureConfig.root === this.elementName) {
+          return false
+        }
+        if (
+          (style === "innerPunc"
+            || style === "weight"
+            || style === "slant"
+            || style === "colour"
+            || style === "textsize"
+          ) && (
+            !structureConfig.elements[this.elementName]
+            || structureConfig.elements[this.elementName].filling === "chd"
+            || structureConfig.elements[this.elementName].filling === "med"
+          )
+        ) {
+          return false
+        }
+        if (
+          (style === "captioning")
+          && (!structureConfig.elements[this.elementName]
+            || structureConfig.elements[this.elementName].filling !== "lst")
+        ) {
+          return false
+        }
+        return true
+      },
+      possibleToggles: [
+        {
+          type: "enablePositionChange",
+          label: "Enable reordering of elements of same type"
+        },
+        {
+          type: "enableParentChange",
+          label: "Enable moving element between different parent elements"
+        },
+        {
+          type: "enableCopying",
+          label: "Enable making copies of element"
+        },
+        {
+          type: "readOnly",
+          label: "Disable editing of element"
+        },
+        {
+          type: "hideElementName",
+          label: "Hide element name in editor"
+        }
+      ],
+
+      possibleStyles: [
+        {
+          type: "displayType",
+          title: "Display type of element",
+          values: [
+            {
+              value: "popup",
+              label: "Popup on click"
+            },
+            {
+              value: "inline",
+              label: "Display in parent element"
+            }
+          ]
+        },
+        {
+          type: "popupDetails",
+          title: "Detail of popup info next to popup button",
+          values: [
+            {
+              value: "all",
+              label: "All info"
+            },
+            {
+              value: "attributes",
+              label: "Attributes"
+            },
+            {
+              value: "elements",
+              label: "Children elements"
+            },
+            {
+              value: "self",
+              label: "Own value"
+            }
+
+          ]
+        },
+        {
+          type: "editorInputType",
+          title: "Input type in editor",
+          values: [
+            {
+              value: "text",
+              label: "Text input"
+            },
+            {
+              value: "textarea",
+              label: "Textarea input"
+            },
+            {
+              value: "number",
+              label: "Number input"
+            }
+          ]
+        },
+        {
+          type: "captioning",
+          title: "Caption display",
+          values: [
+            {
+              value: "replace",
+              label: "Show caption instead of value"
+            },
+            {
+              value: "mouseover",
+              label: "Show caption on mouse-over"
+            }
+          ]
+        },
+        {
+          type: "interactivity",
+          title: "Interactivity",
+          values: [
+            {
+              value: "xref",
+              label: "Clickable cross-reference"
+            },
+            {
+              value: "xlink",
+              label: "External URL link"
+            }
+          ]
+        },
+        {
+          type: "innerPunc",
+          title: "Inner punctuation",
+          values: [
+            {
+              value: "roundBrackets",
+              label: "Round brackets"
+            },
+            {
+              value: "squareBrackets",
+              label: "Square brackets"
+            },
+            {
+              value: "curlyBrackets",
+              label: "Curly brackets"
+            },
+            {
+              value: "comma",
+              label: "Comma"
+            },
+            {
+              value: "semicolon",
+              label: "Semicolon"
+            },
+            {
+              value: "colon",
+              label: "Colon"
+            }
+          ]
+        },
+        {
+          type: "textsize",
+          title: "Text size",
+          values: [
+            {
+              value: "smaller",
+              label: "Smaller"
+            },
+            {
+              value: "bigger",
+              label: "Bigger"
+            }
+          ]
+        },
+        {
+          type: "weight",
+          title: "Text weight",
+          values: [
+            {
+              value: "bold",
+              label: "Bold"
+            }
+          ]
+        },
+        {
+          type: "slant",
+          title: "Text slant",
+          values: [
+            {
+              value: "italic",
+              label: "Italic"
+            }
+          ]
+        },
+        {
+          type: "colour",
+          title: "Text color",
+          values: [
+            {
+              value: "red",
+              label: "Red"
+            },
+            {
+              value: "blue",
+              label: "Blue"
+            },
+            {
+              value: "green",
+              label: "Green"
+            },
+            {
+              value: "grey",
+              label: "Grey"
+            }
+          ]
+        },
+        {
+          type: "outerPunc",
+          title: "Outer punctuation",
+          values: [
+            {
+              value: "roundBrackets",
+              label: "Round brackets"
+            },
+            {
+              value: "squareBrackets",
+              label: "Square brackets"
+            },
+            {
+              value: "curlyBrackets",
+              label: "Curly brackets"
+            },
+            {
+              value: "comma",
+              label: "Comma"
+            },
+            {
+              value: "semicolon",
+              label: "Semicolon"
+            },
+            {
+              value: "colon",
+              label: "Colon"
+            }
+          ]
+        },
+        {
+          type: "background",
+          title: "Background color",
+          values: [
+            {
+              value: "yellow",
+              label: "Yellow"
+            },
+            {
+              value: "blue",
+              label: "Blue"
+            },
+            {
+              value: "grey",
+              label: "Grey"
+            }
+          ]
+        },
+        {
+          type: "border",
+          title: "Box border",
+          values: [
+            {
+              value: "dotted",
+              label: "Dotted"
+            },
+            {
+              value: "solid",
+              label: "Solid"
+            },
+            {
+              value: "thick",
+              label: "Thick"
+            }
+          ]
+        },
+        {
+          type: "gutter",
+          title: "Indentation and bulleting",
+          values: [
+            {
+              value: "disk",
+              label: "Round bullet"
+            },
+            {
+              value: "square",
+              label: "Square bullet"
+            },
+            {
+              value: "diamond",
+              label: "Diamond bullet"
+            },
+            {
+              value: "arrow",
+              label: "Arrow bullet"
+            },
+            {
+              value: "indent",
+              label: "Indent"
+            },
+            {
+              value: "handing",
+              label: "Hanging indent"
+            },
+            {
+              value: "sensenum0",
+              label: "Sense number I, II, III..."
+            },
+            {
+              value: "sensenum1",
+              label: "Sense number 1, 2, 3..."
+            },
+            {
+              value: "sensenum2",
+              label: "Sense number a, b, c..."
+            },
+            {
+              value: "sensenum3",
+              label: "Sense number i, ii, iii..."
+            }
+          ]
+        },
+        {
+          type: "separation",
+          title: "Separation from other content",
+          values: [
+            {
+              value: "space",
+              label: "Whitespace"
+            }
+          ]
+        }
+      ]
+    }
+  </script>
+
+  <style>
+    .display-styles {
+      margin: 0 8px;
+    }
+
+    .break {
+      width: 100%;
+      margin: 15px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .toggle-input {
+      margin: 16px 0;
+    }
+
+    .select-input {
+      margin: 8px 0;
+    }
+
+    .display-styles > select option {
+      color: black;
+    }
+
+    select option {
+      color: black;
+    }
+
+    select option:first-child,
+    select:invalid {
+      color: #aaa;
+    }
+  </style>
+
+</display-styles>

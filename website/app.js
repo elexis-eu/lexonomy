@@ -9,7 +9,8 @@ import './libs/screenful/screenful.js'
 import './libs/screenful/screenful-editor.js'
 import './libs/screenful/screenful-loc-en.js'
 import './libs/screenful/screenful-history.js'
-import './libs/xonomy/xonomy.js'
+// import './libs/xonomy/xonomy.js'
+import '@kcmertens/xonomy'
 import './libs/js.cookie.js'
 import './libs/xonomy-tools/dtdconvert/dtd2xonomy.js'
 import './widgets/xematron.js'
@@ -19,8 +20,6 @@ import './widgets/ske.js'
 import './widgets/kontext.js'
 import './widgets/gmedia.js'
 import './widgets/sub.js'
-import './widgets/xema-designer.js'
-import './widgets/xemplate-designer.js'
 
 import App from './riot/main.riot'
 import api from './riot/api.riot'
@@ -44,6 +43,10 @@ import dict_config_titling from './riot/dict-config-titling.riot'
 import dict_config_url from './riot/dict-config-url.riot'
 import dict_config_users from './riot/dict-config-users.riot'
 import dict_config_xema from './riot/dict-config-xema.riot'
+import dict_config_xema_element from './riot/entry-structure/dict-config-xema-element.riot';
+import dict_config_xema_attribute from './riot/entry-structure/dict-config-xema-attribute.riot';
+import dict_config_element_in_tree from './riot/dict-config-element-in-tree.riot';
+import dict_config_attribute_in_tree from './riot/dict-config-attribute-in-tree.riot';
 import dict_config_xemplate from './riot/dict-config-xemplate.riot'
 import dict_download from './riot/dict-download.riot'
 import dict_edit_entry from './riot/dict-edit-entry.riot'
@@ -94,6 +97,10 @@ riot_register('dict-config-titling', dict_config_titling)
 riot_register('dict-config-url', dict_config_url)
 riot_register('dict-config-users', dict_config_users)
 riot_register('dict-config-xema', dict_config_xema)
+riot_register('dict-config-xema-element', dict_config_xema_element)
+riot_register('dict-config-xema-attribute', dict_config_xema_attribute)
+riot_register('dict-config-element-in-tree', dict_config_element_in_tree)
+riot_register('dict-config-attribute-in-tree', dict_config_attribute_in_tree)
 riot_register('dict-config-xemplate', dict_config_xemplate)
 riot_register('dict-download', dict_download)
 riot_register('dict-edit-entry', dict_edit_entry)

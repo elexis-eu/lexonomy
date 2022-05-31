@@ -1,0 +1,105 @@
+<dict-config-element-in-tree class={state.rootClasses}>
+    <div class="horizontal">
+        <span if={state.hasChildren} class="plusminus" onclick={toggleChildren}></span>
+    </div>
+
+    <div class={state.classes} onclick={selectElementOrAttribute}>
+        <span class="tech">
+            <span class="brak">&lt;</span>
+            <span class="elm">{props.data.elementName || props.data.id}</span>
+            <span class="brak">&gt;</span>
+        </span>
+    </div>
+
+    <div if={(state.hasChildren || this.hasAttributes) && state.showChildren} class="children">
+        <dict-config-attribute-in-tree each={att in state.attributes}
+            data={att}
+            xema={props.xema}
+            parentElement={props.data}
+            currentElement={props.currentElement}
+            currentAttribute={props.currentAttribute}
+            selectElementOrAttribute={props.selectElementOrAttribute}
+        />
+        <dict-config-element-in-tree each={child in state.children} 
+            data={child} 
+            xema={props.xema} 
+            currentElement={props.currentElement}
+            currentAttribute={props.currentAttribute}
+            selectElementOrAttribute={props.selectElementOrAttribute}
+    />
+        <!-- <div class="blinder" style="bottom: 0"></div> -->
+    </div>
+
+    <style>
+        dict-config-element-in-tree {
+            position: relative;
+            display: block;
+            width: auto!important;
+        }
+        /* hide part of the lines in the tree (i.e. borders of the parent) */ 
+        dict-config-element-in-tree:last-child:before {
+            content: "";
+            display: block;
+            position: absolute;
+            left: -16px;
+            bottom: 0;
+            width: 2px;
+            top: 16px;
+            background: white;
+        }
+    </style>
+    <script>
+        export default {
+            // props: xema, current, data (xema element)
+
+            onBeforeMount(props, state) {
+                // console.log(this.props);
+
+                this.state.showChildren = true;
+
+                this.compute();
+            },
+            onMounted(props, state) {
+                // right after the component is mounted on the page
+            },
+            onBeforeUpdate(props, state) {
+                // allows recalculation of context data before the update
+                this.compute();
+                // console.log(`Updating element ${this.props.data.id} - active: ${this.props.currentElement} @${this.props.currentAttribute}`)
+            },
+            onUpdated(props, state) {
+                // right after the component template is updated after an update call
+            },
+            onBeforeUnmount(props, state) {
+                // before the component is removed
+            },
+            onUnmounted(props, state) {
+                // when the component is removed from the page
+            },
+
+            compute() {
+                this.state.children = this.props.data.children.map(c => ({...this.props.xema.elements[c.name], id: c.name}));
+                this.state.attributes = Object.entries(this.props.data.attributes).map(([id, att]) => ({...att, id})).sort((a,b) => a.id.localeCompare(b.id));
+                this.state.hasChildren = this.state.children.length > 0;
+                this.state.hasAttributes = this.state.attributes.length > 0;
+                
+                this.state.rootClasses = 
+                    'container ' + 
+                    (this.state.showChildren ? '' : 'collapsed ') +
+                    (this.state.hasChildren ? 'hasChildren ' : '');
+                this.state.classes = 
+                    'clickable element ' +
+                    // (this.state.hasChildren ? 'hasChildren ' : '') + 
+                    // (this.props.isRoot ? 'root ' : '') + 
+                    (this.props.currentElement === this.props.data.id && !this.props.currentAttribute ? 'current ' : '');
+                // console.log(this.props, this.state)
+            },
+
+            toggleChildren() {
+                this.state.showChildren = !this.state.showChildren;
+                this.update();
+            },
+            selectElementOrAttribute() { this.props.selectElementOrAttribute(this.props.data.id, undefined); }
+        }
+    </script>
+</dict-config-element-in-tree>

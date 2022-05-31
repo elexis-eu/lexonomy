@@ -1,7 +1,7 @@
 import riot from 'rollup-plugin-riot'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import { registerPreprocessor } from '@riotjs/compiler'
-import sass from 'node-sass'
+import sass from 'sass'
 import css from "rollup-plugin-import-css"
 import { uglify } from "rollup-plugin-uglify"
 

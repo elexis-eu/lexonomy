@@ -1,0 +1,192 @@
+<dict-config-xema-attribute class="details">
+    <div class="block">
+        <div class="title">Attribute</div>
+        <form onsubmit={saveNewId}>
+            <input class="textbox tech atName" value={state.newAttributeId} oninput={updateLocalData} data-path="newAttributeId">
+            
+            <button if={props.attributeId !== state.newAttributeId && isValidXmlName(state.newAttributeId) && props.xema.elements[props.elementId].attributes[state.newAttributeId] == null} onclick={saveNewId} class="butRename iconAccept" type="submit">Rename</button>
+            <div if={!isValidXmlName(state.newAttributeId)} class="warn errInvalidAtName" >Cannot rename, not a valid XML name.</div>
+            <div if={state.newAttributeId != props.attributeId && props.xema.elements[props.elementId].attributes[state.newAttributeId]} class="warn errAtNameExists">Cannot rename, such attribute already exists.</div>
+        </form>
+    </div>
+    <div class="block">
+        <div class="title">Content</div>
+        <label class="radio"><input type="radio" name="filling" value="txt" onclick={updateLocalData} data-path="config.filling" data-apply checked={state.config.filling === 'txt'}>Text</label>
+        <label class="radio"><input type="radio" name="filling" value="lst" onclick={updateLocalData} data-path="config.filling" data-apply checked={state.config.filling === 'lst'}>Value from list</label>
+    </div>
+    
+    <div class="block" if={state.config.filling === "lst"}>
+        <div class="title">Values</div>
+        <table>
+            <tr each={(value, index) in state.config.values}>
+                <td class="cell1">
+                    <form onsubmit={applyLocalData} style="white-space: nowrap;">
+                        <input class="textbox val" placeholder="value" value={value.value} oninput={updateLocalData} data-path="config.values[{index}].value">
+                        <input class="textbox cap" placeholder="caption" value={value.caption} oninput={updateLocalData} data-path="config.values[{index}].caption">
+                        <template if={value.value !== props.config.values[index].value || value.caption !== props.config.values[index].caption}>
+                            <button class="change iconAccept" onclick={applyLocalData} type="submit">Change</button>
+                            <button class="cancel iconCancel" onclick={resetLocalData} data-path="config.values[{index}]" type="button">Cancel</button>
+                        </template>
+                    </form>
+                </td>
+                <td class="cell9">
+                    <!-- <button class="iconOnly iconArrowUp">&nbsp;</button>
+                    <button class="iconOnly iconArrowDown">&nbsp;</button> -->
+                    <button class="iconOnly iconCross" onclick={deleteLocalData} data-apply data-path="config.values[{index}]">&nbsp;</button>
+                </td>
+            </tr>
+        </table>
+        
+        <template if={!state.isAddingValue}>
+            <button class="butNewValue iconAdd" onclick={beginNewValue}>Add...</button>
+        </template>
+        <form if={state.isAddingValue} onsubmit={saveNewValue} style="white-space: nowrap;">
+            <input class="textbox new val" data-path="newValue" placeholder="value" value={state.newValue} oninput={updateLocalData} autofocus>
+            <input class="textbox new cap" data-path="newCaption" placeholder="caption" value={state.newCaption} oninput={updateLocalData}>
+            
+            <button if={state.newValue} class="butNewValueOK iconAccept">Add</button>
+            <button class="butNewValueCancel iconCancel" onclick={cancelNewValue} type="button">Cancel</button>
+        </template>
+
+    </div>
+
+    <style>
+        dict-config-xema-attribute {
+            display: block;
+        }
+    </style>
+    <script>
+        export default {
+            onBeforeMount() {
+                this.resetIfSelectedElementChanged();
+            },
+            onBeforeUpdate(prop, state) {
+                this.resetIfSelectedElementChanged()
+            },
+            resetIfSelectedElementChanged(forceReset) { // on different element selected in tree.
+                if (forceReset || this.props.elementId !== this.state.elementId || this.props.attributeId !== this.state.attributeId) {
+                    this.state.elementId = this.props.elementId;
+                    this.state.attributeId = this.props.attributeId;
+                    this.state.config = JSON.parse(JSON.stringify({...this.props.config})); // deep clone.
+                    
+                    this.state.newAttributeId = this.state.attributeId; // temp variable while user is editing it
+
+                    this.state.isAddingValue = false;
+                    this.state.newValue = '';
+                    this.state.newCaption = '';
+                }
+            },
+            
+            /** 
+             * Update a property in our local data copy. 
+             * The new value is event.target.value
+             * The parent data is also updated if either:
+             * 1. the triggering element has [data-apply] attribute.
+             * 2. the event is a keypress and the key is Enter.
+             */
+             updateLocalData(event) {
+                // data-path is a string representing a javascript property accessor. such as 'someObject.someProperty[someIndex]'
+                const path = event.target.getAttribute('data-path');
+                
+                const cur = this._setOrGetPath(this.state, path);
+                const next = this._setOrGetPath(this.state, path, event.target.value);
+                if (event.target.hasAttribute('data-apply') || event.keyCode === 13) this.applyLocalData();
+                else this.update();
+            },
+            /** Like updateLocalData, but delete the property instead. */
+            deleteLocalData(event) {
+                const path = event.target.getAttribute('data-path');
+                this._deletePath(this.state, path);
+                if (event.target.hasAttribute('data-apply')) this.applyLocalData();
+                else this.update();
+            },
+            /** Like updateLocalData, but reset to the (initial) value from our prop */
+            resetLocalData(event) {
+                const path = event.target.getAttribute('data-path');
+                this._setOrGetPath(this.state, path, this._setOrGetPath(this.props, path));
+                this.update();
+            },
+            /** Submit our local (changed) data to the parent component */
+            applyLocalData(event) {
+                const newConfig = JSON.parse(JSON.stringify(this.state.config));
+                this.props.applyLocalData(newConfig);
+            },
+
+            saveNewId(event) {
+                const parentEl = this.props.xema.elements[this.props.elementId];
+                if (this.state.newAttributeId === this.props.newAttributeId) 
+                    return;
+                if (parentEl.attributes[this.state.newAttributeId])
+                    return;
+                if (!this.isValidXmlName(this.state.newAttributeId)) 
+                    return;
+                
+                this.props.renameAttribute(this.state.newAttributeId);
+                // change should flow down automatically.
+            },
+
+            /** User is adding a new value */
+            beginNewValue(event) {
+                this.state.isAddingValue = true;
+                this.update();
+            },
+            /** User canceled adding a new value */
+            cancelNewValue(event) {
+                this.state.isAddingValue = false;
+                this.state.newValue = '';
+                this.state.newCaption = '';
+                this.update();
+            },
+            /** User commits new value */
+            saveNewValue(event) {
+                this.state.config.values.push({
+                    value: this.state.newValue,
+                    caption: this.state.newCaption,
+                })
+                // Keep open
+                // this.state.isAddingValue = false;
+                this.state.newValue = '';
+                this.state.newCaption = '';
+                this.applyLocalData();
+            },
+            
+
+            /**
+             * Set or return the value at an arbitrary property path
+             * @param object any object 
+             * @param {string} path any path like "some.property.path[in].the.object"
+             * @param {any} [newValue] (optional) the new value to set to the property
+             */
+             _setOrGetPath() { 
+                const [object, path] = arguments;
+                // see if we actually got a new value to set, to differentiate between _setOrGet(state, path) and _setOrGet(state, path, undefined).
+                let newValue = undefined;
+                let newValueProvided = false;
+                if (arguments.length > 2) { 
+                    newValue = arguments[2];
+                    newValueProvided = true;
+                }
+
+                const pathParts = path.split(/[\.\[\]\'\"]/).filter(p => p);
+                const lastIndex = newValueProvided ? pathParts.pop() : undefined;
+                const v = pathParts.reduce((o, p) => o ? o[p] : undefined, object);
+                return newValueProvided ? v[lastIndex] = JSON.parse(JSON.stringify(newValue)) : v;
+            },
+            /** Delete the property at the path. If path points at an array entry, remove it in place. */
+            _deletePath(object, path) {
+                const pathParts = path.split(/[\.\[\]\'\"]/).filter(p => p);
+                const lastIndex = pathParts.pop();
+                const v = pathParts.reduce((o, p) => o ? o[p] : undefined, object);
+                if (Array.isArray(v)) v.splice(lastIndex, 1)
+                else delete v[lastIndex]
+            },
+
+            isValidXmlName(str) {
+                if (!str) return false;
+                if (/[=\s\"\']/.test(str)) return false;
+                try { $.parseXML("<" + str + "/>"); } catch (err) { return false; }
+                return true;
+            }
+        }
+    </script>
+</dict-config-xema-attribute>
