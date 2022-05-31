@@ -2,6 +2,7 @@
 
 import os
 from sqlite3 import Connection
+import sqlite3
 import sys
 import functools
 from typing import Any, TYPE_CHECKING
@@ -744,19 +745,16 @@ def configupdate(dictID: str, user: User, dictDB: Connection, configs: Configs):
     if request.forms.id == 'ske':
         adjustedJson = {}
         jsonData = json.loads(request.forms.content)
-        adjustedJson['kex'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'kex', jsonData['kex'])
-        adjustedJson['xampl'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'xampl', jsonData['xampl'])
-        adjustedJson['collx'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'collx', jsonData['collx'])
-        adjustedJson['defo'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'defo', jsonData['defo'])
-        adjustedJson['thes'], resaveNeeded = ops.updateDictConfig(dictDB, dictID, 'thes', jsonData['thes'])
-        resaveNeeded = False
+        adjustedJson['kex'] = ops.updateDictConfig(dictDB, dictID, 'kex', jsonData['kex'])
+        adjustedJson['xampl'] = ops.updateDictConfig(dictDB, dictID, 'xampl', jsonData['xampl'])
+        adjustedJson['collx'] = ops.updateDictConfig(dictDB, dictID, 'collx', jsonData['collx'])
+        adjustedJson['defo'] = ops.updateDictConfig(dictDB, dictID, 'defo', jsonData['defo'])
+        adjustedJson['thes'] = ops.updateDictConfig(dictDB, dictID, 'thes', jsonData['thes'])
     else:
-        adjustedJson, resaveNeeded = ops.updateDictConfig(dictDB, dictID, request.forms.id, json.loads(request.forms.content))
+        adjustedJson = ops.updateDictConfig(dictDB, dictID, request.forms.id, json.loads(request.forms.content))
     if request.forms.id == 'users':
         ops.notifyUsers(configs['users'], adjustedJson, configs['ident'], dictID)
-    if resaveNeeded:
-        configs = ops.readDictConfigs(dictDB)
-        ops.resave(dictDB, dictID, configs)
+        # Resaving the entries is not required here. If needed, entries have been flagged and will be updated as they are used.
     return {"success": True, "id": request.forms.id, "content": adjustedJson}
 
 @post(siteconfig["rootPath"]+"<dictID>/autonumber.json")
@@ -784,11 +782,24 @@ def autoimagestatus(dictID: str, user: User, dictDB: Connection, configs: Config
 def resavejson(dictID: str, user: User, dictDB: Connection, configs: Configs):
     count = 0
     stats = ops.getDictStats(dictDB)
+    # configure the database for some more speed.
+    dictDB.isolation_level=None
+    dictDB.execute('PRAGMA synchronous = 0')
+    dictDB.execute("PRAGMA cache_size = -100000") # about 100 megs
+    dictDB.execute("begin")
+
     while count < stats["needUpdate"] and count <= 127:
         entry = dictDB.execute("select id, xml from entries where needs_update=1 limit 1").fetchone()
         ops.createEntry(dictDB, configs, entry["xml"], "system@lexonomy", entry["id"])
         count += 1
-    return {"todo": ops.getDictStats(dictDB)["needUpdate"]}
+
+    dictDB.commit()
+    todo = ops.getDictStats(dictDB)["needUpdate"]
+    return {
+        "todo": todo,
+        "finished": todo == 0,
+        "progressMessage": f"Reindexing - {todo} entries remaining..."
+    }
 
 @post(siteconfig["rootPath"] + "<dictID>/<doctype>/ontolex.api")
 def ontolex(dictID: str, doctype: str):
