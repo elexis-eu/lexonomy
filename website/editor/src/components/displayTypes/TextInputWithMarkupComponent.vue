@@ -93,11 +93,16 @@ export default {
                 break
               default:
                 if (element.text !== "") {
-                  elements.push({
+                  let newEl = {
                     type: "element",
                     name: element.name,
                     elements: [{type: "text", text: element.text}]
-                  })
+                  }
+                  let contentElement = this.content.find(el => el.name === element.name)
+                  if (contentElement && contentElement.attributes) {
+                    newEl.attributes = contentElement.attributes
+                  }
+                  elements.push(newEl)
                 }
             }
           })
