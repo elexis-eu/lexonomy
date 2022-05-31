@@ -75,7 +75,7 @@ export default {
       //   parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
       //   childElement = parentChildren[this.elementName]
       // }
-      return childElement && (!childElement.max || this.numberOfElements < childElement.max)
+      return childElement && (Number(childElement.max) === 0 || this.numberOfElements < Number(childElement.max))
     },
     canRemoveElement() {
       const xemaElements = this.state.entry.dictConfigs.xema.elements
@@ -85,7 +85,7 @@ export default {
       //   parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
       //   childElement = parentChildren[this.elementName]
       // }
-      return childElement && (!childElement.min || this.numberOfElements > childElement.min)
+      return childElement && (!Number(childElement.min) || this.numberOfElements > Number(childElement.min))
     },
     canMoveElementDown() {
       return this.elementEditorConfig.enablePositionChange && this.editorChildNumber < this.numberOfElements - 1
