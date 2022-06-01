@@ -91,7 +91,7 @@
          },
 
          onMounted() {
-            this.store.loadDictionaryConfig("kontex")
+            this.store.loadDictionaryConfig("kontext")
                   .done(response => {
                      this.state.data = response.content
                      if (!response.url || response.url == '') {
