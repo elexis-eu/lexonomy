@@ -27,15 +27,6 @@
                   class="collection-item {dict.selected ? 'selected' : ''}"
                   key={dict.id}>
                <div>
-                  <label if={dict.currentUserCanDelete}
-                           class="checkbox">
-                     <input id="chb_{idx}"
-                           type="checkbox"
-                           idx={idx}
-                           checked={dict.selected}
-                           onclick={onCheckboxClick}/>
-                     <span></span>
-                  </label>
                   <a href="#/{ dict.id }"
                         id="t_{idx}"
                         class="title">{ dict.title }</a>
