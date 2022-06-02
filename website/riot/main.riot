@@ -26,11 +26,21 @@
       main.login-page app-header {
          visibility: hidden;
       }
+      main.dark-page app-header, main.dark-page app-header nav.white {
+         background-color: #004494 !important;
+      }
+      main.dark-page app-header a {
+         color: #ffffff;
+      }
+      main.dark-page app-header .site-logo {
+         background-image: url(img/logo_lexonomy_white.png) !important;
+      }
       main.main {
          background-color: #f0f8ff;
       }
       main.dark-page, main.login-page {
          background-image: url(img/background_dark.png);
+         background-size: cover;
       }
       main.dark-page .contentWrapper,
       main.login-page .contentWrapper {

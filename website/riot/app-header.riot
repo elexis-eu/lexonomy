@@ -50,7 +50,7 @@
       <div class="nav-wrapper">
          <a href="#"
                class="brand-logo">
-            <img class="site-logo" src="img/logo_lexonomy.png"/>
+            <span class="site-logo" />
          </a>
          <ul class="right hide-on-med-and-down">
             <li if={ authData.authorized && dictData.isDictionaryLoaded }>
@@ -151,7 +151,12 @@
       .site-logo{
          height: 40px;
          position: relative;
-         top: 20px
+         top: 20px;
+         width: 223px;
+         background-image: url(img/logo_lexonomy.png);
+         background-size: contain;
+         display: inline-block;
+         background-repeat: no-repeat;
       }
       .sidenav-trigger i{
          font-size: 36px;
