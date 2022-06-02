@@ -707,7 +707,7 @@ def entrylist(dictID: str, doctype: str, user: User, dictDB: Connection, configs
     else:
         howmany = int(request.forms.howmany) if request.forms.howmany else 100
         total, entryIds = ops.searchEntries(dictDB, configs, doctype, request.forms.searchtext, request.forms.modifier, request.forms.sortdesc, limit = howmany)
-        entries = ops.readEntries(dictDB, configs, entryIds, xml=False)
+        entries = ops.readEntries(dictDB, configs, entryIds, xml=False, sortdesc=request.forms.sortdesc)
         return {"success": True, "entries": entries, "total": total}
 
 @post(siteconfig["rootPath"]+"<dictID>/search.json")

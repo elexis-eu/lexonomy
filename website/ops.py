@@ -539,9 +539,18 @@ def sortEntries(configs: Configs, sortables: List[SortableEntry], reverse: bool 
     
 def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext: Optional[str], modifier: Optional[Literal["start", "wordstart", "substring", "exact"]] = "start", sortdesc: Union[str, bool] = False, limit: Optional[int] = None) -> Tuple[int, List[SortableEntry]]:
     """Retrieve entries sorted by sortkey. Optionally filtered by their headword.
+
+    Args:
+        dictDB (Connection):
+        configs (Configs):
+        doctype (str): doctype of the entries to retrieve. Usually the root element, but might be different when requesting subentries.
+        searchtext (Optional[str]): 
+        modifier (Optional[Literal["start", "wordstart", "substring", "exact"]], optional): Defaults to "start".
+        sortdesc (Union[bool, str], optional): Reverse the usual sort order? The usual sort order is determined by ConfigTitling["headwordSortDesc"]
+        limit (Optional[int], optional): Limit the returned results to this number (when > 0)
     Returns:
         Tuple[int, List[SortableEntry]]: the total number of results, and the limited list of results.
-    """    
+    """
     if not searchtext: 
         searchtext = ""
         modifier = None # can't search parts of words when not searching at all.
@@ -549,8 +558,8 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
     
     if type(sortdesc) == str:
         sortdesc = sortdesc == "true"
-    if "headwordSortDesc" in configs["titling"]: # if default sort is inverted also invert descending
-        sortdesc = not sortdesc
+        if "headwordSortDesc" in configs["titling"]: # if default sort is inverted also invert descending
+            sortdesc = not sortdesc
 
     # Special case: when searching wildcard (i.e. retrieve all entries) and the dictionary is large (>2000) entries. 
     # Don't read all entries before sorting and limiting, but use a shorter path.
@@ -589,10 +598,10 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
         results = results[0:limit]
     return total, results
 
-def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int], List[SortableEntry]], xml: bool=True, tag: bool=False, html: bool=False, titlePlain: bool = False) -> List[EntryFromDatabase]:
-    # TODO fix order of returned entries to be the same as the ids passed in.
+def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int], List[SortableEntry]], xml: bool=True, tag: bool=False, html: bool=False, titlePlain: bool = False, sortdesc: Union[str, bool] = False) -> List[EntryFromDatabase]:
     """Read entries from the database, optionally returning some computed values with them. 
     Entries requiring an update (due to changed config or related entries) are updated prior to returning.
+    Entries are returned sorted according to their sortKey
 
     Args:
         dictDB (Connection): 
@@ -602,7 +611,7 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
         tag (bool, optional): Also return the xml as parsed. Defaults to False.
         html (bool, optional): Also return the html. This runs the xslt from the config, or otherwise generates a <script> tag that will transform the xml to html on the client side. Defaults to False.
         titlePlain (bool, optional): Also include the plain text of the entry. This requires the xml to be parsed, so is slow.
-
+        sortdesc (Union[bool, str], optional): Reverse the usual sort order? The usual sort order is determined by ConfigTitling["headwordSortDesc"]
     Returns:
         List[EntryFromDatabase]: List of the entries.
     """
@@ -611,6 +620,11 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
         ids = [ids]
     if len(ids) > 0 and not isinstance(ids[0], int):
         ids = list(map(lambda x: x["id"], ids))
+
+    if type(sortdesc) == str:
+        sortdesc = sortdesc == "true"
+        if "headwordSortDesc" in configs["titling"]: # if default sort is inverted also invert descending
+            sortdesc = not sortdesc
 
     for r in doSql(dictDB, f"""select id, xml from entries where needs_update = 1 and id in ({",".join("?" * len(ids))})""", ids).fetchall():
         createEntry(dictDB, configs, r["xml"], "system@lexonomy")
@@ -658,6 +672,7 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
         if html:
             ret["html"] = get_entry_html(configs, row["xml"], run_xslt)
         entries.append(ret)
+    sortEntries(configs, entries, sortdesc)  # type: ignore - SortableEntry is a subset of Entry so this always works
     return entries
 
 def get_entry_html(configs: Configs, xml: str, run_xslt: Any) -> str:
@@ -1981,7 +1996,7 @@ def readRandoms(dictDB: Connection):
         ids_and_sortkeys.append({"id": r["id"], "sortkey": r["sortkey"]})
     
     return {
-        "entries": readEntries(dictDB, configs, sortEntries(configs, ids_and_sortkeys)),
+        "entries": readEntries(dictDB, configs, ids_and_sortkeys),
         "more": dictDB.execute("select count(*) as total from entries").fetchone()["total"] > limit
     }
 

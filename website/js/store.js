@@ -46,7 +46,7 @@ class StoreClass {
       if(this.data.isDictionaryLoading){
          this.one("dictionaryChanged", this.changeDoctype.bind(this, doctype))
       } else {
-         doctype = doctype || this.data.doctypes[0]
+         doctype = doctype || this.data.dictConfigs.xema.root || this.data.doctypes[0]
          if(doctype != this.data.doctype){
             this.data.doctype = doctype
             this.data.config.xema.root = doctype
