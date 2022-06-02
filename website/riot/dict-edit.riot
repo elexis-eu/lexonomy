@@ -292,6 +292,18 @@
                   }
                }
             }
+            if (evt.keyCode == 69 && (evt.ctrlKey || evt.metaKey) && evt.shiftKey) { //E key
+               evt.preventDefault()
+               evt.stopImmediatePropagation()
+               $("#butEdit:visible").click()
+               $("#butView:visible").click()
+               return
+            }
+            if (evt.keyCode == 83 && (evt.ctrlKey || evt.metaKey) && evt.shiftKey) { //S key
+               evt.preventDefault()
+               evt.stopImmediatePropagation()
+               $("#butSave:visible").click();
+            }
          },
 
          onResizeHandleMouseDown(evt){
