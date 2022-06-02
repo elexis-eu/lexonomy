@@ -2059,7 +2059,14 @@ def _getProcessStatus(pidfile: str, errfile: str) -> ExternalProcessStatus:
     Args:
         pidfile (str): file path to the console output file
         errfile (str): file path to the error output file
-    """    
+    """
+    if not os.path.exists(pidfile):
+        return {
+            "finished": True,
+            "errors": False,
+            "progressMessage": "Finished",
+        }
+
     content = ''
     while content == '':
         with open(pidfile, "r") as content_file:

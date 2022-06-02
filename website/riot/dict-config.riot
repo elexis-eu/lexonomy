@@ -1,7 +1,7 @@
 <dict-config>
    <dict-nav links={[["config", "Configure"]]}/>
    <h1>Configuration</h1>
-   <div class="row" if="{!state.isResaving}">
+   <div class="row" if="{!state.isResaving && state.stats && state.stats.needUpdate}">
       Your dictionary needs to be re-indexed ({state.stats.needUpdate} entries). <button class="btn" style="margin-left: 15px;" onclick="{resave}">Do it now </button>
       <br>
       <span style="opacity: 75%; font-size: 80%;">You don't have to do this right now. But your dictionary may take longer to load, and searching entries may not always return the results you expect, until you re-index.</span>
