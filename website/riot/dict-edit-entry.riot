@@ -73,7 +73,6 @@
    </style>
 
    <script>
-      // import xonomy from "@kcmertens/xonomy"
       export default {
          bindings: [["store", "entryIdChanged", "onEntryIdChanged"]],
 
@@ -93,9 +92,9 @@
                Screenful.Editor.updateUrl = `${window.API_URL}${this.dictData.dictId}/entryupdate.json`
                Screenful.Editor.deleteUrl = `${window.API_URL}${this.dictData.dictId}/entrydelete.json`
 
-               // global variables used by xonomy/screenfull
-               var xema = this.dictData.config.xema;
-               var xemplate = this.dictData.config.xemplate;
+               // global variables used by xonomy/screenful
+               xema = this.dictData.config.xema;
+               xemplate = this.dictData.config.xemplate;
                kontext = this.dictData.config.kontext;
                kex = this.dictData.config.kex;
                subbing = this.dictData.config.subbing;
@@ -269,36 +268,34 @@
                }
             }
          },
-         loadGraphicalEditorDevServer() {
-            this.graphicalEditorLoading = true
-            if (!document.getElementById("editor-app-chunk-vendors") || !document.getElementById("editor-app-script")) {
-               fetch('http://localhost:8081/js/chunk-vendors.js').then(r => r.text()).then(vendorContent => {
-                  const newScript = document.createElement("script")
-                  newScript.setAttribute("id", "editor-app-chunk-vendors")
-                  newScript.append(document.createTextNode(vendorContent))
-                  document.querySelector('body').appendChild(newScript)
-                  fetch('http://localhost:8081/js/app.js').then(r => r.text()).then(content => {
-                     const newScript = document.createElement("script")
-                     newScript.setAttribute("id", "editor-app-script")
-                     newScript.append(document.createTextNode(content))
-                     document.querySelector('body').appendChild(newScript)
-                     this.graphicalEditorLoaded = true
-                  })
-               })
-            }
-         },
-
          openGraphicalEditor(entry) {
-            // if (!this.graphicalEditorLoaded) {
-            //    if (this.graphicalEditorLoading) {
-            //       setTimeout(() => {
-            //          this.openGraphicalEditor(entry)
-                  // }, 500)
-               // } else {
-               //    this.loadGraphicalEditorDevServer()
-               // }
-            // } else {
-               // console.log(this.dictData)
+            // load the editor from the webpack-dev-server instead of running the prebuilt version from /dist/
+            if (window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL && !this.graphicalEditorLoaded) {
+               if (this.graphicalEditorLoading) {
+                  setTimeout(() => {
+                     this.openGraphicalEditor(entry)
+                  }, 500)
+               } else {
+                  this.graphicalEditorLoading = true
+                  if (!document.getElementById("editor-app-script") || !document.getElementById("editor-app-css")) {
+                     Promise.all([
+                        fetch(window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL + 'editor.js').then(r => r.text()),
+                        fetch(window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL + 'editor.css').then(r => r.text()),
+                     ])
+                     .then(([js, css]) => {
+                        const newScript = document.createElement("script")
+                        newScript.setAttribute("id", "editor-app-script")
+                        newScript.append(document.createTextNode(js))
+                        document.querySelector('body').appendChild(newScript)
+                        const newCss = document.createElement('style')
+                        newCss.setAttribute("id", "editor-app-css")
+                        newCss.append(document.createTextNode(css))
+                        document.querySelector('body').appendChild(newCss)
+                     })
+                     .then(() => this.graphicalEditorLoaded = true)
+                  }
+               }
+            } else {
                window.entryData = {
                   entryId: this.dictData.entryId,
                   dictId: this.dictData.dictId,
@@ -308,7 +305,7 @@
                   content: entry || ""
                }
                window.mountGraphicalEditor()
-            // }
+            }
          },
 
          onAlertCloseClick() {
@@ -337,7 +334,6 @@
          },
 
          onMounted() {
-            // this.loadGraphicalEditorDevServer()
             this.initEditorIfNeeded()
          },
 

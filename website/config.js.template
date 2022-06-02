@@ -1,1 +1,6 @@
 window.API_URL = "http://localhost:8080/";
+
+// Comment in this line to enable serving the graphical editor from a webpack-dev-server (for development purposes)
+// The port can be configured in website/editor/vue.config.js
+// When this setting is disabled, the editor is assumed to be present in a compiled bundle in the website/dist/ directory
+// window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL = "http://localhost:8081/"; 
