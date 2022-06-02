@@ -1,4 +1,4 @@
-<main class="main { ( ['login', 'register', 'registerPassword', 'forgot', 'forgotPassword'].includes(state.subPage) && !authData.authorized ) ? 'login-page' : '' } {['dict-public-entry', 'dict-public', 'open-dict-list'].includes(state.content) ? 'dark-page':''}" >
+<main class="main { ( ['login', 'register', 'registerPassword', 'forgot', 'forgotPassword'].includes(state.subPage) && !authData.authorized ) ? 'login-page' : '' } {['dict-public-entry', 'dict-public', 'open-dict-list'].includes(state.content) && !authData.authorized ? 'dark-page':''}" >
    <loading-overlay if={authData.isCheckingAuth || dictData.isSiteconfigLoading} fullscreen=1/>
    <app-header/>
    <div class="contentWrapper">
@@ -66,6 +66,15 @@
       main.dark-page app-footer .elexislogo,
       main.login-page app-footer .elexislogo {
          background-image: url(img/logo_elexis_white.png) !important;
+      }
+      main.dark-page .container h1 {
+         color: #ffffff;
+      }
+      main.dark-page .container > div {
+         background: #FFFFFF;
+         box-shadow: 0px 0px 30px rgba(92, 32, 170, 0.7);
+         border-radius: 16px;
+         padding: 2em;
       }
    </style>
 
