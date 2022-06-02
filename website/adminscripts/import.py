@@ -212,7 +212,6 @@ p.StartElementHandler = start_element
 p.EndElementHandler = end_element
 p.CharacterDataHandler = char_data
 
-
 p.Parse(xmldata)
 
 
