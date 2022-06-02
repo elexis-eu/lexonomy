@@ -567,11 +567,11 @@ Screenful.Editor={
     	});
     }
   },
-  sourceCode: function(){
+  sourceCode: async function(){
     if($("#container").hasClass("withSourceCode")) {
       Screenful.Editor.hideSourceCode();
     } else {
-      var content=Screenful.Editor.harvester(document.getElementById("editor"));
+      var content= await Screenful.Editor.harvester(document.getElementById("editor"));
       if(Screenful.Editor.formatSourceCode) content=Screenful.Editor.formatSourceCode(content);
       $("#container").removeClass("withHistory").addClass("withSourceCode");
       $("#container").removeClass("empty").html("<div id='sourceCode'><textarea spellcheck='false'>"+content.replace(/\&/g, "&amp;")+"</textarea></div>");
