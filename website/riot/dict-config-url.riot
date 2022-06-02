@@ -2,6 +2,8 @@
    <loading-overlay if={state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["url", "Change URL"]]}/>
    <h1>Change URL</h1>
+   <dict-config-buttons save-data={saveData}
+         label="Change"></dict-config-buttons>
    <div class="row">
       <label for="url">Current URL</label>
       <div style="margin: 0 0 30px;">
@@ -29,8 +31,6 @@
          </div>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData}
-         label="Change"></dict-config-buttons>
    <br>
    <div>
       <span id="error"

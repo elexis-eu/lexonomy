@@ -21,6 +21,7 @@
       <div>
 
       <div if={state.data.users.length}>
+         <dict-config-buttons save-data={saveData}></dict-config-buttons>
          <table>
             <thead>
                <tr style="border-bottom: none;">
@@ -107,7 +108,6 @@
             </button>
          </div>
          <br><br>
-         <dict-config-buttons save-data={saveData}></dict-config-buttons>
          <div id="userConfigError"></div>
       </div>
    </template>

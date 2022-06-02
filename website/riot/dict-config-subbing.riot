@@ -8,6 +8,7 @@
 
    <dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title } configId={ this.configId } configTitle={ this.configTitle }/>
 
+   <button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i></button>
    <div each={ element in this.activeSubentries } data-element={ element.name } class={ element.valid ? "element-info" : "element-info text-red" } >
       <div class="header">
          <h5>{element.name} {element.valid ? ''  : '(unknown element)!'}</h5>
@@ -16,13 +17,13 @@
 
       <div each={att in element.activeAttributes} data-attribute={att.name} class="att">
          <label for={`${att.name}-value`} class="name blue-text flow-text">@{att.name}</label>
-         
+
          <select if={att.values} class="value" onchange={changeAttribute} value={att.value} name={`${att.name}-value`}>
             <option value="" selected={!att.value}>[any value]</option>
             <option each={v in att.values} value={v.value} selected={v.value === att.value}>{v.value}</option>
          </select>
          <input if={!att.values} type="text" class="value" value={att.value} onchange={changeAttribute} placeholder="Value">
-         
+
          <button type="button" class="btn btn-small red lighten-1" title="Remove attribute" onclick={deleteAttribute}><i class="material-icons">delete</i></button>
       </div>
 
@@ -34,7 +35,7 @@
          <button class="btn btn-small" type="button" onclick={addAttribute}><i class="material-icons">add</i></button>
       </div>
    </div>
-   
+
    <div class="row" if={inactiveSubentries.length} style="margin-top: 15px;">
       <div class="input-field col s6">
          <select id="new-element">
@@ -48,7 +49,6 @@
       </div>
    </div>
 
-   <button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i></button>
    </template>
 
    <style>
@@ -121,11 +121,11 @@
          },
          dictId: '',
          configId: '',
-         configTitle: 'Subentries', 
-         
+         configTitle: 'Subentries',
+
          /** @type {{
           * 		[elementName: string]: {
-          * 			attributes: { 
+          * 			attributes: {
           * 				[attributeName: string]: string;
           * 			}
           * 		}
@@ -145,14 +145,14 @@
                   activeAttributes: Object
                      .entries(value.attributes)
                      .map(([attributeName, attributeValue]) => ({
-                        name: attributeName, 
+                        name: attributeName,
                         value: attributeValue,
                      })),
                   inactiveAttributes: Object
                      .entries(this.xema.elements[elementName]?.attributes || {})
                      .filter(([name]) => !(name in value.attributes))
                      .map(([attributeName, {values}]) => ({
-                        name: attributeName, 
+                        name: attributeName,
                         values
                      }))
                   })
@@ -182,10 +182,10 @@
             const elementName = event.target.closest('[data-element]').getAttribute('data-element');
             const attributeName = event.target.closest('[data-attribute]').getAttribute('data-attribute');
             const newValue = event.target.value;
-            this.configData[elementName].attributes[attributeName] = newValue; 
+            this.configData[elementName].attributes[attributeName] = newValue;
             this.update();
          },
-      
+
          doDeleteEl(event) {
             const elementName = event.target.closest('[data-element]').getAttribute('data-element');
             delete this.configData[elementName]
@@ -221,6 +221,6 @@
          }
       }
    </script>
-   
+
 </dict-config-subbing>
 

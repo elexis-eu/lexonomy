@@ -2,6 +2,8 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["searchability", "Searching"]]}/>
    <h1>Searching</h1>
+   <dict-config-buttons save-data={saveData}
+         show-save={state.hasElements}></dict-config-buttons>
    <div if={!state.isLoading && !state.hasElements}
          class="center-align grey-text">
       <h1>No elements found</h1>
@@ -23,8 +25,6 @@
       </div>
    </div>
    <br><br>
-   <dict-config-buttons save-data={saveData}
-         show-save={state.hasElements}></dict-config-buttons>
 
    <script>
       export default {

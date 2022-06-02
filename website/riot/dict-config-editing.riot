@@ -3,6 +3,7 @@
    <dict-nav links={[["config", "Configure"], ["editing", "Entry editor"]]}/>
    <h1>Entry editor</h1>
    <div if={ (!state.data._js || state.data._js == "") && !state.override }>
+      <dict-config-buttons save-data={saveData}></dict-config-buttons>
       <div class="input-field">
          <p>
             <label>
@@ -109,7 +110,6 @@
          </button>
       </div>
       <br><br>
-      <dict-config-buttons save-data={saveData}></dict-config-buttons>
    </div>
    <div if={ (state.data._js && state.data._js != "") || state.override }>
       <div class="row">

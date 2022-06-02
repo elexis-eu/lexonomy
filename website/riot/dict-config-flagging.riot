@@ -2,6 +2,8 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["flagging", "Entry flags"]]}/>
    <h1>Entry flags</h1>
+   <dict-config-buttons save-data={saveData}
+         show-save={state.data.flags.length}></dict-config-buttons>
    <template if={!state.isLoading}>
       <div if={!state.data.flags.length}
             class="center-align grey-text">
@@ -81,8 +83,6 @@
       </template>
    </template>
    <br><br>
-   <dict-config-buttons save-data={saveData}
-         show-save={state.data.flags.length}></dict-config-buttons>
 
    <style>
       tr{

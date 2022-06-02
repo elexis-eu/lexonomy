@@ -2,6 +2,23 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["xemplate", "Entry formatting"]]}/>
    <h1>Entry formatting</h1>
+   <dict-config-buttons style="display: inline-block" save-data={saveData}></dict-config-buttons>
+   <div style="display:inline-block;margin-left:10px"
+      if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
+            <button class="btn waves-effect waves-light"
+                    onclick={ startOverride }>
+               Use your own stylesheet
+               <i class="material-icons right">edit</i>
+            </button>
+   </div>
+   <div style="display:inline-block;margin-left:10px"
+      if={ (state.data._xsl && state.data._xsl != "") || (state.data._css && state.data._css != "") || state.override }>
+            <button class="btn waves-effect waves-light"
+                    onclick={ stopOverride }>
+               Stop using your own stylesheet
+               <i class="material-icons right">edit</i>
+            </button>
+   </div>
    <div
       if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
       <div style="display: flex">
@@ -38,15 +55,6 @@
          />
       </div>
 
-      <div class="row">
-         <div class="col s10">
-            <button class="btn waves-effect waves-light"
-                    onclick={ startOverride }>
-               Use your own stylesheet
-               <i class="material-icons right">edit</i>
-            </button>
-         </div>
-      </div>
    </div>
    <div
       if={ (state.data._xsl && state.data._xsl != "") || (state.data._css && state.data._css != "") || state.override }>
@@ -71,17 +79,7 @@
          </div>
       </div>
 
-      <div class="row">
-         <div class="col s10">
-            <button class="btn waves-effect waves-light"
-                    onclick={ stopOverride }>
-               Stop using your own stylesheet
-               <i class="material-icons right">edit</i>
-            </button>
-         </div>
-      </div>
    </div>
-   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
    <script>
       import displayStyles from "./entry-formatting/display-styles.riot"

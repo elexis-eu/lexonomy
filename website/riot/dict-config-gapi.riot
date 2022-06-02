@@ -2,6 +2,7 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["gapi", "MultimediaApi"]]}/>
    <h1>Multimedia API</h1>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
    <div class="row">
       <div class="input-field">
          <select id="img_licence">
@@ -123,12 +124,6 @@
          <label>VoiceRSS language</label>
       </div>
    </div>
-   <button class="btn waves-effect waves-light"
-        onclick={saveData}
-        id="submit_button">
-      Save
-      <i class="material-icons right">save</i>
-   </button>
    <br>
    <br>
    <hr/>
@@ -161,8 +156,6 @@
    <div if={state.info}
          class="message messageInfo">{state.info}</div>
    <br>
-   <a href="#{dictData.dictId}/config"
-         class="btn btn-secondary btn-flat">Back</a>
 
    <style>
       .input-field{

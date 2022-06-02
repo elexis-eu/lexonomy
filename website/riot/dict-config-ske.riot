@@ -2,6 +2,7 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["ske", "Sketch Engine connection"]]}/>
    <h1>Sketch Engine connection</h1>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
    <div class="row">
       <div class="input-field">
          <input value={ state.data.kex.url }
@@ -159,7 +160,6 @@
          <span class="helper-text">This is the XML that will be inserted into your entries with each definition. The actual text will be where the placeholder <tt>$text</tt> is.</span>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
    <style>
       #kex_concsampling {
