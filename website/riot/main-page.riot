@@ -10,12 +10,14 @@
                user-info={ authData }></userprofile>
       </template>
    </div>
-   <div if={ !authData.authorized }
-         class="row">
-      <div class="col m7 s12">
-         <welcome/>
+   <div if={ !authData.authorized }>
+      <div class="row">
+         <div class="col s12 m5 offset-m4" style="text-align:center">
+            <img class="login-logo" src="img/logo_lexonomy_white.png">
+         </div>
       </div>
-      <div class="col m5 s12">
+      <div class="row">
+      <div class="col s12 m5 offset-m4 login-box">
          <login if={props.mainSubPage == 'login'}></login>
          <register if={props.mainSubPage == 'register'}></register>
          <register-password if={props.mainSubPage == 'registerPassword'}
@@ -24,10 +26,19 @@
          <forgot-password if={props.mainSubPage == 'forgotPassword'}
                token={props.token}></forgot-password>
       </div>
+      </div>
    </div>
 
 
    <style>
+      .login-box {
+         background: #FFFFFF;
+         box-shadow: 0px 0px 30px rgba(92, 32, 170, 0.7);
+         border-radius: 16px;
+      }
+      .login-logo {
+         height: 40px;
+      }
       :host{
          margin-top: 20px;
       }

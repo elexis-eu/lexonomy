@@ -1,4 +1,4 @@
-<main class="main">
+<main class="main { ( ['login', 'register', 'registerPassword', 'forgot', 'forgotPassword'].includes(state.subPage) && !authData.authorized ) ? 'login-page' : '' } {['dict-public-entry', 'dict-public', 'open-dict-list'].includes(state.content) ? 'dark-page':''}" >
    <loading-overlay if={authData.isCheckingAuth || dictData.isSiteconfigLoading} fullscreen=1/>
    <app-header/>
    <div class="contentWrapper">
@@ -13,6 +13,7 @@
    <style>
       .contentWrapper{
          position: relative;
+         background-color: #f0f8ff;
       }
       .content{
          padding-left: 10px;
@@ -21,6 +22,40 @@
       .wideContainer{
          max-width: 1600px;
          width: 90vw;
+      }
+      main.login-page app-header {
+         visibility: hidden;
+      }
+      main.main {
+         background-color: #f0f8ff;
+      }
+      main.dark-page, main.login-page {
+         background-image: url(img/background_dark.png);
+      }
+      main.dark-page .contentWrapper,
+      main.login-page .contentWrapper {
+         background-color: unset;
+      }
+      main.dark-page .footer-logos,
+      main.login-page .footer-logos{
+         background-color: unset;
+         border-top: 1px solid #ffffff;
+      }
+      main.dark-page app-footer a,
+      main.login-page app-footer a,
+      main.dark-page app-footer .version,
+      main.login-page app-footer .version,
+      main.dark-page app-footer .horizon-info,
+      main.login-page app-footer .horizon-info {
+         color: #ffffff;
+      }
+      main.dark-page app-footer .eulogo,
+      main.login-page app-footer .eulogo {
+         background-image: url(img/logo_eu_white.png) !important;
+      }
+      main.dark-page app-footer .elexislogo,
+      main.login-page app-footer .elexislogo {
+         background-image: url(img/logo_elexis_white.png) !important;
       }
    </style>
 

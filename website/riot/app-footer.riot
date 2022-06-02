@@ -10,12 +10,10 @@
          <a target="_blank"
                href="https://www.elex.is/"
                title="ELEXIS">
-            <img class="elexislogo"
-                  src="img/logo_elexis.png"/>
+            <span class="elexislogo"/>
          </a>
          <span class="horizon-info">
-            <img class="" style="float:left; margin-right: 5px"
-                  src="img/logo_eu.png"/>
+            <span class="eulogo" />
 This project has received funding from the European Union's Horizon 2020<br/>
 research and innovation programme under grant agreement No 731015.
 
@@ -67,12 +65,6 @@ research and innovation programme under grant agreement No 731015.
          border-right: 1px solid #fff;
          margin: 0 10px;
       }
-      .logolint a img{
-         height: 30px;
-      }
-      .logolint a:hover img{
-         filter: none;
-      }
       .version{
          font-weight: 100;
          color: #004494;
@@ -87,6 +79,24 @@ font-size: x-small;
 }
 .horizon-info img {
 height: 30px;
+}
+.elexislogo {
+   width: 112px;
+   height: 30px;
+   background-image: url(img/logo_elexis.png);
+   background-size: contain;
+   display: inline-block;
+   background-repeat: no-repeat;
+}
+.eulogo {
+   width: 45px;
+   height: 30px;
+   background-image: url(img/logo_eu.png);
+   float: left;
+   margin-right: 5px;
+   background-size: contain;
+   display: inline-block;
+   background-repeat: no-repeat;
 }
    </style>
 
