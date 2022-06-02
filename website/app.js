@@ -75,6 +75,7 @@ import user_consent from './riot/user-consent.riot'
 import raw_html from './riot/raw-html.riot'
 import loading_overlay from './riot/loading-overlay.riot'
 import docs_intro from './riot/docs-intro.riot'
+import docs_about from './riot/docs-about.riot'
 
 riot_register('api', api)
 riot_register('dict-config-autonumber', dict_config_autonumber)
@@ -129,6 +130,7 @@ riot_register('user-consent', user_consent)
 riot_register('raw-html', raw_html)
 riot_register('loading-overlay', loading_overlay)
 riot_register('docs-intro', docs_intro)
+riot_register('docs-about', docs_about)
 
 
 component(App)(document.getElementById('root'))

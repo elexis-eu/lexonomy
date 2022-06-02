@@ -65,7 +65,7 @@
          },
 
          needAuthorization(content, subPage){
-            if(['e404', 'open-dict-list', 'dict-public', 'dict-public-entry', 'docs-intro'].includes(content)
+            if(['e404', 'open-dict-list', 'dict-public', 'dict-public-entry', 'docs-intro', 'docs-about'].includes(content)
                   || content == 'main-page' && !['new', 'userprofile'].includes(subPage)){
                return false
             }
@@ -94,6 +94,9 @@
             })
             route('/docs/intro', () => {
                this.goTo('docs-intro')
+            })
+            route('/docs/about', () => {
+               this.goTo('docs-about')
             })
             route('/createaccount/*', (token) => {
                this.goTo('main-page', 'registerPassword', '', {token: token})
