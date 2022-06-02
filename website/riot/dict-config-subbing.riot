@@ -3,51 +3,50 @@
    <dict-nav links={[["config", "Configure"], ["subbing", "Subentries"]]}/>
    <h1>Subentries</h1>
    <template if={!state.isLoading}>
+      <dict-config-buttons save-data={saveData} show-save={true}></dict-config-buttons>
+      
+      <div each={ element in this.activeSubentries } data-element={ element.name } class={ element.valid ? "element-info" : "element-info text-red" } >
+         <div class="header">
+            <h5>{element.name} {element.valid ? ''  : '(unknown element)!'}</h5>
+            <button type="button" class="btn btn-small red lighten-1" title="Remove {element.name} from subentries" style="margin-right: 15px;" onclick={ doDeleteEl }><i class="material-symbols-outlined">delete</i></button>
+         </div>
 
 
+         <span class="helper-text">(Optional) - Attributes this element should have to be a subentry: </span>
 
-   <dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title } configId={ this.configId } configTitle={ this.configTitle }/>
+         <div each={att in element.activeAttributes} data-attribute={att.name} class="att">
+            <label for={`${att.name}-value`} class="name blue-text">@{att.name}</label>
 
-   <button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-symbols-outlined right">save</i></button>
-   <div each={ element in this.activeSubentries } data-element={ element.name } class={ element.valid ? "element-info" : "element-info text-red" } >
-      <div class="header">
-         <h5>{element.name} {element.valid ? ''  : '(unknown element)!'}</h5>
-         <button type="button" class="btn btn-small red lighten-1" title="Remove subentry" style="margin-right: 15px;" onclick={ doDeleteEl }><i class="material-symbols-outlined">delete</i></button>
+            <select if={att.values} class="value" onchange={changeAttribute} value={att.value} name={`${att.name}-value`}>
+               <option value="" selected={!att.value}>[any value]</option>
+               <option each={v in att.values} value={v.value} selected={v.value === att.value}>{v.value}</option>
+            </select>
+            <input if={!att.values} type="text" class="value" value={att.value} onchange={changeAttribute} placeholder="Value">
+
+            <button type="button" class="btn btn-small red lighten-1" title="Remove {att.name} from required attributes" onclick={deleteAttribute}><i class="material-symbols-outlined">delete</i></button>
+         </div>
+
+         <div if={element.inactiveAttributes.length} class="att-new">
+            
+            <select class="name new-attribute" name="new-attribute">
+               <option each={att in element.inactiveAttributes} value={att.name}>{att.name}</option>
+            </select>
+            <button class="btn btn-small" type="button" onclick={addAttribute} title="Add required subentry attribute"><i class="material-symbols-outlined">add</i></button>
+         </div>
       </div>
 
-      <div each={att in element.activeAttributes} data-attribute={att.name} class="att">
-         <label for={`${att.name}-value`} class="name blue-text flow-text">@{att.name}</label>
-
-         <select if={att.values} class="value" onchange={changeAttribute} value={att.value} name={`${att.name}-value`}>
-            <option value="" selected={!att.value}>[any value]</option>
-            <option each={v in att.values} value={v.value} selected={v.value === att.value}>{v.value}</option>
-         </select>
-         <input if={!att.values} type="text" class="value" value={att.value} onchange={changeAttribute} placeholder="Value">
-
-         <button type="button" class="btn btn-small red lighten-1" title="Remove attribute" onclick={deleteAttribute}><i class="material-symbols-outlined">delete</i></button>
+      <div class="row" if={inactiveSubentries.length} style="margin-top: 15px;">
+         <div class="input-field col s6">
+            <select id="new-element">
+               <option each={elementName in inactiveSubentries} value={elementName}>{elementName}</option>
+            </select>
+            <label for="new-element">Subentry element</label>
+            <span class="helper-text">Elements listed here function as subentries which can be shared by multiple entries.</span>
+         </div>
+         <div class="input-field col s1">
+            <button class="btn btn-small" onclick={ doAddEl } title="Add subentry element"><i class="material-symbols-outlined">add</i></button>
+         </div>
       </div>
-
-      <div if={element.inactiveAttributes.length} class="att-new">
-         <label style="width: 100%">(Optional) - Attributes this element should have to be a subentry: </label>
-         <select class="name new-attribute" name="new-attribute">
-            <option each={att in element.inactiveAttributes} value={att.name}>{att.name}</option>
-         </select>
-         <button class="btn btn-small" type="button" onclick={addAttribute}><i class="material-symbols-outlined">add</i></button>
-      </div>
-   </div>
-
-   <div class="row" if={inactiveSubentries.length} style="margin-top: 15px;">
-      <div class="input-field col s6">
-         <select id="new-element">
-            <option each={elementName in inactiveSubentries} value={elementName}>{elementName}</option>
-         </select>
-         <label for="new-element">Subentry element</label>
-         <span class="helper-text">Elements listed here function as subentries which can be shared by multiple entries.</span>
-      </div>
-      <div class="input-field col s1">
-         <a class="btn btn-small" onclick={ doAddEl }><i class="material-symbols-outlined">add</i></a>
-      </div>
-   </div>
 
    </template>
 
@@ -70,6 +69,9 @@
          justify-content: space-between;
          border-bottom: 1px solid #9e9e9e;
          margin-bottom: 25px;
+      }
+      .element-info > .helper-text {
+         margin-left: 25px;
       }
 
       .element-info > .att,
@@ -123,6 +125,7 @@
          configId: '',
          configTitle: 'Subentries',
 
+         // configData is where we store the subbing config from the server, and immediately put all modifications.
          /** @type {{
           * 		[elementName: string]: {
           * 			attributes: {
@@ -133,7 +136,7 @@
          configData: {
          },
 
-         get xema() { return this.props.dictConfigs?.xema; },
+         get xema() { return this.dictData?.dictConfigs?.xema; },
          get elements() { return Object.keys(this.xema?.elements || {}); },
          get activeSubentries() {
             if (!this.xema) return [];
@@ -202,7 +205,7 @@
          onMounted() {
             this.dictId = this.props.dictId;
             this.configId = this.props.configId;
-
+            
             this.store
                .loadDictionaryConfig("subbing")
                .done(response => this.configData = response.content)
