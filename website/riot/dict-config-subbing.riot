@@ -8,11 +8,11 @@
 
    <dict-config-nav dictId={ this.dictId } dictTitle={ this.props.dictDetails.title } configId={ this.configId } configTitle={ this.configTitle }/>
 
-   <button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-icons right">save</i></button>
+   <button class="btn waves-effect waves-light" onclick={ saveData } id="submit_button">Save <i class="material-symbols-outlined right">save</i></button>
    <div each={ element in this.activeSubentries } data-element={ element.name } class={ element.valid ? "element-info" : "element-info text-red" } >
       <div class="header">
          <h5>{element.name} {element.valid ? ''  : '(unknown element)!'}</h5>
-         <button type="button" class="btn btn-small red lighten-1" title="Remove subentry" style="margin-right: 15px;" onclick={ doDeleteEl }><i class="material-icons">delete</i></button>
+         <button type="button" class="btn btn-small red lighten-1" title="Remove subentry" style="margin-right: 15px;" onclick={ doDeleteEl }><i class="material-symbols-outlined">delete</i></button>
       </div>
 
       <div each={att in element.activeAttributes} data-attribute={att.name} class="att">
@@ -24,7 +24,7 @@
          </select>
          <input if={!att.values} type="text" class="value" value={att.value} onchange={changeAttribute} placeholder="Value">
 
-         <button type="button" class="btn btn-small red lighten-1" title="Remove attribute" onclick={deleteAttribute}><i class="material-icons">delete</i></button>
+         <button type="button" class="btn btn-small red lighten-1" title="Remove attribute" onclick={deleteAttribute}><i class="material-symbols-outlined">delete</i></button>
       </div>
 
       <div if={element.inactiveAttributes.length} class="att-new">
@@ -32,7 +32,7 @@
          <select class="name new-attribute" name="new-attribute">
             <option each={att in element.inactiveAttributes} value={att.name}>{att.name}</option>
          </select>
-         <button class="btn btn-small" type="button" onclick={addAttribute}><i class="material-icons">add</i></button>
+         <button class="btn btn-small" type="button" onclick={addAttribute}><i class="material-symbols-outlined">add</i></button>
       </div>
    </div>
 
@@ -45,7 +45,7 @@
          <span class="helper-text">Elements listed here function as subentries which can be shared by multiple entries.</span>
       </div>
       <div class="input-field col s1">
-         <a class="btn btn-small" onclick={ doAddEl }><i class="material-icons">add</i></a>
+         <a class="btn btn-small" onclick={ doAddEl }><i class="material-symbols-outlined">add</i></a>
       </div>
    </div>
 

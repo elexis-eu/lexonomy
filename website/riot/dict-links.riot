@@ -12,7 +12,7 @@
             <h2 class="dictName">
                {dict.title}
                <i if={dict.blurb}
-                     class="material-icons clickable"
+                     class="material-symbols-outlined clickable"
                      onclick={openDictInfo.bind(this, dict)}>
                   info_outline
                </i>
@@ -37,7 +37,7 @@
                         {link.source_hw ? ('(' + link.source_id + ')') : ''}
                      </td>
                      <td class="arrowCell">
-                        <i class="material-icons">arrow_forward</i>
+                        <i class="material-symbols-outlined">arrow_forward</i>
                      </td>
                      <td>
                         <a href="#/{link.target_dict}/edit/entry/view/{link.target_entry}">
@@ -68,7 +68,7 @@
                      </td>
                      <td style="padding: 0 20px;"
                            class="grey-text">
-                        <i class="material-icons">arrow_forward</i>
+                        <i class="material-symbols-outlined">arrow_forward</i>
                      </td>
                      <td>
                         <a href="#/{dictData.dictId}/edit/entry/view/{link.target_entry}">

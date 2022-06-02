@@ -6,16 +6,16 @@
          <div style="display: flex; align-items: center; flex-wrap: wrap;">
             <span if={dictData.dictionaryList.length}
                   class="searchBox input-field">
-                  <i class="material-icons prefix grey-text">search</i>
+                  <i class="material-symbols-outlined prefix grey-text">search</i>
                <input id="searchBox"
                      oninput={onSearchInput}>
                <i onclick={onClearFilterClick}
-                  class="material-icons clearFilterIcon grey-text clickable">close</i>
+                  class="material-symbols-outlined clearFilterIcon grey-text clickable">close</i>
             </span>
             <span style="margin-left: auto;">
                <a href="#/make"
                      class="btn waves-effect waves-light">
-                  <i class="material-icons left">add</i>
+                  <i class="material-symbols-outlined left">edit_note</i>
                   create new dictionary
                </a>
             </span>
@@ -37,25 +37,25 @@
                         class="secondary-content clickable"
                         title="delete dictionary"
                         onclick={ doDeleteDict.bind(this, dict.id) }>
-                     <i class="material-icons">delete</i>
+                     <i class="material-symbols-outlined">delete</i>
                   </a>
                   <a class="secondary-content clickable"
                         title="clone dictionary"
                         onclick={ doCloneDict.bind(this, dict.id) }>
-                     <i class="material-icons">content_copy</i>
+                     <i class="material-symbols-outlined">control_point_duplicate</i>
                   </a>
                   <a  if={ dict.currentUserCanDelete }
                         class="secondary-content clickable"
                         title="config dictionary"
                         onclick={ doConfigDict.bind(this, dict.id) }>
-                     <i class="material-icons">settings</i>
+                     <i class="material-symbols-outlined">settings</i>
                   </a>
                   <a if={ dict.currentUserCanEdit }
                         class="secondary-content clickable"
                         data-dict-id={ dict.id }
                         title="edit dictionary"
                         onclick={ doEditDict.bind(this, dict.id) }>
-                     <i class="material-icons">edit</i>
+                     <i class="material-symbols-outlined">edit</i>
                   </a>
                </div>
             </li>
@@ -92,7 +92,7 @@
          <br>
          <a href="#/make"
                class="btn waves-effect waves-light">
-            <i class="material-icons left">add</i>
+            <i class="material-symbols-outlined left">edit_note</i>
             create new dictionary
          </a>
       </div>

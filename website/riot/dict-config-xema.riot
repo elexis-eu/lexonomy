@@ -9,7 +9,7 @@
 
       <dict-config-buttons style="display:inline-block" save-data={saveData}></dict-config-buttons>
       <div style="display:inline-block;margin-left: 10px">
-         <button class="btn waves-effect waves-light" onclick={ toggleOverride } > {state.override ? 'Stop using your own schema' : 'Use your own schema' } <i class="material-icons right">edit</i></button>
+         <button class="btn waves-effect waves-light" onclick={ toggleOverride } > {state.override ? 'Stop using your own schema' : 'Use your own schema' } <i class="material-symbols-outlined right">edit</i></button>
       </div>
       <div if={ !state.override } id="editor" class="editor designer">
          <div class="list">

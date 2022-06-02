@@ -42,7 +42,7 @@
                      <a class="btn btn-floating right"
                            data-element={ element.linkElement }
                            onclick={ doDeleteEl.bind(this, element.linkElement) }>
-                        <i class="material-icons">delete</i>
+                        <i class="material-symbols-outlined">delete</i>
                      </a>
                   </td>
                </tr>
@@ -52,13 +52,13 @@
             <button class="btn {state.unusedElements.length ? '' : 'disabled'}"
                   onclick={ doAddEl }>
                add element
-               <i class="material-icons right">add</i>
+               <i class="material-symbols-outlined right">add</i>
             </button>
             <button class="btn waves-effect waves-light"
                   onclick={saveData}
                   id="submit_button">
                Save
-               <i class="material-icons right">save</i>
+               <i class="material-symbols-outlined right">edit</i>
             </button>
          </div>
       </template>

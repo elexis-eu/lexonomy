@@ -56,14 +56,14 @@
                      id="flagDropdown"
                      class="dropdown-content flagDropdown">
                   <li data-flag="">
-                     <i class="material-icons"
+                     <i class="material-symbols-outlined"
                            style="color: grey">label_outline</i>
                      <div>no flag</div>
                      <div class="right flagKey">delete</div>
                   </li>
                   <li each={flag in dictData.config.flagging.flags}
                         data-flag={flag.name}>
-                     <i class="material-icons"
+                     <i class="material-symbols-outlined"
                            style="color: {flag.color}">label</i>
                      <div>{flag.label}</div>
                      <div class="right flagKey">{flag.key}</div>

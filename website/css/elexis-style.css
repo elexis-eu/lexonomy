@@ -54,3 +54,18 @@ h3.header {
 a {
 	text-decoration: none !important;
 }
+.material-symbols-outlined {
+  color: #004494;
+}
+.btn .material-symbols-outlined {
+  color: #ffffff;
+}
+.collection .material-symbols-outlined {
+  margin-left: 15px;
+  padding: 3px;
+}
+.collection .material-symbols-outlined:hover {
+  background-color: #d4deed;
+  border-radius: 50%;
+
+}
