@@ -89,7 +89,7 @@ def migrate_1(dictDB: Connection, configs: Configs):
         for r in dictDB.execute("select distinct(id), xml from entries where id in (select parent_id from sub) or id in (select child_id from sub)").fetchall():
             xml = ops.parse(r["xml"])
             migrate_subentries(xml)
-            ops.createEntry(dictDB, configs, xml, "system@lexonomy")
+            ops.createEntry(dictDB, configs, xml, "system@lexonomy", id=r["id"])
             done += 1
             if done % 100 == 0:
                 print(f"Migrated {done} entries so far...")

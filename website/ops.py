@@ -484,9 +484,10 @@ def deleteEntry(dictDB: Connection, configs: Configs, id: int, email: Optional[s
 
     for parent in doSql(dictDB, "select entries.id, xml from entries left join sub on entries.id = sub.parent_id where sub.child_id=?", (id, )).fetchall():
         parentXml = parse(parent["xml"])
+        parentId = parent["id"]
         for reference in parentXml.find_all("lxnm:subentryParent", attrs={"id": id}):
             reference.decompose() # removes the element
-        createEntry(dictDB, configs, parentXml, email="system@lexonomy") # annnd - update! Going through the whole process ensures that we always run all relevant code, even when more is added in the future.
+        createEntry(dictDB, configs, parentXml, email="system@lexonomy", id=parentId) # annnd - update! Going through the whole process ensures that we always run all relevant code, even when more is added in the future.
 
     # tell history that I have been deleted:
     dictDB.execute("insert into history(entry_id, action, [when], email, xml) values(?,?,?,?,?)",
@@ -627,7 +628,7 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
             sortdesc = not sortdesc
 
     for r in doSql(dictDB, f"""select id, xml from entries where needs_update = 1 and id in ({",".join("?" * len(ids))})""", ids).fetchall():
-        createEntry(dictDB, configs, r["xml"], "system@lexonomy")
+        createEntry(dictDB, configs, r["xml"], "system@lexonomy", id = r["id"])
     dictDB.commit() # createEntry does not perform commit every call for performance sake.
 
     rows = doSql(dictDB, f"""
@@ -821,7 +822,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
 
             # SubentryParent points to an entry in the database that shouldn't be a subentry due to changed config: replace with contents.
             if r["needs_update"]: # fixup subentry's xml before copying it, if it needs it (maybe it has subentries of its own to do things with?)
-                _, subentryXml, _, _ = createEntry(dictDB, configs, r["xml"], email)
+                _, subentryXml, _, _ = createEntry(dictDB, configs, r["xml"], email, id=r["id"])
             else:
                 subentryXml = parse(r["xml"])
             del subentryXml.attrs["lxnm:id"] # remove lexonomy attributes since this is no longer a full entry now
