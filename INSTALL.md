@@ -4,7 +4,7 @@ on your own computer or adapt a version to run on a server.
 # Preliminary remarks
 
 Lexonomy's backend is written in [Python](https://python.org). That means that as of now you need
-a working installation of Python 3.
+a working installation of Python >=3.9
 
 You also need to download the source code from this repository into a directory
 on your computer.
@@ -19,14 +19,15 @@ configuration:
 
 ## Prerequisites
 
-- [Download and install Python](https://www.python.org/downloads/) 3.5+
+- [Download and install Python](https://www.python.org/downloads/) 3.9+
 - [Download and install the JWT module for Python3](https://github.com/jpadilla/pyjwt)
 - [Download and install the LXML module for Python3](https://lxml.de/installation.html)
 - [Download and install the Markdown module for Python3](https://python-markdown.github.io/)
-- [(Optional) Download and install NodeJS to build the frontend](https://nodejs.org/en/)
+- [Download and install NodeJS to build the frontend](https://nodejs.org/en/)
 
 # Configuring your Lexonomy
-The frontend configuration file is `website/config.js`. Currently the only setting is the URL of the backend configuration (as `window.API_URL`), which should in most cases be the same as `baseUrl` specified below. However, you can point Lexonomy frontend to an arbitrary backend installation.
+The frontend configuration file is `website/config.js`. The most important setting is the URL of the backend configuration (as `window.API_URL`), which should in most cases be the same as `baseUrl` specified below. However, you can point Lexonomy frontend to an arbitrary backend installation.
+You can also use this file to load the Vue-based graphical editor from webpack directly (during development, see inside the file for further instructions).
 
 By default, backend configuration is located in the file `website/siteconfig.json`, however this can be changed by setting the `$LEXONOMY_SITECONFIG` environmental variable. This file contains some configuration options for your Lexonomy installation. Let's look at those options you will probably want to change at this stage.
 
@@ -45,17 +46,24 @@ cp siteconfig.json.template siteconfig.json
 cp config.js.template config.js
 ```
 
-- Optional but recommended: build the frontend into a single Javascript bundle.
-Lexonomy uses [https://riot.js.org/](Riot.js) a its front-end library. Riot supports in-browser
-compilation, so it is not necessary to build the bundle, however the first loading of Lexonomy is
-then quite slower (because your browser is compiling all the Javascript together).
-To use the in-browser compilation, navigate to `http://localhost:8080/index.browsercompile.html`.
-Of course, you can rename this file as you wish. The default `index.html` uses a precompiled
-Javascript bundle. For the compilation, you need to install NodeJS and run
+- Build the frontend.
+Lexonomy uses a combination of [https://riot.js.org/](Riot.js) for its menus, and [https://vuejs.org/](Vue) for the graphical xml editor.
+
 ```sh
 make
 ```
-in the top-level directory. It produces `bundle.js` which contains a complete frontend for Lexonomy.
+It produces `website/dist`, containing the necessary javascript and css files for the general Lexonomy interface and the editor.
+Alternaltively the following commands perform a manual build:
+```sh
+cd website
+npm install
+cd editor 
+npm install
+cd ..
+npm run build
+```
+
+During development it is also possible to automatically have the frontend rebuild on change by running `npm run watch`. To enable this for the Graphical Editor, you should enable the webpack url in `website/config.js`.
 
 # Backend configuration
 
