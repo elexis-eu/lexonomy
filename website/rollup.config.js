@@ -4,7 +4,6 @@ import { registerPreprocessor } from '@riotjs/compiler'
 import sass from 'sass'
 import postcss from "rollup-plugin-postcss"
 import url from "postcss-url"
-import { uglify } from "rollup-plugin-uglify"
 const path = require('path')
 
 /*
@@ -39,7 +38,6 @@ export default [{
   },
   plugins: [
     riot(options),
-    ...(process.env.ROLLUP_WATCH ? [] : [uglify]), // only enable the slow uglify if creating production build (i.e. not in watch mode)
     nodeResolve()
   ]
 }, {
