@@ -717,8 +717,10 @@ def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) ->
             id = int(id)
         except:
             print(f"Invalid ID (non-number) {id} in to-be-imported entry: replacing...")
-            del xml.attrs["lxnm:id"]
-            del xml.attrs["lxnm:entryID"]
+            if "lxnm:id" in xml.attrs:
+                del xml.attrs["lxnm:id"]
+            if "lxnm:entryID" in xml.attrs:
+                del xml.attrs["lxnm:entryID"]
             id = None
 
     isNewEntry: bool = False
@@ -730,7 +732,8 @@ def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) ->
         isNewEntry = doSql(dictDB, "insert into entries(id, doctype, xml, title, sortkey) values(?,?,?,?,?) on conflict(id) do nothing", (id, "", "", "", "")).rowcount > 0
 
     xml.attrs["lxnm:id"] = str(id)
-    del xml.attrs["lxnm:entryID"] # delete legacy ID
+    if "lxnm:entryID" in xml.attrs: # delete legacy id attribute
+        del xml.attrs["lxnm:entryID"]
     return id, isNewEntry
 
 def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entryID: int, email: str):

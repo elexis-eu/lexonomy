@@ -483,6 +483,15 @@ testables = [{
             <text>title</text>
         </entry>
     """
+}, {
+    "description": "Test that legacy lxnm:entryID attribute is converted into new-style lxnm:id attribute",
+
+    "entry": """
+    <entry lxnm:entryID="201">some test</entry>
+    """,
+
+    "xml": """<entry lxnm:id="201" xmlns:lxnm="http://www.lexonomy.eu/">some test</entry>""",
+    "id": 201
 }]
 
 def overwriteConfig(originalConfig, overrides):
