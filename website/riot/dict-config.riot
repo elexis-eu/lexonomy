@@ -7,7 +7,7 @@
       <span style="opacity: 75%; font-size: 80%;">You don't have to do this right now. But your dictionary may take longer to load, and searching entries may not always return the results you expect until you re-index.</span>
    </div>
    <div if="{state.isResaving}">
-      <span if={state.resaveProgressMessage}>{state.resaveProgressMessage}</span>
+      <span>{state.resaveProgressMessage || 'Re-indexing...'}</span>
       <br>
       <span style="opacity: 75%; font-size: 80%;">You may close or leave this window at any time to pause the process, and return later to resume.</span>
    </div>
@@ -107,6 +107,10 @@
          
          onMounted() {
             this.getStats();
+            this.state.isUnmounted = false; // I don't think components are re-used, but just in case.
+         },
+         onUnmounted() {
+            this.state.isUnmounted = true;
          },
 
          getStats() {
@@ -115,7 +119,7 @@
          async resave() {
             if (this.state.isResaving) return;
             this.update({isResaving: true});
-            while (true) {
+            while (true && !this.state.isUnmounted) {
                try {
                   const {progressMessage, finished, errors} = await $.post(`${this.dictData.dictId}/resave.json`);
                   if (finished) {
