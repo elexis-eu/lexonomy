@@ -6,11 +6,10 @@
    <div if={ !state.xema }>Loading...</div>
 
    <template if={state.xema}>
-
-      <dict-config-buttons style="display:inline-block" save-data={saveData}></dict-config-buttons>
-      <div style="display:inline-block;margin-left: 10px">
+      <dict-config-buttons save-data={saveData}>
          <button class="btn waves-effect waves-light" onclick={ toggleOverride } > {state.override ? 'Stop using your own schema' : 'Use your own schema' } <i class="material-symbols-outlined right">edit</i></button>
-      </div>
+      </dict-config-buttons>
+
       <div if={ !state.override } id="editor" class="editor designer">
          <div class="list">
             <dict-config-element-in-tree each={root in state.roots}
@@ -208,12 +207,22 @@
          },
 
          onXemaElementUpdated(id, newConfig) {
+            console.log('onxemaelementupdated', id, newConfig)
             this.state.xema.elements[id] = newConfig;
             this.update();
          },
          onXemaElementDeleted(id) {
-            delete this.state.xema.elements[id];
-            this.update();
+            // check it's not used anywhere, and only delete if it isn't
+            if (!Object.values(this.state.xema.elements).some(el => el.children.some(c => c.name === id))) {
+               delete this.state.xema.elements[id];
+               if (this.state.currentElement === id)  {
+                  this.update({
+                     currentElement: undefined,
+                     currentAttribute: undefined,
+                  })
+               } else 
+                  this.update();
+            }
          },
 
          onXemaAttributeUpdated(newConfig) {
