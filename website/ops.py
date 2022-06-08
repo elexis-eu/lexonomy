@@ -565,10 +565,10 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
     # Special case: when searching wildcard (i.e. retrieve all entries) and the dictionary is large (>2000) entries. 
     # Don't read all entries before sorting and limiting, but use a shorter path.
     if not searchtext or not modifier: 
-        total = dictDB.execute("select count(*) as total from entries").fetchone()["total"]
+        total = dictDB.execute("select count(*) as total from entries where doctype = ?", (doctype, )).fetchone()["total"]
         if total > 2000:
             results: list[SortableEntry] = []
-            for rf in dictDB.execute("select id, sortkey from entries order by sortkey limit 200").fetchall():
+            for rf in dictDB.execute("select id, sortkey from entries where doctype = ? order by sortkey limit 200", (doctype, )).fetchall():
                 results.append({"id": rf["id"], "sortkey": rf["sortkey"]})
             sortEntries(configs, results, reverse=sortdesc)
             return total, results
