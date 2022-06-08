@@ -9,7 +9,7 @@ import jwt
 import json
 import datetime
 import urllib.request
-from ops import siteconfig, i18n
+from ops import siteconfig, i18n, enable_cors
 import media
 import bottle
 from bottle import (hook, route, get, post, run, template, error, request,
@@ -155,6 +155,8 @@ def entrydelete(dictID, user, dictDB, configs):
     ops.deleteEntry(dictDB, request.forms.id, user["email"])
     return {"success": True, "id": request.forms.id}
 
+
+@enable_cors
 @post(siteconfig["rootPath"]+"<dictID>/entryread.json")
 @authDict([])
 def entryread(dictID, user, dictDB, configs):
@@ -855,6 +857,7 @@ def dictsearch(dictID):
         nabes = ops.readNabesByText(dictDB, dictID, configs, request.query.q)
         return template("dict-search.tpl", **{"siteconfig": siteconfig, "i18n": i18n, "i18nDump": i18nDump, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes})
 
+@enable_cors
 @get(siteconfig["rootPath"]+"<dictID>/search.json")
 def dictsearch(dictID):
     if not ops.dictExists(dictID):
@@ -1210,4 +1213,3 @@ else: # run a standalone server, prefer the paste server if available over the b
         run(host=host, port=port, debug=debug, reloader=debug, server='paste', interval=0.1)
     except ImportError:
         run(host=host, port=port, debug=debug, reloader=debug, interval=0.1)
-
