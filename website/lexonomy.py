@@ -173,7 +173,8 @@ def entrydelete(dictID: str, user: User, dictDB: Connection, configs: Configs):
 @authDict([])
 def entryread(dictID: str, user: User, dictDB: Connection, configs: Configs):
     entryID = int(request.forms.id)
-    entry = ops.readEntries(dictDB, configs, entryID, html = True, titlePlain = True)[0]
+    entries = ops.readEntries(dictDB, configs, entryID, html = True, titlePlain = True)
+    entry = entries[0] if len(entries) else None
     if entry:
         # interop between database and old frontend code
         entry["success"] = True
