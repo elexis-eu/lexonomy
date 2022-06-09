@@ -1,0 +1,8 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/macbookpro/lexonomy'
+docker volume create nodemodules
+docker-compose -f docker-compose-dev.yml run --rm dev npm install --unsafe-perm=true
+docker-compose -f docker-compose-dev.yml run --rm dev pip install -r requirements.txt
+docker-compose -f docker-compose-dev.yml run --rm --service-ports dev
+make: Leaving directory `/Users/macbookpro/lexonomy'
+ 

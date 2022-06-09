@@ -7,6 +7,7 @@ import ops
 import re
 import jwt
 import json
+import requests
 import datetime
 import urllib.request
 from ops import siteconfig, i18n
@@ -14,9 +15,8 @@ import media
 import bottle
 from bottle import (hook, route, get, post, run, template, error, request,
                     response, static_file, abort, redirect, install)
-from camel_tools.disambig.mle import MLEDisambiguator
+import pyarabic.araby as araby
 
-mle = MLEDisambiguator.pretrained()
 i18nDump = json.dumps(i18n, ensure_ascii=False);
 # configuration
 app = bottle.default_app()
@@ -863,28 +863,22 @@ def dictsearch(dictID):
     user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
     if not configs["publico"]["public"]:
         return {"ok": False}
-    sentence = request.query.q.split()
+    sentence = request.query.q
     lemma=disam(sentence)
-    entries = ops.listEntriesPublic(dictDB, dictID, configs, lemma)
+    text=araby.strip_tashkeel(lemma.json()['text'][0])
+    entries = ops.listEntriesPublic(dictDB, dictID, configs, text)
     if len(entries) == 1 and entries[0]["exactMatch"]:
-        return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes}
+        return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": text, "entries": entries, "nabes": nabes}
     else:
-        nabes = ops.readNabesByText(dictDB, dictID, configs, lemma)
-        return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes}
+        nabes = ops.readNabesByText(dictDB, dictID, configs, text)
+        return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": text, "entries": entries, "nabes": nabes}
 
-def disam(type, sentence):
+def disam(sentence):
 
-    # We expect a sentence to be whitespace/punctuation tokenized beforehand.
-    # We provide a simple whitespace and punctuation tokenizer as part of camel_tools.
-    # See camel_tools.tokenizers.word.simple_word_tokenize.
-    disambig = mle.disambiguate(sentence)
-
-    # Let's, for example, use the top disambiguations to generate a diacritized
-    # version of the above sentence.
-    # Note that, in practice, you'll need to make sure that each word has a
-    # non-zero list of analyses.
-    return [(d.analyses[0].analysis[type] if len(d.analyses) > 0 else None) for d in disambig];
-
+    url = 'http://camel:5005/lemma'
+    myobj = { 'text': sentence}
+    return requests.post(url, json=myobj)
+    
 @get(siteconfig["rootPath"]+"<dictID>/resave")
 @authDict(["canEdit","canConfig","canUpload"])
 def resave(dictID, user, dictDB, configs):

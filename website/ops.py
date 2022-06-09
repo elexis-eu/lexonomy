@@ -1329,6 +1329,7 @@ def listEntriesPublic(dictDB, dictID, configs, searchtext):
     howmany = 100
     sql_list = f"select s.txt, min(s.level) as level, e.id, e.title, e.sortkey, case when s.txt={ques} then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like {ques} and e.doctype={ques} group by e.id order by priority, level, s.level"
     c1 = dictDB.execute(sql_list, ("%"+searchtext+"%", "%"+searchtext+"%", configs["xema"].get("root")))
+    c1 = c1 if c1 else dictDB
     entries = []
     for r1 in c1.fetchall() if c1 else []:
         item = {"id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"], "exactMatch": (r1["level"] == 1 and r1["priority"] == 1)}

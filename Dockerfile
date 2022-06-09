@@ -12,8 +12,6 @@ RUN apk add --virtual .build-deps gcc g++ libxslt-dev libffi-dev openssl-dev icu
     apk add openjdk11-jre  $(: for Naisc ) && \
     pip install --no-cache-dir -r requirements.txt && \
     apk del .build-deps && \
-    [ -z "$VER" ] || echo "$VER" > version.txt
+    [ -z "$VER" ] || echo "$VER" > version.txt 
 
-RUN camel_data -i all
-
-ENTRYPOINT ["python3", "lexonomy.py", "0.0.0.0:8000"]
+ENTRYPOINT ["python3", "lexonomy.py", "localhost:8000"]
