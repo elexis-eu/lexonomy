@@ -15,7 +15,7 @@ if len(sys.argv) != 2:
 
 conn = mysql.connector.connect(
     host=os.environ['MYSQL_DB_HOST'],
-    user="lexo",
+    user=os.environ['MYSQL_DB_USER'],
     database="lexo",
     password=os.environ['MYSQL_DB_PASSWORD']
 )
