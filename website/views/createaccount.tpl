@@ -4,7 +4,7 @@
 <html>
 	<head>
 		% include("head.tpl")
-		<title>Create your account</title>
+		<title i18n>Create your account</title>
 		<script type="text/javascript" src="../libs/screenful/screenful.js"></script>
 		<script type="text/javascript" src="../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../libs/screenful/screenful-user.css" />

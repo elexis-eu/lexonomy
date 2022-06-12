@@ -23,11 +23,11 @@ Screenful.Loc = {
   deletingFailed: "فشل الحذف.",
   deleteConfirm: "احذر! هل أنت متأكد؟",
   username: "عنوان البريد الإلكتروني",
-  password: "كلمه السر",
+  password: "كلمة المرور",
   login: "تسجيل دخول",
   loginError: "عنوان البريد الإلكتروني أو كلمة المرور غير صحيحة.",
   logout: "تسجيل خروج",
-  anonymous: "مستخدم مجهول",
+  anonymous: "زائر",
   home: "الرئيسية",
   title: "عنوان",
   titleEmpty: "يجب ألا يكون العنوان فارغًا.",
@@ -43,7 +43,7 @@ Screenful.Loc = {
   changePwd: "غير كلمة المرور الخاصة بك",
   userProfile: "ملفك الشخصي",
   signup: "الحصول على حساب",
-  forgotPwd: "نسيت رقمك السري؟",
+  forgotPwd: "استرجاع كلمة المرور",
   signupEmail: "للحصول على حساب أرسل بريدًا إلكترونيًا إلى",
   newPassword: "كلمة مرور جديدة",
   change: "تغيير",
@@ -51,7 +51,7 @@ Screenful.Loc = {
   skeApiKeyChanged: "تم تغيير مفتاح API الخاص بك.",
   skeUserName: "اسم مستخدم Sketch Engine الخاص بك",
   skeUserNameChanged: "تم تغيير اسم مستخدم Sketch Engine الخاص بك.",
-  passwordChanged: "تم تغيير كلمة السر الخاصة بك.",
+  passwordChanged: "تم تغيير كلمة المرور الخاصة بك.",
   passwordEmpty: "يجب ألا تكون كلمة المرور فارغة.",
   passwordShort: "يجب أن تتكون كلمة المرور من ستة أحرف على الأقل.",
   passwordWhitespace: "يجب ألا تبدأ كلمة المرور أو تنتهي بمسافة.",
@@ -199,6 +199,20 @@ Screenful.Loc = {
   "Line break before and after": "سطر جديد قبل وبعد",
   Inline: "مع النص",
   Appearance: "مظهر خارجي",
+  "404": "صفحة غير موجودة",
+  "Lexonomy API": "واجهة برمجة تطبيقات للمنصة API",
+  "Lexonomy Terms of Use": "شروط استخدام المنصة",
+  "Create your account": "أنشئ حسابك",
+  "Lexonomy Dictionaries": "المعاجم",
+  "Forgot your password?": "استرجاع كلمة المرور",
+  "Lexonomy": "منصة المعاجم العربية",
+  "Log in": "تسجيل دخول",
+  "Create a dictionary": "أنشئ قاموسًا",
+  "Lexonomy Push API": "واجهة برمجة تطبيقات للمنصة Push API",
+  "Reset your password": "اعد ضبط كلمة المرور",
+  "Sign up": "التسجيل",
+  "Screenful Editor": "المحرر",
+  "User profile": "ملف المستخدم التعريفي",
 };
 notFoundLoc = {}
 doI18n = () => {
@@ -234,3 +248,4 @@ Screenful.loc = (t, w) => {
     return t.replace("¡i18n¡", w || "");
   }
 }
+doI18n();

@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		%include("head.tpl")
-		<title>Lexonomy</title>
+		<title i18n>Lexonomy</title>
 		<meta property="og:title" content="Lexonomy" />
 		<meta property="og:site_name" content="Lexonomy"/>
 		<meta name="description" content="A platform for writing and publishing dictionaries" />
@@ -81,11 +81,11 @@
 					    });
 						});
 						</script>
-						<div class="orline"><span>{{i18n["Other ways to log in"]}}</span></div>
             %if error != "":
                 <div class="error">{{i18n["Sketch Engine login error:"]}} {{error}}</div>
             %end
             %if siteconfig["sketchengineLoginPage"]:
+			<div class="orline"><span>{{i18n["Other ways to log in"]}}</span></div>
             <div class="skelogin">
               <a href="{{siteconfig["sketchengineLoginPage"]}}">{{i18n["Sign up or log in with"]}} <img style="width:105px;height:39px;" alt="Sketch Engine" title="Sketch Engine" src="furniture/logo_ske.png"/> »</a>
             </div>
@@ -144,7 +144,7 @@
 
 		<div class="invelope bottom">
 			<div id="sitefooter">
-				<div class="right"><a href="https://github.com/elexis-eu/lexonomy" class="github" title="GitHub" target="_blank"></a></div>
+				<div class="right" hidden><a href="https://github.com/elexis-eu/lexonomy" class="github" title="GitHub" target="_blank"></a></div>
 				%if version != "":
 				<div>{{i18n["Build version:"]}} {{version}}</div>
 				%end
