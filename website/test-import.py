@@ -20,6 +20,13 @@ from ops import Configs
 # a "test" is basically just a list of commands to execute, the rest of the object is parameters for those commands
 # It's written a little ad-hoc but works well enough.
 
+class LinkablesTests(TypedDict):
+    txt: list[str]
+    "The expected ids of the elements (as defined by ConfigLinks['identifier'] that were made linkable, in no particular order"
+    preview: list[str]
+    "The expected previews of the elements (as defined by ConfigLinks['preview']) that were made linkable, in no particular order"
+    element: list[str]
+    "The expected xml element names of the elements that were made linkable, in no particular order"
 
 class Test(TypedDict):
     description: str
@@ -51,6 +58,9 @@ class Test(TypedDict):
     subentrytests: dict[int, Any] # really another Test instance
     """Keyed by subentry ID: tests/comparisons for the subentry's properties (such as sortkey, title, doctype, etc). This may contain more subentrytests for the subentry's subentries, because they can be recursive."""
     
+    linkables: LinkablesTests
+    """Values that the linkables table should have for the entry"""
+
     configs: Configs
     """A partial config object (with xema, flagging, titling, etc.) used to specificy specific config settings for this test."""
     
@@ -492,7 +502,43 @@ testables = [{
 
     "xml": """<entry lxnm:id="201" xmlns:lxnm="http://www.lexonomy.eu/">some test</entry>""",
     "id": 201
-}]
+}, {
+    "description": "Test linkables format-strings work correctly",
+
+    "configs": {
+        "links": {
+            "sense": {
+                "linkElement": "sense",
+                "identifier": "[%(@sense_id)] %(content) (%(pos))",
+                "preview": "%(content) (%(pos))"
+            }
+        }
+    },
+
+    "entry": """
+        <entry lxnm:id="201">
+            <headword>test</headword>
+            <sense sense_id="sense_1">
+                <content>the first sense</content>
+                <pos>noun</pos>
+            </sense>
+            <sense sense_id="sense_2">
+                <content>the second sense</content>
+                <pos>verb</pos>
+            </sense>
+        </entry>
+    """,
+
+    "linkables": {
+        "txt": ["[sense_1] the first sense (noun)", "[sense_2] the second sense (verb)"], # identifiers
+        "element": ["sense", "sense"],
+        "preview": ["the first sense (noun)", "the second sense (verb)"]
+    }
+
+}
+
+
+]
 
 def overwriteConfig(originalConfig, overrides):
     """
@@ -527,7 +573,7 @@ def failIf(
         property (str): What property in the test are we comparing
         got (Any): What was the result of the test run (usually the value of the property in the database after importing)
         expected (Optional[Any]): What did we expect the result to be? 
-        compare: How to actual and expected variables
+        compare: How to compare actual and expected variables
         message (Optional[str], optional): Some additional info to print if not a match
 
     Raises:
@@ -554,7 +600,7 @@ def failIf(
 """)
 
 def arraycompare(a, b) -> bool:
-    """Set equality comparator for arrays. Uses in operator to compare"""
+    """Set equality comparator for arrays. Uses 'in' operator to compare"""
     if len(a) != len(b):
         return False
     for v in a:
@@ -566,6 +612,10 @@ def test(tests, id: int, description: str):
     """After doing all the operations, run the database value checks."""
 
     entry = dictDB.execute("select * from entries where id=?", (id, )).fetchone()
+    linkables = dictDB.execute("select json_group_array(txt) as txt, json_group_array(element) as element, json_group_array(preview) as preview from linkables where entry_id = ? group by entry_id", (id, )).fetchone()
+    if linkables:
+        for key in linkables:
+            linkables[key] = json.loads(linkables[key])
 
     # normalize xml whitespace so we can compare (sort of)
     if "xml" in tests:
@@ -581,7 +631,9 @@ def test(tests, id: int, description: str):
         searchables = list(map(lambda r: r["txt"], dictDB.execute("select * from searchables where entry_id=?", (id, )).fetchall()))
         failIf(description, "searchables", searchables, expectedSearchables, arraycompare)
 
-    # TODO: Test linking
+    for key in ["txt", "element", "preview"]:
+        if key in tests.get("linkables", {}):
+            failIf(description, key, linkables[key], tests["linkables"][key], arraycompare)
 
     # Test subentries last, because it might be recursive
     if expectedSubentries := tests.get("subentries"):

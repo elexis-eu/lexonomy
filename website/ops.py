@@ -857,6 +857,7 @@ def get_text(xml: Tag, tagName: Optional[str] = None) -> Optional[str]:
         if element and element does not exist: None
         if no element: first non-whitespace text content of document
         if no element and no text: None
+        
         Only checks descendants of the xml node.
     """
     if tagName:
@@ -1080,8 +1081,6 @@ def presave_searchables(dictDB: Connection, configs: Configs, entryXml: Tag, ent
 
 
 def presave_linkables(dictDB: Connection, config: ConfigLinks, entryXml: Tag, entryID: int):
-    # TODO migrate https://github.com/elexis-eu/lexonomy/commit/debd38ff321ff3e7624a7d74272b9fa6b2b22646
-    
     """
     Purge outdated linkables, find new linkables, make linkables database up-to-date for this entry.
     Entry is not saved yet, only its xml is changed.
@@ -1101,25 +1100,34 @@ def presave_linkables(dictDB: Connection, config: ConfigLinks, entryXml: Tag, en
     ret: List[Tuple[int, str, str, str]] = []
     for linkref in config.values():
         linkElement = linkref["linkElement"]
-        identifier = linkref["identifier"] # format-string. NOTE: variable is gradually overwritten with result
-        preview = linkref["preview"]
 
-        identifierEscapes = re.findall(r"%\([^)]+\)", identifier) # pre-process 
-        previewEscapes = re.findall(r"%\([^)]+\)", preview)
+        identifierEscapes = re.findall(r"%\([^)]+\)", linkref["identifier"]) # pre-process 
+        previewEscapes = re.findall(r"%\([^)]+\)", linkref["preview"])
         for el in entryXml.findAll(linkElement):
+            identifier = linkref["identifier"] # format-string. NOTE: variable is gradually overwritten with result
+            preview = linkref["preview"] # format-string. NOTE: variable is gradually overwritten with result
+
             for pattern in identifierEscapes:
-                elementName = pattern[2:-1]
-                text = get_text(el, elementName) or get_text(entryXml, elementName) # use descendants of the link element first, if that fails try entire entry
+                if pattern[2] == '@': # if the pattern is %(@some-attribute), extract it
+                    attributeName = pattern[3:-1]
+                    text = el.attrs.get(attributeName)
+                else: # pattern is %(some_element)
+                    elementName = pattern[2:-1]
+                    text = get_text(el, elementName) or get_text(entryXml, elementName) # use descendants of the link element first, if that fails try entire entry
                 if text:
                     identifier = identifier.replace(pattern, text)
 
             for pattern in previewEscapes:
-                elementName = pattern[2:-1]
-                text = get_text(el, elementName) or get_text(entryXml, elementName)
+                if pattern[2] == '@': # if the pattern is %(@some-attribute), extract it
+                    attributeName = pattern[3:-1]
+                    text = el.attrs.get(attributeName)
+                else: # pattern is %(some_element)
+                    elementName = pattern[2:-1]
+                    text = get_text(el, elementName) or get_text(entryXml, elementName) # use descendants of the link element first, if that fails try entire entry
                 if text:
                     preview = preview.replace(pattern, text)
 
-            el.setAttribute('lxnm:linkable', identifier)
+            el.attrs["lxnm:linkable"] = identifier
             ret.append((entryID, identifier, linkElement, preview))
 
     if len(ret):
