@@ -23,7 +23,7 @@ def migrate_1(dictDB: Connection, configs: Configs):
         return
 
     try:
-        dictDB.execute("ALTER TABLE entries ADD COLUMN flag TEXT DEFAULT ('')")
+        dictDB.execute("ALTER TABLE entries ADD COLUMN flag TEXT NOT NULL DEFAULT ('')")
     except Exception as ex:
         print(ex)
     
