@@ -255,6 +255,7 @@ class RelatedEntry(TypedDict):
     "Related entry in dictionary - parent- or child/sub-entry "
     id: int
     title: str
+    doctype: str
 
 class EntryFromDatabase(TypedDict):
     id: int
@@ -262,6 +263,8 @@ class EntryFromDatabase(TypedDict):
     sortkey: str
     flag: str 
     """Flag is "" when entry not flagged."""
+    doctype: str
+    "Xml name of the root node"
     subentries: List[RelatedEntry]
     parententries: List[RelatedEntry]
     # Optionals
@@ -632,19 +635,48 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
     dictDB.commit() # createEntry does not perform commit every call for performance sake.
 
     rows = doSql(dictDB, f"""
-        SELECT id, doctype, xml, title, sortkey, flag, needs_update, children, parents
+        WITH children_by_parent AS (
+            select 
+            sub.parent_id,
+            json_group_array(json_object(
+                'id', entries.id, 
+                'title', entries.title, 
+                'doctype', entries.doctype
+            )) as children
+            from sub left join entries 
+            on sub.child_id = entries.id
+            group by sub.parent_id
+        ),
+        parents_by_child AS (
+            select 
+            sub.child_id,
+            json_group_array(json_object(
+                'id', entries.id, 
+                'title', entries.title, 
+                'doctype', entries.doctype
+            )) as parents
+            from sub left join entries 
+            on sub.parent_id = entries.id
+            group by sub.child_id
+        )
+        
+        SELECT 
+            entries.id, 
+            entries.doctype, 
+            entries.xml, 
+            entries.title, 
+            entries.sortkey, 
+            entries.flag, 
+            entries.needs_update, 
+            children,
+            parents
+            -- parent_id,
+            -- child_id
         FROM entries 
-        LEFT JOIN (
-            SELECT parent_id, json_group_array(json_object('id', child_id, 'title', title)) as children
-            from sub left join entries on entries.id = sub.parent_id 
-            group by parent_id
-        ) on parent_id = entries.id 
-        left join (
-            SELECT child_id, json_group_array(json_object('id', parent_id, 'title', title)) as parents
-            from sub left join entries on entries.id = sub.child_id
-            group by child_id
-        ) on child_id = entries.id
-        where id in ({",".join("?" * len(ids))})
+        left join children_by_parent on entries.id = children_by_parent.parent_id
+        left join parents_by_child on entries.id = parents_by_child.child_id
+
+        where entries.id in ({",".join("?" * len(ids))})
     """, ids).fetchall()
 
     # If required, load transformer outside of loop
@@ -659,6 +691,7 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
             "flag": row["flag"],
             "subentries": json.loads(row["children"] or "[]"),
             "parententries": json.loads(row["parents"] or "[]"),
+            "doctype": row["doctype"]
             # "success": True
         }
         if xml:
@@ -857,7 +890,7 @@ def get_text(xml: Tag, tagName: Optional[str] = None) -> Optional[str]:
         if element and element does not exist: None
         if no element: first non-whitespace text content of document
         if no element and no text: None
-        
+
         Only checks descendants of the xml node.
     """
     if tagName:

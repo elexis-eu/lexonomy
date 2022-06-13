@@ -183,7 +183,7 @@
                   Xrefs.extendDocspec(docSpec, xema);
                   Ske.extendDocspec(docSpec, xema);
                   Kontext.extendDocspec(docSpec, xema);
-                  Sub.extendDocspec(docSpec, xema);
+                  Sub.extendDocspec(docSpec, xema, entry);
                   docSpec.onchange = Screenful.Editor.changed;
                   if (uneditable) {
                      for (elName in docSpec.elements) docSpec.elements[elName].isReadOnly = true;

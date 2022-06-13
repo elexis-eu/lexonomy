@@ -366,18 +366,25 @@ Xematron.valuesHave=function(values, value){
 	return ret;
 };
 Xematron.childrenHave=function(children, childName){
+	if (childName === "lxnm:subentryParent") return true; // always valid
 	var ret=false;
 	for(var i=0; i<children.length; i++){
 		if(children[i].name==childName) { ret=true; break; }
 	}
 	return ret;
 };
-Xematron.validate=function(xema, jsElement){
+Xematron.validate=function(xema, jsElement, level){
+	if (level == null) level = 0
 	var xel=xema.elements[jsElement.name];
-	if(!xel){ //is the element allowed to exist?
-		Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The top element should be <"+xema.root+">."});
-	} else {
-
+	
+	if (jsElement.name === "lxnm:subentryParent") {
+		return; // a subentry reference - should never be validated.
+	} else if(!xel){ //is the element allowed to exist?
+		if (level === 0)
+			Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The top element should be <"+xema.root+">."});
+		else 
+			Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "No element <"+jsElement.name+"> should exist here."});
+	}  else {
 		//cycle through the attributes the element should have:
 		for(var attname in xel.attributes){
 			if(xel.attributes[attname].optionality=="obligatory" && !jsElement.getAttribute(attname)){
@@ -430,9 +437,11 @@ Xematron.validate=function(xema, jsElement){
 
 		//if this is a chd element:
 		if(xel.filling=="chd") {
-			var hasTextChild=false; for(var i=0; i<jsElement.children.length; i++) if(jsElement.children[i].type=="text"){ hasTextChild=true; break; }
-			if(hasTextChild) { //does the element not have text?
-				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should not have any text."});
+			for(var i=0; i<jsElement.children.length; i++) { //does the element not have text?
+				if(jsElement.children[i].type=="text" && jsElement.children[i].value.trim() !== '') { 
+					Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should not have any text."});
+					break; 
+				}
 			}
 		}
 
@@ -465,7 +474,7 @@ Xematron.validate=function(xema, jsElement){
 				if(!Xematron.childrenHave(xel.children, jsChild.name)) {
 					Xonomy.warnings.push({htmlID: jsChild.htmlID, text: "The <"+jsElement.name+"> element should not have a child element called <"+jsChild.name+">."});
 				} else {
-					Xematron.validate(xema, jsChild);
+					Xematron.validate(xema, jsChild, level+1);
 				}
 			}
 		}
