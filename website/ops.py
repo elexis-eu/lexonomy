@@ -1616,7 +1616,10 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
         dicts = getDictList(sourceLang, True)
 
     for d in dicts:
-        dictDB = getDB(d["id"])
+        try:
+            dictDB = getDB(d["id"])
+        except IOError: 
+            dictDB = None
         if dictDB:
             query = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND s.txt LIKE ? AND s.level=1"
             c = dictDB.execute(query, (headword+"%", ))
@@ -1644,7 +1647,10 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                     info = info0.copy()
                     info["targetDict"] = r2["target_dict"]
                     info["confidence"] = r2["confidence"]
-                    targetDB = getDB(r2["target_dict"])
+                    try:
+                        targetDB = getDB(r2["target_dict"])
+                    except IOError:
+                        targetDB = None
                     if targetDB:
                         info["targetLang"] = readDictConfigs(targetDB)['ident']['lang']
                         info["targetDictConcept"] = False
@@ -1677,7 +1683,10 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                     info = info0.copy()
                     info["targetDict"] = r2["source_dict"]
                     info["confidence"] = r2["confidence"]
-                    sourceDB = getDB(r2["source_dict"])
+                    try:
+                        sourceDB = getDB(r2["source_dict"])
+                    except IOError: 
+                        sourceDB = None
                     if sourceDB:
                         info["targetLang"] = readDictConfigs(sourceDB)['ident']['lang']
                         info["targetDictConcept"] = False
@@ -1716,7 +1725,10 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                 info = info0.copy()
                 info["targetDict"] = r2["target_dict"]
                 info["confidence"] = r2["confidence"]
-                targetDB = getDB(r2["target_dict"])
+                try:
+                    targetDB = getDB(r2["target_dict"])
+                except IOError:
+                    targetDB = None
                 if targetDB:
                     info["targetLang"] = readDictConfigs(targetDB)['ident']['lang']
                     info["targetDictConcept"] = False
@@ -1749,7 +1761,10 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                 info = info0.copy()
                 info["targetDict"] = r2["source_dict"]
                 info["confidence"] = r2["confidence"]
-                sourceDB = getDB(r2["source_dict"])
+                try:
+                    sourceDB = getDB(r2["source_dict"])
+                except IOError:
+                    sourceDB = None
                 if sourceDB:
                     info["targetLang"] = readDictConfigs(sourceDB)['ident']['lang']
                     info["targetDictConcept"] = False
@@ -1779,7 +1794,10 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
         if link["sourceDict"] in dictUsed:
             dictTitle = dictUsed[link["sourceDict"]]
         else:
-            dictDB = getDB(link["sourceDict"])
+            try:
+                dictDB = getDB(link["sourceDict"])
+            except IOError:
+                dictDB = None
             if dictDB:
                 dictConf = readDictConfigs(dictDB)
                 dictConf = loadHandleMeta(dictConf)
@@ -1793,7 +1811,10 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
         if link["targetDict"] in dictUsed:
             dictTitle = dictUsed[link["targetDict"]]
         else:
-            dictDB = getDB(link["targetDict"])
+            try:
+                dictDB = getDB(link["targetDict"])
+            except IOError:
+                dictDB = None
             if dictDB:
                 dictConf = readDictConfigs(dictDB)
                 dictConf = loadHandleMeta(dictConf)
@@ -2629,166 +2650,171 @@ def listOntolexEntries(dictDB: Connection, dictID: str, configs: Configs, doctyp
             yield line; yield "\n"
 
 def elexisDictAbout(dictID: str):
-    dictDB = getDB(dictID)
-    if dictDB:
-        info = {"id": dictID}
-        configs = readDictConfigs(dictDB)
-        configs = loadHandleMeta(configs)
-        if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
-            info["sourceLanguage"] = configs["metadata"]["dc.language.iso"][0]
-            info["targetLanguage"] = configs["metadata"]["dc.language.iso"]
-        elif configs['ident'].get('lang'):
-            info["sourceLanguage"] = configs['ident'].get('lang')
-            info["targetLanguage"] = [configs['ident'].get('lang')]
-        else:
-            info["sourceLanguage"] = 'en'
-            info["targetLanguage"] = ['en']
-        if configs["metadata"].get("dc.rights"):
-            if configs["metadata"].get("dc.rights.label") == "PUB":
-                info["release"] = "PUBLIC"
-                if configs["metadata"].get("dc.rights.uri") != "":
-                    info["license"] = configs["metadata"].get("dc.rights.uri")
-                else:
-                    info["license"] = configs["metadata"].get("dc.rights")
-            else:
-                info["release"] = "PRIVATE"
-                info["license"] = ""
-        else:
-            if configs["publico"]["public"]:
-                info["release"] = "PUBLIC"
-                info["license"] = configs["publico"]["licence"]
-                if siteconfig["licences"][configs["publico"]["licence"]]:
-                    info["license"] = siteconfig["licences"][configs["publico"]["licence"]]["url"]
-            else:
-                info["release"] = "PRIVATE"
-        info["creator"] = []
-        info["publisher"] = []
-        if configs["metadata"].get("dc.contributor.author"):
-            for auth in configs["metadata"]["dc.contributor.author"]:
-                info["creator"].append({"name": auth})
-        else:
-            for user in configs["users"]:
-                info["creator"].append({"email": user})
-        if configs["metadata"].get("dc.publisher"):
-            info["publisher"] = [{"name": configs["metadata"]["dc.publisher"]}]
-        if configs["metadata"].get("dc.title"):
-            info["title"] = configs["metadata"]["dc.title"]
-        else:
-            info["title"] = configs["ident"]["title"]
-        if configs["metadata"].get("dc.description"):
-            info["abstract"] = configs["metadata"]["dc.description"]
-        else:
-            info["abstract"] = configs["ident"]["blurb"]
-        if configs["metadata"].get("dc.date.issued"):
-            info["issued"] = configs["metadata"]["dc.date.issued"]
-        info["genre"] = ["gen"]
-        if configs["metadata"].get("dc.subject"):
-            info["subject"] = '; '.join(configs["metadata"]["dc.subject"])
-            if "terminolog" in info["subject"]:
-                info["genre"].append("trm")
-            if "etymolog" in info["subject"]:
-                info["genre"].append("ety")
-            if "historical" in info["subject"]:
-                info["genre"].append("his")
-        c = dictDB.execute("select count(*) as total from entries")
-        r = c.fetchone()
-        info["entryCount"] = r['total']
-        return info
-    else:
+    try:
+        dictDB = getDB(dictID)
+    except IOError:
         return None
+
+    info = {"id": dictID}
+    configs = readDictConfigs(dictDB)
+    configs = loadHandleMeta(configs)
+    if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
+        info["sourceLanguage"] = configs["metadata"]["dc.language.iso"][0]
+        info["targetLanguage"] = configs["metadata"]["dc.language.iso"]
+    elif configs['ident'].get('lang'):
+        info["sourceLanguage"] = configs['ident'].get('lang')
+        info["targetLanguage"] = [configs['ident'].get('lang')]
+    else:
+        info["sourceLanguage"] = 'en'
+        info["targetLanguage"] = ['en']
+    if configs["metadata"].get("dc.rights"):
+        if configs["metadata"].get("dc.rights.label") == "PUB":
+            info["release"] = "PUBLIC"
+            if configs["metadata"].get("dc.rights.uri") != "":
+                info["license"] = configs["metadata"].get("dc.rights.uri")
+            else:
+                info["license"] = configs["metadata"].get("dc.rights")
+        else:
+            info["release"] = "PRIVATE"
+            info["license"] = ""
+    else:
+        if configs["publico"]["public"]:
+            info["release"] = "PUBLIC"
+            info["license"] = configs["publico"]["licence"]
+            if siteconfig["licences"][configs["publico"]["licence"]]:
+                info["license"] = siteconfig["licences"][configs["publico"]["licence"]]["url"]
+        else:
+            info["release"] = "PRIVATE"
+    info["creator"] = []
+    info["publisher"] = []
+    if configs["metadata"].get("dc.contributor.author"):
+        for auth in configs["metadata"]["dc.contributor.author"]:
+            info["creator"].append({"name": auth})
+    else:
+        for user in configs["users"]:
+            info["creator"].append({"email": user})
+    if configs["metadata"].get("dc.publisher"):
+        info["publisher"] = [{"name": configs["metadata"]["dc.publisher"]}]
+    if configs["metadata"].get("dc.title"):
+        info["title"] = configs["metadata"]["dc.title"]
+    else:
+        info["title"] = configs["ident"]["title"]
+    if configs["metadata"].get("dc.description"):
+        info["abstract"] = configs["metadata"]["dc.description"]
+    else:
+        info["abstract"] = configs["ident"]["blurb"]
+    if configs["metadata"].get("dc.date.issued"):
+        info["issued"] = configs["metadata"]["dc.date.issued"]
+    info["genre"] = ["gen"]
+    if configs["metadata"].get("dc.subject"):
+        info["subject"] = '; '.join(configs["metadata"]["dc.subject"])
+        if "terminolog" in info["subject"]:
+            info["genre"].append("trm")
+        if "etymolog" in info["subject"]:
+            info["genre"].append("ety")
+        if "historical" in info["subject"]:
+            info["genre"].append("his")
+    c = dictDB.execute("select count(*) as total from entries")
+    r = c.fetchone()
+    info["entryCount"] = r['total']
+    return info
+    
 
 def elexisLemmaList(dictID, limit=None, offset=0):
-    dictDB = getDB(dictID)
-    if dictDB:
-        info = {"language": "en", "release": "PRIVATE"}
-        configs = readDictConfigs(dictDB)
-        configs = loadHandleMeta(configs)
-        if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
-            info["language"] = configs["metadata"]["dc.language.iso"][0]
-        elif configs['ident'].get('lang'):
-            info["language"] = configs['ident'].get('lang')
-        if configs["metadata"].get("dc.rights"):
-            if configs["metadata"].get("dc.rights.label") == "PUB":
-                info["release"] = "PUBLIC"
-            else:
-                info["release"] = "PRIVATE"
-        else:
-            if configs["publico"]["public"]:
-                info["release"] = "PUBLIC"
-            else:
-                info["release"] = "PRIVATE"
-        lemmas = []
-        query = "SELECT id, xml FROM entries"
-        if limit != None and limit != "":
-            query += " LIMIT "+str(int(limit))
-        if offset != "" and int(offset) > 0:
-            query += " OFFSET "+str(int(offset))
-        c = dictDB.execute(query)
-        formats = []
-        firstentry = True
-        for r in c.fetchall():
-            if firstentry:
-                firstentry = False
-                jsonentry = elexisConvertTei(r["xml"])
-                if jsonentry != None:
-                    formats = ["tei", "json"]
-            lemma = {"release": info["release"], "language": info["language"], "formats": formats}
-            lemma["id"] = str(r["id"])
-            lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
-            pos = elexisGuessPOS(r["xml"])
-            if pos != "":
-                lemma["partOfSpeech"] = [pos]
-            lemmas.append(lemma)
-        return lemmas
-    else:
+    try:
+        dictDB = getDB(dictID)
+    except IOError:
         return None
 
-def elexisGetLemma(dictID, headword, limit=None, offset=0):
-    dictDB = getDB(dictID)
-    if dictDB:
-        info = {"language": "en", "release": "PRIVATE"}
-        configs = readDictConfigs(dictDB)
-        configs = loadHandleMeta(configs)
-        if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
-            info["language"] = configs["metadata"]["dc.language.iso"][0]
-        elif configs['ident'].get('lang'):
-            info["language"] = configs['ident'].get('lang')
-        if configs["metadata"].get("dc.rights"):
-            if configs["metadata"].get("dc.rights.label") == "PUB":
-                info["release"] = "PUBLIC"
-            else:
-                info["release"] = "PRIVATE"
+    info = {"language": "en", "release": "PRIVATE"}
+    configs = readDictConfigs(dictDB)
+    configs = loadHandleMeta(configs)
+    if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
+        info["language"] = configs["metadata"]["dc.language.iso"][0]
+    elif configs['ident'].get('lang'):
+        info["language"] = configs['ident'].get('lang')
+    if configs["metadata"].get("dc.rights"):
+        if configs["metadata"].get("dc.rights.label") == "PUB":
+            info["release"] = "PUBLIC"
         else:
-            if configs["publico"]["public"]:
-                info["release"] = "PUBLIC"
-            else:
-                info["release"] = "PRIVATE"
-        lemmas = []
-        query = "SELECT e.id, e.xml FROM searchables AS s INNER JOIN entries AS e on e.id=s.entry_id WHERE doctype=? AND s.txt=? GROUP BY e.id ORDER by s.level"
-        params = (configs["xema"]["root"], headword)
-        if limit != None and limit != "":
-            query += " LIMIT "+str(int(limit))
-        if offset != "" and int(offset) > 0:
-            query += " OFFSET "+str(int(offset))
-        c = dictDB.execute(query, params)
-        formats = []
-        firstentry = True
-        for r in c.fetchall():
-            if firstentry:
-                firstentry = False
-                jsonentry = elexisConvertTei(r["xml"])
-                if jsonentry != None:
-                    formats = ["tei", "json"]
-            lemma = {"release": info["release"], "language": info["language"], "formats": formats}
-            lemma["id"] = str(r["id"])
-            lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
-            pos = elexisGuessPOS(r["xml"])
-            if pos != "":
-                lemma["partOfSpeech"] = [pos]
-            lemmas.append(lemma)
-        return lemmas
+            info["release"] = "PRIVATE"
     else:
+        if configs["publico"]["public"]:
+            info["release"] = "PUBLIC"
+        else:
+            info["release"] = "PRIVATE"
+    lemmas = []
+    query = "SELECT id, xml FROM entries"
+    if limit != None and limit != "":
+        query += " LIMIT "+str(int(limit))
+    if offset != "" and int(offset) > 0:
+        query += " OFFSET "+str(int(offset))
+    c = dictDB.execute(query)
+    formats = []
+    firstentry = True
+    for r in c.fetchall():
+        if firstentry:
+            firstentry = False
+            jsonentry = elexisConvertTei(r["xml"])
+            if jsonentry != None:
+                formats = ["tei", "json"]
+        lemma = {"release": info["release"], "language": info["language"], "formats": formats}
+        lemma["id"] = str(r["id"])
+        lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
+        pos = elexisGuessPOS(r["xml"])
+        if pos != "":
+            lemma["partOfSpeech"] = [pos]
+        lemmas.append(lemma)
+    return lemmas
+
+def elexisGetLemma(dictID, headword, limit=None, offset=0):
+    try:
+        dictDB = getDB(dictID)
+    except IOError:
         return None
+
+    info = {"language": "en", "release": "PRIVATE"}
+    configs = readDictConfigs(dictDB)
+    configs = loadHandleMeta(configs)
+    if configs["metadata"].get("dc.language.iso") and len(configs["metadata"]["dc.language.iso"]) > 0:
+        info["language"] = configs["metadata"]["dc.language.iso"][0]
+    elif configs['ident'].get('lang'):
+        info["language"] = configs['ident'].get('lang')
+    if configs["metadata"].get("dc.rights"):
+        if configs["metadata"].get("dc.rights.label") == "PUB":
+            info["release"] = "PUBLIC"
+        else:
+            info["release"] = "PRIVATE"
+    else:
+        if configs["publico"]["public"]:
+            info["release"] = "PUBLIC"
+        else:
+            info["release"] = "PRIVATE"
+    lemmas = []
+    query = "SELECT e.id, e.xml FROM searchables AS s INNER JOIN entries AS e on e.id=s.entry_id WHERE doctype=? AND s.txt=? GROUP BY e.id ORDER by s.level"
+    params = (configs["xema"]["root"], headword)
+    if limit != None and limit != "":
+        query += " LIMIT "+str(int(limit))
+    if offset != "" and int(offset) > 0:
+        query += " OFFSET "+str(int(offset))
+    c = dictDB.execute(query, params)
+    formats = []
+    firstentry = True
+    for r in c.fetchall():
+        if firstentry:
+            firstentry = False
+            jsonentry = elexisConvertTei(r["xml"])
+            if jsonentry != None:
+                formats = ["tei", "json"]
+        lemma = {"release": info["release"], "language": info["language"], "formats": formats}
+        lemma["id"] = str(r["id"])
+        lemma["lemma"] = getEntryHeadword(r["xml"], configs["titling"].get("headword"))
+        pos = elexisGuessPOS(r["xml"])
+        if pos != "":
+            lemma["partOfSpeech"] = [pos]
+        lemmas.append(lemma)
+    return lemmas
+    
 
 def elexisGuessPOS(xml):
     # try to guess frequent PoS element
@@ -2809,17 +2835,16 @@ def elexisGuessPOS(xml):
     return pos
 
 def elexisGetEntry(dictID, entryID):
-    dictDB = getDB(dictID)
-    if dictDB:
-        query = "SELECT id, xml FROM entries WHERE id=?"
-        c = dictDB.execute(query, (entryID, ))
-        r = c.fetchone()
-        if not r:
-            return None
-        else:
-            return r["xml"]
-    else:
+    try:
+        dictDB = getDB(dictID)
+    except IOError:
         return None
+
+    query = "SELECT id, xml FROM entries WHERE id=?"
+    c = dictDB.execute(query, (entryID, ))
+    r = c.fetchone()
+    return r if r["xml"] else None
+
 
 def loadHandleMeta(configs: Configs):
     configs["metadata"] = {}
