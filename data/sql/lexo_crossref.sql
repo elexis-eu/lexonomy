@@ -21,6 +21,9 @@ SET time_zone = "+00:00";
 -- Database: `lexo_crossref`
 --
 
+CREATE DATABASE  IF NOT EXISTS lexo_crossref;
+USE lexo_crossref;
+
 -- --------------------------------------------------------
 
 --
