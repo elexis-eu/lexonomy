@@ -4,7 +4,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		%include("head.tpl")
-		<title>Lexonomy Push API</title>
+		<title i18n>Lexonomy Push API</title>
 		<script type="text/javascript" src="libs/screenful/screenful.js"></script>
 		<script type="text/javascript" src="libs/screenful/screenful-loc-{{siteconfig['lang']}}.js"></script>
 		%if siteconfig["rtl"]:

@@ -4,7 +4,7 @@
 <html>
   <head>
     %include("head.tpl")
-    <title>Screenful Editor</title>
+    <title i18n>Screenful Editor</title>
     <script type="text/javascript">var rootPath="../../../";</script>
     <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful.css" />
     <link type="text/css" rel="stylesheet" href="../../../libs/screenful/screenful-editor.css" />
