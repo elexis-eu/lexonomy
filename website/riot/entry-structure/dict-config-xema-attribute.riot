@@ -44,7 +44,7 @@
             <input class="textbox new val" data-path="newValue" placeholder="value" value={state.newValue} oninput={updateLocalData} autofocus>
             <input class="textbox new cap" data-path="newCaption" placeholder="caption" value={state.newCaption} oninput={updateLocalData}>
             
-            <button if={state.newValue} class="butNewValueOK iconAccept">Add</button>
+            <button style={state.newValue ? "" : "display: none;"} class="butNewValueOK iconAccept" type="submit">Add</button>
             <button class="butNewValueCancel iconCancel" onclick={cancelNewValue} type="button">Cancel</button>
         </template>
 
@@ -148,6 +148,8 @@
                 this.state.newValue = '';
                 this.state.newCaption = '';
                 this.applyLocalData();
+                this.$('[data-path="newValue"]').focus();
+                event.preventDefault(); // form submit
             },
             
 
