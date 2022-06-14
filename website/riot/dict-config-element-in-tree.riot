@@ -11,7 +11,7 @@
         </span>
     </div>
 
-    <div if={(state.hasChildren || this.hasAttributes) && state.showChildren} class="children">
+    <div if={state.hasChildren && state.showChildren && props.depth < 15} class="children">
         <dict-config-attribute-in-tree each={att in state.attributes}
             data={att}
             xema={props.xema}
@@ -20,14 +20,17 @@
             currentAttribute={props.currentAttribute}
             selectElementOrAttribute={props.selectElementOrAttribute}
         />
+        <!-- pass a high depth if this element is recursive, so we stop the recursion. -->
         <dict-config-element-in-tree each={child in state.children} 
+            depth={child.id == props.data.id ? 100 : props.depth + 1}
             data={child} 
             xema={props.xema} 
             currentElement={props.currentElement}
             currentAttribute={props.currentAttribute}
             selectElementOrAttribute={props.selectElementOrAttribute}
-    />
-        <!-- <div class="blinder" style="bottom: 0"></div> -->
+        />
+
+
     </div>
 
     <style>
@@ -78,10 +81,9 @@
             },
 
             compute() {
-                this.state.children = this.props.data.children.map(c => ({...this.props.xema.elements[c.name], id: c.name}));
-                this.state.attributes = Object.entries(this.props.data.attributes).map(([id, att]) => ({...att, id})).sort((a,b) => a.id.localeCompare(b.id));
-                this.state.hasChildren = this.state.children.length > 0;
-                this.state.hasAttributes = this.state.attributes.length > 0;
+                this.state.children = (this.props.data.children || []).map(c => ({...this.props.xema.elements[c.name], id: c.name}));
+                this.state.attributes = Object.entries(this.props.data.attributes || {}).map(([id, att]) => ({...att, id})).sort((a,b) => a.id.localeCompare(b.id));
+                this.state.hasChildren = this.state.children.length > 0 || this.state.attributes.length > 0;
                 
                 this.state.rootClasses = 
                     'container ' + 

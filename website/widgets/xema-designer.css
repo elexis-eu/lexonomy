@@ -23,7 +23,7 @@
 #editor.designer button.iconArrowUp { background-image: url(./furniture/arrow_up.png);}
 #editor.designer button.iconArrowDown { background-image: url(./furniture/arrow_down.png);}
 #editor.designer label.radio { position: relative; top: -3px; }
-#editor.designer label.radio input { position: relative; top: 3px;}
+#editor.designer label.radio input { position: relative; margin-right: 5px; }
 #editor.designer label {cursor: pointer; margin-right: 10px; white-space: nowrap;}
 #editor.designer label:hover { background-color: #f7f9ea; padding: 5px 0px 5px 0px; }
 #editor.designer label.big {font-weight: bold; font-size: 1rem;}

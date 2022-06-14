@@ -13,6 +13,7 @@
       <div if={ !state.override } id="editor" class="editor designer">
          <div class="list">
             <dict-config-element-in-tree each={root in state.roots}
+               depth={0}
                data={root}
                xema={state.xema}
                current-element={state.currentElement}
@@ -89,7 +90,7 @@
          display: flex;
          flex-wrap: nowrap;
       }
-      #editor .details {flex-grow: 1;}
+      #editor .details {flex-grow: 1; overflow: hidden; max-width: 100%;}
 
       .editor .list { flex-basis: 0; }
 
@@ -168,8 +169,24 @@
 
          onBeforeUpdate() {
             if (!this.state.xema) return;
+            // get root elements:
+            // first get all elements
             const roots = new Set(Object.keys(this.state.xema.elements));
-            Object.values(this.state.xema.elements).forEach(/** @param {XemaElement} el */ el => el.children.forEach(c => roots.delete(c.name)));
+            // then remove anything reachable through a child anywhere.
+            Object.values(this.state.xema.elements).forEach(/** @param {XemaElement} el */ el => (el.children || []).forEach(c => roots.delete(c.name)));
+            
+            if (!roots.size) {
+               // hmm, there is no root? (it might be its own child i.e. recursive)
+               // add from xema if it exists, otherwise add a random element (again - if it exists)
+               const xemaRoot = this.state.xema.root;
+               if (xemaRoot && this.state.xema.elements[xemaRoot]) {
+                  roots.add(xemaRoot);
+               } else {
+                  const allElements = Object.keys(this.state.xema.elements);
+                  if (allElements.length) roots.add(alleElements[0]);
+               }
+            }
+
             this.state.roots = [...roots].map(id => ({...this.state.xema.elements[id], id})); // add ID so tree renderer knows the id of every element
          },
 
@@ -202,7 +219,6 @@
          selectElementOrAttribute(currentElement, currentAttribute) {
             this.state.currentElement = currentElement;
             this.state.currentAttribute = currentAttribute;
-            console.log(`Updating actives, ${this.state.currentElement} @${this.state.currentAttribute}`)
             this.update();
          },
 
