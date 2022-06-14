@@ -1,4 +1,4 @@
-bottle==0.12.19
+bottle==0.12.20
 express==1.0
 lxml>=4.3.4
 Paste==3.0.8
