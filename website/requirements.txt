@@ -7,5 +7,5 @@ PyICU>=2.2
 requests
 beautifulsoup4>=4.4.0
 typing-extensions
-PyJWT==1.7.1
+PyJWT
 
