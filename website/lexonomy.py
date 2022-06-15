@@ -747,12 +747,12 @@ def importjson(dictID, user, dictDB, configs):
         response.set_header("Content-Disposition", "attachment; filename=error.log")
         return ops.showImportErrors(request.query.filename, truncate)
     else:
-        return ops.importfile(dictID, request.query.filename, user["email"])
+       return ops.importfile(dictID, request.query.filename, user["email"])
 
 @get(siteconfig["rootPath"]+"<dictID>/edit")
 @authDict(["canEdit"], True)
 def dictedit(dictID, user, dictDB, configs):
-    return redirect(siteconfig["baseUrl"]+"/"+dictID+"/edit/"+configs["xema"]["root"])
+    return redirect(siteconfig["baseUrl"]+dictID+"/edit/"+configs["xema"]["root"])
 
 @get(siteconfig["rootPath"]+"<dictID>/edit/<doctype>/<selectedID>")
 @get(siteconfig["rootPath"]+"<dictID>/edit/<doctype>")
@@ -1205,3 +1205,38 @@ else: # run a standalone server, prefer the paste server if available over the b
     except ImportError:
         run(host=host, port=port, debug=debug, reloader=debug, interval=0.1)
 
+class EnableCors(object):
+    name = 'enable_cors'
+    api = 2
+
+    def apply(self, fn, context):
+        def _enable_cors(*args, **kwargs):
+            # set CORS headers
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+
+            if bottle.request.method != 'OPTIONS':
+                # actual request; reply with the actual response
+                return fn(*args, **kwargs)
+
+        return _enable_cors
+
+@error(405)
+def method_not_allowed(res):
+    if request.method == 'OPTIONS':
+        new_res = bottle.HTTPResponse()
+        new_res.set_header('Access-Control-Allow-Origin', '*')
+        new_res.set_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
+        new_res.set_header('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token')
+
+        return new_res
+    res.headers['Allow'] += ', OPTIONS'
+    return request.app.default_error_handler(res)
+
+@hook('after_request')
+def enableCORSAfterRequestHook():
+    response.set_header('Access-Control-Allow-Origin', '*')
+
+# after:  install(profiler)
+install(EnableCors())

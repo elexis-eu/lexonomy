@@ -1,18 +1,20 @@
-{
-    "makefile.extensionOutputFolder": "./.vscode",
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "default"
-            },
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 3306,
-            "driver": "MariaDB",
-            "name": "DataKSAA",
-            "database": "DataKSAA",
-            "username": "DataKSAA",
-            "password": "2022"
-        }
-    ]
-}
+// {
+//     "makefile.extensionOutputFolder": "./.vscode",
+//     "sqltools.connections": [
+//         {
+//             "mysqlOptions": {
+//                 "authProtocol": "default"
+//             },
+//             "previewLimit": 100,
+//             "server": "db",
+//             "port": 3306,
+//             "driver": "MariaDB",
+//             "name": "db",
+//             "database": "lexo_bg8rubj5",
+//             "username": "root",
+//             "askForPassword": false,
+//             "password": "example"
+//         }
+//     ],
+//     "editor.foldingMaximumRegions": 65000
+// }

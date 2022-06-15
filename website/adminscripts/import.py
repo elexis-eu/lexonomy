@@ -86,7 +86,6 @@ import re
 entryCount = len(re.findall('<'+entryTag+'[ >]', xmldata))
 entryInserted = 0
 print("Detected %d entries in '%s' element" % (entryCount, entryTag))
-
 configs = ops.readDictConfigs(db)
 needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
 needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0

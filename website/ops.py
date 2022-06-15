@@ -5,6 +5,7 @@ import json
 import os
 import os.path
 import sqlite3
+from this import s
 import mysql.connector
 import hashlib
 import random
@@ -330,16 +331,23 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
 def getEntryTitle(xml, titling, plaintext=False):
     if titling.get("headwordAnnotationsType") == "advanced" and not plaintext:
         ret = titling["headwordAnnotationsAdvanced"]
+        print("ret: ",ret,file=sys.stderr)
+
         advancedUsed = False
         for el in re.findall(r"%\([^)]+\)", titling["headwordAnnotationsAdvanced"]):
+            print("findall ",file=sys.stderr)
             text = ""
             extract = extractText(xml, el[2:-1])
+            print("el[2:-1]:",el[2:-1], file=sys.stderr)
             if len(extract) > 0:
                 text = extract[0]
                 advancedUsed = True
             ret = ret.replace(el, text)
+            print("ret = ret.replace(el, text)",ret,file=sys.stderr)
         if advancedUsed:
             return ret
+    print("titling.get(headword)",titling.get("headword"),file=sys.stderr)
+    print("xml",xml,file=sys.stderr)
     ret = getEntryHeadword(xml, titling.get("headword"))
     if not plaintext:
         ret = "<span class='headword'>" + ret + "</span>"
@@ -1191,21 +1199,29 @@ def importfile(dictID, filename, email):
     pidfile = filename + ".pid";
     errfile = filename + ".err";
     if os.path.isfile(pidfile):
+        print("pidfile:", pidfile, file = sys.stderr)
+        print("1st importfile:", os.path.isfile(pidfile), file = sys.stderr)
+        # print("checkImportStatus(pidfile, errfile):", checkImportStatus(pidfile, errfile), file = sys.stderr)
         return checkImportStatus(pidfile, errfile)
     pidfile_f = open(pidfile, "w")
     errfile_f = open(errfile, "w")
+    print("In the 1st importfile the code can be seen", file = sys.stderr)
     if DB == 'sqlite': 
+        print("2nd importfile:", file = sys.stderr)
         dbpath = os.path.join(siteconfig["dataDir"], "dicts/"+dictID+".sqlite")
         p = subprocess.Popen(["adminscripts/import.py", dbpath, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
     else:
+        print("3rd importfile:", file = sys.stderr)
         p = subprocess.Popen(["adminscripts/importMysql.py", dictID, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
     return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
 
 def checkImportStatus(pidfile, errfile):
+    print("enter the checkImportStatus", file = sys.stderr)
     content = ''
-    while content == '':
+    i=0
+    while not content:
         with open(pidfile, "r") as content_file:
-            content = content_file.read()
+            content=content_file.read()
     pid_data = re.split(r"[\n\r]", content)
     finished = False
     if len(pid_data) > 1:
@@ -1219,8 +1235,7 @@ def checkImportStatus(pidfile, errfile):
         progress = "Import started. Please wait..."
     errors = False
     if os.path.isfile(errfile) and os.stat(errfile).st_size:
-        errors = True
-    return {"progressMessage": progress, "finished": finished, "errors": errors}
+        errors = True    return {"progressMessage": progress, "finished": finished, "errors": errors}
 
 def readDoctypesUsed(dictDB):
     c = dictDB.execute("select doctype from entries group by doctype order by count(*) desc")
@@ -1251,66 +1266,92 @@ def listEntriesById(dictDB, entryID, configs):
 def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start", howmany=10, sortdesc=False, reverse=False, fullXML=False):
     # fast initial loading, for large dictionaries without search
     if searchtext == "":
+        print("sqlc",file = sys.stderr)
         sqlc = "select count(*) as total from entries"
         cc = dictDB.execute(sqlc)
+        print("cc",cc,file = sys.stderr)
         cc = cc if cc else dictDB
+        print("cc",cc,file = sys.stderr)
         rc = cc.fetchone() if cc else None
+        print("rc",rc,file = sys.stderr)
         if int(rc["total"]) > 1000:
             sqlf = "select * from entries order by sortkey limit 200"
             cf = dictDB.execute(sqlf)
             cf = cf if cf else dictDB
+            print("cf",cf,file = sys.stderr)
             entries = []
             for rf in cf.fetchall() if cf else []:
                 item = {"id": rf["id"], "title": rf["title"], "sortkey": rf["sortkey"]}
                 entries.append(item)
+                print("item",item,file = sys.stderr)
+                print("entries",entries,file = sys.stderr)
             return rc["total"], entries, True
 
     lowertext = searchtext.lower()
     if type(sortdesc) == str:
+        print("type(sortdesc)",file = sys.stderr)
         if sortdesc == "true":
             sortdesc = True
         else:
             sortdesc = False
     if "flag_element" in configs["flagging"] or fullXML:
+        print("flag_element",file = sys.stderr)
         entryXML = ", e.xml "
     else:
         entryXML = ""
     if "headwordSortDesc" in configs["titling"]:
+        print("headwordSortDesc",file = sys.stderr)
         reverse = configs["titling"]["headwordSortDesc"]
     if reverse:
         sortdesc = not sortdesc
 
     if modifier == "start":
+        print("start",file = sys.stderr)
         sql1 = f"select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + f" from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or s.txt like {ques}) group by e.id order by s.level"
         params1 = (doctype, lowertext+"%", searchtext+"%")
         sql2 = f"select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or s.txt like {ques})"
         params2 = (doctype, lowertext+"%", searchtext+"%")
     elif modifier == "wordstart":
+        print("wordstart",file = sys.stderr)
         sql1 = f"select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + f" from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or LOWER(s.txt) like {ques} or s.txt like {ques} or s.txt like {ques}) group by e.id order by s.level"
         params1 = (doctype, lowertext + "%", "% " + lowertext + "%", searchtext + "%", "% " + searchtext + "%")
         sql2 = f"select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or LOWER(s.txt) like {ques} or s.txt like {ques} or s.txt like {ques})"
         params2 = (doctype, lowertext + "%", "% " + lowertext + "%", searchtext + "%", "% " + searchtext + "%")
     elif modifier == "substring":
+        print("substring",file = sys.stderr)
         sql1 = f"select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + f" from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or s.txt like {ques}) group by e.id order by s.level"
         params1 = (doctype, "%" + lowertext + "%", "%" + searchtext + "%")
         sql2 = f"select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and (LOWER(s.txt) like {ques} or s.txt like {ques})"
         params2 = (doctype, "%" + lowertext + "%", "%" + searchtext + "%")
     elif modifier == "exact":
+        print("exact",file = sys.stderr)
         sql1 = "select s.txt, min(s.level) as level, e.id, e.sortkey, e.title" + entryXML + f" from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and s.txt={ques} group by e.id order by s.level"
         params1 = (doctype, searchtext)
         sql2 = f"select count(distinct s.entry_id) as total from searchables as s inner join entries as e on e.id=s.entry_id where doctype={ques} and s.txt={ques}"
         params2 = (doctype, searchtext)
     c1 = dictDB.execute(sql1, params1)
     c1 = c1 if c1 else dictDB
+    print("c1: ",c1, file = sys.stderr)
+    # print("c1._last_executed: ",dictDB.last_executed_query(), file = sys.stderr)
+    print("this here","\"", doctype, "\"", lowertext+"%","\"", searchtext+"%","\"", file = sys.stderr)
+    print("entryXML",entryXML, file = sys.stderr)
+    print("c1.fetchall() : ",c1.fetchall(), file = sys.stderr)
+
+    #####
     entries = []
     for r1 in c1.fetchall() if c1 else []:
+        print("r1",file = sys.stderr)
         item = {"id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"]}
         if "flag_element" in configs["flagging"]:
+            print("flag_element",file = sys.stderr)
             item["flag"] = extractText(r1["xml"], configs["flagging"]["flag_element"])
         if fullXML:
+            print("fullXML",file = sys.stderr)
             item["xml"] = setHousekeepingAttributes(r1["id"], r1["xml"], configs["subbing"])
         if r1["level"] > 1:
+            print("level",file = sys.stderr)
             item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
+        print("item",item,file = sys.stderr)
         entries.append(item)
 
     # sort by selected locale
@@ -1323,6 +1364,7 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
     c2 = c2 if c2 else dictDB
     r2 = c2.fetchone() if c2 else None
     total = r2["total"]
+    print("total",file = sys.stderr)
     return total, entries, False
 
 def listEntriesPublic(dictDB, dictID, configs, searchtext):
@@ -1346,6 +1388,7 @@ def listEntriesPublic(dictDB, dictID, configs, searchtext):
     return entries
 
 def extractText(xml, elName):
+    print("elName",elName,file=sys.stderr)
     elName = str(elName)
     if elName == "":
         return []
