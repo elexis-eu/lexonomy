@@ -7,6 +7,7 @@ services:
             - camel
             - db
         volumes:
+            # - /Users/abbander/dev/lexonomy/website/siteconfig.json:/opt/service/website/siteconfig.json
             - ${LEXO_WEBSITE_PATH}:/opt/service/website
             - ${LEXO_DATA_PATH}:/opt/service/data
         environment:
