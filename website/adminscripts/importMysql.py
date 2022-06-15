@@ -32,7 +32,7 @@ filename = args[1]
 email = args[2] if len(args)>2 else "IMPORT@LEXONOMY"
 db = mysql.connector.connect(
     host=os.environ['MYSQL_DB_HOST'],
-    user="lexo",
+    user=os.environ['MYSQL_DB_USER'],
     database="lexo_" + dbname,
     password=os.environ['MYSQL_DB_PASSWORD']
 )

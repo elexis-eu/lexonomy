@@ -11,7 +11,6 @@ else
     mysql --host=${MYSQL_DB_HOST} --user=${MYSQL_DB_USER} --password=${MYSQL_DB_PASSWORD} < /opt/service/data/sql/lexo_template_lmf.sql
 
     echo 'done creating databases.';
-    
     echo 'creating root password:';
     python3 ./adminscripts/changePasswordMysql.py root@localhost
 fi;
