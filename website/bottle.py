@@ -4303,7 +4303,7 @@ ERROR_PAGE_TEMPLATE = """
     <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
     <html>
         <head>
-            <title>Error: {{e.status}}</title>
+            <title i18n>Error: {{e.status}}</title>
             <style type="text/css">
               html {background-color: #eee; font-family: sans-serif;}
               body {background-color: #fff; border: 1px solid #ddd;

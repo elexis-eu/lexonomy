@@ -21,6 +21,9 @@ SET time_zone = "+00:00";
 -- Database: `lexo`
 --
 
+CREATE DATABASE IF NOT EXISTS lexo;
+USE lexo;
+
 -- --------------------------------------------------------
 
 --

@@ -4,7 +4,7 @@
 <html>
 	<head>
 		% include("head.tpl")
-		<title>Lexonomy Terms of Use</title>
+		<title i18n>Lexonomy Terms of Use</title>
 		<script type="text/javascript" src="../libs/screenful/screenful.js"></script>
 		<script type="text/javascript" src="../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../libs/screenful/screenful-theme-blue.css" />

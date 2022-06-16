@@ -4,7 +4,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		%include("head.tpl")
-		<title>404</title>
+		<title i18n>404</title>
 		<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}furniture/public.css" />
 		%if siteconfig["rtl"]:
 			<link type="text/css" rel="stylesheet" href="{{siteconfig["baseUrl"]}}/furniture/rtl.css" />

@@ -8,6 +8,5 @@ website/node_modules/*
 website/package-lock.json
 website/__pycache__/*
 .DS_Store
-docker-compose.yml
 definitions.txt
 .env

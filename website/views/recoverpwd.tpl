@@ -4,7 +4,7 @@
 <html>
 	<head>
 		%include("head.tpl")
-		<title>Reset your password</title>
+		<title i18n>Reset your password</title>
 		<script type="text/javascript" src="../libs/screenful/screenful.js"></script>
 		<script type="text/javascript" src="../libs/screenful/screenful-user.js"></script>
 		<link type="text/css" rel="stylesheet" href="../libs/screenful/screenful-user.css" />

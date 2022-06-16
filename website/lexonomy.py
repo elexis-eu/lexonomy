@@ -10,7 +10,7 @@ import json
 import requests
 import datetime
 import urllib.request
-from ops import siteconfig, i18n
+from ops import siteconfig, i18n, enable_cors
 import media
 import bottle
 from bottle import (hook, route, get, post, run, template, error, request,
@@ -39,6 +39,40 @@ if not cgi and len(sys.argv) > 1:
         print(sys.argv, file=sys.stderr)
         sys.exit(1)
     my_url = sys.argv[1]
+
+class EnableCors(object):
+    name = 'enable_cors'
+    api = 2
+
+    def apply(self, fn, context):
+        def _enable_cors(*args, **kwargs):
+            # set CORS headers
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+
+            if bottle.request.method != 'OPTIONS':
+                # actual request; reply with the actual response
+                return fn(*args, **kwargs)
+
+        return _enable_cors
+
+@error(405)
+def method_not_allowed(res):
+    if request.method == 'OPTIONS':
+        new_res = bottle.HTTPResponse()
+        new_res.set_header('Access-Control-Allow-Origin', '*')
+        new_res.set_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
+        new_res.set_header('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token')
+
+        return new_res
+    res.headers['Allow'] += ', OPTIONS'
+    return request.app.default_error_handler(res)
+
+@hook('after_request')
+def enableCORSAfterRequestHook():
+    response.set_header('Access-Control-Allow-Origin', '*')
+
 
 # serve static files
 @route('/<path:re:(widgets|furniture|libs).*>')
@@ -73,6 +107,7 @@ def profiler(callback):
         return body
     return wrapper
 install(profiler)
+install(EnableCors())
 
 # authentication decorator
 # use @authDict(["canEdit", "canConfig", "canUpload", "canDownload"]) before any handler
@@ -155,6 +190,8 @@ def entrydelete(dictID, user, dictDB, configs):
     ops.deleteEntry(dictDB, request.forms.id, user["email"])
     return {"success": True, "id": request.forms.id}
 
+
+@enable_cors
 @post(siteconfig["rootPath"]+"<dictID>/entryread.json")
 @authDict([])
 def entryread(dictID, user, dictDB, configs):
@@ -855,6 +892,7 @@ def dictsearch(dictID):
         nabes = ops.readNabesByText(dictDB, dictID, configs, request.query.q)
         return template("dict-search.tpl", **{"siteconfig": siteconfig, "i18n": i18n, "i18nDump": i18nDump, "user": user, "dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": request.query.q, "entries": entries, "nabes": nabes})
 
+@enable_cors
 @get(siteconfig["rootPath"]+"<dictID>/search.json")
 def dictsearch(dictID):
     if not ops.dictExists(dictID):
@@ -1204,39 +1242,3 @@ else: # run a standalone server, prefer the paste server if available over the b
         run(host=host, port=port, debug=debug, reloader=debug, server='paste', interval=0.1)
     except ImportError:
         run(host=host, port=port, debug=debug, reloader=debug, interval=0.1)
-
-class EnableCors(object):
-    name = 'enable_cors'
-    api = 2
-
-    def apply(self, fn, context):
-        def _enable_cors(*args, **kwargs):
-            # set CORS headers
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
-            response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
-
-            if bottle.request.method != 'OPTIONS':
-                # actual request; reply with the actual response
-                return fn(*args, **kwargs)
-
-        return _enable_cors
-
-@error(405)
-def method_not_allowed(res):
-    if request.method == 'OPTIONS':
-        new_res = bottle.HTTPResponse()
-        new_res.set_header('Access-Control-Allow-Origin', '*')
-        new_res.set_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
-        new_res.set_header('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token')
-
-        return new_res
-    res.headers['Allow'] += ', OPTIONS'
-    return request.app.default_error_handler(res)
-
-@hook('after_request')
-def enableCORSAfterRequestHook():
-    response.set_header('Access-Control-Allow-Origin', '*')
-
-# after:  install(profiler)
-install(EnableCors())
