@@ -534,11 +534,14 @@ testables = [{
         "element": ["sense", "sense"],
         "preview": ["the first sense (noun)", "the second sense (verb)"]
     }
-
-}
-
-
-]
+}, {
+    # tests for autonumbering behavior. 
+    # - correct template handling for string templates
+    # - correct resetting of numbers across entries
+    # - correct resuming of numbers
+    # - correct overwriting of existing values
+    # - correct NOT overwriting of existing numeric values when autorunning
+}]
 
 def overwriteConfig(originalConfig, overrides):
     """

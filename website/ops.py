@@ -173,6 +173,29 @@ class ConfigKontext(TypedDict):
     url: str
     corpus: str
 
+class ConfigAutoNumbering(TypedDict):
+    element: str
+    """XML element to add IDS to"""
+    attribute: Optional[str] 
+    """Attribute on the XML element to add IDS to (optional)"""
+    type: Literal["string", "number"]
+    string_format: Optional[str]
+    """Only used if type == "string".
+        The format string to use to generate textual ids - takes the shape of %(some-element) $(@some-attribute).
+    """
+    number_globally: bool
+    """Only used if type == 'number'
+        Whether to keep incrementing the IDs, or restart at 0 every entry
+    """
+    number_next: int
+    """Only used if type == 'number'
+        The next number to output. Should be saved across runs
+    """
+    overwrite_existing: bool
+    "Whether to overwrite existing ID values in the target element/attribute"
+    auto_apply: bool
+    "Whether to automatically perform this autonumbering on entry saving, or only as a one-off manual operation"
+
 class Configs(TypedDict):
     titling: ConfigTitling
     subbing: ConfigSubbing
@@ -188,6 +211,7 @@ class Configs(TypedDict):
     metadata: ConfigMetadata
     download: ConfigDownload
     kontext: ConfigKontext
+    autonumbering: NotRequired[list[ConfigAutoNumbering]]
 
 # Other types
 class IsoCode(TypedDict):
@@ -1112,6 +1136,38 @@ def presave_searchables(dictDB: Connection, configs: Configs, entryXml: Tag, ent
     if len(toInsert):
         dictDB.executemany("insert into searchables(entry_id, txt, level) values(?, ?, ?)", toInsert)
 
+def split_template_string(template: str) -> list[str]:
+    "Extract and return the templates from a template-string like %(some-element)" 
+    return re.findall(r"%\([^)]+\)", template) # pre-process 
+
+def eval_template_string(entry: Tag, current_element: Tag, template: str, split_template: Optional[list[str]] = None) -> str:
+    """Replace templates %(some-element) and %(@some-attribute) with their text values. 
+        Unmatched templates are preserved.
+        Elements are first matched inside current_element, and if that fails, on the entire entry.
+
+    Args:
+        entry (Tag): the entry, used as fallback when template string refers to an element that can't be found in/below the current_element
+        current_element (Tag): element for which to evaluate the template
+        template (str): complete template string
+        split_template (list[str]): speedup for when calling this function in a loop, the pre-extracted templates from the string.
+
+    Returns:
+        str: the template string with templates replaced by their values
+    """
+
+    if not split_template:
+        split_template = split_template_string(template)
+    
+    for pattern in split_template:
+        if pattern[2] == '@': # if the pattern is %(@some-attribute), extract it
+            attributeName = pattern[3:-1]
+            text = current_element.attrs.get(attributeName)
+        else: # pattern is %(some_element)
+            elementName = pattern[2:-1]
+            text = get_text(current_element, elementName) or get_text(entry, elementName) # use descendants of the link element first, if that fails try entire entry
+        if text:
+            template = template.replace(pattern, text)
+    return template
 
 def presave_linkables(dictDB: Connection, config: ConfigLinks, entryXml: Tag, entryID: int):
     """
@@ -1134,37 +1190,98 @@ def presave_linkables(dictDB: Connection, config: ConfigLinks, entryXml: Tag, en
     for linkref in config.values():
         linkElement = linkref["linkElement"]
 
-        identifierEscapes = re.findall(r"%\([^)]+\)", linkref["identifier"]) # pre-process 
-        previewEscapes = re.findall(r"%\([^)]+\)", linkref["preview"])
+        identifierEscapes = split_template_string(linkref["identifier"]) # pre-process 
+        previewEscapes = split_template_string(linkref["preview"])
         for el in entryXml.findAll(linkElement):
-            identifier = linkref["identifier"] # format-string. NOTE: variable is gradually overwritten with result
-            preview = linkref["preview"] # format-string. NOTE: variable is gradually overwritten with result
-
-            for pattern in identifierEscapes:
-                if pattern[2] == '@': # if the pattern is %(@some-attribute), extract it
-                    attributeName = pattern[3:-1]
-                    text = el.attrs.get(attributeName)
-                else: # pattern is %(some_element)
-                    elementName = pattern[2:-1]
-                    text = get_text(el, elementName) or get_text(entryXml, elementName) # use descendants of the link element first, if that fails try entire entry
-                if text:
-                    identifier = identifier.replace(pattern, text)
-
-            for pattern in previewEscapes:
-                if pattern[2] == '@': # if the pattern is %(@some-attribute), extract it
-                    attributeName = pattern[3:-1]
-                    text = el.attrs.get(attributeName)
-                else: # pattern is %(some_element)
-                    elementName = pattern[2:-1]
-                    text = get_text(el, elementName) or get_text(entryXml, elementName) # use descendants of the link element first, if that fails try entire entry
-                if text:
-                    preview = preview.replace(pattern, text)
-
+            identifier = eval_template_string(entryXml, el, linkref["identifier"], identifierEscapes)
+            preview = eval_template_string(entryXml, el, linkref["preview"], previewEscapes)
             el.attrs["lxnm:linkable"] = identifier
             ret.append((entryID, identifier, linkElement, preview))
 
     if len(ret):
         dictDB.executemany("insert into linkables(entry_id, txt, element, preview) values(?,?,?,?)", ret)
+
+def get_next_autonumber_value(dictDB: Connection, element: str, attribute: Optional[str]) -> Optional[int]:
+    """Scan all entries for values in the element or the attribute on the element (if supplied), returning the highest found number + 1
+
+    Args:
+        dictDB (Connection): the dictionary
+        element (str): name of the element to scan
+        attribute (Optional[str]): name of the attribute on the element to scan. element text content is scanned if omitted.
+    """ 
+    
+    # """Get the next unused integer for an autonumber configuration."""
+    highest = -1
+    for e in dictDB.execute("select xml from entries"):
+        entry = parse(e["xml"])
+        for el in entry.findAll(element):
+            existing_value = get_text(el) if not attribute else el.attrs.get(attribute)
+            if existing_value:
+                try: 
+                    i = int(existing_value)
+                    highest = i if i > highest else highest
+                except:
+                    pass
+    return highest + 1 # return NEXT number 
+
+def presave_autonumbering(dictDB: Connection, config: list[ConfigAutoNumbering], entry: Tag, isNewEntry = False, isAutoApplying = True) -> bool:
+    """Add automatically generated IDS/numbers to elements/attributes in the entry according to the config.
+    If the next ID is persistent, the config is also written to the database.
+
+    Args:
+        dictDB (Connection): database
+        config (list[ConfigAutoNumbering]): autonumbers to apply
+        isNewEntry (bool): Is this a new entry, or an update to an existing entry? Used to skip refreshing numeric IDs on existing entries. 
+        isAutoApplying (bool): Are we autonumbering in the context of a user that pressed "autonumber my dictionary" or is this just during import/saving?
+
+    Returns: 
+        true if the xml was changed
+    """
+    touched_global_number = False
+    for c in config:
+        # Be a little smart about this:
+        # Only overwrite values when running auto_apply on a new entry, or when doing a manual run with overwrite true
+        if not c["auto_apply"] and isAutoApplying:
+            continue
+        if not c["element"]:
+            continue
+        # setup required variables to compute the value
+        if  c["type"] == "number":
+            next_number = c.get("number_next", 0) if c["number_globally"] else 0
+            template = None
+            template_parts = None
+        else: # c["type"] == "string":
+            next_number = 0
+            template = c["string_format"]
+            template_parts = split_template_string(template) if template else None
+            if not template_parts: # template string is empty, or contains nothing to evaluate; skip.
+                continue
+        
+        for el in entry.findAll(c["element"]):
+            existing_value = get_text(el) if not c["attribute"] else el.attrs.get(c["attribute"])
+            write_new_value = not existing_value or (c["type"] == "string" and c["overwrite_existing"] and isNewEntry)
+            if not write_new_value:
+                continue
+            
+            if c["type"] == "number":
+                value = next_number
+                next_number += 1
+            else:
+                value = eval_template_string(entry, el, template, template_parts)
+            
+            if c["attribute"]:
+                el.attrs[c["attribute"]] = value
+            else:
+                el.clear()
+                el.append(value) # add the string
+        
+        # After writing the values, save the current number so we can continue in later entries
+        if c["type"] == "number" and c["number_globally"]:
+            c["number_next"] = next_number
+            touched_global_number = True
+
+    if touched_global_number:
+        dictDB.execute("UPDATE configs SET json=? WHERE id=?", (json.dumps(config), "autonumbering"))
 
 def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], email: str, id: Optional[int] = None) -> Union[
     Tuple[int, Tag, Literal[True], Optional[Any]], 
@@ -1198,6 +1315,7 @@ def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], emai
 
     presave_searchables(dictDB, configs, xml, id, titleText)
     presave_linkables(dictDB, configs["links"], xml, id)
+    presave_autonumbering(dictDB, configs.get("autonumbering", []), xml, isNewEntry, isAutoApplying=True)
 
     # Create/update the entry, save history
     xmlstr = str(xml)
@@ -2504,45 +2622,45 @@ def autoImageStatus(dictDB, dictID, bgjob):
     else:
         return {"status": "failed"}
 
-def addAutoNumbers(dictDB: Connection, dictID: str, countElem: str, storeElem: str):
-    # TODO port to lxml instead of minidom
-    from xml.dom import minidom, Node
-    isAttr = False
-    if storeElem[0] == '@':
-        isAttr = True
-        storeElem = storeElem[1:]
-    c = dictDB.execute("select id, xml from entries")
-    process = 0
-    for r in c.fetchall():
-        entryID = r["id"]
-        xml = r["xml"]
-        doc = minidom.parseString(xml)
-        allEmpty = True
-        for el in doc.getElementsByTagName(countElem):
-            if isAttr:
-                if el.getAttribute(storeElem) != "":
-                    allEmpty = False
-            else:
-                for sel in el.getElementsByTagName(storeElem):
-                    if sel.firstChild != None and sel.firstChild.nodeValue != "":
-                        allEmpty = False
-        if allEmpty:
-            count = 0
-            for el in doc.getElementsByTagName(countElem):
-                count += 1
-                if isAttr:
-                    el.setAttribute(storeElem, str(count))
-                else:
-                    for sel in el.getElementsByTagName(storeElem):
-                        el.removeChild(sel)
-                    n_elem = doc.createElement(storeElem)
-                    el.appendChild(n_elem)
-                    n_elem.appendChild(doc.createTextNode(str(count)))
-            process += 1
-            xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
-            dictDB.execute("update entries set xml=? where id=?", (xml, entryID)) # do not update needs_update
-    dictDB.commit()
-    return process
+# def addAutoNumbers(dictDB: Connection, dictID: str, countElem: str, storeElem: str):
+#     # TODO port to lxml instead of minidom
+#     from xml.dom import minidom, Node
+#     isAttr = False
+#     if storeElem[0] == '@':
+#         isAttr = True
+#         storeElem = storeElem[1:]
+#     c = dictDB.execute("select id, xml from entries")
+#     process = 0
+#     for r in c.fetchall():
+#         entryID = r["id"]
+#         xml = r["xml"]
+#         doc = minidom.parseString(xml)
+#         allEmpty = True
+#         for el in doc.getElementsByTagName(countElem):
+#             if isAttr:
+#                 if el.getAttribute(storeElem) != "":
+#                     allEmpty = False
+#             else:
+#                 for sel in el.getElementsByTagName(storeElem):
+#                     if sel.firstChild != None and sel.firstChild.nodeValue != "":
+#                         allEmpty = False
+#         if allEmpty:
+#             count = 0
+#             for el in doc.getElementsByTagName(countElem):
+#                 count += 1
+#                 if isAttr:
+#                     el.setAttribute(storeElem, str(count))
+#                 else:
+#                     for sel in el.getElementsByTagName(storeElem):
+#                         el.removeChild(sel)
+#                     n_elem = doc.createElement(storeElem)
+#                     el.appendChild(n_elem)
+#                     n_elem.appendChild(doc.createTextNode(str(count)))
+#             process += 1
+#             xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
+#             dictDB.execute("update entries set xml=? where id=?", (xml, entryID)) # do not update needs_update
+#     dictDB.commit()
+#     return process
 
 def notifyUsers(configOld: ConfigUsers, configNew: ConfigUsers, dictInfo: ConfigIdent, dictID: str):
     for user in configNew:
