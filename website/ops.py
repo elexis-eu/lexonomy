@@ -328,7 +328,13 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
             return entryID, xml, True, feedback
 
 def getEntryTitle(xml, titling, plaintext=False):
-    if titling.get("headwordAnnotationsType") == "advanced" and not plaintext:
+    if titling.get("headwordXpath", False):
+        from lxml import etree as ET
+        root = ET.fromstring(xml)
+        result = root.xpath(titling.get("headwordXpath"));
+        ret = str(result[0]) if len(result) > 0 else ''
+        return ret
+    elif titling.get("headwordAnnotationsType") == "advanced" and not plaintext:
         ret = titling["headwordAnnotationsAdvanced"]
         advancedUsed = False
         for el in re.findall(r"%\([^)]+\)", titling["headwordAnnotationsAdvanced"]):

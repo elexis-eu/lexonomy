@@ -15,6 +15,7 @@ services:
             - MYSQL_DB_USER=${MYSQL_DB_USER}
             - MYSQL_DB_PASSWORD=${MYSQL_DB_PASSWORD}
             - MYSQL_DB_PORT=${MYSQL_DB_PORT}
+            - DEBUG=${DEBUG}
             - CAMEL=http://camel
         ports:
             - "8000:8000"
@@ -39,12 +40,12 @@ services:
         entrypoint: flask run -h 0.0.0.0 -p ${CAMEL_PORT}
     db:
         image: mariadb
-        restart: always
+        # restart: always
         environment:
             - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
     adminer:
         image: adminer
-        restart: always
+        # restart: always
         ports:
             - 8080:8080
         depends_on:

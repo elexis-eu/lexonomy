@@ -9,6 +9,7 @@ import datetime
 import json
 import xml.sax
 import re
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import ops
 ops.DB = 'mysql'
@@ -128,8 +129,8 @@ for entry in re.findall(re_entry, xmldata):
             sql = "insert into entries(xml, needs_refac, needs_resave, needs_refresh, doctype, title, sortkey) values(%s, %s, %s, %s, %s, %s, %s)"
             params = (entry, needs_refac, needs_resave, 0, entryTag, title, sortkey)
         c = cur.execute(sql, params)
-        if entryID == None and c:
-            entryID = c.lastrowid
+        if entryID == None:
+            entryID = cur.lastrowid
         cur.execute(f"insert into history(entry_id, action, `when`, email, xml, historiography) values(%s, %s, %s, %s, %s, %s)", (entryID, action, str(datetime.datetime.utcnow()), email, entry, json.dumps(historiography)))
         cur.execute("delete from searchables where entry_id=%s and level=%s", (entryID, 1))
         searchTitle = ops.getEntryTitle(entry, configs["titling"], True)
