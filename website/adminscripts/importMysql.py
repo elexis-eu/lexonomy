@@ -26,6 +26,7 @@ if args[0] == "-p":
     purge = True
     args.pop(0)
 
+
 dbname = args[0]
 filename = args[1]
 email = args[2] if len(args)>2 else "IMPORT@LEXONOMY"
@@ -92,7 +93,6 @@ entryCount = len(re.findall('<'+entryTag+'[ >]', xmldata))
 entryInserted = 0
 print("Detected %d entries in '%s' element" % (entryCount, entryTag))
 configs = ops.readDictConfigs(cur)
-# print("1st configs[titling]: ",configs["titling"],file=sys.stderr) 
 needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
 needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
 
@@ -115,8 +115,6 @@ for entry in re.findall(re_entry, xmldata):
         entryID = None
         action = "create"
         title = ops.getEntryTitle(entry, configs["titling"])
-        print("title",title,file=sys.stderr)
-        print("2nd configs[titling]: ",configs["titling"],file=sys.stderr) 
         sortkey = ops.getSortTitle(entry, configs["titling"])  
         if re.match(pat, entry):
             entryID = re.match(pat, entry).group(2)
@@ -137,7 +135,6 @@ for entry in re.findall(re_entry, xmldata):
         cur.execute(f"insert into history(entry_id, action, `when`, email, xml, historiography) values(%s, %s, %s, %s, %s, %s)", (entryID, action, str(datetime.datetime.utcnow()), email, entry, json.dumps(historiography)))
         cur.execute("delete from searchables where entry_id=%s and level=%s", (entryID, 1))
         searchTitle = ops.getEntryTitle(entry, configs["titling"], True)
-        # print("3rd configs[titling]: ",configs["titling"],file=sys.stderr) 
         cur.execute("insert into searchables(entry_id, txt, level) values(%s, %s, %s)", (entryID, searchTitle, 1))
         cur.execute("insert into searchables(entry_id, txt, level) values(%s, %s, %s)", (entryID, searchTitle.lower(), 1))
         db.commit() 
