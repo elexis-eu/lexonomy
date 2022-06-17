@@ -761,23 +761,7 @@ def configupdate(dictID: str, user: User, dictDB: Connection, configs: Configs):
 @post(siteconfig["rootPath"]+"<dictID>/autonumber.json")
 @authDict(["canConfig"])
 def autonumber(dictID: str, user: User, dictDB: Connection, configs: Configs):
-    config = configs.get("autonumbering")
-    if not config: 
-        return {"success": True, "processed": 0}
-    total = 0
-    for e in dictDB.execute("select id, xml from entries").fetchall():
-        id = e["id"]
-        xml = ops.parse(e["xml"])
-        entry_was_updated = ops.presave_autonumbering(dictDB, config, xml, isNewEntry = False, isAutoApplying = False)
-        if not entry_was_updated:
-            continue
-        
-        total += 1
-        xmlstr = str(xml)
-        dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (id, "autonumber", str(datetime.datetime.utcnow()), user["email"], xmlstr, json.dumps({})))
-        dictDB.execute("update entries set xml = ? where id = ?", (xmlstr, id))
-
-    return {"success": True, "processed": total}
+    return ops.addAutoNumbers(dictDB, configs, user)
 
 @post(siteconfig["rootPath"]+"<dictID>/next_autonumber.json")
 @authDict(["canConfig"])
