@@ -2,25 +2,19 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["xemplate", "Entry formatting"]]}/>
    <h1>Entry formatting</h1>
-   <dict-config-buttons style="display: inline-block" save-data={saveData}></dict-config-buttons>
-   <div style="display:inline-block;margin-left:10px"
-      if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
-            <button class="btn waves-effect waves-light"
-                    onclick={ startOverride }>
-               Use your own stylesheet
-               <i class="material-symbols-outlined right">edit</i>
-            </button>
-   </div>
-   <div style="display:inline-block;margin-left:10px"
-      if={ (state.data._xsl && state.data._xsl != "") || (state.data._css && state.data._css != "") || state.override }>
-            <button class="btn waves-effect waves-light"
-                    onclick={ stopOverride }>
-               Stop using your own stylesheet
-               <i class="material-symbols-outlined right">edit</i>
-            </button>
-   </div>
-   <div
-      if={ (!state.data._xsl || state.data._xsl == "") && (!state.data._css || state.data._css == "") && !state.override }>
+   <dict-config-buttons save-data={saveData}>
+      <button 
+         class="btn waves-effect waves-light"
+         onclick={ toggleOverride }
+      >
+         { state.override ? "Stop using your own stylesheet" : "Use your own stylesheet" }
+         <i class="material-symbols-outlined right">edit</i>
+      </button>
+   </dict-config-buttons>
+
+
+ 
+   <div if={ !state.override }>
       <div style="display: flex">
          <!-- TODO fixup styles so we don't need this sillyness. -->
          <div
@@ -57,8 +51,7 @@
       </div>
 
    </div>
-   <div
-      if={ (state.data._xsl && state.data._xsl != "") || (state.data._css && state.data._css != "") || state.override }>
+   <div if={state.override }>
       <div class="row">
          <div class="input-field col s10">
             <textarea id="editor_xsl"
@@ -99,15 +92,15 @@
          elementName: null,
          attributeName: null,
 
-         startOverride() {
-            this.update({override: true})
+         toggleOverride() {
+            this.state.override = !this.state.override;
+            if (!this.state.override) {
+               delete this.state.data._xsl
+               delete this.state.data._css
+            }
+            this.update();
          },
 
-         stopOverride() {
-            delete this.state.data._xsl
-            delete this.state.data._css
-            this.update({override: false})
-         },
 
          exampleXsl() {
             $('#editor_xsl').val(
@@ -148,7 +141,7 @@ div.myEntry span.myHeadword {font-weight: bold}
             this.store.loadDictionaryConfig("xemplate")
                .done(response => {
                   this.state.data = response.content
-                  this.state.override = this.state.data._xsl || this.state.data._css
+                  this.state.override = !!(this.state.data._xsl || this.state.data._css)
                })
                .always(() => {
                   this.update({isLoading: false})
