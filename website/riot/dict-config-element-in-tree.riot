@@ -11,7 +11,7 @@
         </span>
     </div>
 
-    <div if={state.hasChildren && state.showChildren && props.depth < 15} class="children">
+    <div if={state.hasChildren && state.showChildren && (props.depth || 0) < 15} class="children">
         <dict-config-attribute-in-tree each={att in state.attributes}
             data={att}
             xema={props.xema}
@@ -22,7 +22,7 @@
         />
         <!-- pass a high depth if this element is recursive, so we stop the recursion. -->
         <dict-config-element-in-tree each={child in state.children} 
-            depth={child.id == props.data.id ? 100 : props.depth + 1}
+            depth={child.id == props.data.id ? 100 : (props.depth || 0) + 1}
             data={child} 
             xema={props.xema} 
             currentElement={props.currentElement}
