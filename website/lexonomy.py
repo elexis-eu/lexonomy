@@ -906,6 +906,7 @@ def dictsearch(dictID):
     text=araby.strip_tashkeel(lemma.json()['text'][0])
     entries = ops.listEntriesPublic(dictDB, dictID, configs, text)
     if len(entries) == 1 and entries[0]["exactMatch"]:
+        nabes = ops.readNabesByText(dictDB, dictID, configs, text)
         return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": text, "entries": entries, "nabes": nabes}
     else:
         nabes = ops.readNabesByText(dictDB, dictID, configs, text)

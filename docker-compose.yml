@@ -2,14 +2,18 @@ version: '3'
 
 services:
     main:
-        image: anlp.ksaa.gov.sa/lexonomy
+        build: .
+        # image: lexonomy
         links:
             - camel
             - db
         volumes:
-            # - /Users/abbander/dev/lexonomy/website/siteconfig.json:/opt/service/website/siteconfig.json
-            - ${LEXO_WEBSITE_PATH}:/opt/service/website
+            - ${LEXO_WEBSITE_PATH}:/opt/service/website/
+            #siteconfig.json
             - ${LEXO_DATA_PATH}:/opt/service/data
+            # - <path to siteconfig.json>:/opt/service/website/siteconfig.json
+            # - <path to data directory>:/opt/service/data
+        # entrypoint: python3 lexonomy.py 0.0.0.0:8000
         environment:
             - MYSQL_DB_HOST=${MYSQL_DB_HOST}
             - MYSQL_DB_USER=${MYSQL_DB_USER}
@@ -24,14 +28,17 @@ services:
           - camel
           - db
     camel:
-        image: anlp.ksaa.gov.sa/camel_tools
+        build: .
+        image: ksaa_nlp/camel_tools
         volumes:
             - type: bind
-              source: ${CAMEL_DATA_PATH}
+              source: $HOME/.camel_tools/data
               target: /root/.camel_tools/data
             - type: bind
               source: ${CAMEL_PATH}
               target: /opt/service
+        ports:
+            - "${CAMEL_PORT}:${CAMEL_PORT}"
         environment:
             - CAMEL_PORT=${CAMEL_PORT}
             - FLASK_APP=${FLASK_APP}
@@ -42,11 +49,72 @@ services:
         image: mariadb
         # restart: always
         environment:
-            - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+            - MARIADB_ROOT_PASSWORD= ${MYSQL_DB_PASSWORD}
     adminer:
         image: adminer
         # restart: always
         ports:
-            - 8080:8080
+            - 3030:8080
         depends_on:
           - db
+
+
+# version: '3'
+
+# services:
+#     main:
+#         build: .
+#         # image: lexonomy
+#         links:
+#             - "db:db"
+#             - "camel:camel"
+#         volumes:
+#             - ${LEXO_WEBSITE_PATH}:/opt/service/website/
+#             -  ${LEXO_DATA_PATH}:/opt/service/data
+           
+#         # entrypoint: python3 lexonomy.py 0.0.0.0:8000
+        
+#         environment:
+#             - MYSQL_DB_HOST=${MYSQL_DB_HOST}
+#             - MYSQL_DB_USER=${MYSQL_DB_USER}
+#             - MYSQL_DB_PASSWORD=${MYSQL_DB_PASSWORD}
+#             - MYSQL_DB_PORT=${MYSQL_DB_PORT}
+#             # - DEBUG=${DEBUG}
+#             # - CAMEL=http://camel
+#         ports:
+#             - "8000:8000"
+#         entrypoint: /bin/sh entrypoint.sh
+#         # depends_on:
+#         #   - "db:db"
+#         #   - "camel:camel"
+#     camel:
+#         # build: .
+#         image: ksaa_nlp/camel_tools
+#         volumes:
+#             - type: bind
+#               source: ${CAMEL_DATA_PATH}
+#               target: /root/.camel_tools/data
+#             - type: bind
+#               source: ${CAMEL_PATH}
+#               target: /opt/service
+#         # ports:
+#         #     - "${CAMEL_PORT}:${CAMEL_PORT}"
+#         environment:
+#             - CAMEL_PORT=${CAMEL_PORT}
+#             - FLASK_APP=${FLASK_APP}
+#             - FLASK_ENV=${FLASK_ENV}
+#         tty: true
+#         entrypoint: flask run -h 0.0.0.0 -p ${CAMEL_PORT}
+
+#     db:
+#         image: mariadb
+#         # restart: always
+#         environment:
+#             MARIADB_ROOT_PASSWORD: ${MYSQL_DB_PASSWORD}
+#     adminer:
+#         image: adminer
+#         # restart: always
+#         ports:
+#             - 3030:8080
+#         # depends_on:
+#         #   - db

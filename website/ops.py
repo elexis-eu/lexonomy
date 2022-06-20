@@ -380,6 +380,8 @@ def getDoctype(xml):
 def getSortTitle(xml, titling):
     if titling.get("headwordSorting"):
         return getEntryHeadword(xml, titling.get("headwordSorting"))
+    if titling.get("headwordXpath", False):
+        return getEntryTitle(xml, titling);
     return getEntryHeadword(xml, titling.get("headword"))
 
 def generateKey(size=32):
@@ -1081,7 +1083,7 @@ def readNabesByText(dictDB, dictID, configs, text):
     # sort by selected locale
     collator = Collator.createInstance(Locale(getLocale(configs)))
     nabes.sort(key=lambda x: collator.getSortKey(x['sortkey']))
-   
+    
     #select before/after entries 
     for n in nabes:
         if collator.getSortKey(n["sortkey"]) <= collator.getSortKey(text):
@@ -1335,7 +1337,9 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
 def listEntriesPublic(dictDB, dictID, configs, searchtext):
     howmany = 100
     sql_list = f"select s.txt, min(s.level) as level, e.id, e.title, e.sortkey, case when s.txt={ques} then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like {ques} and e.doctype={ques} group by e.id order by priority, level, s.level"
-    c1 = dictDB.execute(sql_list, ("%"+searchtext+"%", "%"+searchtext+"%", configs["xema"].get("root")))
+    # c1 = dictDB.execute(sql_list, ("%"+searchtext+"%", "%"+searchtext+"%", configs["xema"].get("root")))
+    c1 = dictDB.execute(sql_list, (searchtext, searchtext, configs["xema"].get("root")))
+    
     c1 = c1 if c1 else dictDB
     entries = []
     for r1 in c1.fetchall() if c1 else []:
@@ -2040,7 +2044,7 @@ def get_locales():
     return codes
 
 def getLocale(configs):
-    locale = 'en'
+    locale = 'ar'
     if "locale" in configs["titling"] and configs["titling"]["locale"] != "":
         locale = configs["titling"]["locale"]
     return locale
