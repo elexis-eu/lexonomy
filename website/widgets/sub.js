@@ -8,10 +8,15 @@ window.Sub = {
   /** @type {{[id: number]: {title: string, id: number, parents?: Array<{id: number, title: string}>, children?: Array<{id: number, title: string}>}}} */
   parents: {},
   htmlID: '',
-  entryID: -1 // NOTE: might be null! when creating new entry.
+  entryID: null // NOTE: might be null! when creating new entry.
 }
 
 Sub.extendDocspec = function(/** @type {import("@kcmertens/xonomy").XonomyDocSpec} */ docspec, xema, entry) {
+  entry = {
+    id: null,
+    parententries: [],
+    subentries: [],
+  }
   Sub.children = {};
   Sub.parents = {};
   Sub.entryID = entry.id; 
@@ -29,6 +34,7 @@ Sub.extendDocspec = function(/** @type {import("@kcmertens/xonomy").XonomyDocSpe
 
   // For every element that can contain subentries, add menu entries to search for the subentries
   Object.entries(xema.elements).forEach(([id, element]) => {
+    element = {children: [], ...element};
     const elementName = element.elementName || id;
     const subentryChildren = element.children.filter(c => subbing[c.name]);
     if (!subentryChildren.length) return;
@@ -40,7 +46,7 @@ Sub.extendDocspec = function(/** @type {import("@kcmertens/xonomy").XonomyDocSpe
     spec.menu = spec.menu || [];
     subentryChildren.forEach(child => {
       const childID = child.name; 
-      const childConfig = xema.elements[childID];
+      const childConfig = xema.elements[childID] || {};
       const childElementName = childConfig.elementName || childID;
 
       spec.menu.push({
