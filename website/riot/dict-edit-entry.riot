@@ -269,43 +269,45 @@
             }
          },
          openGraphicalEditor(entry) {
-            // load the editor from the webpack-dev-server instead of running the prebuilt version from /dist/
-            if (window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL && !this.graphicalEditorLoaded) {
+            if (window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL && (!document.getElementById("editor-app-script") || !document.getElementById("editor-app-css"))) {
+               // editor is hosted on server instead of embedded in page - load it!
                if (this.graphicalEditorLoading) {
-                  setTimeout(() => {
-                     this.openGraphicalEditor(entry)
-                  }, 500)
-               } else {
-                  this.graphicalEditorLoading = true
-                  if (!document.getElementById("editor-app-script") || !document.getElementById("editor-app-css")) {
-                     Promise.all([
-                        fetch(window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL + 'editor.js').then(r => r.text()),
-                        fetch(window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL + 'editor.css').then(r => r.text()),
-                     ])
-                     .then(([js, css]) => {
-                        const newScript = document.createElement("script")
-                        newScript.setAttribute("id", "editor-app-script")
-                        newScript.append(document.createTextNode(js))
-                        document.querySelector('body').appendChild(newScript)
-                        const newCss = document.createElement('style')
-                        newCss.setAttribute("id", "editor-app-css")
-                        newCss.append(document.createTextNode(css))
-                        document.querySelector('body').appendChild(newCss)
-                     })
-                     .then(() => this.graphicalEditorLoaded = true)
-                  }
+                  return
                }
-            } else {
-               window.entryData = {
-                  entryId: this.dictData.entryId,
-                  dictId: this.dictData.dictId,
-                  dictConfigs: this.dictData.dictConfigs,
-                  userAccess: this.dictData.userAccess,
-                  userInfo: this.dictData.userInfo,
-                  content: entry || ""
-               }
-               window.mountGraphicalEditor()
+               this.graphicalEditorLoading = true
+               Promise.all([
+                  fetch(window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL + 'editor.js').then(r => r.text()),
+                  fetch(window.GRAPHICAL_EDITOR_WEBPACK_DEV_SERVER_URL + 'editor.css').then(r => r.text())
+               ])
+                  .then(([js, css]) => {
+                     const newScript = document.createElement("script")
+                     newScript.setAttribute("id", "editor-app-script")
+                     newScript.append(document.createTextNode(js))
+                     document.querySelector('body').appendChild(newScript)
+                     const newCss = document.createElement('style')
+                     newCss.setAttribute("id", "editor-app-css")
+                     newCss.append(document.createTextNode(css))
+                     document.querySelector('body').appendChild(newCss)
+                  })
+                  .then(() => {
+                     console.log("opening", entry)
+                     this.graphicalEditorLoading = false
+                     this.loadEntryIntoEditor(entry)
+                  })
+               return
             }
+            this.loadEntryIntoEditor(entry)
+         },
+         loadEntryIntoEditor(entry) {
+            window.entryData = {
+               entryId: this.dictData.entryId,
+               dictId: this.dictData.dictId,
+               dictConfigs: this.dictData.dictConfigs,
+               userAccess: this.dictData.userAccess,
+               userInfo: this.authData,
+               content: entry || ""
+            }
+            window.mountGraphicalEditor()
          },
 
          onAlertCloseClick() {
