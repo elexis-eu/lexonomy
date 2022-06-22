@@ -550,9 +550,9 @@ Screenful.Editor={
       prompt("Direct link to edit this entry", link);
     }
   },*/
-  clone: function(event){
+  clone: async function(event){
     if(Screenful.Editor.entryID && $("#editor").length>0){ //we have an existing entry open for editing
-      var content=Screenful.Editor.harvester(document.getElementById("editor"));
+      var content = await Screenful.Editor.harvester(document.getElementById("editor"));
       Screenful.Editor.new(event, content);
     } else if(Screenful.Editor.entryID && $("#viewer").length>0){ //we have an existing entry open for viewing
       var url=Screenful.Editor.readUrl;
