@@ -3,6 +3,9 @@ export default {
     getStylesFromConfig(elementName) {
       let data = this.state.entry.dictConfigs.xemplate[elementName]
       let output = {}
+       if (!data) {
+          return output
+       }
       for (const [style, value] of Object.entries(data)) {
         switch (style) {
           // Commented are ignored in graphical editor
