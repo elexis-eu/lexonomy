@@ -6,17 +6,20 @@
          <div style="display: flex; align-items: center; flex-wrap: wrap;">
             <span if={dictData.dictionaryList.length}
                   class="searchBox input-field">
-                  <i class="material-symbols-outlined prefix grey-text">search</i>
-               <input id="searchBox"
+                  <i class="material-symbols-outlined prefix">search</i>
+               <input id="searchBox" placeholder="search"
                      oninput={onSearchInput}>
                <i onclick={onClearFilterClick}
-                  class="material-symbols-outlined clearFilterIcon grey-text clickable">close</i>
+                  class="material-symbols-outlined clearFilterIcon clickable">close</i>
             </span>
-            <span style="margin-left: auto;">
+            <span style="margin-left: auto; margin-right: 1em;">
+               <a href="#/opendictionaries" style="color:#004494">Public dictionaries</a>
+            </span>
+            <span>
                <a href="#/make"
                      class="btn waves-effect waves-light">
-                  <i class="material-symbols-outlined left">edit_note</i>
-                  create new dictionary
+                  create a dictionary
+                  <i class="material-symbols-outlined right">edit_note</i>
                </a>
             </span>
          </div>
@@ -103,10 +106,20 @@
          max-width: 200px;
          display: inline-block;
          margin: 0 15px 0 0;
+         border-bottom: 2px solid #004494;
       }
       .searchBox input{
          padding-right: 27px;
+         border: unset;
+         background-color: #F0F8FF !important;
       }
+   .searchBox input:focus{
+         border: unset !important;
+         outline: unset !important;
+   }
+   .searchBox input::placeholder{
+         color: #004494;
+   }
       .clearFilterIcon{
          position: absolute;
          right: 5px;
