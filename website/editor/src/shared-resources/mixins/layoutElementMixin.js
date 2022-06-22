@@ -93,6 +93,9 @@ export default {
   },
   methods: {
     getHeadwordValue(data) {
+       if (!data) {
+          return ""
+       }
       try {
         return data.find(el => el.type === "text").text
       } catch (e) {
