@@ -32,7 +32,7 @@
                         class="title">{ dict.title }</a>
                   <span if={ dict.lang }
                         class="dict-lang">{ dict.lang }</span>
-                  <span class="dict-lang grey-text">{ dict.size } entries</span>
+                     <span class="dict-lang grey-text">{ dict.size } <template if={ dict.size == 1 }> entry</template><template if={ dict.size != 1}> entries</template></span>
                   <a if={ dict.currentUserCanDelete }
                         class="secondary-content clickable"
                         title="delete dictionary"
