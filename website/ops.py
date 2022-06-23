@@ -725,6 +725,7 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
             ret["xml"] = row["xml"]
             ret["content"] = row["xml"] # type: ignore - compatibility with screenful. TODO remove
         if tag or titlePlain:
+            print(row["xml"])
             parsedXml = parse(row["xml"])
             if tag:
                 ret["tag"] = parsedXml

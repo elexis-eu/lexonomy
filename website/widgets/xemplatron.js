@@ -13,8 +13,11 @@ Xemplatron.el2html=function(el, isFirst, isLast){
   if(!Xemplatron.getXemplate(el).shown) return "";
   var html="";
   var caption="";
+  if (el.hasAttribute('lxnm:linkable')) {
+     html+="<span style='display:none' name='"+el.getAttribute('lxnm:linkable')+"' class='linkable'><img src='/furniture/link.png'/>"+el.getAttribute('lxnm:linkable')+"</span>";
+  }
   var xema=Xemplatron.xema.elements[el.nodeName]; if(xema && xema.filling=="lst") {
-    html=el.textContent;
+    html+=el.textContent;
     if(xema.values) for(var i=0; i<xema.values.length; i++) if(xema.values[i].value==el.textContent) {caption=xema.values[i].caption; break;}
   } else if (xema && xema.filling=="med") {
     var fileType = Xemplatron.detectFileType(el.textContent);

@@ -498,3 +498,8 @@ span.badge{
       width: 95vw;
    }
 }
+
+.linkable {
+  display: inline-block;
+  background-color: yellow;
+}
