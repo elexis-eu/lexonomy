@@ -1273,7 +1273,7 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
             continue
 
         if value_type == "number":
-            next_number = c.get("number_next", 0) if c.get("number_globally") else 0
+            next_number = int(c.get("number_next", 0)) if c.get("number_globally") else 0
             template = None
             template_parts = None
         else: # value_type == "string":
