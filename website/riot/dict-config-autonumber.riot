@@ -2,6 +2,7 @@
    <loading-overlay if={state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["autonumber", "Auto-numbering"]]}/>
    <h1>Auto-numbering of elements</h1>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
    <div class="row">
       <p>If you need to number some of entry elements automatically, Lexonomy can do that for you. First, go to Entry structure and add element/attribute where you want to store the number. Eg. in element <tt>sense</tt> add attribute <tt>number</tt>. When you're ready, select element to number (eg. <tt>sense</tt>) and element/attribute to store numbering (eg. <tt>@number</tt>). Lexonomy will fill the numbers where missing.</p>
    </div>
@@ -35,21 +36,126 @@
          {state.info}
       </div>
    </div>
+   <div class="row">
+      <p>
+         <label>
+            <input name="autoApply" id="autoApply_yes" type="radio"
+               class="with-gap"
+            checked={ state.data.auto_apply == true }/>
+            <span>Apply numbers automatically</span>
+         </label>
+         <label>
+            <input name="autoApply" id="autoApply_no" type="radio"
+               class="with-gap"
+            checked={ state.data.auto_apply == false }/>
+            <span>Only run numbering manually</span>
+         </label>
+      </p>
+   </div>
+   <h3>What to do with existing values</h3>
+   <div class="row">
+      <p>
+         <label>
+            <input name="existingValues" id="existingValues_keep" type="radio"
+               class="with-gap"
+            checked={ state.data.overwrite_existing == false }/>
+            <span><b>Keep</b> existing values</span>
+         </label>
+         <label>
+            <input name="existingValues" id="existingValues_overwrite" type="radio"
+               class="with-gap"
+            checked={ state.data.overwrite_existing == true }/>
+            <span><b>Overwrite</b> existing values</span>
+         </label>
+      </p>
+   </div>
+   <h3>New values</h3>
+   <div class="row">
+      <label>
+         <input name="newValues" id="newValues_numbers" type="radio"
+         class="with-gap"
+         checked={ state.data.type == 'number' }/>
+         <span>Use numbers</span>
+      </label>
+   </div>
+   <div class="row">
+      <div class=" col s5">
+         <label style="margin-left:2em;">
+            <input name="useNumbers" id="useNumbers_entry" type="radio"
+            class="with-gap"
+            checked={ state.data.number_globally == false }/>
+            <span>Start at 0 in every entry</span>
+         </label>
+      </div>
+   </div>
+   <div class="row">
+      <div class=" col s5">
+         <label style="margin-left:2em;">
+            <input name="useNumbers" id="useNumbers_global" type="radio"
+            class="with-gap"
+            checked={ state.data.number_globally == true}/>
+            <span>Keep counting up, starting from</span>
+         </label>
+      </div>
+      <div class=" col s1">
+         <input type="text" id="startNumber" value={ state.data.number_next }/>
+      </div>
+      <div class=" col s3">
+         <a class="btn waves-effect waves-light" onclick={ findNext } id="findNext">Find next number</a>
+      </div>
+   </div>
+   <div class="row">
+         <label>
+            <input name="newValues" id="newValues_string" type="radio"
+            class="with-gap"
+            checked={ state.data.type == 'string'}/>
+            <span>Use text</span>
+         </label>
+   </div>
+   <div class="row">
+      <div class="col s6">
+         <input type="text" id="stringFormat" value={ state.data.string_format }/>
+      </div>
+   </div>
 
    <script>
       export default {
          state: {
+            isLoading: true,
             isSaving: false,
-            info: ""
+            info: "",
+            data: {
+               overwrite_existing: false,
+               auto_apply: false,
+               number_next: 1,
+               number_globally: true,
+               string_format: '%(headword)-%(pos)',
+               element: 'sense',
+               attribute: '@xml:id',
+               type: 'number'
+            }
          },
 
+
+         onMounted() {
+            this.store.loadDictionaryConfig("autonumbering")
+                  .done(response => {
+                     this.state.data = response.content
+                  })
+                  .always(() => {
+                     this.update({isLoading: false})
+                     M.updateTextFields()
+                  })
+         },
          onUpdated() {
             if (this.dictData.config.xema && this.dictData.config.xema.elements) {
                if ($('#elements option').length == 0) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
                      $('#elements').append('<option value="' + key + '">' + key + '</option>')
                   })
+                  $('#elements option[value="'+this.state.data.element+'"]').attr('selected','selected');
                   this.changeElem()
+                  $('#children option[value="'+this.state.data.attribute+'"]').attr('selected','selected');
                } else {
                   $('select').formSelect()
                }
@@ -90,7 +196,69 @@
                      })
                      .always(() => this.update({isSaving: false}))
             }
+         },
+
+         findNext() {
+            var countElem = $("#elements").val()
+            var storeElem = $("#children").val()
+            if (countElem && storeElem) {
+               this.update({
+                  isSaving: true,
+                  info: ''
+               })
+               this.store.autonumberNext(countElem, storeElem)
+                  .done(response => {
+                     $('#startNumber').val(response.next);
+                     })
+                     .always(() => this.update({isSaving: false}))
+            }
+         },
+
+         getConfigData() {
+            var newData = {
+               overwrite_existing: false,
+               auto_apply: false,
+               number_next: 1,
+               number_globally: true,
+               string_format: '%(headword)-%{pos}',
+               element: 'sense',
+               attribute: '@xml:id',
+               type: 'number'
+            };
+            newData.element = $("#elements").val();
+            newData.attribute = $("#children").val();
+            newData.string_format = $("#stringFormat").val();
+            newData.number_next = $("#startNumber").val();
+            if ($("#existingValues_keep").is(":checked")) {
+               newData.overwrite_existing = false;
+            } else {
+               newData.overwrite_existing = true;
+            }
+            if ($("#newValues_string").is(":checked")) {
+               newData.type = 'string';
+            } else {
+               newData.type = 'number';
+            }
+            if ($("#autoApply_yes").is(":checked")) {
+               newData.auto_apply = true;
+            } else {
+               newData.auto_apply = false;
+            }
+            if ($("#useNumbers_entry").is(":checked")) {
+               newData.number_globally = false;
+            } else {
+               newData.number_globally = true;
+            }
+
+            return newData;
+         },
+
+         saveData() {
+            this.update({isSaving: true})
+            this.store.updateDictionaryConfig("autonumbering", this.getConfigData())
+                  .always(() => this.update({isSaving: false}))
          }
+
       }
    </script>
 

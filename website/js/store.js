@@ -588,6 +588,19 @@ class StoreClass {
                M.toast({html: "Autonumbering failed."})
             })
    }
+   autonumberNext(countElem, storeElem){
+      return $.ajax({
+         url: `${window.API_URL}${this.data.dictId}/next_autonumber.json`,
+         method: 'POST',
+         data: {
+            "countElem": countElem,
+            "storeElem": storeElem
+         }
+      })
+            .fail(response => {
+               M.toast({html: "Autonumbering failed."})
+            })
+   }
 }
 
 window.store = new StoreClass()
