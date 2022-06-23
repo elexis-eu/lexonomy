@@ -1260,7 +1260,7 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
 
     touched_global_number = False
     touched_entry = False
-    for c in [autonumbering]:
+    for c in autonumbering:
         # Be a little smart about this:
         # Only overwrite values when running auto_apply on a new entry, or when doing a manual run with overwrite true
         if not c.get("auto_apply") and isAutoApplying:
