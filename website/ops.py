@@ -173,6 +173,32 @@ class ConfigKontext(TypedDict):
     url: str
     corpus: str
 
+class ConfigAutoNumbering(TypedDict):
+    element: str
+    """XML element to add IDS to"""
+    attribute: Optional[str] 
+    """Attribute on the XML element to add IDS to (optional)"""
+    type: NotRequired[Literal["string", "number"]] 
+    """Whether to write numbers or use the string_template to create a textual ID. Defaults to 'number'"""
+    string_template: Optional[str]
+    """Only used if type == "string".
+        The format string to use to generate textual ids - takes the shape of %(some-element) $(@some-attribute).
+    """
+    number_globally: NotRequired[bool]
+    """Only used if type == 'number'
+        Whether to keep incrementing the IDs, or restart at 0 every entry
+    """
+    number_next: NotRequired[int]
+    """Only used if type == 'number'
+        The next number to output. Should be saved across runs
+    """
+    overwrite_existing: NotRequired[bool]
+    """Whether to overwrite existing values in the target element/attribute. 
+        Does not apply when auto_apply = True and type = "number" and number_globally = True, as that would case ids to increase every single time an entry is updated.
+    """
+    auto_apply: NotRequired[bool]
+    "Whether to automatically perform this autonumbering on entry saving, or only as a one-off manual operation"
+
 class Configs(TypedDict):
     titling: ConfigTitling
     subbing: ConfigSubbing
@@ -188,6 +214,7 @@ class Configs(TypedDict):
     metadata: ConfigMetadata
     download: ConfigDownload
     kontext: ConfigKontext
+    autonumbering: NotRequired[list[ConfigAutoNumbering]]
 
 # Other types
 class IsoCode(TypedDict):
@@ -401,7 +428,7 @@ DEFAULT_HEADWORD = "?"
 
 def xema_get_element_name_from_id(xema: ConfigXema, elementID: str) -> str:
     """Xema elements no longer keyed by their xml tag name. Now keyed by an arbitrary ID. Util function to convert one to the other."""
-    return xema["elements"].get(elementID, {}).get("elementName", elementID)
+    return xema["elements"].get(elementID, {}).get("elementName", elementID) or elementID
 
 def xema_get_id_from_element_name(xema: ConfigXema, elementName: str, parentElementID: Optional[str] = None) -> str:
     """Xema elements no longer keyed by their xml tag name. Now keyed by an arbitrary ID. Util function to convert one to the other. 
@@ -992,6 +1019,46 @@ def get_entry_flag(xml: Union[str, Tag], configs: Configs) -> Optional[str]:
     flag_text = (get_text(xml, flag_element_name) or "") if flag_element_name else ""
     return flag_text
 
+def find_path_to_element(xema: ConfigXema, current_element_id: str, target_element_id: str) -> Optional[list[str]]:
+    """
+    Find the (first) path to to the target element. 
+    The list is returned with the target element at the end. The list contains the xml names of the elements, not their IDS.
+    The initial starting point element is NOT returned in the list.
+    If any of the encountered elements have no config in the xema it is not considered further.
+    """
+    if elementConfig := xema["elements"].get(current_element_id): # if element has a definition in xema, check the children
+        for c in elementConfig.get("children", []):
+            child_id = c["name"] # confusing, but alas.. the child.name property is the key in the xema.elements object, so it is actually the ID of the child.
+            child_name= xema_get_element_name_from_id(xema, c["name"])
+            if child_id == target_element_id:
+                return [child_name]
+            elif path_to_target := find_path_to_element(xema, child_id, target_element_id):
+                return [child_name] + path_to_target
+            # doesn't lead to target, next child
+        # nothing leads to target - dead-end.
+
+def create_path_to_element(xml: Tag, path: list[str]) -> Tag: 
+    """
+    Make sure the path exists within the entry, creating missing elements along the way.
+    The list should not contain the current xml node, only the descendants to create.
+        Ex: create_path_to_element(parse("<a><b></b></a>") , ["b", "c", "d"]) # ensure ./b/c/d exists
+            xml is now "<a><b><c><d></d></c></b></a>"
+    Returns the final node.
+    """
+    path = path.copy()
+    current_element = xml
+     # Find the element closest to the flag in the xml, adding unfound elements as we run across them.
+    tagCreator = BeautifulSoup()
+    while len(path):
+        next_nearest_elementname = path.pop(0)
+        if next_element := current_element.findChild(next_nearest_elementname):
+            current_element = next_element
+        else: # didn't find, add it!
+            new_element = tagCreator.new_tag(next_nearest_elementname) # when doing the last entry in the list, the element should be the flag tag itself.
+            current_element.append(new_element)
+            current_element = new_element
+    return current_element
+
 def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs, email: str, xml: Optional[Union[Tag, str]] = None) -> Tuple[Optional[Tag], Optional[str]]:
     """
     Update or create the flag element's contents. 
@@ -1019,7 +1086,6 @@ def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs
     elif isinstance(xml, str):
         xml = parse(xml)
 
-
     def updateFlag(entryRoot: Tag, the_flag_element: Tag):
         the_flag_element.clear()
         the_flag_element.append(flag) # add the string
@@ -1027,60 +1093,32 @@ def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs
         doSql(dictDB, "update entries set xml=?, flag=? where id=?", (xmlstr, flag, entryID))
         doSql(dictDB, "insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (entryID, "update", str(datetime.datetime.utcnow()), email, xmlstr, json.dumps({})))
 
+        # if the user can search in the flag field (which we just modified), update the search table
         if flag_element_id in configs["searchability"].get("searchableElements", []):
             titleText, titleHtml = get_entry_title(entryRoot, configs)
             presave_searchables(dictDB, configs, entryRoot, entryID, titleText)
 
-    def path_to_element(current_element_id: str, target_element_id: str) -> Optional[list[str]]:
-        """
-        Find the (first) path to to the target element. 
-        The list is returned with the target element at the end. The list contains the xml names of the elements, not their IDS.
-        The initial starting point element is not returned in the list.
-        If any of the encountered elements have no config in the xema it is not considered further.
-        """
-        if elementConfig := xema["elements"].get(current_element_id): # if element has a definition in xema, check the children
-            for c in elementConfig.get("children", []):
-                child_id = c["name"] # confusing, but alas.. the child.name property is the key in the xema.elements object, so it is actually the ID of the child.
-                child_name= xema_get_element_name_from_id(xema, c["name"])
-                if child_id == target_element_id:
-                    return [child_name]
-                elif path_to_target := path_to_element(child_id, target_element_id):
-                    return [child_name] + path_to_target
-                # doesn't lead to target, next child
-            # nothing leads to target - dead-end.
-
     # Note, we do not check the path to the flag element here. 
     # We assume that when it exists, it is valid to use it, and the exact location does not matter very much
-    if the_flag_element := xml.find(flag_element_name):
-        updateFlag(xml, the_flag_element)
+    if flag_element := xml.find(flag_element_name):
+        updateFlag(xml, flag_element)
         return xml, None
 
     # flag not present. try and find where we should insert it, and do so.
     # Start looking from the actual entry root instead of schema root, 
     # as it is possible this entry does not start at the schema root (such as when this is a subentry).
     root_element_id = xema_get_id_from_element_name(xema, xml.name)
-    path_to_flag = (path_to_element(root_element_id, flag_element_id) or [flag_element_name]) # if we can't find a path, add the flag directly below the root.
-    flag_or_nearest_ancestor = xml
-    
-    # Find the element closest to the flag in the xml, adding unfound elements as we run across them.
-    tagCreator = BeautifulSoup()
-    while len(path_to_flag):
-        next_nearest_elementname = path_to_flag.pop(0)
-        if nextTarget := flag_or_nearest_ancestor.findChild(next_nearest_elementname):
-            flag_or_nearest_ancestor = nextTarget
-        else: # didn't find, add it!
-            new_element = tagCreator.new_tag(next_nearest_elementname) # when doing the last entry in the list, the element should be the flag tag itself.
-            flag_or_nearest_ancestor.append(new_element)
-            flag_or_nearest_ancestor = new_element
-    
-    updateFlag(xml, flag_or_nearest_ancestor)
+    path_to_flag = find_path_to_element(xema, root_element_id, flag_element_id) or [flag_element_name] # if we can't find a path, add the flag directly below the root.
+    flag_element = create_path_to_element(xml, path_to_flag)
+    updateFlag(xml, flag_element)
     return xml, None
 
 
 def presave_searchables(dictDB: Connection, configs: Configs, entryXml: Tag, entryID: int, entryTitleText: str):
     """
+    Make the search database up-to-date for this entry. 
     A searchable is a string that is indexed in the database and is used to quickly find entries based on the text contents of (some of) their elements.
-
+    
     The entry title is always stored as searchable.
     The entry headword is always stored as a searchable.
     Additionally the text contents of all elements listed in configs.searchability.searchableElements
@@ -1112,8 +1150,40 @@ def presave_searchables(dictDB: Connection, configs: Configs, entryXml: Tag, ent
     if len(toInsert):
         dictDB.executemany("insert into searchables(entry_id, txt, level) values(?, ?, ?)", toInsert)
 
+def split_template_string(template: str) -> list[str]:
+    "Extract and return the templates from a template-string like %(some-element)" 
+    return re.findall(r"%\([^)]+\)", template) # pre-process 
 
-def presave_linkables(dictDB: Connection, config: ConfigLinks, entryXml: Tag, entryID: int):
+def eval_template_string(entry: Tag, current_element: Tag, template: str, split_template: Optional[list[str]] = None) -> str:
+    """Replace templates %(some-element) and %(@some-attribute) with their text values. 
+        Unmatched templates are preserved.
+        Elements are first matched inside current_element, and if that fails, on the entire entry.
+
+    Args:
+        entry (Tag): the entry, used as fallback when template string refers to an element that can't be found in/below the current_element
+        current_element (Tag): element for which to evaluate the template
+        template (str): complete template string
+        split_template (list[str]): speedup for when calling this function in a loop, the pre-extracted templates from the string.
+
+    Returns:
+        str: the template string with templates replaced by their values
+    """
+
+    if not split_template:
+        split_template = split_template_string(template)
+    
+    for pattern in split_template:
+        if pattern[2] == '@': # if the pattern is %(@some-attribute), extract it
+            attributeName = pattern[3:-1]
+            text = current_element.attrs.get(attributeName) or entry
+        else: # pattern is %(some_element)
+            elementName = pattern[2:-1]
+            text = get_text(current_element, elementName) or get_text(entry, elementName) # use descendants of the link element first, if that fails try entire entry
+        if text:
+            template = template.replace(pattern, text)
+    return template
+
+def presave_linkables(dictDB: Connection, configs: Configs, entryXml: Tag, entryID: int):
     """
     Purge outdated linkables, find new linkables, make linkables database up-to-date for this entry.
     Entry is not saved yet, only its xml is changed.
@@ -1125,46 +1195,132 @@ def presave_linkables(dictDB: Connection, config: ConfigLinks, entryXml: Tag, en
     entryID is passed in to prevent repeatitive database lookups during processing of (new or currently saving) entries.
     """
 
+    xema = configs.get("xema", {"elements": {}})
+    config_links = configs.get("links", {})
+
     # First remove all linkables, so we don't keep any stale entries around either in the entry or the database.
     doSql(dictDB, "delete from linkables where entry_id=?", (entryID,))
     for linkable in entryXml.findAll(attrs = {"lxnm:linkable": True}): # match all with linkable attribute
         del linkable.attrs["lxnm:linkable"]
 
     ret: List[Tuple[int, str, str, str]] = []
-    for linkref in config.values():
-        linkElement = linkref["linkElement"]
+    for linkref in config_links.values():
+        linkElement = xema_get_element_name_from_id(xema, linkref["linkElement"])
 
-        identifierEscapes = re.findall(r"%\([^)]+\)", linkref["identifier"]) # pre-process 
-        previewEscapes = re.findall(r"%\([^)]+\)", linkref["preview"])
+        identifierEscapes = split_template_string(linkref["identifier"]) # pre-process 
+        previewEscapes = split_template_string(linkref["preview"])
         for el in entryXml.findAll(linkElement):
-            identifier = linkref["identifier"] # format-string. NOTE: variable is gradually overwritten with result
-            preview = linkref["preview"] # format-string. NOTE: variable is gradually overwritten with result
-
-            for pattern in identifierEscapes:
-                if pattern[2] == '@': # if the pattern is %(@some-attribute), extract it
-                    attributeName = pattern[3:-1]
-                    text = el.attrs.get(attributeName)
-                else: # pattern is %(some_element)
-                    elementName = pattern[2:-1]
-                    text = get_text(el, elementName) or get_text(entryXml, elementName) # use descendants of the link element first, if that fails try entire entry
-                if text:
-                    identifier = identifier.replace(pattern, text)
-
-            for pattern in previewEscapes:
-                if pattern[2] == '@': # if the pattern is %(@some-attribute), extract it
-                    attributeName = pattern[3:-1]
-                    text = el.attrs.get(attributeName)
-                else: # pattern is %(some_element)
-                    elementName = pattern[2:-1]
-                    text = get_text(el, elementName) or get_text(entryXml, elementName) # use descendants of the link element first, if that fails try entire entry
-                if text:
-                    preview = preview.replace(pattern, text)
-
+            identifier = eval_template_string(entryXml, el, linkref["identifier"], identifierEscapes)
+            preview = eval_template_string(entryXml, el, linkref["preview"], previewEscapes)
             el.attrs["lxnm:linkable"] = identifier
             ret.append((entryID, identifier, linkElement, preview))
 
     if len(ret):
         dictDB.executemany("insert into linkables(entry_id, txt, element, preview) values(?,?,?,?)", ret)
+
+def get_next_autonumber_value(dictDB: Connection, element: str, attribute: Optional[str]) -> Optional[int]:
+    """Scan all entries for values in the element or the attribute on the element (if supplied), returning the highest found number + 1
+
+    Args:
+        dictDB (Connection): the dictionary
+        element (str): name of the element to scan
+        attribute (Optional[str]): name of the attribute on the element to scan. element text content is scanned if omitted.
+    """ 
+    
+    # """Get the next unused integer for an autonumber configuration."""
+    highest = -1
+    for e in dictDB.execute("select xml from entries"):
+        entry = parse(e["xml"])
+        for el in entry.findAll(element):
+            existing_value = get_text(el) if not attribute else el.attrs.get(attribute)
+            if existing_value:
+                try: 
+                    i = int(existing_value)
+                    highest = i if i > highest else highest
+                except:
+                    pass
+    return highest + 1 # return NEXT number 
+
+def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAutoApplying: bool = True) -> bool:
+    """Add automatically generated IDS/numbers to elements/attributes in the entry according to the config.
+    If the next ID is persistent, the config is then written to the database with the updating running nummer.
+
+    Args:
+        dictDB (Connection): database
+        config (list[ConfigAutoNumbering]): autonumbers to apply
+        isNewEntry (bool): Is this a new entry, or an update to an existing entry? Used to skip refreshing numeric IDs on existing entries. 
+        isAutoApplying (bool): Are we autonumbering in the context of a user that pressed "autonumber my dictionary" or are we just processing a single entry during saving?
+
+    Returns: 
+        true if the xml was changed
+    """
+    xema = configs["xema"]
+    autonumbering = configs.get("autonumbering", [])
+    
+    touched_global_number = False
+    touched_entry = False
+    for c in [autonumbering]:
+        # Be a little smart about this:
+        # Only overwrite values when running auto_apply on a new entry, or when doing a manual run with overwrite true
+        if not c.get("auto_apply") and isAutoApplying:
+            continue
+        
+        # setup
+        value_type = c.get("type", "number") # number or string
+        element_name = xema_get_element_name_from_id(xema, c.get("element", ""))
+        attribute_name = c.get("attribute")
+        if not element_name:
+            continue
+
+        if value_type == "number":
+            next_number = int(c.get("number_next", 0)) if c.get("number_globally") else 0
+            template = None
+            template_parts = None
+        else: # value_type == "string":
+            next_number = 0
+            template = c.get("string_template")
+            template_parts = split_template_string(template) if template else None
+            if not template_parts: # template string is empty, missing, or contains nothing to evaluate; skip.
+                continue
+        
+        for el in entry.findAll(element_name):
+            existing_value = get_text(el) if not attribute_name else el.attrs.get(attribute_name)
+            write_new_value = not existing_value or c.get("overwrite_existing") 
+            # Exception to the rule:
+            # When in numeric mode, and numbers are globally unique, and we're auto-applying: don't overwrite 
+            # Doing that would cause new numbers to be assigned every time an entry is saved or otherwise touched.
+            # Which would be completely useless from an ID standpoint, and also cause the numbers to grow rather quickly..
+            # So only overwrite existing global numbers if not isAutoApplying
+            # Local numbers are fine to overwrite, since they are usually the same, unless the entry added or removed the target elements.
+            # And in that case you probably DO want the ids to auto-update since they're more index numbers instead of actual idenfitiers. 
+            if value_type == "number" and c.get("number_globally") and existing_value and isAutoApplying:
+                write_new_value = False
+
+            if not write_new_value:
+                continue
+            
+            if value_type == "number":
+                value = str(next_number)
+                next_number += 1
+            else:
+                value = eval_template_string(entry, el, template, template_parts)
+            
+            touched_entry = True
+            if attribute_name:
+                el.attrs[attribute_name] = value
+            else:
+                el.clear()
+                el.append(value) # add the string
+        
+        # After writing the values, save the current number so we can continue in later entries
+        if value_type == "number" and c.get("number_globally"):
+            c["number_next"] = next_number
+            touched_global_number = True
+
+    if touched_global_number:
+        dictDB.execute("UPDATE configs SET json=? WHERE id=?", (json.dumps(autonumbering), "autonumbering"))
+
+    return touched_entry
 
 def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], email: str, id: Optional[int] = None) -> Union[
     Tuple[int, Tag, Literal[True], Optional[Any]], 
@@ -1197,7 +1353,8 @@ def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], emai
     flag = get_entry_flag(xml, configs)
 
     presave_searchables(dictDB, configs, xml, id, titleText)
-    presave_linkables(dictDB, configs["links"], xml, id)
+    presave_linkables(dictDB, configs, xml, id)
+    presave_autonumbering(dictDB, configs, xml, isAutoApplying=True)
 
     # Create/update the entry, save history
     xmlstr = str(xml)
@@ -2214,8 +2371,8 @@ def updateDictConfig(dictDB: Connection, dictID: str, configID: str, content: An
             conn.commit()
     elif configID == 'users':
         attachDict(dictDB, dictID)
-    elif configID == "titling" or configID == "searchability" or configID == "subbing" or configID == "flagging" or configID == "links":
-        flagForUpdate(dictDB) # Something changed that influences entries xml or metadata (headwod)
+    elif configID == "titling" or configID == "searchability" or configID == "subbing" or configID == "flagging" or configID == "links" or configID == "autonumbering":
+        flagForUpdate(dictDB) # Something changed that influences entries xml or metadata (headword)
 
     return content
 
@@ -2504,45 +2661,25 @@ def autoImageStatus(dictDB, dictID, bgjob):
     else:
         return {"status": "failed"}
 
-def addAutoNumbers(dictDB: Connection, dictID: str, countElem: str, storeElem: str):
-    # TODO port to lxml instead of minidom
-    from xml.dom import minidom, Node
-    isAttr = False
-    if storeElem[0] == '@':
-        isAttr = True
-        storeElem = storeElem[1:]
-    c = dictDB.execute("select id, xml from entries")
-    process = 0
-    for r in c.fetchall():
-        entryID = r["id"]
-        xml = r["xml"]
-        doc = minidom.parseString(xml)
-        allEmpty = True
-        for el in doc.getElementsByTagName(countElem):
-            if isAttr:
-                if el.getAttribute(storeElem) != "":
-                    allEmpty = False
-            else:
-                for sel in el.getElementsByTagName(storeElem):
-                    if sel.firstChild != None and sel.firstChild.nodeValue != "":
-                        allEmpty = False
-        if allEmpty:
-            count = 0
-            for el in doc.getElementsByTagName(countElem):
-                count += 1
-                if isAttr:
-                    el.setAttribute(storeElem, str(count))
-                else:
-                    for sel in el.getElementsByTagName(storeElem):
-                        el.removeChild(sel)
-                    n_elem = doc.createElement(storeElem)
-                    el.appendChild(n_elem)
-                    n_elem.appendChild(doc.createTextNode(str(count)))
-            process += 1
-            xml = doc.toxml().replace('<?xml version="1.0" ?>', '').strip()
-            dictDB.execute("update entries set xml=? where id=?", (xml, entryID)) # do not update needs_update
-    dictDB.commit()
-    return process
+def addAutoNumbers(dictDB: Connection, configs: Configs, user: User):
+    """Runs the autonumbering operation in manual mode"""
+    config = configs.get("autonumbering")
+    if not config: 
+        return {"success": True, "processed": 0}
+    total = 0
+    for e in dictDB.execute("select id, xml from entries").fetchall():
+        id = e["id"]
+        xml = parse(e["xml"])
+        entry_was_updated = presave_autonumbering(dictDB, configs, xml, isAutoApplying = False)
+        if not entry_was_updated:
+            continue
+        
+        total += 1
+        xmlstr = str(xml)
+        dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (id, "autonumber", str(datetime.datetime.utcnow()), user["email"], xmlstr, json.dumps({})))
+        dictDB.execute("update entries set xml = ? where id = ?", (xmlstr, id))
+
+    return {"success": True, "processed": total}
 
 def notifyUsers(configOld: ConfigUsers, configNew: ConfigUsers, dictInfo: ConfigIdent, dictID: str):
     for user in configNew:

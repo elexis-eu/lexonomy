@@ -18,7 +18,7 @@ import bottle
 from bottle import (hook, route, get, post, run, template, error, request,
                     response, static_file, abort, redirect, install)
 
-from ops import Configs, User, get_entry_html
+from ops import Configs, User
 
 if TYPE_CHECKING:
     request: Any
@@ -761,8 +761,14 @@ def configupdate(dictID: str, user: User, dictDB: Connection, configs: Configs):
 @post(siteconfig["rootPath"]+"<dictID>/autonumber.json")
 @authDict(["canConfig"])
 def autonumber(dictID: str, user: User, dictDB: Connection, configs: Configs):
-    process = ops.addAutoNumbers(dictDB, dictID, request.forms.countElem, request.forms.storeElem)
-    return {"success": True, "processed": process}
+    return ops.addAutoNumbers(dictDB, configs, user)
+
+@post(siteconfig["rootPath"]+"<dictID>/next_autonumber.json")
+@authDict(["canConfig"])
+def next_autonumber(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    element = request.forms.element
+    attribute = request.forms.get("attribute")
+    return { "next": ops.get_next_autonumber_value(dictDB, element, attribute) }
 
 @post(siteconfig["rootPath"]+"<dictID>/autoimage.json")
 @authDict(["canEdit"])
