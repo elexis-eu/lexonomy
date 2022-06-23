@@ -31,7 +31,7 @@ class ConfigTitling(TypedDict):
 
     headwordSorting: NotRequired[str]
     """(optional) alternative (xema) ID for element to use for sorting."""
-    
+
     sortDesc: bool
     """invert sort order?"""
 
@@ -46,7 +46,7 @@ class ConfigTitling(TypedDict):
 
     headwordAnnotations: NotRequired[List[str]]
     """List of element IDs (not names!) whose text to put in the entry's title"""
-    
+
     headwordAnnotationsAdvanced: NotRequired[str]
     """a format string like "<some_html>%(element_name)</some_html><some_more_html>%(another_element_name)</some_more_html>"
     %() escape-codes will be substituted with the text contents of the first element with that name in the entry"""
@@ -55,15 +55,15 @@ class ConfigSearchability(TypedDict):
     searchableElements: NotRequired[List[str]]
     """List of element names whose text to extract and index as searchable strings for entries"""
 
-class ConfigLinksEntry(TypedDict): 
-    """Elements listed here can be used as target of cross-reference link. 
-    For each element, specify unique identifier in the form of placeholders <tt>'%(element)'</tt>. 
-    Eg. element <tt>entry</tt> can have identifier <tt>%(lemma)-%(pos)</tt>, element <tt>sense</tt> can have identifier <tt>%(lemma)-%(number)</tt>. 
+class ConfigLinksEntry(TypedDict):
+    """Elements listed here can be used as target of cross-reference link.
+    For each element, specify unique identifier in the form of placeholders <tt>'%(element)'</tt>.
+    Eg. element <tt>entry</tt> can have identifier <tt>%(lemma)-%(pos)</tt>, element <tt>sense</tt> can have identifier <tt>%(lemma)-%(number)</tt>.
     Optionally, specify element you want to show as preview when selecting links.</p>"""
 
     linkElement: str
     """Element name .e.g. "entry"""""
-    
+
     identifier: str
     """a format-string with sequences like %(element_name)"""
 
@@ -105,7 +105,7 @@ class ConfigXemaElement(TypedDict):
     """When supplied, use this as xml tag instead of the key in the xema["elements"].
         This can be useful when the xml contains elements with the same name that require a different configuration.
 
-        E.G.: 
+        E.G.:
         xema = {
             elements: {
                 some_element: { }, # no name is set, so we use the key as xml element: <some_element>...</some_element>
@@ -122,7 +122,7 @@ class ConfigXemaElement(TypedDict):
     attributes: dict[str, ConfigXemaAttribute]
 
 
-class ConfigXema(TypedDict): 
+class ConfigXema(TypedDict):
     root: str
     elements: dict[str, ConfigXemaElement]
 
@@ -176,9 +176,9 @@ class ConfigKontext(TypedDict):
 class ConfigAutoNumbering(TypedDict):
     element: str
     """XML element to add IDS to"""
-    attribute: Optional[str] 
+    attribute: Optional[str]
     """Attribute on the XML element to add IDS to (optional)"""
-    type: NotRequired[Literal["string", "number"]] 
+    type: NotRequired[Literal["string", "number"]]
     """Whether to write numbers or use the string_template to create a textual ID. Defaults to 'number'"""
     string_template: Optional[str]
     """Only used if type == "string".
@@ -193,7 +193,7 @@ class ConfigAutoNumbering(TypedDict):
         The next number to output. Should be saved across runs
     """
     overwrite_existing: NotRequired[bool]
-    """Whether to overwrite existing values in the target element/attribute. 
+    """Whether to overwrite existing values in the target element/attribute.
         Does not apply when auto_apply = True and type = "number" and number_globally = True, as that would case ids to increase every single time an entry is updated.
     """
     auto_apply: NotRequired[bool]
@@ -222,7 +222,7 @@ class IsoCode(TypedDict):
     code3: str
     lang: str
 
-class Language(TypedDict): 
+class Language(TypedDict):
     code: str
     language: str
 
@@ -288,7 +288,7 @@ class EntryFromDatabase(TypedDict):
     id: int
     title: str
     sortkey: str
-    flag: str 
+    flag: str
     """Flag is "" when entry not flagged."""
     doctype: str
     "Xml name of the root node"
@@ -315,8 +315,8 @@ os.environ["SQLITE_TMPDIR"] = os.path.join(siteconfig["dataDir"], "sqlite_tmp")
 
 defaultDictConfig = {
     "editing": {
-        "xonomyMode": "nerd", 
-        "xonomyTextEditor": "askString" 
+        "xonomyMode": "nerd",
+        "xonomyTextEditor": "askString"
     },
     "searchability": {
         "searchableElements": []
@@ -328,7 +328,7 @@ defaultDictConfig = {
         "headwordAnnotations": []
     },
     "flagging": {
-        "flag_element": "", 
+        "flag_element": "",
         "flags": []
     }
 }
@@ -431,12 +431,12 @@ def xema_get_element_name_from_id(xema: ConfigXema, elementID: str) -> str:
     return xema["elements"].get(elementID, {}).get("elementName", elementID) or elementID
 
 def xema_get_id_from_element_name(xema: ConfigXema, elementName: str, parentElementID: Optional[str] = None) -> str:
-    """Xema elements no longer keyed by their xml tag name. Now keyed by an arbitrary ID. Util function to convert one to the other. 
+    """Xema elements no longer keyed by their xml tag name. Now keyed by an arbitrary ID. Util function to convert one to the other.
     Parent is used to disambiguate (because multiple elements may specify the same elementName value, but elementName is unique among siblings.
     That means if you use this without specifying the parent, and the elementName is not the entry's root node, you're doing it wrong.
     """
 
-    # Since there mayb be multiple elements where this is true, use the parent to disambiguate (if supplied). 
+    # Since there mayb be multiple elements where this is true, use the parent to disambiguate (if supplied).
     parentElement: Optional[ConfigXemaElement] = xema["elements"].get(parentElementID) if parentElementID else None
     if parentElement:
         for childConfig in parentElement["children"]:
@@ -444,12 +444,12 @@ def xema_get_id_from_element_name(xema: ConfigXema, elementName: str, parentElem
             childElementName = xema["elements"].get(childElementID, {}).get("elementName") or childElementID # use name if supplied, ID becomes fallback name otherwise
             if childElementName == elementName:
                 return childElementID
-    
+
     # No parent supplied, or not found: return the root if it matches
     if root := xema.get("root"):
         if xema["elements"].get(root, {}).get("elementName", root) == elementName:
             return root
-    
+
     # Root also didn't match: check all elements to see which it is (maybe an orphan element? (not the root, but no parent either.))
     for thisElementID, thisElement in xema["elements"].items():
         thisElementName = thisElement.get("elementName", thisElementID) # again, use name of this element if supplied in the config, use the ID otherwise
@@ -464,17 +464,17 @@ def parse(xml: str) -> Tag:
     # We roll our own builder because all existing beatifulsoup parsers have some drawback that make them unusable in our context:
     # 1. lxml lowercases and expands self-closing elements e.g. <Test/> -> <test></test>
     # 2. lxml-xml removes unbound namespaces e.g. <mynamespace:element> -> <element> when mynamespace is not declared.
-    #    which can often happen because we're not processing entire documents, only fragments, 
+    #    which can often happen because we're not processing entire documents, only fragments,
     #    and so the element where the namespace was declared (usually the dictionary root) is not part of the xml string here.
     #    It's bad behavior to just remove random user namespaces, especially as the dictionary may be from a toolset that relies on them.
     # 3. html does...many things, lowercase elements, mess with attributes, etc. It's not an xml parser after all.
-    
+
     # So what we do:
     # Treat namespace prefixes as if they're just part of the element or attribute name.
     # This means that to match a namespaced element, the query should just include the prefix: e.g. xml.findAll('lxnm:subentryParent')
-    
-    # There are a few (small) drawbacks to this method, listed here: 
-    # 1. we cannot tell what uri a namespace prefix is bound to, so it may be possible there is a "lxnm" namespace DIFFERENT from the lexonomy one, 
+
+    # There are a few (small) drawbacks to this method, listed here:
+    # 1. we cannot tell what uri a namespace prefix is bound to, so it may be possible there is a "lxnm" namespace DIFFERENT from the lexonomy one,
     #    we then erroneously assume elements in that namespace are ours, and use them, IF they have the same name as ours.
     #    However I consider this bad-faith input, so we will disregard this possibility.
     # 2. Since we're not namespace-aware, if sections of the xml are put in a namespace without using "namespace:" prefixes, we miss that, and assume they are in the global namespace.
@@ -527,7 +527,7 @@ def deleteEntry(dictDB: Connection, configs: Configs, id: int, email: Optional[s
 
 def get_xslt_transformer(xsl: Optional[str]) -> Callable[[str], Optional[str]]:
     """
-    Compile the xslt, return a function that runs it on the passed xml and returns the result. 
+    Compile the xslt, return a function that runs it on the passed xml and returns the result.
     The returned function will return None when: xslt cannot be parsed/xml cannot be parsed/no xslt was supplied.
 
     Example: getXsltTransformer(myOptionalXslt)(myXml) or myXml # get and run transformer, return the untransformed xml if something went wrong.\
@@ -541,7 +541,7 @@ def get_xslt_transformer(xsl: Optional[str]) -> Callable[[str], Optional[str]]:
         try:
             xsl_dom = ET.xml(xsl)
             xslt = ET.XSLT(xsl_dom)
-        except: 
+        except:
             return no_op
     else:
         return no_op
@@ -567,7 +567,7 @@ def sortEntries(configs: Configs, sortables: List[SortableEntry], reverse: bool 
     collator = Collator.createInstance(Locale(configs.get("titling", {}).get("locale", "en") or "en"))
     sortables.sort(key=lambda x: collator.getSortKey(x["sortkey"]), reverse=reverse)
     return sortables
-    
+
 def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext: Optional[str], modifier: Optional[Literal["start", "wordstart", "substring", "exact"]] = "start", sortdesc: Union[str, bool] = False, limit: Optional[int] = None) -> Tuple[int, List[SortableEntry]]:
     """Retrieve entries sorted by sortkey. Optionally filtered by their headword.
 
@@ -575,26 +575,26 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
         dictDB (Connection):
         configs (Configs):
         doctype (str): doctype of the entries to retrieve. Usually the root element, but might be different when requesting subentries.
-        searchtext (Optional[str]): 
+        searchtext (Optional[str]):
         modifier (Optional[Literal["start", "wordstart", "substring", "exact"]], optional): Defaults to "start".
         sortdesc (Union[bool, str], optional): Reverse the usual sort order? The usual sort order is determined by ConfigTitling["headwordSortDesc"]
         limit (Optional[int], optional): Limit the returned results to this number (when > 0)
     Returns:
         Tuple[int, List[SortableEntry]]: the total number of results, and the limited list of results.
     """
-    if not searchtext: 
+    if not searchtext:
         searchtext = ""
         modifier = None # can't search parts of words when not searching at all.
     searchtext = searchtext.lower()
-    
+
     if type(sortdesc) == str:
         sortdesc = sortdesc == "true"
         if "headwordSortDesc" in configs["titling"]: # if default sort is inverted also invert descending
             sortdesc = not sortdesc
 
-    # Special case: when searching wildcard (i.e. retrieve all entries) and the dictionary is large (>2000) entries. 
+    # Special case: when searching wildcard (i.e. retrieve all entries) and the dictionary is large (>2000) entries.
     # Don't read all entries before sorting and limiting, but use a shorter path.
-    if not searchtext or not modifier: 
+    if not searchtext or not modifier:
         total = dictDB.execute("select count(*) as total from entries where doctype = ?", (doctype, )).fetchone()["total"]
         if total > 2000:
             results: list[SortableEntry] = []
@@ -618,11 +618,11 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
     else: # default: searchtext not used
         sql1 = "select distinct e.id, e.sortkey from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? group by e.id order by s.level"
         params1 = (doctype, )
-    
+
     results: List[SortableEntry] = []
     for r in dictDB.execute(sql1, params1).fetchall():
         results.append({"id": r["id"], "sortkey": r["sortkey"]})
-    
+
     results = sortEntries(configs, results, reverse=sortdesc)
     total = len(results)
     if (limit is not None and limit > 0):
@@ -630,13 +630,13 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
     return total, results
 
 def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int], List[SortableEntry]], xml: bool=True, tag: bool=False, html: bool=False, titlePlain: bool = False, sortdesc: Union[str, bool] = False) -> List[EntryFromDatabase]:
-    """Read entries from the database, optionally returning some computed values with them. 
+    """Read entries from the database, optionally returning some computed values with them.
     Entries requiring an update (due to changed config or related entries) are updated prior to returning.
     Entries are returned sorted according to their sortKey
 
     Args:
-        dictDB (Connection): 
-        configs (Configs): 
+        dictDB (Connection):
+        configs (Configs):
         ids (Tuple[int, List[int]]): either a single id or list of ids to retrieve. Maxes out at something like 500k, due to statement length limitations.
         xml (bool, optional): Also return the xml as string. Defaults to True.
         tag (bool, optional): Also return the xml as parsed. Defaults to False.
@@ -663,43 +663,43 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
 
     rows = doSql(dictDB, f"""
         WITH children_by_parent AS (
-            select 
+            select
             sub.parent_id,
             json_group_array(json_object(
-                'id', entries.id, 
-                'title', entries.title, 
+                'id', entries.id,
+                'title', entries.title,
                 'doctype', entries.doctype
             )) as children
-            from sub left join entries 
+            from sub left join entries
             on sub.child_id = entries.id
             group by sub.parent_id
         ),
         parents_by_child AS (
-            select 
+            select
             sub.child_id,
             json_group_array(json_object(
-                'id', entries.id, 
-                'title', entries.title, 
+                'id', entries.id,
+                'title', entries.title,
                 'doctype', entries.doctype
             )) as parents
-            from sub left join entries 
+            from sub left join entries
             on sub.parent_id = entries.id
             group by sub.child_id
         )
-        
-        SELECT 
-            entries.id, 
-            entries.doctype, 
-            entries.xml, 
-            entries.title, 
-            entries.sortkey, 
-            entries.flag, 
-            entries.needs_update, 
+
+        SELECT
+            entries.id,
+            entries.doctype,
+            entries.xml,
+            entries.title,
+            entries.sortkey,
+            entries.flag,
+            entries.needs_update,
             children,
             parents
             -- parent_id,
             -- child_id
-        FROM entries 
+        FROM entries
         left join children_by_parent on entries.id = children_by_parent.parent_id
         left join parents_by_child on entries.id = parents_by_child.child_id
 
@@ -768,12 +768,12 @@ def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) ->
     if maybeID is not None: # id is passed in - update the xml to reflect.
         xml.attrs["lxnm:id"] = str(maybeID)
         id = None
-    
+
     id = xml.attrs.get('lxnm:id') # check if xml has an id, if not, create one. (entryID is legacy)
     if id is None:
         id = xml.attrs.get('lxnm:entryID') # id used to be stored in lxnm:entryID once upon a time: legacy support
     if id is not None:
-        try: 
+        try:
             id = int(id)
         except:
             print(f"Invalid ID (non-number) {id} in to-be-imported entry: replacing...")
@@ -787,7 +787,7 @@ def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) ->
     if id is None: # let db create one
         id = doSql(dictDB, "insert into entries(doctype, xml, title, sortkey) values(?, ?, ?, ?)", ("", "", "", "")).lastrowid
         isNewEntry = True
-    else: 
+    else:
         # ensure row exists
         isNewEntry = doSql(dictDB, "insert into entries(id, doctype, xml, title, sortkey) values(?,?,?,?,?) on conflict(id) do nothing", (id, "", "", "", "")).rowcount > 0
 
@@ -803,19 +803,19 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
     1. Find elements that should be a subentry (their tag is in the subbing config)
     2. Extract the element and its childen, and store it as a separate entry in the database
     3. Add back a <lxnm:subentryParent id="{idOfTheSeparateEntry}"/> xml placeholder element in this entry
-    4. Fixup any remaining invalid references 
-       Those are lxnm:subentryParent tags that point to 
+    4. Fixup any remaining invalid references
+       Those are lxnm:subentryParent tags that point to
         (<lxnm:subentryParent> tags) that are invalid (due to changed configuration settings -or just because an uploaded entry happens to have one somehow):
         1. If the entry it points to exists in the database:
         - replace it with a copy of that xml (removing lexonomy bookkeeping attributes in the copy)
         2. If it points to an entry that doesn't exist in the database:
-        - delete the tag. 
-            Keeping the tag is not an option, because we cannot save a link to a nonexistant entry due to referential constraints in the database. 
-            If we would keep the tag, but not save the reference in the database, that would give issues if the missing subentry was later created, perhaps by automatic assignment of an id. 
+        - delete the tag.
+            Keeping the tag is not an option, because we cannot save a link to a nonexistant entry due to referential constraints in the database.
+            If we would keep the tag, but not save the reference in the database, that would give issues if the missing subentry was later created, perhaps by automatic assignment of an id.
 
     Finally save all parent->child references in the database.
 
-    NOTE: changes stay within this entry. 
+    NOTE: changes stay within this entry.
     If this entry was once a subentry, but is now no longer (due to config changes), parents of this entry will need a separate update,
     this function will only modify subentries inside this entry, not modify entries that have this entry as subentry.
     """
@@ -823,7 +823,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
     config = configs["subbing"]
     def turnChildElementIntoSubentry(parentEntry: Tag, subentry: Tag) -> int:
         """
-            Save the child in the database, giving it an ID automatically. 
+            Save the child in the database, giving it an ID automatically.
             Then in the parent, replace the child xml with <lxnm:subentryParent id=${childID}/> and store the link between parent and child in the sub database.
             NOTE: the link is not registered in the database 'sub' table yet - that happens in a batch operation
         """
@@ -840,10 +840,10 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
         # Find a matching attribute
         for name, requiredValue in required_attributes:
             if el.has_attr(name) and (not requiredValue or el.attrs.get(name) == requiredValue):
-                return True 
+                return True
         # No matching attributes (but at least one should be present defined)
         return False
-    
+
     def isInsideOtherSubentry(el: Tag) -> bool:
         ancestor = el
         while (ancestor := ancestor.parent) != None and ancestor is not entryXml: # entry xml may not be root of doc, avoid looking at its parents (might happen in subentries)!
@@ -872,7 +872,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
     for subentry in entryXml.findAll("lxnm:subentryParent"):
         subentryID = int(subentry.attrs["id"])
         if not subentryID in newSubentries: # new subentries are guaranteed to be correct in the datbaase already.
-            subentryIDsToProcess.add(subentryID) 
+            subentryIDsToProcess.add(subentryID)
 
     validSubentryIDs = set(newSubentries)
     # 3 Replace invalid references with contents, delete if no contents in database.
@@ -882,7 +882,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
         for r in doSql(dictDB, f"select * from entries where id in ({idplaceholder})", list(subentryIDsToProcess)).fetchall():
             isValid = r["doctype"] in validDoctypes
             subentryID = int(r["id"])
-            if isValid: 
+            if isValid:
                 subentryIDsToProcess.remove(subentryID) # mark this one done.
                 validSubentryIDs.add(subentryID)
                 continue
@@ -913,7 +913,7 @@ def get_entry_doctype(xml: Tag) -> str:
 
 def get_text(xml: Tag, tagName: Optional[str] = None) -> Optional[str]:
     """
-        If element and element exists: returns the first (non-whitespace) text content of the element. 
+        If element and element exists: returns the first (non-whitespace) text content of the element.
         if element and element does not exist: None
         if no element: first non-whitespace text content of document
         if no element and no text: None
@@ -978,7 +978,7 @@ def get_entry_title(xml: Tag, configs: Configs) -> Tuple[str, str]:
             if (text := get_text(xml, elementName)) != None:
                 titleParts.append(text)
                 asHtml = asHtml.replace(elementFormatString, text)
-        
+
         if len(titleParts):
             return ' '.join(titleParts), asHtml
 
@@ -995,7 +995,7 @@ def get_entry_title(xml: Tag, configs: Configs) -> Tuple[str, str]:
     return ' '.join(stringParts), ' '.join(htmlParts)
 
 
-def get_entry_sortkey(xml: Tag, configs: Configs) -> str: 
+def get_entry_sortkey(xml: Tag, configs: Configs) -> str:
     """
     Get the entry's sort key as defined by configs.titling.headwordSorting
     Fallbacks are in order:
@@ -1021,7 +1021,7 @@ def get_entry_flag(xml: Union[str, Tag], configs: Configs) -> Optional[str]:
 
 def find_path_to_element(xema: ConfigXema, current_element_id: str, target_element_id: str) -> Optional[list[str]]:
     """
-    Find the (first) path to to the target element. 
+    Find the (first) path to to the target element.
     The list is returned with the target element at the end. The list contains the xml names of the elements, not their IDS.
     The initial starting point element is NOT returned in the list.
     If any of the encountered elements have no config in the xema it is not considered further.
@@ -1037,7 +1037,7 @@ def find_path_to_element(xema: ConfigXema, current_element_id: str, target_eleme
             # doesn't lead to target, next child
         # nothing leads to target - dead-end.
 
-def create_path_to_element(xml: Tag, path: list[str]) -> Tag: 
+def create_path_to_element(xml: Tag, path: list[str]) -> Tag:
     """
     Make sure the path exists within the entry, creating missing elements along the way.
     The list should not contain the current xml node, only the descendants to create.
@@ -1061,10 +1061,10 @@ def create_path_to_element(xml: Tag, path: list[str]) -> Tag:
 
 def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs, email: str, xml: Optional[Union[Tag, str]] = None) -> Tuple[Optional[Tag], Optional[str]]:
     """
-    Update or create the flag element's contents. 
+    Update or create the flag element's contents.
     Returns either [xml Tag, None] or [None, feedback], depending on success.
     Load the xml from the database if not passed in. Otherwise it is assumed the xml is from the database (so not just some unprocessed/unvalidated user input).
-    Returns the updated xml. 
+    Returns the updated xml.
     NOTE: If Tag is passed in - it is modified in place and returned.
     NOTE: XML and flag column in Database are always updated on success.
     NOTE: A history entry is created on success.
@@ -1098,14 +1098,14 @@ def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs
             titleText, titleHtml = get_entry_title(entryRoot, configs)
             presave_searchables(dictDB, configs, entryRoot, entryID, titleText)
 
-    # Note, we do not check the path to the flag element here. 
+    # Note, we do not check the path to the flag element here.
     # We assume that when it exists, it is valid to use it, and the exact location does not matter very much
     if flag_element := xml.find(flag_element_name):
         updateFlag(xml, flag_element)
         return xml, None
 
     # flag not present. try and find where we should insert it, and do so.
-    # Start looking from the actual entry root instead of schema root, 
+    # Start looking from the actual entry root instead of schema root,
     # as it is possible this entry does not start at the schema root (such as when this is a subentry).
     root_element_id = xema_get_id_from_element_name(xema, xml.name)
     path_to_flag = find_path_to_element(xema, root_element_id, flag_element_id) or [flag_element_name] # if we can't find a path, add the flag directly below the root.
@@ -1116,9 +1116,9 @@ def set_entry_flag(dictDB: Connection, entryID: int, flag: str, configs: Configs
 
 def presave_searchables(dictDB: Connection, configs: Configs, entryXml: Tag, entryID: int, entryTitleText: str):
     """
-    Make the search database up-to-date for this entry. 
+    Make the search database up-to-date for this entry.
     A searchable is a string that is indexed in the database and is used to quickly find entries based on the text contents of (some of) their elements.
-    
+
     The entry title is always stored as searchable.
     The entry headword is always stored as a searchable.
     Additionally the text contents of all elements listed in configs.searchability.searchableElements
@@ -1151,11 +1151,11 @@ def presave_searchables(dictDB: Connection, configs: Configs, entryXml: Tag, ent
         dictDB.executemany("insert into searchables(entry_id, txt, level) values(?, ?, ?)", toInsert)
 
 def split_template_string(template: str) -> list[str]:
-    "Extract and return the templates from a template-string like %(some-element)" 
-    return re.findall(r"%\([^)]+\)", template) # pre-process 
+    "Extract and return the templates from a template-string like %(some-element)"
+    return re.findall(r"%\([^)]+\)", template) # pre-process
 
 def eval_template_string(entry: Tag, current_element: Tag, template: str, split_template: Optional[list[str]] = None) -> str:
-    """Replace templates %(some-element) and %(@some-attribute) with their text values. 
+    """Replace templates %(some-element) and %(@some-attribute) with their text values.
         Unmatched templates are preserved.
         Elements are first matched inside current_element, and if that fails, on the entire entry.
 
@@ -1171,7 +1171,7 @@ def eval_template_string(entry: Tag, current_element: Tag, template: str, split_
 
     if not split_template:
         split_template = split_template_string(template)
-    
+
     for pattern in split_template:
         if pattern[2] == '@': # if the pattern is %(@some-attribute), extract it
             attributeName = pattern[3:-1]
@@ -1207,7 +1207,7 @@ def presave_linkables(dictDB: Connection, configs: Configs, entryXml: Tag, entry
     for linkref in config_links.values():
         linkElement = xema_get_element_name_from_id(xema, linkref["linkElement"])
 
-        identifierEscapes = split_template_string(linkref["identifier"]) # pre-process 
+        identifierEscapes = split_template_string(linkref["identifier"]) # pre-process
         previewEscapes = split_template_string(linkref["preview"])
         for el in entryXml.findAll(linkElement):
             identifier = eval_template_string(entryXml, el, linkref["identifier"], identifierEscapes)
@@ -1225,8 +1225,8 @@ def get_next_autonumber_value(dictDB: Connection, element: str, attribute: Optio
         dictDB (Connection): the dictionary
         element (str): name of the element to scan
         attribute (Optional[str]): name of the attribute on the element to scan. element text content is scanned if omitted.
-    """ 
-    
+    """
+
     # """Get the next unused integer for an autonumber configuration."""
     highest = -1
     for e in dictDB.execute("select xml from entries"):
@@ -1234,12 +1234,12 @@ def get_next_autonumber_value(dictDB: Connection, element: str, attribute: Optio
         for el in entry.findAll(element):
             existing_value = get_text(el) if not attribute else el.attrs.get(attribute)
             if existing_value:
-                try: 
+                try:
                     i = int(existing_value)
                     highest = i if i > highest else highest
                 except:
                     pass
-    return highest + 1 # return NEXT number 
+    return highest + 1 # return NEXT number
 
 def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAutoApplying: bool = True) -> bool:
     """Add automatically generated IDS/numbers to elements/attributes in the entry according to the config.
@@ -1248,15 +1248,15 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
     Args:
         dictDB (Connection): database
         config (list[ConfigAutoNumbering]): autonumbers to apply
-        isNewEntry (bool): Is this a new entry, or an update to an existing entry? Used to skip refreshing numeric IDs on existing entries. 
+        isNewEntry (bool): Is this a new entry, or an update to an existing entry? Used to skip refreshing numeric IDs on existing entries.
         isAutoApplying (bool): Are we autonumbering in the context of a user that pressed "autonumber my dictionary" or are we just processing a single entry during saving?
 
-    Returns: 
+    Returns:
         true if the xml was changed
     """
     xema = configs["xema"]
     autonumbering = configs.get("autonumbering", [])
-    
+
     touched_global_number = False
     touched_entry = False
     for c in [autonumbering]:
@@ -1264,7 +1264,7 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
         # Only overwrite values when running auto_apply on a new entry, or when doing a manual run with overwrite true
         if not c.get("auto_apply") and isAutoApplying:
             continue
-        
+
         # setup
         value_type = c.get("type", "number") # number or string
         element_name = xema_get_element_name_from_id(xema, c.get("element", ""))
@@ -1282,36 +1282,36 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
             template_parts = split_template_string(template) if template else None
             if not template_parts: # template string is empty, missing, or contains nothing to evaluate; skip.
                 continue
-        
+
         for el in entry.findAll(element_name):
             existing_value = get_text(el) if not attribute_name else el.attrs.get(attribute_name)
-            write_new_value = not existing_value or c.get("overwrite_existing") 
+            write_new_value = not existing_value or c.get("overwrite_existing")
             # Exception to the rule:
-            # When in numeric mode, and numbers are globally unique, and we're auto-applying: don't overwrite 
+            # When in numeric mode, and numbers are globally unique, and we're auto-applying: don't overwrite
             # Doing that would cause new numbers to be assigned every time an entry is saved or otherwise touched.
             # Which would be completely useless from an ID standpoint, and also cause the numbers to grow rather quickly..
             # So only overwrite existing global numbers if not isAutoApplying
             # Local numbers are fine to overwrite, since they are usually the same, unless the entry added or removed the target elements.
-            # And in that case you probably DO want the ids to auto-update since they're more index numbers instead of actual idenfitiers. 
+            # And in that case you probably DO want the ids to auto-update since they're more index numbers instead of actual idenfitiers.
             if value_type == "number" and c.get("number_globally") and existing_value and isAutoApplying:
                 write_new_value = False
 
             if not write_new_value:
                 continue
-            
+
             if value_type == "number":
                 value = str(next_number)
                 next_number += 1
             else:
                 value = eval_template_string(entry, el, template, template_parts)
-            
+
             touched_entry = True
             if attribute_name:
-                el.attrs[attribute_name] = value
+                el.attrs[attribute_name[1:]] = value
             else:
                 el.clear()
                 el.append(value) # add the string
-        
+
         # After writing the values, save the current number so we can continue in later entries
         if value_type == "number" and c.get("number_globally"):
             c["number_next"] = next_number
@@ -1323,11 +1323,11 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
     return touched_entry
 
 def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], email: str, id: Optional[int] = None) -> Union[
-    Tuple[int, Tag, Literal[True], Optional[Any]], 
+    Tuple[int, Tag, Literal[True], Optional[Any]],
     Tuple[Optional[int], Optional[Tag], Literal[False], Any]
 ]:
     """
-    Create or re-index an entry, ensuring the xml is conformant and the database is up to date. 
+    Create or re-index an entry, ensuring the xml is conformant and the database is up to date.
     Returns in order: id, parsed xml, success (true/false), feedback as JSON object {"type": string, "info": string|int} when duplicate entry or otherwise error.
     NOTE: for efficiency during import, COMMIT is not called and is left to the caller.
 
@@ -1335,13 +1335,13 @@ def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], emai
     """
 
     if isinstance(xml, str) or xml is None:
-        try: 
+        try:
             xml = parse(xml)
         except:
             return id, None, False, {"type": "savingFailed", "info": "Invalid XML."}
 
     fixup_namespaces(xml)
-    
+
     # Specific order: reserve ID in the database, then extract subentries
     # So that any element matching after this does not go into subentries
     id, isNewEntry = get_entry_id(xml, dictDB, id)
@@ -1623,7 +1623,7 @@ def makeDict(dictID: str, template: str, title: str, blurb: str, email: str):
     conn.commit()
     #update dictionary info
     users = {email: {"canEdit": True, "canConfig": True, "canDownload": True, "canUpload": True}}
-    dictDB = getDB(dictID) 
+    dictDB = getDB(dictID)
     c = dictDB.execute("SELECT count(*) AS total FROM configs WHERE id='users'")
     r = c.fetchone()
     if r['total'] == 0:
@@ -1816,7 +1816,7 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
     for d in dicts:
         try:
             dictDB = getDB(d["id"])
-        except IOError: 
+        except IOError:
             dictDB = None
         if dictDB:
             query = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND s.txt LIKE ? AND s.level=1"
@@ -1883,7 +1883,7 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                     info["confidence"] = r2["confidence"]
                     try:
                         sourceDB = getDB(r2["source_dict"])
-                    except IOError: 
+                    except IOError:
                         sourceDB = None
                     if sourceDB:
                         info["targetLang"] = readDictConfigs(sourceDB)['ident']['lang']
@@ -2135,7 +2135,7 @@ def exportEntryXml(dictDB: Connection, dictID: str, entryID: int, configs: Confi
 def export(dictID: str, dictDB: Connection, configs: Configs, clean: bool = True) -> Iterable[str]:
     "Export all entries, (optionally) cleaning all lexonomy things."
     def prepare_for_export(xml: str) -> Tag:
-        """Pre-process the xml to replace subentry references with their contents, and optionally remove all lexonomy bookkeeping. 
+        """Pre-process the xml to replace subentry references with their contents, and optionally remove all lexonomy bookkeeping.
             Return tag so we don't stringify and re-parse subentries.
         """
         tag = parse(xml)
@@ -2188,7 +2188,7 @@ def readNabesByEntryID(dictDB: Connection, dictID: str, entryID: int, configs: C
         if n["id"] == -1:
             break
         i += 1
-    
+
     # Return the surrounding entries, excluding the target entry
     return readEntries(dictDB, configs, nabes[i-8: i] + nabes[i+1:i+15], xml=False)
 
@@ -2216,12 +2216,12 @@ def readNabesByText(dictDB: Connection, dictID: str, configs: Configs, text: str
 def readRandoms(dictDB: Connection):
     configs = readDictConfigs(dictDB)
     limit = 75
-    
+
     c = dictDB.execute("select id, sortkey from entries where doctype=? order by random() limit ?", (configs["xema"]["root"], limit))
     ids_and_sortkeys: List[SortableEntry] = []
     for r in c.fetchall():
         ids_and_sortkeys.append({"id": r["id"], "sortkey": r["sortkey"]})
-    
+
     return {
         "entries": readEntries(dictDB, configs, ids_and_sortkeys),
         "more": dictDB.execute("select count(*) as total from entries").fetchone()["total"] > limit
@@ -2268,7 +2268,7 @@ def importfile(dictID: str, filepath: str, user: str, purge: bool = False, saveS
     args: list[str] = []
     if purge:
         args.append("-pp") # purge both entries AND history
-    if saveSurroundingContent: 
+    if saveSurroundingContent:
         args.append("-a")
     args.append("-u")
     args.append(user)
@@ -2278,7 +2278,7 @@ def importfile(dictID: str, filepath: str, user: str, purge: bool = False, saveS
     return _startSubprocess(subProcessID = filepath, scriptPath = os.path.join("adminscripts", "import.py"), args = args)
 
 def _startSubprocess(subProcessID: str, scriptPath: str, args: list[str]) -> ExternalProcessStatus:
-    "Start the subprocess if it is not already running or finished. Return the status of the process if is was already running." 
+    "Start the subprocess if it is not already running or finished. Return the status of the process if is was already running."
     import subprocess
     import sys
 
@@ -2296,7 +2296,7 @@ def _startSubprocess(subProcessID: str, scriptPath: str, args: list[str]) -> Ext
 
 def _getProcessStatus(pidfile: str, errfile: str) -> ExternalProcessStatus:
     """read the pidfile and errfile and return the status of the proces.
-    When the pidfile ends with a line 
+    When the pidfile ends with a line
 
     Args:
         pidfile (str): file path to the console output file
@@ -2376,7 +2376,7 @@ def updateDictConfig(dictDB: Connection, dictID: str, configID: str, content: An
 
     return content
 
-def flagForUpdate(dictDB: Connection) -> int: 
+def flagForUpdate(dictDB: Connection) -> int:
     "Flag all entries in the dictionary for an update"
     c = dictDB.execute("update entries set needs_update=1")
     dictDB.commit()
@@ -2412,19 +2412,19 @@ def getEntryLinks(dictDB: Connection, dictID: str, entryID: int):
 
 def readDictHistory(dictDB: Connection, dictID: str, configs: Configs, entryID: int) -> List[HistoryEntry]:
     html_transformer = get_xslt_transformer(configs.get("xemplate", {}).get("_xsl", ""))
-    
+
     history: List[HistoryEntry] = []
     c = dictDB.execute("select * from history where entry_id=? order by [when] desc", (entryID,))
     for row in c.fetchall():
         xml = row["xml"]
         history.append({
-            "entry_id": row["entry_id"], 
-            "revision_id": row["id"], 
-            "content": xml, 
+            "entry_id": row["entry_id"],
+            "revision_id": row["id"],
+            "content": xml,
             "contentHtml": get_entry_html(configs, xml, html_transformer),
-            "action": row["action"], 
-            "when": row["when"], 
-            "email": row["email"] or "", 
+            "action": row["action"],
+            "when": row["when"],
+            "email": row["email"] or "",
             "historiography": json.loads(row["historiography"])
         })
     return history
@@ -2664,7 +2664,7 @@ def autoImageStatus(dictDB, dictID, bgjob):
 def addAutoNumbers(dictDB: Connection, configs: Configs, user: User):
     """Runs the autonumbering operation in manual mode"""
     config = configs.get("autonumbering")
-    if not config: 
+    if not config:
         return {"success": True, "processed": 0}
     total = 0
     for e in dictDB.execute("select id, xml from entries").fetchall():
@@ -2673,7 +2673,7 @@ def addAutoNumbers(dictDB: Connection, configs: Configs, user: User):
         entry_was_updated = presave_autonumbering(dictDB, configs, xml, isAutoApplying = False)
         if not entry_was_updated:
             continue
-        
+
         total += 1
         xmlstr = str(xml)
         dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (id, "autonumber", str(datetime.datetime.utcnow()), user["email"], xmlstr, json.dumps({})))
@@ -2896,7 +2896,7 @@ def elexisDictAbout(dictID: str):
     r = c.fetchone()
     info["entryCount"] = r['total']
     return info
-    
+
 
 def elexisLemmaList(dictID, limit=None, offset=0):
     try:
@@ -2992,7 +2992,7 @@ def elexisGetLemma(dictID, headword, limit=None, offset=0):
             lemma["partOfSpeech"] = [pos]
         lemmas.append(lemma)
     return lemmas
-    
+
 
 def elexisGuessPOS(xml):
     # try to guess frequent PoS element
