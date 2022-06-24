@@ -6,135 +6,205 @@
    <div class="row">
       <p>If you need to number some of entry elements automatically, Lexonomy can do that for you. First, go to Entry structure and add element/attribute where you want to store the number. Eg. in element <tt>sense</tt> add attribute <tt>number</tt>. When you're ready, select element to number (eg. <tt>sense</tt>) and element/attribute to store numbering (eg. <tt>@number</tt>). Lexonomy will fill the numbers where missing.</p>
    </div>
-   <div class="row">
-      <div class="input-field col s4">
-         <select id="elements"
-               onchange={ changeElem }></select>
-         <label for="elements">Element to number</label>
+   <hr>
+   <template each={config in Object.values(state.data).sort()}>
+      <div class="row">
+         <div class="input-field col s4">
+            <select onchange={changeElement.bind(this, config)} class="browser-default">
+               <option selected value={config.element}>{config.element}</option>
+               <option each={el in getUnusedElements()} value={el}>{el}</option>
+            </select>
+            <label>Element to number</label>
+         </div>
+         <div id="hasChildren" class="input-field col s4">
+            <select name="children" onchange={setWithEvent.bind(this, config, 'target')} class="browser-default">
+               <option value="" selected={config.target === ""}>{config.element} itself</option>
+               <option each={attribute in getAttributesForElement(config.element)} value=@{attribute} selected={config.target === '@' + attribute}>@{attribute}</option>
+               <option each={childElement in getChildElementsForElement(config.element)} value={childElement} selected={config.target === childElement}>{childElement}</option>
+            </select>
+            <label for="children">Add numbers to</label>
+         </div>
+         <div class="input-field col s4">
+            <button type="button" class="btn waves-effect waves-light" onclick={deleteElement.bind(this, config.element)} style="height:3rem;">Remove</button>
+         </div>
+
+         <div id="hasNoChildren"
+               class="input-field col s4 grey-text"
+               style="display: none; padding-top: 10px;">
+            element has no children
+         </div>
+
+
+         <div class="col s12">
+            <label>
+               <input name={config.element + 'autoApply'} type="radio" class="with-gap" value="false" checked={ config.auto_apply } onchange={set.bind(this, config, 'auto_apply', true)}/>
+               <span>Apply numbers automatically</span>
+            </label>
+            <br>
+            <label>
+               <input name={config.element + 'autoApply'} type="radio" class="with-gap" value="true" checked={ !config.auto_apply } onchange={set.bind(this, config, 'auto_apply', false)}/>
+               <span>Only run numbering manually</span>
+            </label>
+         </div>
+
+         <h3 class="col s12" style="margin-top: 2rem;">What to do with existing values</h3>
+         <div class="col s12" style="padding-left: 2.75rem;">
+            <label>
+               <input name="existingValues" id="existingValues_keep" type="radio" class="with-gap" value="false" checked={ !config.overwrite_existing } onchange={set.bind(this, config, 'overwrite_existing', false)}/>
+               <span><b>Keep</b> existing values</span>
+            </label>
+            <br>
+            <label>
+               <input name="existingValues" id="existingValues_overwrite" type="radio" class="with-gap" value="true" checked={ config.overwrite_existing } onchange={set.bind(this, config, 'overwrite_existing', true)}/>
+               <span><b>Overwrite</b> existing values</span>
+            </label>
+         </div>
+
+         <h3 class="col s12" style="margin-top: 2rem;">New values</h3>
+         <div class="col s12" style="padding-left: 2.75rem;">
+            <label>
+               <input name="{config.element + 'newValues'}" type="radio" class="with-gap" value="number" checked={ config.type == 'number' } onchange={setWithEvent.bind(this, config, 'type')} />
+               <span>Use numbers</span>
+            </label>
+            <br>
+
+            <label style="margin-left: 3rem; margin-top: 0.75rem;">
+               <input name="{config.element} + 'useNumbers'" type="radio" class="with-gap" disabled={config.type !== 'number'} checked={ !config.number_globally } onchange={set.bind(this, config, 'number_globally', false)}/>
+               <span>Start at 0 in every entry</span>
+            </label>
+            <div style="margin-left: 3rem; display: flex; flex-wrap: wrap; align-items: baseline;">
+               <label style="white-space: nowrap;">
+                  <input style="margin-left: 0.75rem;" name="{config.element} + 'useNumbers'" type="radio" class="with-gap" disabled={config.type !== 'number'} checked={ config.number_globally } onchange={set.bind(this, config, 'number_globally', true)}/>
+                  <span>Keep counting up, starting from</span>
+               </label>
+               <input type="text" style="margin-left: 0.75rem; flex-basis: 5ch; flex-grow: 1;" value={ config.number_next } onchange={setWithEvent.bind(this, config, 'number_next')}/>
+               <button type="button" class="btn waves-effect waves-light" style="height: 3rem; flex-shrink: 0; margin-left: 0.75rem;" onclick={ findNext.bind(this, config) }>Find next number</button>
+            </div>
+
+            
+            <label>
+               <input name="{config.element + 'newValues'}" type="radio" class="with-gap" checked={ config.type == 'string'} onchange={set.bind(this, config, 'type', 'string')}/>
+               <span>Use text</span>
+            </label>
+      
+            <input style="margin-left: 3rem;" disabled={config.type !== 'string'} type="text" id="stringFormat" placeholder="%(headword)-%(pos)" value={ config.string_template } onchange={setWithEvent.bind(this, config, 'string_template')}/>
+
+
+         </div>
+
       </div>
-      <div id="hasChildren"
-            class="input-field col s4">
-         <select id="children"></select>
-         <label for="children">Add numbers to</label>
-      </div>
-      <div id="hasNoChildren"
-            class="input-field col s4 grey-text"
-            style="display: none; padding-top: 10px;">
-         element has no children
-      </div>
-      <div class="input-field col s3">
-         <a class="btn waves-effect waves-light"
-               onclick={ addNumbers }
-               id="submit_button">
-            <i class="material-symbols-outlined right">add</i>Add numbers
-         </a>
-      </div>
+      <hr>
+   </template>
+
+   <div>
+      <i class="material-symbols-outlined right">add</i>Add autonumbering to another element
+      <select class="browser-default" id="newElement">
+         <option each={el in getUnusedElements()} value={el}>{el}</option>
+      </select>
+      <button type="button" class="btn waves-effect waves-light" onclick={addElement}>Add</button>
    </div>
+
+   <div class="input-field col s3">
+      <a class="btn waves-effect waves-light"
+            onclick={ addNumbers }
+            id="submit_button">
+         <i class="material-symbols-outlined right">add</i>Autonumber my dictionary right now
+      </a>
+   </div>
+
    <div if={state.info}
          class="section">
       <div class="message messageInfo">
          {state.info}
       </div>
    </div>
-   <div class="row">
-      <p>
-         <label>
-            <input name="autoApply" id="autoApply_yes" type="radio"
-               class="with-gap"
-            checked={ state.data.auto_apply == true }/>
-            <span>Apply numbers automatically</span>
-         </label>
-         <label>
-            <input name="autoApply" id="autoApply_no" type="radio"
-               class="with-gap"
-            checked={ state.data.auto_apply == false }/>
-            <span>Only run numbering manually</span>
-         </label>
-      </p>
-   </div>
-   <h3>What to do with existing values</h3>
-   <div class="row">
-      <p>
-         <label>
-            <input name="existingValues" id="existingValues_keep" type="radio"
-               class="with-gap"
-            checked={ state.data.overwrite_existing == false }/>
-            <span><b>Keep</b> existing values</span>
-         </label>
-         <label>
-            <input name="existingValues" id="existingValues_overwrite" type="radio"
-               class="with-gap"
-            checked={ state.data.overwrite_existing == true }/>
-            <span><b>Overwrite</b> existing values</span>
-         </label>
-      </p>
-   </div>
-   <h3>New values</h3>
-   <div class="row">
-      <label>
-         <input name="newValues" id="newValues_numbers" type="radio"
-         class="with-gap"
-         checked={ state.data.type == 'number' }/>
-         <span>Use numbers</span>
-      </label>
-   </div>
-   <div class="row">
-      <div class=" col s5">
-         <label style="margin-left:2em;">
-            <input name="useNumbers" id="useNumbers_entry" type="radio"
-            class="with-gap"
-            checked={ state.data.number_globally == false }/>
-            <span>Start at 0 in every entry</span>
-         </label>
-      </div>
-   </div>
-   <div class="row">
-      <div class=" col s5">
-         <label style="margin-left:2em;">
-            <input name="useNumbers" id="useNumbers_global" type="radio"
-            class="with-gap"
-            checked={ state.data.number_globally == true}/>
-            <span>Keep counting up, starting from</span>
-         </label>
-      </div>
-      <div class=" col s1">
-         <input type="text" id="startNumber" value={ state.data.number_next }/>
-      </div>
-      <div class=" col s3">
-         <a class="btn waves-effect waves-light" onclick={ findNext } id="findNext">Find next number</a>
-      </div>
-   </div>
-   <div class="row">
-         <label>
-            <input name="newValues" id="newValues_string" type="radio"
-            class="with-gap"
-            checked={ state.data.type == 'string'}/>
-            <span>Use text</span>
-         </label>
-   </div>
-   <div class="row">
-      <div class="col s6">
-         <input type="text" id="stringFormat" value={ state.data.string_format }/>
-      </div>
-   </div>
-
+   
    <script>
       export default {
          state: {
             isLoading: true,
             isSaving: false,
             info: "",
-            data: {
+            data: { 
+            }
+         },
+
+         setWithEvent(config, prop, event) {
+            if (typeof (config[prop]) === 'number') {
+               const prev = config[prop]
+               try {
+                  config[prop] = parseInt(event.target.value, 10);
+                  if (isNaN(config[prop])) config[prop] = prev;
+               } catch (e) {
+                  // ?
+                  config[prop] = prev;
+               }
+            } else {
+               config[prop] = event.target.value;
+            }
+            this.update();
+         },
+         set(config, prop, value) {
+            config[prop] = value;
+            this.update();
+         },
+
+         changeElement(config, event) {
+            oldElement = config.element;
+            newElement = event.target.value;
+            console.log('changing element ->', oldElement, newElement)
+            if (!oldElement || !newElement) return;
+
+            this.state.data[newElement] = config;
+            config.element = newElement;
+            config.target = '';
+            delete this.state.data[oldElement];
+            this.update();
+            event.target.value = newElement; // weird bug but the select goes out of sync otherwise
+            
+         },
+         deleteElement(element) {
+            if (!element) return;
+            delete this.state.data[element];
+            this.update();
+         },
+         addElement() {
+            const element = document.getElementById('newElement').value
+            if (!element) return;
+            this.state.data[element] = this.getInitialConfig(element);
+            this.update();
+         },
+
+         getInitialConfig(element) {
+            return {
                overwrite_existing: false,
                auto_apply: false,
                number_next: 1,
                number_globally: true,
-               string_format: '%(headword)-%(pos)',
-               element: 'sense',
-               attribute: '@xml:id',
-               type: 'number'
+               string_template: '%(headword)-%(pos)',
+               element,
+               attribute: 'xml:id',
+               type: 'number',
+               target: ''
             }
          },
+         getUnusedElements() {
+            const xema = this.dictData && this.dictData.config && this.dictData.config.xema;
+            if (xema && xema.elements) {
+               return Object.keys(xema.elements).map(key => xema.elements[key].elementName || key).filter(el => !this.state.data[el]);
+            }
+
+            return [];
+         },
+         getAttributesForElement(element) {
+            const xema = this.dictData && this.dictData.config && this.dictData.config.xema;
+            return xema ? Object.keys(xema.elements[element].attributes || {}) : [];
+         },
+         getChildElementsForElement(element) {
+            const xema = this.dictData && this.dictData.config && this.dictData.config.xema;
+            return (xema.elements[element].children || []).map(c => xema.elements[c.name].elementName || c.name);
+         },
+       
 
 
          onMounted() {
@@ -147,115 +217,46 @@
                      M.updateTextFields()
                   })
          },
-         onUpdated() {
-            if (this.dictData.config.xema && this.dictData.config.xema.elements) {
-               if ($('#elements option').length == 0) {
-                  Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
-                     $('#elements').append('<option value="' + key + '">' + key + '</option>')
-                  })
-                  $('#elements option[value="'+this.state.data.element+'"]').attr('selected','selected');
-                  this.changeElem()
-                  $('#children option[value="'+this.state.data.attribute+'"]').attr('selected','selected');
-               } else {
-                  $('select').formSelect()
-               }
-               M.updateTextFields()
-            }
-         },
-
-         changeElem() {
-            $("#children").find('option').remove()
-            var elem = $("#elements").val()
-            for(var atName in this.dictData.config.xema.elements[elem]['attributes']){
-               $("#children").append("<option value='@"+atName+"'>@"+atName+"</option>")
-            }
-            for(var child in this.dictData.config.xema.elements[elem]['children']){
-               $("#children").append("<option value='"+this.dictData.config.xema.elements[elem]['children'][child].name+"'>"+this.dictData.config.xema.elements[elem]['children'][child].name+"</option>")
-            }
-            var hasChildren = !!this.dictData.config.xema.elements[elem]['children'].length
-            $("#submit_button").toggleClass("disabled", !hasChildren)
-            $("#hasChildren").toggle(hasChildren)
-            $("#hasNoChildren").toggle(!hasChildren)
-
-            $('select').formSelect()
-         },
 
          addNumbers() {
-            var countElem = $("#elements").val()
-            var storeElem = $("#children").val()
-            if (countElem && storeElem) {
-               this.update({
-                  isSaving: true,
-                  info: ''
-               })
-               this.store.autonumberElements(countElem, storeElem)
-                     .done(response => {
-                        if(response.success) {
-                           this.update({info: 'Auto-numbering finished, ' + response.processed + ' entries updated.'})
-                        }
-                     })
-                     .always(() => this.update({isSaving: false}))
-            }
+            if (!confirm("Save config and start autonumbering?"))
+               return;
+
+            this.saveData().then(() => {
+               this.update({ isSaving: true, info: 'Working on it...' });
+               this.store
+                  .autonumberElements()
+                  .done(response => {
+                     if(response.success) {
+                        this.update({info: 'Auto-numbering finished, ' + response.processed + ' entries updated.'})
+                     }
+                  })
+                  .always(() => this.update({isSaving: false}))
+            })
          },
 
-         findNext() {
-            var countElem = $("#elements").val()
-            var storeElem = $("#children").val()
-            if (countElem && storeElem) {
+         findNext(config) {
+            if (config && config.element) {
                this.update({
                   isSaving: true,
-                  info: ''
+                  info: 'Working on it...'
                })
-               this.store.autonumberNext(countElem, storeElem)
+               this.store
+                  .autonumberNext(config.element, config.target)
                   .done(response => {
-                     $('#startNumber').val(response.next);
-                     })
-                     .always(() => this.update({isSaving: false}))
+                     config.number_next = response.next
+                  })
+                  .always(() => this.update({isSaving: false}))
             }
          },
 
          getConfigData() {
-            var newData = {
-               overwrite_existing: false,
-               auto_apply: false,
-               number_next: 1,
-               number_globally: true,
-               string_format: '%(headword)-%{pos}',
-               element: 'sense',
-               attribute: '@xml:id',
-               type: 'number'
-            };
-            newData.element = $("#elements").val();
-            newData.attribute = $("#children").val();
-            newData.string_format = $("#stringFormat").val();
-            newData.number_next = $("#startNumber").val();
-            if ($("#existingValues_keep").is(":checked")) {
-               newData.overwrite_existing = false;
-            } else {
-               newData.overwrite_existing = true;
-            }
-            if ($("#newValues_string").is(":checked")) {
-               newData.type = 'string';
-            } else {
-               newData.type = 'number';
-            }
-            if ($("#autoApply_yes").is(":checked")) {
-               newData.auto_apply = true;
-            } else {
-               newData.auto_apply = false;
-            }
-            if ($("#useNumbers_entry").is(":checked")) {
-               newData.number_globally = false;
-            } else {
-               newData.number_globally = true;
-            }
-
-            return newData;
+            return this.state.data;
          },
 
          saveData() {
             this.update({isSaving: true})
-            this.store.updateDictionaryConfig("autonumbering", this.getConfigData())
+            return this.store.updateDictionaryConfig("autonumbering", this.getConfigData())
                   .always(() => this.update({isSaving: false}))
          }
 

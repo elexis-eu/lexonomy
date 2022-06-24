@@ -767,8 +767,8 @@ def autonumber(dictID: str, user: User, dictDB: Connection, configs: Configs):
 @authDict(["canConfig"])
 def next_autonumber(dictID: str, user: User, dictDB: Connection, configs: Configs):
     element = request.forms.element
-    attribute = request.forms.get("attribute")
-    return { "next": ops.get_next_autonumber_value(dictDB, element, attribute) }
+    target = request.forms.get("target")
+    return { "next": ops.get_next_autonumber_value(dictDB, element, target) }
 
 @post(siteconfig["rootPath"]+"<dictID>/autoimage.json")
 @authDict(["canEdit"])

@@ -93,11 +93,7 @@ def dict_factory(cursor, row):
 dictDB.row_factory = dict_factory
 
 testables = [{
-    "description": """
-        Test the defaults;
-        Id and lexonomy namespace should be added
-        Defaults for sortkey, title and search should be as expected
-    """,
+    "description": """Test entry without any further content. Id and lexonomy namespace should be added, sortkey, title and searchables should default to "?".""",
 
     "entry": """<entry></entry>""",
 
@@ -542,103 +538,127 @@ testables = [{
     }
 }, {
     "description": "Test autonumbering can place number in element",
-    "configs": {"autonumbering": [{
+    "configs": {"autonumbering": {"n": {
         "auto_apply": True,
         "element": "n", 
-        "type": "number", 
-    }]},
+        "type": "number"
+    }}},
     "entry": """<entry lxnm:id="0"><n/></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n>0</n></entry>"""
 }, {
     "description": "Test autonumbering can place string template in element",
-    "configs": {"autonumbering": [{
+    "configs":{"autonumbering": {"n": {
         "auto_apply": True,
         "element": "n",
         "type": "string", 
         "string_template": "autonumber %(headword) %(@some-attribute)"
-    }]},
+    }}},
     "entry": """<entry lxnm:id="0"><n some-attribute="0"/><headword>test</headword></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n some-attribute="0">autonumber test 0</n><headword>test</headword></entry>"""
 }, {
     "description": "Test autonumbering can place string template in attribute",
-    "configs": {"autonumbering": [{
+    "configs": {"autonumbering": {"n": {
         "auto_apply": True,
         "element": "n",
-        "attribute": "id",
+        "target": "@id",
         "type": "string", 
         "string_template": "autonumber %(headword) %(@some-attribute)"
-    }]},
+    }}},
     "entry": """<entry lxnm:id="0"><n some-attribute="0"/><headword>test</headword></entry>""",
     "xml":   """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n id="autonumber test 0" some-attribute="0"></n><headword>test</headword></entry>"""
 }, {
+    "debug": True,
+    "description": "Test autonumbering can place string template in child element",
+    "configs": {"autonumbering": {"n": {
+        "auto_apply": True,
+        "element": "n",
+        "target": "target_element",
+        "type": "string", 
+        "string_template": "autonumber %(headword) %(@some-attribute)",
+        "overwrite_existing": True
+    }}},
+    "entry": """<entry lxnm:id="0"><n some-attribute="0"><target_element>this value should be overwritten</target_element></n><headword>test</headword></entry>""",
+    "xml":   """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n some-attribute="0"><target_element>autonumber test 0</target_element></n><headword>test</headword></entry>"""
+}, {
+    "description": "Test autonumbering can create child element with string template",
+    "configs": {"autonumbering": {"n": {
+        "auto_apply": True,
+        "element": "n",
+        "target": "target_element",
+        "type": "string", 
+        "string_template": "autonumber %(headword) %(@some-attribute)"
+    }}},
+    "entry": """<entry lxnm:id="0"><n some-attribute="0"></n><headword>test</headword></entry>""",
+    "xml":   """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n some-attribute="0"><target_element>autonumber test 0</target_element></n><headword>test</headword></entry>"""
+}, {
     "description": "Test autonumbering continues from last known number when numbering globally is enabled",
-    "configs": {"autonumbering": [{
+    "configs":{"autonumbering": {"n": {
         "auto_apply": True,
         "element": "n",
         "type": "number", 
         "number_globally": True,
         "number_next": 10
-    }]},
+    }}},
     "entry": """<entry lxnm:id="0"><n/><n/></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n>10</n><n>11</n></entry>"""
 }, {
     "description": "Test autonumbering does not apply when auto_apply is False",
-    "configs": {"autonumbering": [{
+    "configs": {"autonumbering": {"n": {
         "auto_apply": False,
         "element": "n",
         "type": "number", 
         "number_globally": True,
         "number_next": 10
-    }]},
+    }}},
     "entry": """<entry lxnm:id="0"><n/><n/></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n></n><n></n></entry>"""
 }, {
     "description": "Test autonumbering manually works even when auto_apply is False",
-    "configs": {"autonumbering": [{
+    "configs": {"autonumbering": {"n": {
         "auto_apply": False,
         "element": "n",
         "type": "number", 
         "number_globally": True,
         "number_next": 10
-    }]},
+    }}},
     "entry": """<entry lxnm:id="0"><n/><n/></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n>10</n><n>11</n></entry>""",
     "actions": ["create", "autonumber"]
 }, {
     "description": "Test autonumbering ignores next number when not numbering globally",
-    "configs": {"autonumbering": [{
+    "configs": {"autonumbering": {"n": {
         "auto_apply": True,
         "element": "n",
         "type": "number", 
         "number_globally": False,
         "number_next": 10
-    }]},
+    }}},
     "entry": """<entry lxnm:id="0"><n/><n/></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n>0</n><n>1</n></entry>""",
 }, {
     # We don't do this because it causes numbers to go up indefinitely every time an entry is saved
     # Because identifiers changing every time you touch the entry is actually completely useless...
     "description": "Test autonumbering does NOT overwrite existing numeric values automatically when global numbers are enabled",
-    "configs": {"autonumbering": [{
+    "configs": {"autonumbering": {"n": {
         "auto_apply": True,
         "element": "n",
         "type": "number", 
         "number_globally": True,
         "number_next": 10,
         "overwrite_existing": True
-    }]},
+    }}},
     "entry": """<entry lxnm:id="0"><n/><n>1</n></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n>10</n><n>1</n></entry>""",
 }, {
     "description": "Test autonumbering DOES overwrite existing numeric values automatically when global numbers are enabled when not in auto-apply mode",
-    "configs": {"autonumbering": [{
+    "configs": {"autonumbering": {"n": {
         "auto_apply": True,
         "element": "n",
         "type": "number", 
         "number_globally": True,
         "number_next": 10,
         "overwrite_existing": True
-    }]},
+    }}},
     "entry": """<entry lxnm:id="0"><n/><n>1</n></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n>11</n><n>12</n></entry>""",
     "actions": ["create", "autonumber"]

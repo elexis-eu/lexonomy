@@ -174,10 +174,19 @@ class ConfigKontext(TypedDict):
     corpus: str
 
 class ConfigAutoNumbering(TypedDict):
+    """Given an element to count, and a place to put the number of occurances (or """
+
     element: str
-    """XML element to add IDS to"""
-    attribute: Optional[str]
-    """Attribute on the XML element to add IDS to (optional)"""
+    """Element to count, or where to evaluate string_template.
+        Unless 'target' property is set, any contents of this element are also replaced with the result (so either the count or the evaluated string_template).
+    """
+    target: NotRequired[str] 
+    """(optional) Alternative place to put the Value, can be a child element or an attribute.
+        Attributes are denoted by a leading '@', so '@some_attribute'. The attribute is added to the element denoted by the 'element' setting.
+        Child elements are just the name of the target element, so 'some_child_element'. 
+        Element and attribute are created if missing.
+    """
+    
     type: NotRequired[Literal["string", "number"]]
     """Whether to write numbers or use the string_template to create a textual ID. Defaults to 'number'"""
     string_template: Optional[str]
@@ -189,7 +198,7 @@ class ConfigAutoNumbering(TypedDict):
         Whether to keep incrementing the IDs, or restart at 0 every entry
     """
     number_next: NotRequired[int]
-    """Only used if type == 'number'
+    """Only used if type == 'number' and 'number_globally' == True
         The next number to output. Should be saved across runs
     """
     overwrite_existing: NotRequired[bool]
@@ -198,6 +207,9 @@ class ConfigAutoNumbering(TypedDict):
     """
     auto_apply: NotRequired[bool]
     "Whether to automatically perform this autonumbering on entry saving, or only as a one-off manual operation"
+
+
+
 
 class Configs(TypedDict):
     titling: ConfigTitling
@@ -214,7 +226,7 @@ class Configs(TypedDict):
     metadata: ConfigMetadata
     download: ConfigDownload
     kontext: ConfigKontext
-    autonumbering: NotRequired[list[ConfigAutoNumbering]]
+    autonumbering: dict[str, ConfigAutoNumbering]
 
 # Other types
 class IsoCode(TypedDict):
@@ -376,7 +388,7 @@ def readDictConfigs(dictDB: Connection) -> Configs:
         configs[r["id"]] = json.loads(r["json"])
     for conf in ["ident", "publico", "users", "kex", "kontext", "titling", "flagging",
                  "searchability", "xampl", "thes", "collx", "defo", "xema",
-                 "xemplate", "editing", "subbing", "download", "links", "autonumber", "gapi", "metadata"]:
+                 "xemplate", "editing", "subbing", "download", "links", "autonumber", "gapi", "metadata", "autonumbering"]:
         if not conf in configs:
             configs[conf] = defaultDictConfig.get(conf, {})
 
@@ -725,7 +737,6 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
             ret["xml"] = row["xml"]
             ret["content"] = row["xml"] # type: ignore - compatibility with screenful. TODO remove
         if tag or titlePlain:
-            print(row["xml"])
             parsedXml = parse(row["xml"])
             if tag:
                 ret["tag"] = parsedXml
@@ -933,10 +944,10 @@ def get_entry_doctype(xml: Tag) -> str:
 
 def get_text(xml: Tag, tagName: Optional[str] = None) -> Optional[str]:
     """
-        If element and element exists: returns the first (non-whitespace) text content of the element.
-        if element and element does not exist: None
-        if no element: first non-whitespace text content of document
-        if no element and no text: None
+        If tagName and such an element exists: returns the first (non-whitespace) text content of the element.
+        if tagName and such an element does not exist: None
+        if no tagName: first non-whitespace text content of xml
+        if no tagName and no text in the entire xml: None
 
         Only checks descendants of the xml node.
     """
@@ -1238,28 +1249,42 @@ def presave_linkables(dictDB: Connection, configs: Configs, entryXml: Tag, entry
     if len(ret):
         dictDB.executemany("insert into linkables(entry_id, txt, element, preview) values(?,?,?,?)", ret)
 
-def get_next_autonumber_value(dictDB: Connection, element: str, attribute: Optional[str]) -> Optional[int]:
+def get_next_autonumber_value(dictDB: Connection, element: str, target: Optional[str]) -> Optional[int]:
     """Scan all entries for values in the element or the attribute on the element (if supplied), returning the highest found number + 1
 
     Args:
         dictDB (Connection): the dictionary
         element (str): name of the element to scan
-        attribute (Optional[str]): name of the attribute on the element to scan. element text content is scanned if omitted.
+        target (Optional[str]): name of the actual container element or attribute, attribute should be prefixed with 'a'. See ConfigAutoNumber["target"].
     """
+
+    target_is_attribute = False
+    if target and target.startswith("@"):
+        target_is_attribute = True
+        target = target[1:]
+
 
     # """Get the next unused integer for an autonumber configuration."""
     highest = -1
     for e in dictDB.execute("select xml from entries"):
         entry = parse(e["xml"])
         for el in entry.findAll(element):
-            existing_value = get_text(el) if not attribute else el.attrs.get(attribute)
+            existing_value = el.attrs.get(target) if target_is_attribute else get_text(el, target)
             if existing_value:
                 try:
                     i = int(existing_value)
                     highest = i if i > highest else highest
                 except:
                     pass
-    return highest + 1 # return NEXT number
+    highest += 1 # return NEXT number
+    configs = readDictConfigs(dictDB)
+    # since this is a long operation - just save it now.
+    config = configs.get("autonumbering", {})
+    if elementConf := config.get(element):
+        elementConf["number_next"] = highest
+        dictDB.execute("UPDATE configs SET json=? WHERE id=?", (json.dumps(config), "autonumbering"))
+
+    return highest 
 
 def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAutoApplying: bool = True) -> bool:
     """Add automatically generated IDS/numbers to elements/attributes in the entry according to the config.
@@ -1275,11 +1300,11 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
         true if the xml was changed
     """
     xema = configs["xema"]
-    autonumbering = configs.get("autonumbering", [])
+    autonumbering = configs.get("autonumbering", {})
 
     touched_global_number = False
     touched_entry = False
-    for c in autonumbering:
+    for c in autonumbering.values():
         # Be a little smart about this:
         # Only overwrite values when running auto_apply on a new entry, or when doing a manual run with overwrite true
         if not c.get("auto_apply") and isAutoApplying:
@@ -1287,9 +1312,14 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
 
         # setup
         value_type = c.get("type", "number") # number or string
-        element_name = xema_get_element_name_from_id(xema, c.get("element", ""))
-        attribute_name = c.get("attribute")
-        if not element_name:
+        element_to_number = xema_get_element_name_from_id(xema, c.get("element", ""))
+        target = c.get("target") or None # Note: keep None if not valid, or get_text call later fails because it will look for empty string element or something.
+        target_is_attribute = False
+        if target and target.startswith("@"):
+            target_is_attribute = True
+            target = target[1:]
+        
+        if not element_to_number:
             continue
 
         if value_type == "number":
@@ -1303,16 +1333,17 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
             if not template_parts: # template string is empty, missing, or contains nothing to evaluate; skip.
                 continue
 
-        for el in entry.findAll(element_name):
-            existing_value = get_text(el) if not attribute_name else el.attrs.get(attribute_name)
+        for el in entry.findAll(element_to_number):
+            existing_value = el.attrs.get(target) if target_is_attribute else get_text(el, target)
             write_new_value = not existing_value or c.get("overwrite_existing")
+            
             # Exception to the rule:
             # When in numeric mode, and numbers are globally unique, and we're auto-applying: don't overwrite
             # Doing that would cause new numbers to be assigned every time an entry is saved or otherwise touched.
             # Which would be completely useless from an ID standpoint, and also cause the numbers to grow rather quickly..
             # So only overwrite existing global numbers if not isAutoApplying
-            # Local numbers are fine to overwrite, since they are usually the same, unless the entry added or removed the target elements.
-            # And in that case you probably DO want the ids to auto-update since they're more index numbers instead of actual idenfitiers.
+            # Local numbers are fine to overwrite, since they are usually the same, unless the entry added or removed the elements to count.
+            # And in that case you probably DO want the ids to auto-update since they're more local index numbers instead of actual idenfitiers.
             if value_type == "number" and c.get("number_globally") and existing_value and isAutoApplying:
                 write_new_value = False
 
@@ -1326,11 +1357,15 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
                 value = eval_template_string(entry, el, template, template_parts)
 
             touched_entry = True
-            if attribute_name:
-                el.attrs[attribute_name[1:]] = value
-            else:
+            if target_is_attribute:
+                el.attrs[target] = value
+            elif target: 
+                targetEl = el.find(target) or create_path_to_element(el, [target])
+                targetEl.clear()
+                targetEl.append(value)
+            else: 
                 el.clear()
-                el.append(value) # add the string
+                el.append(value)
 
         # After writing the values, save the current number so we can continue in later entries
         if value_type == "number" and c.get("number_globally"):
@@ -2684,7 +2719,7 @@ def autoImageStatus(dictDB, dictID, bgjob):
 def addAutoNumbers(dictDB: Connection, configs: Configs, user: User):
     """Runs the autonumbering operation in manual mode"""
     config = configs.get("autonumbering")
-    if not config:
+    if not config or not (len(config)):
         return {"success": True, "processed": 0}
     total = 0
     for e in dictDB.execute("select id, xml from entries").fetchall():
@@ -2699,6 +2734,7 @@ def addAutoNumbers(dictDB: Connection, configs: Configs, user: User):
         dictDB.execute("insert into history(entry_id, action, [when], email, xml, historiography) values(?, ?, ?, ?, ?, ?)", (id, "autonumber", str(datetime.datetime.utcnow()), user["email"], xmlstr, json.dumps({})))
         dictDB.execute("update entries set xml = ? where id = ?", (xmlstr, id))
 
+    dictDB.commit()
     return {"success": True, "processed": total}
 
 def notifyUsers(configOld: ConfigUsers, configNew: ConfigUsers, dictInfo: ConfigIdent, dictID: str):

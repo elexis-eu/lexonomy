@@ -575,31 +575,27 @@ class StoreClass {
             })
    }
 
-   autonumberElements(countElem, storeElem){
+   autonumberElements(){
       return $.ajax({
          url: `${window.API_URL}${this.data.dictId}/autonumber.json`,
          method: 'POST',
-         data: {
-            "countElem": countElem,
-            "storeElem": storeElem
-         }
       })
-            .fail(response => {
-               M.toast({html: "Autonumbering failed."})
-            })
+      .fail(response => {
+         M.toast({html: "Autonumbering failed."})
+      })
    }
-   autonumberNext(countElem, storeElem){
+   autonumberNext(element, target){
       return $.ajax({
          url: `${window.API_URL}${this.data.dictId}/next_autonumber.json`,
          method: 'POST',
          data: {
-            "countElem": countElem,
-            "storeElem": storeElem
+            "element": element,
+            "target": target
          }
       })
-            .fail(response => {
-               M.toast({html: "Autonumbering failed."})
-            })
+      .fail(response => {
+         M.toast({html: "Autonumbering failed."})
+      })
    }
 }
 
