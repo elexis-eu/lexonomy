@@ -343,7 +343,7 @@ def getDB(dictID: str) -> Connection:
         conn.executescript("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=on")
         return conn
     else:
-        raise FileNotFoundError("Database not found")
+        raise FileNotFoundError(f"Database for dictionary {dictID} not found")
 
 def getMainDB():
     conn = sqlite3.connect(os.path.join(siteconfig["dataDir"], 'lexonomy.sqlite'))
@@ -800,17 +800,18 @@ def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) ->
 def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entryID: int, email: str):
     """
     Ensure this entry has all subentries properly extracted and referenced through xml and database.
+    Also flag any parent entries for needs_update.
 
     1. Find elements that should be a subentry (their tag is in the subbing config)
     2. Extract the element and its childen, and store it as a separate entry in the database
     3. Add back a <lxnm:subentryParent id="{idOfTheSeparateEntry}"/> xml placeholder element in this entry
     4. Fixup any remaining invalid references
-       Those are lxnm:subentryParent tags that point to
-        (<lxnm:subentryParent> tags) that are invalid (due to changed configuration settings -or just because an uploaded entry happens to have one somehow):
-        1. If the entry it points to exists in the database:
-        - replace it with a copy of that xml (removing lexonomy bookkeeping attributes in the copy)
-        2. If it points to an entry that doesn't exist in the database:
-        - delete the tag.
+        1. If the target has been updated and is still a valid subentry otherwise:
+            Fixup the title and doctype on the <lxnm:parentEntry> 
+        2. If the entry it points to exists in the database, but is no longer allowed to be a subentry (due to changed attributes, doctype, etc?):
+            replace it with a copy of that xml (removing lexonomy bookkeeping attributes in the copy)
+        3. If it points to an entry that doesn't exist in the database:
+            delete the tag. 
             Keeping the tag is not an option, because we cannot save a link to a nonexistant entry due to referential constraints in the database.
             If we would keep the tag, but not save the reference in the database, that would give issues if the missing subentry was later created, perhaps by automatic assignment of an id.
 
@@ -828,77 +829,92 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
             Then in the parent, replace the child xml with <lxnm:subentryParent id=${childID}/> and store the link between parent and child in the sub database.
             NOTE: the link is not registered in the database 'sub' table yet - that happens in a batch operation
         """
-        subentryID, _, _, _ = createEntry(dictDB, configs, subentry, email)
-        new_tag = BeautifulSoup().new_tag("lxnm:subentryParent", attrs={"id": str(subentryID)})
-        subentry.replaceWith(new_tag)
+        subentryID, subentryXml, _, _ = createEntry(dictDB, configs, subentry, email)
+        if subentryXml:
+            subentryTitlePlain = get_entry_title(subentryXml, configs)[0]
+            subentryDoctype = get_entry_doctype(subentryXml)
+            new_tag = BeautifulSoup().new_tag("lxnm:subentryParent", attrs={
+                "id": str(subentryID), 
+                "title": subentryTitlePlain, 
+                "doctype": subentryDoctype
+            })
+            subentry.replaceWith(new_tag)
         return subentryID
 
-    def matchesAttributes(el: Tag, element_id: str):
-        """Return True if any of the attributes is present with the correct value."""
+    def isActualSubentry(el: Tag, element_id: str):
+        """Return True if this element is a subentry, i.e. it's in the sub config, and it has the required attributes."""
+        if not el.name in config:
+            return False
         required_attributes = config.get(element_id, {}).get("attributes", {}).items()
         if not(len(required_attributes)):
             return True # no attributes required - always good.
         # Find a matching attribute
         for name, requiredValue in required_attributes:
             if el.has_attr(name) and (not requiredValue or el.attrs.get(name) == requiredValue):
-                return True
-        # No matching attributes (but at least one should be present defined)
+                return True 
+        # No matching attribute found, element has the correct <name>, but not the correct attributes.
         return False
 
     def isInsideOtherSubentry(el: Tag) -> bool:
         ancestor = el
-        while (ancestor := ancestor.parent) != None and ancestor is not entryXml: # entry xml may not be root of doc, avoid looking at its parents (might happen in subentries)!
+        while (ancestor := ancestor.parent) != None and ancestor is not entryXml: # entry xml may not be root of doc, avoid looking at its parents (might happen in nested subentries)!
             ancestor_id = xema_get_id_from_element_name(configs["xema"], ancestor.name)
-            if ancestor_id in config and matchesAttributes(ancestor, ancestor_id):
+            if isActualSubentry(ancestor, ancestor_id):
                 return True
         return False
 
-    # 1. Replace subentries with subentryParent placeholder/standin elements
+    # 1. Replace subentries with <subentryParent> placeholder/standin elements
     # NOTE: gather first - then replace, as to avoid modifying the xml while we're iterating and throwing off BeatifulSoup
     nodesToTurnIntoSubentries: List[Tag] = []
     newSubentries: List[int] = []
     for element_id in config:
         element_name = xema_get_element_name_from_id(configs["xema"], element_id)
         for subentryElement in entryXml.select(element_name):
-            if not isInsideOtherSubentry(subentryElement) and matchesAttributes(subentryElement, element_id):
+            if not isInsideOtherSubentry(subentryElement) and isActualSubentry(subentryElement, element_id):
                 nodesToTurnIntoSubentries.append(subentryElement)
     for subentryElement in nodesToTurnIntoSubentries:
         subentryID = turnChildElementIntoSubentry(entryXml, subentryElement)
         newSubentries.append(subentryID)
 
-    # 2. Gather all subentries in the entry, excluding ones we just created (those are guaranteed to be valid)
+    # 2. Gather all subentry IDs for this entry, excluding ones we just created (those are guaranteed to be valid)
     # So that we can validate them.
     # Only do this after new subentries have been extracted, or this query would also match a subentry in a subentry
-    subentryIDsToProcess: Set[int] = set()
+    subentryIdsToValidate: Set[int] = set()
     for subentry in entryXml.findAll("lxnm:subentryParent"):
         subentryID = int(subentry.attrs["id"])
         if not subentryID in newSubentries: # new subentries are guaranteed to be correct in the datbaase already.
-            subentryIDsToProcess.add(subentryID)
+            subentryIdsToValidate.add(subentryID) 
 
     validSubentryIDs = set(newSubentries)
     # 3 Replace invalid references with contents, delete if no contents in database.
-    if len(subentryIDsToProcess): # avoid running a query we know won't return anything
-        validDoctypes = config.keys()
-        idplaceholder = ",".join("?" * len(subentryIDsToProcess))
-        for r in doSql(dictDB, f"select * from entries where id in ({idplaceholder})", list(subentryIDsToProcess)).fetchall():
-            isValid = r["doctype"] in validDoctypes
-            subentryID = int(r["id"])
-            if isValid:
-                subentryIDsToProcess.remove(subentryID) # mark this one done.
-                validSubentryIDs.add(subentryID)
-                continue
-
-            # SubentryParent points to an entry in the database that shouldn't be a subentry due to changed config: replace with contents.
-            if r["needs_update"]: # fixup subentry's xml before copying it, if it needs it (maybe it has subentries of its own to do things with?)
+    if len(subentryIdsToValidate): # avoid running a query we know won't return anything
+        idplaceholder = ",".join("?" * len(subentryIdsToValidate))
+        for r in doSql(dictDB, f"select * from entries where id in ({idplaceholder})", list(subentryIdsToValidate)).fetchall():
+            # fixup subentry's xml before using it, if it needs it (maybe it has subentries of its own to do things with?)
+            if r["needs_update"]:
                 _, subentryXml, _, _ = createEntry(dictDB, configs, r["xml"], email, id=r["id"])
             else:
                 subentryXml = parse(r["xml"])
-            del subentryXml.attrs["lxnm:id"] # remove lexonomy attributes since this is no longer a full entry now
-            del subentryXml.attrs["xmlns:lxnm"]
-            for subentry in entryXml.findAll("lxnm:subentryParent", {"id": subentryID}): # and place xml content in the parent entry
-                subentry.replaceWith(subentryXml)
-            subentryIDsToProcess.remove(subentryID) # mark this one done.
-        for subentryID in subentryIDsToProcess: # for everything that's not done: delete the subentryParent from the entry.
+            
+            subentryID = int(r["id"])
+            isValid = isActualSubentry(subentryXml, xema_get_id_from_element_name(configs["xema"], r["doctype"]))
+            if isValid: # this <lxnm:subentryParent> may stay, but update its attributes anyway while we're here, so we're sure they are up to date.
+                for subentry in entryXml.findAll("lxnm:subentryParent", {"id": subentryID}): # and place xml content in the parent entry
+                    subentry.attrs["title"] = get_entry_title(subentryXml, configs)[0]
+                    subentry.attrs["doctype"] = r["doctype"]
+                subentryIdsToValidate.remove(subentryID) # mark this one done.
+                validSubentryIDs.add(subentryID)
+                continue
+            else:
+                del subentryXml.attrs["lxnm:id"] # remove lexonomy attributes since this is no longer a full entry now
+                del subentryXml.attrs["xmlns:lxnm"]
+                for subentry in entryXml.findAll("lxnm:subentryParent", {"id": subentryID}): # and place xml content in the parent entry
+                    subentry.replaceWith(subentryXml)
+           
+            subentryIdsToValidate.remove(subentryID) # mark this one done.
+            
+        # Every ID we've not see so far has no backing entry in the database - so just remove it outright.
+        for subentryID in subentryIdsToValidate: 
             for subentry in entryXml.findAll("lxnm:subentryParent", {"id": subentryID}):
                 subentry.decompose()
 
@@ -907,6 +923,9 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
     tuples_of_parent_child_id = list(zip(itertools.repeat(entryID), validSubentryIDs))
     if len(tuples_of_parent_child_id):
         dictDB.executemany("insert into sub(parent_id, child_id) values(?,?)", tuples_of_parent_child_id)
+    
+    # Flag our parents they need an update (in case this is a subentry)
+    doSql(dictDB, "update entries set needs_update=1 where id in (select distinct parent_id from sub where child_id = ?)", (entryID, ))
 
 def get_entry_doctype(xml: Tag) -> str:
     """Get elementName of the root of the entry xml"""

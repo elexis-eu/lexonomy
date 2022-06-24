@@ -261,9 +261,9 @@ testables = [{
     "xml": """
     <entry lxnm:id="100" xmlns:lxnm="http://www.lexonomy.eu/">
         <text>some other text in the entry</text>
-        <lxnm:subentryParent id="101"></lxnm:subentryParent>
+        <lxnm:subentryParent doctype="sub" id="101" title="subentry headword subentry text"></lxnm:subentryParent>
         <headword>headword</headword>
-        <lxnm:subentryParent id="102"></lxnm:subentryParent>
+        <lxnm:subentryParent doctype="sub" id="102" title="subentry headword 2"></lxnm:subentryParent>
     </entry>
     """,
     "subentries": [101, 102] # created during import.
@@ -469,7 +469,14 @@ testables = [{
         <subentry lxnm:id="100" att="true"><text>processed subentry</text></subentry>
     </entry>""",
 
-    "xml": """<entry lxnm:id="5" xmlns:lxnm="http://www.lexonomy.eu/"><text>title</text><subentry att="false"><text>ignored subentry</text></subentry><lxnm:subentryParent id="100"></lxnm:subentryParent></entry>""",
+    "xml": """
+    <entry lxnm:id="5" xmlns:lxnm="http://www.lexonomy.eu/">
+        <text>title</text>
+        <subentry att="false">
+            <text>ignored subentry</text>
+        </subentry>
+        <lxnm:subentryParent doctype="subentry" id="100" title="processed subentry"></lxnm:subentryParent>
+    </entry>""",
     "subentries": [100]
 }, {
     "description": "Creating entry with a subentry, then deleting that subentry: the link with the subentry is removed.",
@@ -533,15 +540,7 @@ testables = [{
         "element": ["sense", "sense"],
         "preview": ["the first sense (noun)", "the second sense (verb)"]
     }
-}, 
- # tests for autonumbering behavior. 
-    # x correct placement of values in elements and attributes
-    # x correct template handling for string templates 
-    # x correct resetting of numbers across entries
-    # - correct resuming of numbers
-    # - correct overwriting of existing values
-    # - correct NOT overwriting of existing numeric values when autorunning
-{
+}, {
     "description": "Test autonumbering can place number in element",
     "configs": {"autonumbering": [{
         "auto_apply": True,
@@ -643,6 +642,29 @@ testables = [{
     "entry": """<entry lxnm:id="0"><n/><n>1</n></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n>11</n><n>12</n></entry>""",
     "actions": ["create", "autonumber"]
+}, {
+    "description": "Test that parent entry is flagged for update when subentry changes",
+
+    "configs": {
+        "titling": {
+            "headword": "headword"
+        },
+        "subbing": {
+            "sub": {}
+        },
+    },
+
+    "entry": """
+    <entry lxnm:id="100">
+        <headword>headword</headword>
+        <sub lxnm:id="101">
+            <headword>subentry headword</headword>
+        </sub>
+    </entry>""",
+
+    "actions": ["create", ["update", "<sub><headword>subentry headword edited</headword></sub>", "test@lexonomy", 101]],
+
+    "needs_update": 1,
 }]
 
 def overwriteConfig(originalConfig, overrides):
@@ -727,7 +749,7 @@ def test(tests, id: int, description: str):
         tests["xml"] = re.sub(r"\s", "", tests["xml"])
         entry["xml"] = re.sub(r"\s", "", entry["xml"])
 
-    for key in ["id", "xml", "doctype", "title", "sortkey", "flag"]:
+    for key in ["id", "xml", "doctype", "title", "sortkey", "flag", "needs_update"]:
         if key in tests:
             failIf(description, key, entry[key], tests[key], tests[key])
 
@@ -774,6 +796,8 @@ for tests in testables:
                 ops.addAutoNumbers(dictDB, configs, {"email": "test@lexonomy"})
             elif action == "delete":
                 ops.deleteEntry(dictDB, configs, params[0] if len(params) > 0 else id, "test@lexonomy")
+            elif action == "update": 
+                ops.createEntry(dictDB, configs, params[0], params[1], params[2])
             else:
                 print(f"ERROR - Unknown action '{action}' - ignoring", file=sys.stderr)
 

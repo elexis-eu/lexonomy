@@ -95,12 +95,25 @@ def migrate_1(dictDB: Connection, configs: Configs):
                 print(f"Migrated {done} entries so far...")
             # all entries should now be up-to-date :)
 
+def migrate_2(dictDB: Connection, configs: Configs):
+    # Enhance <lxnm:subentryParent id="..."> into <lxnm:subentryParent id="..." doctype="..." title="...">
+    # Copy the logic here as code in ops file might change in the future and this should still work.
+    for entryXml in dictDB.execute("select * from entries where id in (select distinct parent_id from sub)").fetchall():
+        for subentryRef in entryXml.findAll("lxnm:subentryParent"):
+            subentryID = int(subentryRef.attrs["id"])
+            subentry = dictDB.execute("select * from entries where id=?", (subentryID, )).fetchone()
+            subentryXml = ops.parse(subentry["xml"])
+            subentryRef.attrs["title"] = ops.get_entry_title(subentryXml, configs)
+            subentryRef.attrs["doctype"] = ops.get_entry_doctype(subentryXml)
+
+        ops.createEntry(dictDB, configs, entryXml["xml"], "system@lexonomy", entryXml["id"])
+
 def get_version(mainDB: Connection) -> int:
     return mainDB.execute("PRAGMA user_version").fetchone()["user_version"]
 
 def migrate():
-    current_version = 1 
-    migrations = [migrate_1] # add migrations to newer versions at the end of the list.
+    migrations = [migrate_1, migrate_2] # add migrations to newer versions at the end of the list.
+    current_version = len(migrations)
 
     mainDB = ops.getMainDB()
     possibly_outdated_version = get_version(mainDB)
@@ -119,9 +132,11 @@ def migrate():
             print(f"Migrating dictionary {title} ({id}) ...")
             for migration in migrations:
                 migration(dictDB, configs)
+            dictDB.commit()
             print(f"Migration of {title} ({id}) finished!")
         except Exception as ex:
             print(ex)
     mainDB.execute(f"PRAGMA user_version={current_version}")
+    mainDB.commit()
 
 migrate()

@@ -16,7 +16,8 @@ Sub.extendDocspec = function(/** @type {import("@kcmertens/xonomy").XonomyDocSpe
     id: null,
     parententries: [],
     subentries: [],
-  }
+    ...entry
+  };
   Sub.children = {};
   Sub.parents = {};
   Sub.entryID = entry.id; 
@@ -228,7 +229,7 @@ Sub.insertSubentries = function () {
       var title = $label.data("title")
       var doctype = $label.data("doctype")
       Sub.children[id] = {id: id, title: title, doctype: doctype}
-      Xonomy.newElementChild(Sub.htmlID, `<lxnm:subentryParent xmlns:lxnm="http://www.lexonomy.eu/" id="${id}"/>`);
+      Xonomy.newElementChild(Sub.htmlID, `<lxnm:subentryParent xmlns:lxnm="http://www.lexonomy.eu/" id="${id}" doctype="${doctype}" title="${title}"/>`);
     }
   });
 };
