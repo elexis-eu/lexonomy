@@ -75,7 +75,7 @@ export default {
       //   parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
       //   childElement = parentChildren[this.elementName]
       // }
-      return childElement && (Number(childElement.max) === 0 || this.numberOfElements < Number(childElement.max))
+      return childElement && (!Number(childElement.max) || this.numberOfElements < Number(childElement.max))
     },
     canRemoveElement() {
       const xemaElements = this.state.entry.dictConfigs.xema.elements
