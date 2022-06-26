@@ -11,7 +11,8 @@ var state = {
     contentHtml: null
   },
   xml2jsConfig: {
-    compact: false
+    compact: false,
+    captureSpacesBetweenElements: true
   },
   _initialContent: null,
   headwordElement: null,
