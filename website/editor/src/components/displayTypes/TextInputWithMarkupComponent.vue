@@ -27,6 +27,7 @@
           <button v-for="(element, index) in markupElements"
                   :key="index"
                   class="tertiary"
+                  :style="calculatedStyles(element)"
                   @click="markTextAs(element.type)"
                   :disabled="element.disabled">{{ element.type }}
           </button>
@@ -205,6 +206,8 @@ export default {
           return this.getStylesFromConfig(this.elementName)
         case "element":
           return this.getStylesFromConfig(element.name)
+        default:
+          return this.getStylesFromConfig(element.type)
       }
 
     },
