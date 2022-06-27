@@ -28,6 +28,7 @@
                   :key="index"
                   class="tertiary"
                   :style="calculatedStyles(element)"
+                  style="border: none;"
                   @click="markTextAs(element.type)"
                   :disabled="element.disabled">{{ element.type }}
           </button>
@@ -201,15 +202,21 @@ export default {
       return ""
     },
     calculatedStyles(element) {
+      let configs = null
       switch (element.type) {
         case "text":
-          return this.getStylesFromConfig(this.elementName)
+          configs = this.getStylesFromConfig(this.elementName)
+          break
         case "element":
-          return this.getStylesFromConfig(element.name)
+          configs = this.getStylesFromConfig(element.name)
+          break
         default:
-          return this.getStylesFromConfig(element.type)
+          configs = this.getStylesFromConfig(element.type)
       }
-
+      if (configs.color) {
+        configs.borderColor = configs.color
+      }
+      return configs
     },
     calculatedClasses(element) {
       let output = []
@@ -318,19 +325,24 @@ export default {
 
   span[contenteditable] {
     margin: 0;
-    padding: 4px 0;
-    border: 1px solid transparent;
+    padding: 5px 1px;
     border-radius: 0;
     line-height: 24px;
     text-align: left;
+    transition: none;
 
-    &:focus {
-      border-color: #E85D04;
+    &:focus,
+    &:hover{
+      padding: 4px 0;
+      border: 1px solid;
+      text-decoration: none;
     }
 
     &.empty-element {
-      border: 1px solid #eee;
       padding: 4px 16px;
+    }
+    &.text-element {
+      text-decoration: none;
     }
   }
 }

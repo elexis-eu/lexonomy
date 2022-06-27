@@ -288,24 +288,12 @@ $blue-600: #023672;
     font-size: 14px;
     line-height: 18px;
     font-weight: 400;
-    border: 1px solid $blue-400;
     border-radius: 4px;
     outline: none;
     transition: 0.1s all;
 
     &::placeholder {
       color: #B6BFC9;
-      //color: #637383;
-    }
-
-    &:hover {
-      color: $blue-500;
-      border: 1px solid $blue-500;
-    }
-
-    &:focus {
-      color: #637383;
-      border: 1px solid #E85D04;
     }
 
     &:disabled,
