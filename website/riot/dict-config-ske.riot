@@ -72,7 +72,7 @@
    </div>
    <div class="row">
       <div class="input-field">
-         <select id="xampl_container">
+         <select id="xampl_container" data-template="xampl_template">
             <option value="">(not set)</option>
          </select>
          <label for="xampl_container">Example container</label>
@@ -102,7 +102,7 @@
    </div>
    <div class="row">
       <div class="input-field">
-         <select id="collx_container">
+         <select id="collx_container" data-template="collx_template">
             <option value="">(not set)</option>
          </select>
          <label for="collx_container">Collocation container</label>
@@ -123,7 +123,7 @@
    </div>
    <div class="row">
       <div class="input-field">
-         <select id="thes_container">
+         <select id="thes_container" data-template="thes_template">
             <option value="">(not set)</option>
          </select>
          <label for="thes_container">Thesaurus item container</label>
@@ -144,7 +144,7 @@
    </div>
    <div class="row">
       <div class="input-field">
-         <select id="defo_container">
+         <select id="defo_container" data-template="defo_template">
             <option value="">(not set)</option>
          </select>
          <label for="defo_container">Definition container</label>
@@ -173,6 +173,7 @@
    <script>
       export default {
          state: {
+            bindings: [["store", "dictionaryChanged", "loadConfig"]],
             isLoading: true,
             isSaving: false,
             data: {
@@ -189,7 +190,7 @@
             }
          },
 
-         onMounted() {
+         loadConfig() {
             this.store.loadDictionaryConfig("ske")
                   .done(response => {
                      this.state.data = response.content
@@ -266,48 +267,58 @@
                      M.textareaAutoResize($('#xampl_template'))
                   })
          },
-
+         onMounted() {
+            if(this.dictData.isDictionaryLoaded){
+               this.loadConfig()
+            }
+         },
          onUpdated() {
             if (this.dictData.config.xema && this.dictData.config.xema.elements) {
                if ($('#kex_searchElements option').length == 0) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
                      if (info.filling == 'txt' || info.filling == 'lst') {
-                        var checked = this.state.data.kex.searchElements.includes(key)? 'checked':''
-                        $('#kex_searchElements').append('<option value="' + key + '" ' + checked + '>' + key + '</option>')
+                        var selected = this.state.data.kex.searchElements.includes(key)? 'selected':''
+                        $('#kex_searchElements').append('<option value="' + key + '" ' + selected + '>' + key + '</option>')
                      }
                   })
                }
                if ($('#xampl_container option').length == 1) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
-                     var checked = (this.state.data.xampl.container == key)? 'checked':''
-                     $('#xampl_container').append('<option value="' + key + '" ' + checked + '>' + key + '</option>')
+                     var selected = (this.state.data.xampl.container == key)? 'selected':''
+                     $('#xampl_container').append('<option value="' + key + '" ' + selected + '>' + key + '</option>')
                   })
                }
                if ($('#xampl_markup option').length == 1) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
-                     var checked = (this.state.data.xampl.markup == key)? 'checked':''
-                     $('#xampl_markup').append('<option value="' + key + '" ' + checked + '>' + key + '</option>')
+                     var selected = (this.state.data.xampl.markup == key)? 'selected':''
+                     $('#xampl_markup').append('<option value="' + key + '" ' + selected + '>' + key + '</option>')
                   })
                }
                if ($('#collx_container option').length == 1) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
-                     var checked = (this.state.data.collx.container == key)? 'checked':''
-                     $('#collx_container').append('<option value="' + key + '" ' + checked + '>' + key + '</option>')
+                     var selected = (this.state.data.collx.container == key)? 'selected':''
+                     $('#collx_container').append('<option value="' + key + '" ' + selected + '>' + key + '</option>')
                   })
                }
                if ($('#defo_container option').length == 1) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
-                     var checked = (this.state.data.defo.container == key)? 'checked':''
-                     $('#defo_container').append('<option value="' + key + '" ' + checked + '>' + key + '</option>')
+                     var selected = (this.state.data.defo.container == key)? 'selected':''
+                     $('#defo_container').append('<option value="' + key + '" ' + selected + '>' + key + '</option>')
                   })
                }
                if ($('#thes_container option').length == 1) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
-                     var checked = (this.state.data.thes.container == key)? 'checked':''
-                     $('#thes_container').append('<option value="' + key + '" ' + checked + '>' + key + '</option>')
+                     var selected = (this.state.data.thes.container == key)? 'selected':''
+                     $('#thes_container').append('<option value="' + key + '" ' + selected + '>' + key + '</option>')
                   })
                }
-               $('select').formSelect()
+               $('select').formSelect().on("change", (evt) => {
+                  let template = evt.target.dataset.template
+                  let element = evt.target.value
+                  if(template){
+                     $(`#${template}`).val(`<${element}>$text</${element}>`)
+                  }
+               })
             }
          },
 
