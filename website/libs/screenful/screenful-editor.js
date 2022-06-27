@@ -172,6 +172,7 @@ Screenful.Editor={
     }
   },
   new: function(event, content){
+     Screenful.Editor.needsSaving=false;
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
       $("#container").css("right", ""); //remove room for xonomy layby
       Screenful.Editor.needsSaving=false;
@@ -189,6 +190,7 @@ Screenful.Editor={
     }
   },
   edit: function(event, id){
+     Screenful.Editor.needsSaving=false;
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
       $("#container").css("right", ""); //remove room for xonomy layby
       Screenful.Editor.needsSaving=false;
@@ -226,6 +228,7 @@ Screenful.Editor={
     }
   },
   view: function(event, id){
+     Screenful.Editor.needsSaving=false;
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
       $("#container").css("right", ""); //remove room for xonomy layby
       Screenful.Editor.needsSaving=false;
@@ -322,6 +325,7 @@ Screenful.Editor={
     Screenful.Editor.open(event, null);
   },
   open: function(event, id){
+     Screenful.Editor.needsSaving=false;
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
       Screenful.Editor.needsSaving=false;
       Screenful.Editor.hideHistory();
@@ -503,6 +507,7 @@ Screenful.Editor={
     $("#butSave .star").hide();
   },
   history: function(){
+     Screenful.Editor.needsSaving=false;
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
       $("#container").css("right", ""); //remove room for xonomy layby
       Screenful.Editor.needsSaving=false;
