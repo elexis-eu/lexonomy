@@ -180,13 +180,13 @@ class ConfigAutoNumbering(TypedDict):
     """Element to count, or where to evaluate string_template.
         Unless 'target' property is set, any contents of this element are also replaced with the result (so either the count or the evaluated string_template).
     """
-    target: NotRequired[str] 
+    target: NotRequired[str]
     """(optional) Alternative place to put the Value, can be a child element or an attribute.
         Attributes are denoted by a leading '@', so '@some_attribute'. The attribute is added to the element denoted by the 'element' setting.
-        Child elements are just the name of the target element, so 'some_child_element'. 
+        Child elements are just the name of the target element, so 'some_child_element'.
         Element and attribute are created if missing.
     """
-    
+
     type: NotRequired[Literal["string", "number"]]
     """Whether to write numbers or use the string_template to create a textual ID. Defaults to 'number'"""
     string_template: Optional[str]
@@ -818,11 +818,11 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
     3. Add back a <lxnm:subentryParent id="{idOfTheSeparateEntry}"/> xml placeholder element in this entry
     4. Fixup any remaining invalid references
         1. If the target has been updated and is still a valid subentry otherwise:
-            Fixup the title and doctype on the <lxnm:parentEntry> 
+            Fixup the title and doctype on the <lxnm:parentEntry>
         2. If the entry it points to exists in the database, but is no longer allowed to be a subentry (due to changed attributes, doctype, etc?):
             replace it with a copy of that xml (removing lexonomy bookkeeping attributes in the copy)
         3. If it points to an entry that doesn't exist in the database:
-            delete the tag. 
+            delete the tag.
             Keeping the tag is not an option, because we cannot save a link to a nonexistant entry due to referential constraints in the database.
             If we would keep the tag, but not save the reference in the database, that would give issues if the missing subentry was later created, perhaps by automatic assignment of an id.
 
@@ -845,8 +845,8 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
             subentryTitlePlain = get_entry_title(subentryXml, configs)[0]
             subentryDoctype = get_entry_doctype(subentryXml)
             new_tag = BeautifulSoup().new_tag("lxnm:subentryParent", attrs={
-                "id": str(subentryID), 
-                "title": subentryTitlePlain, 
+                "id": str(subentryID),
+                "title": subentryTitlePlain,
                 "doctype": subentryDoctype
             })
             subentry.replaceWith(new_tag)
@@ -862,7 +862,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
         # Find a matching attribute
         for name, requiredValue in required_attributes:
             if el.has_attr(name) and (not requiredValue or el.attrs.get(name) == requiredValue):
-                return True 
+                return True
         # No matching attribute found, element has the correct <name>, but not the correct attributes.
         return False
 
@@ -894,7 +894,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
     for subentry in entryXml.findAll("lxnm:subentryParent"):
         subentryID = int(subentry.attrs["id"])
         if not subentryID in newSubentries: # new subentries are guaranteed to be correct in the datbaase already.
-            subentryIdsToValidate.add(subentryID) 
+            subentryIdsToValidate.add(subentryID)
 
     validSubentryIDs = set(newSubentries)
     # 3 Replace invalid references with contents, delete if no contents in database.
@@ -906,7 +906,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
                 _, subentryXml, _, _ = createEntry(dictDB, configs, r["xml"], email, id=r["id"])
             else:
                 subentryXml = parse(r["xml"])
-            
+
             subentryID = int(r["id"])
             isValid = isActualSubentry(subentryXml, xema_get_id_from_element_name(configs["xema"], r["doctype"]))
             if isValid: # this <lxnm:subentryParent> may stay, but update its attributes anyway while we're here, so we're sure they are up to date.
@@ -921,11 +921,11 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
                 del subentryXml.attrs["xmlns:lxnm"]
                 for subentry in entryXml.findAll("lxnm:subentryParent", {"id": subentryID}): # and place xml content in the parent entry
                     subentry.replaceWith(subentryXml)
-           
+
             subentryIdsToValidate.remove(subentryID) # mark this one done.
-            
+
         # Every ID we've not see so far has no backing entry in the database - so just remove it outright.
-        for subentryID in subentryIdsToValidate: 
+        for subentryID in subentryIdsToValidate:
             for subentry in entryXml.findAll("lxnm:subentryParent", {"id": subentryID}):
                 subentry.decompose()
 
@@ -934,7 +934,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
     tuples_of_parent_child_id = list(zip(itertools.repeat(entryID), validSubentryIDs))
     if len(tuples_of_parent_child_id):
         dictDB.executemany("insert into sub(parent_id, child_id) values(?,?)", tuples_of_parent_child_id)
-    
+
     # Flag our parents they need an update (in case this is a subentry)
     doSql(dictDB, "update entries set needs_update=1 where id in (select distinct parent_id from sub where child_id = ?)", (entryID, ))
 
@@ -1284,7 +1284,7 @@ def get_next_autonumber_value(dictDB: Connection, element: str, target: Optional
         elementConf["number_next"] = highest
         dictDB.execute("UPDATE configs SET json=? WHERE id=?", (json.dumps(config), "autonumbering"))
 
-    return highest 
+    return highest
 
 def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAutoApplying: bool = True) -> bool:
     """Add automatically generated IDS/numbers to elements/attributes in the entry according to the config.
@@ -1318,7 +1318,7 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
         if target and target.startswith("@"):
             target_is_attribute = True
             target = target[1:]
-        
+
         if not element_to_number:
             continue
 
@@ -1336,7 +1336,7 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
         for el in entry.findAll(element_to_number):
             existing_value = el.attrs.get(target) if target_is_attribute else get_text(el, target)
             write_new_value = not existing_value or c.get("overwrite_existing")
-            
+
             # Exception to the rule:
             # When in numeric mode, and numbers are globally unique, and we're auto-applying: don't overwrite
             # Doing that would cause new numbers to be assigned every time an entry is saved or otherwise touched.
@@ -1359,11 +1359,11 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
             touched_entry = True
             if target_is_attribute:
                 el.attrs[target] = value
-            elif target: 
+            elif target:
                 targetEl = el.find(target) or create_path_to_element(el, [target])
                 targetEl.clear()
                 targetEl.append(value)
-            else: 
+            else:
                 el.clear()
                 el.append(value)
 
@@ -1663,8 +1663,6 @@ def suggestDictId() -> str:
 def makeDict(dictID: str, template: str, title: str, blurb: str, email: str):
     if title == "":
         title = "?"
-    if blurb == "":
-        blurb = "Yet another Lexonomy dictionary."
     if dictID in prohibitedDictIDs or dictExists(dictID):
         return False
     if not template:
