@@ -231,6 +231,25 @@
                      return customizeEditor.harvester(div);
                   }
                };
+               Screenful.Editor.new = function (event, content) {
+                  if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
+                     return $.ajax({
+                        url: Screenful.Editor.createUrl,
+                        method: 'POST',
+                        data: { content }
+                     })
+                     .done(function(response) {
+                        if (!response.success) {
+                           M.toast({html: 'Failed to clone entry'});
+                        } else {
+                           window.store.changeEntryId(response.id)
+                           window.store.loadEntryList(200);
+                        }
+                     })
+                  }
+               }
+
+
                Screenful.Editor.allowSourceCode = true;
                Screenful.Editor.formatSourceCode = Screenful.formatXml
                Screenful.Editor.validateSourceCode = Screenful.isWellFormedXml

@@ -202,7 +202,18 @@ def entryupdate(dictID: str, user: User, dictDB: Connection, configs: Configs):
 @post(siteconfig["rootPath"]+"<dictID>/entrycreate.json")
 @authDict(["canEdit"])
 def entrycreate(dictID: str, user: User, dictDB: Connection, configs: Configs):
-    id, xml, success, feedback = ops.createEntry(dictDB, configs, xml = request.forms.content, email=user["email"])
+    xml = request.forms.content
+    try:
+        xml = ops.parse(xml)
+        if "lxnm:entryID" in xml.attrs: # delete id attributes so we actually get a new ID for this entry
+            del xml.attrs["lxnm:entryID"]
+        if "lxnm:id" in xml.attrs:
+            del xml.attrs["lxnm:id"]
+    except:
+        return { "success": False, "feedback": "Invalid XML"}
+
+    id, xml, success, feedback = ops.createEntry(dictDB, configs, xml , email=user["email"])
+
     dictDB.commit()
     result = {"success": success, "id": id, "content": "", "contentHtml": "", "feedback": feedback}
     if success:
