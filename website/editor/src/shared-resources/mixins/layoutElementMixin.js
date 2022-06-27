@@ -126,6 +126,12 @@ export default {
     },
     handleChildUpdate(data) {
       let content = {...this.calculatedContent, ...data.content}
+       if (!content.type) {
+          content.type = "element"
+       }
+       if (!content.name) {
+          content.name = this.elementName
+       }
       this.$emit('input', {elementName: this.elementName, editorChildNumber: this.editorChildNumber, content: content})
     },
     updateContent(newContent) {
