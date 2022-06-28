@@ -143,3 +143,77 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- --------------------------------------------------------
+-- Added in 25/6/2022 
+-- brief: add entry and searchables tables into lexo DB to use it in the gloabal search
+--
+-- Table structure for table `searchables`
+--
+
+CREATE TABLE `searchables` (
+  `id` int(11) NOT NULL,
+  `entry_id` int(11) DEFAULT NULL,
+  `txt` varchar(512) DEFAULT NULL,
+  `level` int(11) DEFAULT NULL,
+  `dict_id` varchar(250) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `entries`
+--
+
+CREATE TABLE `entries` (
+  `id` int(11) NOT NULL,
+  `doctype` text DEFAULT NULL,
+  `xml` text DEFAULT NULL,
+  `title` varchar(1024) DEFAULT NULL,
+  `sortkey` varchar(1024) DEFAULT NULL,
+  `needs_resave` tinyint(1) DEFAULT 0,
+  `needs_refresh` tinyint(1) DEFAULT 0,
+  `needs_refac` tinyint(1) DEFAULT 0,
+  `dict_id` varchar(250) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+-- --------------------------------------------------------
+
+
+--
+-- Indexes for table `entries`
+--
+ALTER TABLE `entries`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sortkey` (`sortkey`(768)),
+  ADD KEY `needs_re` (`needs_resave`,`needs_refresh`,`needs_refac`);
+
+--
+-- AUTO_INCREMENT for table `entries`
+--
+ALTER TABLE `entries`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+  --
+-- Indexes for table `searchables`
+--
+ALTER TABLE `searchables`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `entry_id` (`entry_id`),
+  ADD KEY `search` (`txt`,`level`);
+
+--
+-- AUTO_INCREMENT for table `searchables`
+--
+ALTER TABLE `searchables`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+-- --
+-- -- Constraints for table `searchables`
+-- --
+-- ALTER TABLE `searchables`
+--   ADD CONSTRAINT `searchables_ibfk_1` FOREIGN KEY (`entry_id`) REFERENCES `entries` (`id`) ON DELETE CASCADE;
+
+

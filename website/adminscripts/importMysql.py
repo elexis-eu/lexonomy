@@ -137,7 +137,11 @@ for entry in re.findall(re_entry, xmldata):
         cur.execute("delete from searchables where entry_id=%s and level=%s", (entryID, 1))
         searchTitle = ops.getEntryTitle(entry, configs["titling"], True)
         cur.execute("insert into searchables(entry_id, txt, level) values(%s, %s, %s)", (entryID, searchTitle, 1))
-        cur.execute("insert into searchables(entry_id, txt, level) values(%s, %s, %s)", (entryID, searchTitle.lower(), 1))
+        # cur.execute("insert into searchables(entry_id, txt, level) values(%s, %s, %s)", (entryID, searchTitle.lower(), 1))
+        #_____
+        # Deleted in 27/6/2022 
+        # brief: the inquiry is repated twice which cause repated entry in the searchable table
+        #_____
         db.commit() 
         entryInserted += 1
         print("\r%.2d%% (%d/%d entries imported)" % ((entryInserted/entryCount*100), entryInserted, entryCount))

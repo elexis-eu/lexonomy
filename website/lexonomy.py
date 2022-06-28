@@ -214,7 +214,7 @@ def entryread(dictID, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/entryupdate.json")
 @authDict(["canEdit"])
 def entryupdate(dictID, user, dictDB, configs):
-    adjustedEntryID, adjustedXml, changed, feedback = ops.updateEntry(dictDB, configs, request.forms.id, request.forms.content, user["email"], {})
+    adjustedEntryID, adjustedXml, changed, feedback = ops.updateEntry(dictID, dictDB, configs, request.forms.id, request.forms.content, user["email"], {})
     html = ""
     if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
         import lxml.etree as ET
@@ -237,7 +237,7 @@ def entryupdate(dictID, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/entrycreate.json")
 @authDict(["canEdit"])
 def entrycreate(dictID, user, dictDB, configs):
-    adjustedEntryID, adjustedXml, feedback = ops.createEntry(dictDB, configs, None, request.forms.content, user["email"], {})
+    adjustedEntryID, adjustedXml, feedback = ops.createEntry(dictID, dictDB, configs, None, request.forms.content, user["email"], {})
     html = ""
     if configs["xemplate"].get("_xsl") and configs["xemplate"]["_xsl"] != "":
         import lxml.etree as ET
@@ -845,6 +845,9 @@ def configpage(dictID, page, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/configread.json")
 @authDict(["canConfig"])
 def configread(dictID, user, dictDB, configs):
+    #brief: if dict is public ==> insert entries to gloabal searchable
+    if configs[request.forms.id]["public"]:
+        ops.insertToGlobalSearchables(dictID)
     return {"success": True, "id": request.forms.id, "content": configs[request.forms.id]}
 
 @post(siteconfig["rootPath"]+"<dictID>/configupdate.json")
@@ -912,6 +915,25 @@ def dictsearch(dictID):
         nabes = ops.readNabesByText(dictDB, dictID, configs, text)
         return {"dictID": dictID, "dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "publico": configs["publico"], "q": text, "entries": entries, "nabes": nabes}
 
+# Added by Waad Alshammari
+# 23/6/2022 
+# Brief: search in all public dict
+@enable_cors
+@get(siteconfig["rootPath"]+"search.json")
+def dictsearch(dictID=""):
+    dictDB = ops.getMainDB()
+    configs="ar"
+    sentence = request.query.q
+    lemma=disam(sentence)
+    text=araby.strip_tashkeel(lemma.json()['text'][0])
+    entries = ops.listEntriesPublic(dictDB, dictID, configs, text)
+    if len(entries) == 1 and entries[0]["exactMatch"]:
+        nabes = ops.readNabesByText(dictDB, dictID, configs, text)
+        return {"dictID": "كل المعاجم", "q": text, "entries": entries, "nabes": nabes}
+    else:
+        nabes = ops.readNabesByText(dictDB, dictID, configs, text)
+        return {"dictID": "كل المعاجم", "q": text, "entries": entries, "nabes": nabes}
+      
 def disam(sentence):
 
     url = 'http://camel:5005/lemma'
@@ -1057,7 +1079,7 @@ def pushapi():
                 for entry in entryXmls:
                     if data.get("format") == "teilex0":
                         entry = ops.preprocessLex0(entry)
-                    ops.createEntry(dictDB, configs, None, entry, user["email"], {"apikey": data["apikey"]})
+                    ops.createEntry(dictID, dictDB, configs, None, entry, user["email"], {"apikey": data["apikey"]})
                 return {"success": True}
             else:
                 return {"success": False}

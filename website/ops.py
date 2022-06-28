@@ -239,10 +239,16 @@ def deleteEntry(db, entryID, email):
     # tell my parents that they need a refresh:
     db.execute (f"update entries set needs_refresh=1 where id in (select parent_id from sub where child_id={ques})", (entryID,))
     # delete me:
-    db.execute (f"delete from entries where id={ques}", (entryID,))
+    db.execute (f"delete from entries where id={ques}", (entryID,)) 
     # tell history that I have been deleted:
     db.execute (f"insert into history(entry_id, action, {SQL_SEP}when{SQL_SEP_C}, email, xml) values({ques},{ques},{ques},{ques},{ques})",
                 (entryID, "delete", datetime.datetime.utcnow(), email, None))
+    # brief: if dict is public delete the entry from the MainDB "lexo"
+    configs = readDictConfigs(db)
+    if configs["publico"]["public"]:
+        MainDB = getMainDB()
+        MainDB.execute(f"delete from entries where id={ques}", (entryID,))
+        MainDB.execute(f"delete from searchables where entry_id={ques}", (entryID,)) #where is the deletion for the entry in dict in the searchable ? I did not find. Thus, I added the deletion for MianDB here
     close_db(db)
 
 def readEntry(db, configs, entryID):
@@ -258,7 +264,7 @@ def readEntry(db, configs, entryID):
         xml = updateEntryLinkables(db, entryID, xml, configs, False, False)
     return entryID, xml, row["title"]
 
-def createEntry(dictDB, configs, entryID, xml, email, historiography):
+def createEntry(dictID, dictDB, configs, entryID, xml, email, historiography):
     xml = setHousekeepingAttributes(entryID, xml, configs["subbing"])
     xml = removeSubentryParentTags(xml)
     title = getEntryTitle(xml, configs["titling"])
@@ -267,25 +273,49 @@ def createEntry(dictDB, configs, entryID, xml, email, historiography):
     needs_refac = 1 if len(list(configs["subbing"].keys())) > 0 else 0
     needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
     # entry title already exists?
-    c = dictDB.execute(f"select id from entries where title = {ques} and id <> {ques}", (title, entryID))
+    c = dictDB.execute(f"select id from entries where title = {ques} and id <> {ques}", (title, entryID)) 
+    # Comment: I think this query is not true, ex, (select id from entries where title = "مدرسة" and id <> "125") retreive no row. while the entry is already existed in the DB
+    # However, select id from entries where title = {ques} and id <=> {ques} retrun the row.. should I replace ? 
     c = c if c else dictDB
     r = c.fetchone() if c else None
     feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
+
+    # Brief: insert the entry in the global DB "lexo" if the dict is public
+    if configs["publico"]["public"]:
+        MainDB = getMainDB()
+        c1 = MainDB.execute(f"select id from entries where title = {ques} and id <=> {ques}", (title, entryID))
+        c1 = c1 if c1 else MainDB
+
     if entryID:
         sql = f"insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques}, {ques})"
         params = (entryID, xml, title, sortkey, needs_refac, needs_resave, doctype)
+        if configs["publico"]["public"]:
+            sql1 = f"insert into entries(id, xml, title, sortkey, needs_refac, needs_resave, doctype, dict_id) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques}, {ques}, {ques})"
+            params1 = (entryID, xml, title, sortkey, needs_refac, needs_resave, doctype, dictID)
+
     else:
         sql = f"insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques})"
         params = (xml, title, sortkey, needs_refac, needs_resave, doctype)
+        if configs["publico"]["public"]:
+            sql1 = f"insert into entries(xml, title, sortkey, needs_refac, needs_resave, doctype, dict_id) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques}, {ques})"
+            params1 = (xml, title, sortkey, needs_refac, needs_resave, doctype, dictID)
     c = dictDB.execute(sql, params)
     c = c if c else dictDB
     entryID = c.lastrowid
     dictDB.execute(f"insert into searchables(entry_id, txt, level) values({ques}, {ques}, {ques})", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
     dictDB.execute(f"insert into history(entry_id, action, {SQL_SEP}when{SQL_SEP_C}, email, xml, historiography) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques})", (entryID, "create", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
     close_db(dictDB, shouldclose=False)
+
+    # 27/6/2022 
+    # Brief: insert entry in Lexo
+    if configs["publico"]["public"]:
+        c1 = MainDB.execute(sql1, params1)
+        c1 = c1 if c1 else MainDB
+        MainDB.execute(f"insert into searchables (entry_id, txt, level, dict_id) values({ques}, {ques}, {ques}, {ques})", (entryID, getEntryTitle(xml, configs["titling"], True), 1, dictID))
+
     return entryID, xml, feedback
 
-def updateEntry(dictDB, configs, entryID, xml, email, historiography):
+def updateEntry(dictID, dictDB, configs, entryID, xml, email, historiography):
     c = dictDB.execute(f"select id, xml from entries where id={ques}", (entryID, ))
     c = c if c else dictDB
     row = c.fetchone() if c else None
@@ -296,7 +326,7 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
     newxml = re.sub(r" lxnm:(sub)?entryID='[0-9]+'", "", newxml)
     newxml = re.sub(r" lxnm:linkable='[^']+'", "", newxml)
     if not row:
-        adjustedEntryID, adjustedXml, feedback = createEntry(dictDB, configs, entryID, xml, email, historiography)
+        adjustedEntryID, adjustedXml, feedback = createEntry(dictID, dictDB, configs, entryID, xml, email, historiography)
         if configs["links"]:
             adjustedXml = updateEntryLinkables(dictDB, adjustedEntryID, adjustedXml, configs, True, True)
         return adjustedEntryID, adjustedXml, True, feedback
@@ -323,6 +353,10 @@ def updateEntry(dictDB, configs, entryID, xml, email, historiography):
             dictDB.execute(f"update entries set doctype={ques}, xml={ques}, title={ques}, sortkey={ques}, needs_refac={ques}, needs_resave={ques} where id={ques}", (doctype, xml, title, sortkey, needs_refac, needs_resave, entryID))
             dictDB.execute(f"update searchables set txt={ques} where entry_id={ques} and level=1", (getEntryTitle(xml, configs["titling"], True), entryID))
             dictDB.execute(f"insert into history(entry_id, action, {SQL_SEP}when{SQL_SEP_C}, email, xml, historiography) values({ques}, {ques}, {ques}, {ques}, {ques}, {ques})", (entryID, "update", str(datetime.datetime.utcnow()), email, xml, json.dumps(historiography)))
+            if configs["publico"]["public"]:
+                MainDB = getMainDB()
+                MainDB.execute(f"update entries set doctype={ques}, xml={ques}, title={ques}, sortkey={ques}, needs_refac={ques}, needs_resave={ques} where id={ques}", (doctype, xml, title, sortkey, needs_refac, needs_resave, entryID))
+                MainDB.execute(f"update searchables set txt={ques} where entry_id={ques} and level=1", (getEntryTitle(xml, configs["titling"], True), entryID))
             close_db(dictDB, shouldclose=False)
             if configs["links"]:
                 xml = updateEntryLinkables(dictDB, entryID, xml, configs, True, True)
@@ -1075,13 +1109,21 @@ def readNabesByText(dictDB, dictID, configs, text):
     nabes_before = []
     nabes_after = []
     nabes = []
-    c = dictDB.execute(f"select e1.id, e1.title, e1.sortkey from entries as e1 where e1.doctype={ques} ", (configs["xema"]["root"],))
-    c = c if c else dictDB
-    for r in c.fetchall() if c else []:
-        nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
+    if not dictID:
+        c = dictDB.execute(f"select id, title, sortkey from entries")
+        c = c if c else dictDB
+        for r in c.fetchall() if c else []:
+            nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
+        # sort by selected locale
+        collator = Collator.createInstance(Locale(configs))
 
-    # sort by selected locale
-    collator = Collator.createInstance(Locale(getLocale(configs)))
+    else:
+        c = dictDB.execute(f"select e1.id, e1.title, e1.sortkey from entries as e1 where e1.doctype={ques} ", (configs["xema"]["root"],))
+        c = c if c else dictDB
+        for r in c.fetchall() if c else []:
+            nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
+        # sort by selected locale
+        collator = Collator.createInstance(Locale(getLocale(configs)))
     nabes.sort(key=lambda x: collator.getSortKey(x['sortkey']))
     
     #select before/after entries 
@@ -1209,6 +1251,26 @@ def importfile(dictID, filename, email):
     else:
         p = subprocess.Popen(["adminscripts/importMysql.py", dictID, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
     return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
+# Added by Waad Alshammari
+# 22/6/2022 
+# Brief: insert all puplic dict inot the golable DB "lexo", in table searchable and entries
+
+
+def insertToGlobalSearchables(dictID):
+
+    MainDB= getMainDB()
+    if DB == 'mysql':
+        sql_list="insert into lexo.searchables select *, \"{0}\" from lexo_{1}.searchables".format(dictID,dictID)
+        c1 = MainDB.execute(sql_list)
+        c1 = c1 if c1 else MainDB
+        sql_list2="insert into lexo.entries select *, \"{0}\" from lexo_{1}.entries".format(dictID,dictID)
+        c2 = MainDB.execute(sql_list2)
+        c2 = c2 if c2 else MainDB
+        return {"success": True}
+
+    elif DB == 'sqlite': 
+        return {"success": False, "state": "elif DB == 'sqlite' is none exists"}
+
 
 def checkImportStatus(pidfile, errfile):
     content = ''
@@ -1336,20 +1398,36 @@ def listEntries(dictDB, dictID, configs, doctype, searchtext="", modifier="start
 
 def listEntriesPublic(dictDB, dictID, configs, searchtext):
     howmany = 100
-    sql_list = f"select s.txt, min(s.level) as level, e.id, e.title, e.sortkey, case when s.txt={ques} then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like {ques} and e.doctype={ques} group by e.id order by priority, level, s.level"
-    # c1 = dictDB.execute(sql_list, ("%"+searchtext+"%", "%"+searchtext+"%", configs["xema"].get("root")))
-    c1 = dictDB.execute(sql_list, (searchtext, searchtext, configs["xema"].get("root")))
-    
-    c1 = c1 if c1 else dictDB
-    entries = []
-    for r1 in c1.fetchall() if c1 else []:
-        item = {"id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"], "exactMatch": (r1["level"] == 1 and r1["priority"] == 1)}
-        if r1["level"] > 1:
-            item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
-        entries.append(item)
+    # Brief: return of list entries in all public dict
+    if not dictID:
+        sql_list = f"select s.txt, min(s.level) as level, e.id, e.title, e.sortkey, e.dict_id, case when s.txt={ques} then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like {ques} group by e.id order by priority, level, s.level, e.dict_id"
+        c1 = dictDB.execute(sql_list, (searchtext, searchtext))
+        c1 = c1 if c1 else dictDB
+        entries = []
+        for r1 in c1.fetchall() if c1 else []:
+            dictDB = getDB(r1["dict_id"])
+            configs = readDictConfigs(dictDB)
+            item = {"dict_id": r1["dict_id"],"dictTitle": configs["ident"]["title"], "dictBlurb": configs["ident"]["blurb"], "id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"], "exactMatch": (r1["level"] == 1 and r1["priority"] == 1)}
+            if r1["level"] > 1:
+                item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
+            entries.append(item)
+        collator = Collator.createInstance(Locale(getLocale(configs)))
 
-    # sort by selected locale
-    collator = Collator.createInstance(Locale(getLocale(configs)))
+    else:
+        sql_list = f"select s.txt, min(s.level) as level, e.id, e.title, e.sortkey, case when s.txt={ques} then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like {ques} and e.doctype={ques} group by e.id order by priority, level, s.level"
+        # c1 = dictDB.execute(sql_list, ("%"+searchtext+"%", "%"+searchtext+"%", configs["xema"].get("root")))
+        c1 = dictDB.execute(sql_list, (searchtext, searchtext, configs["xema"].get("root")))
+
+        c1 = c1 if c1 else dictDB
+        entries = []
+        for r1 in c1.fetchall() if c1 else []:
+            item = {"id": r1["id"], "title": r1["title"], "sortkey": r1["sortkey"], "exactMatch": (r1["level"] == 1 and r1["priority"] == 1)}
+            if r1["level"] > 1:
+                item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
+            entries.append(item)
+
+        # sort by selected locale
+        collator = Collator.createInstance(Locale(getLocale(configs)))
     entries.sort(key=lambda x: collator.getSortKey(x['sortkey']))
     # and limit
     entries = entries[0:int(howmany)]
@@ -1479,15 +1557,15 @@ def refac(dictDB, dictID, configs):
             subentryID = el.getAttributeNS("http://www.lexonomy.eu/", "subentryID")
             xml = el.toxml()
             if subentryID:
-                subentryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, xml, email.lower(), {"refactoredFrom":entryID})
+                subentryID, adjustedXml, changed, feedback = updateEntry(dictID, dictDB, configs, subentryID, xml, email.lower(), {"refactoredFrom":entryID})
                 el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", str(subentryID))
                 dictDB.execute(f"insert into sub(parent_id, child_id) values({ques},{ques})", (entryID, subentryID))
                 if changed:
                     dictDB.execute(f"update entries set needs_refresh=1 where id in (select parent_id from sub where child_id={ques}) and id<>{ques}", (subentryID, entryID))
             else:
-                subentryID, adjustedXml, feedback = createEntry(dictDB, configs, None, xml, email.lower(), {"refactoredFrom":entryID})
+                subentryID, adjustedXml, feedback = createEntry(dictID, dictDB, configs, None, xml, email.lower(), {"refactoredFrom":entryID})
                 el.setAttributeNS("http://www.lexonomy.eu/", "lxnm:subentryID", str(subentryID))
-                subentryID, adjustedXml, changed, feedback = updateEntry(dictDB, configs, subentryID, el.toxml(), email.lower(), {"refactoredFrom":entryID})
+                subentryID, adjustedXml, changed, feedback = updateEntry(dictID, dictDB, configs, subentryID, el.toxml(), email.lower(), {"refactoredFrom":entryID})
                 dictDB.execute(f"insert into sub(parent_id, child_id) values({ques},{ques})", (entryID, subentryID))
                 if DB == 'mysql':
                     dictDB.execute(f"update entries set needs_refresh=1 where id in (select parent_id from sub where child_id={subentryID})", multi=True )
@@ -1564,8 +1642,15 @@ def resave(dictDB, dictID, configs):
         xml = re.sub(r"^<([^>^ ]*) ", r"<\1 xmlns:lxnm='http://www.lexonomy.eu/' ", xml)
         dictDB.execute(f"update entries set needs_resave=0, title={ques}, sortkey={ques} where id={ques}", (getEntryTitle(xml, configs["titling"]), getSortTitle(xml, configs["titling"]), entryID))
         dictDB.execute(f"delete from searchables where entry_id={ques}", (entryID,))
+        if configs["publico"]["public"]:
+            MainDB = getMainDB()
+            MainDB.execute(f"delete from searchables where entry_id={ques}", (entryID,))
         dictDB.execute(f"insert into searchables(entry_id, txt, level) values({ques}, {ques}, {ques})", (entryID, getEntryTitle(xml, configs["titling"], True), 1))
-        dictDB.execute(f"insert into searchables(entry_id, txt, level) values({ques}, {ques}, {ques})", (entryID, getEntryTitle(xml, configs["titling"], True).lower(), 1))
+        # dictDB.execute(f"insert into searchables(entry_id, txt, level) values({ques}, {ques}, {ques})", (entryID, getEntryTitle(xml, configs["titling"], True).lower(), 1))
+        # Deleted 
+        # 27/6/2022 
+        # Brief: the inquiry is repated twice which cause repated entry in the searchable table
+        
         headword = getEntryHeadword(xml, configs["titling"].get("headword"))
         for searchable in getEntrySearchables(xml, configs):
             if searchable != headword:
