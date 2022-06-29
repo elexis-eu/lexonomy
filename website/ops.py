@@ -637,8 +637,8 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
 
     results = sortEntries(configs, results, reverse=sortdesc)
     total = len(results)
-    if (limit is not None and limit > 0):
-        results = results[0:limit]
+    if (limit is not None and int(limit) > 0):
+        results = results[0:int(limit)]
     return total, results
 
 def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int], List[SortableEntry]], xml: bool=True, tag: bool=False, html: bool=False, titlePlain: bool = False, sortdesc: Union[str, bool] = False) -> List[EntryFromDatabase]:
@@ -2276,7 +2276,7 @@ def readRandoms(dictDB: Connection):
         ids_and_sortkeys.append({"id": r["id"], "sortkey": r["sortkey"]})
 
     return {
-        "entries": readEntries(dictDB, configs, ids_and_sortkeys),
+        "entries": readEntries(dictDB, configs, ids_and_sortkeys, titlePlain=True),
         "more": dictDB.execute("select count(*) as total from entries").fetchone()["total"] > limit
     }
 
