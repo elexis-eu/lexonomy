@@ -274,8 +274,6 @@ def createEntry(dictID, dictDB, configs, entryID, xml, email, historiography):
     needs_resave = 1 if configs["searchability"].get("searchableElements") and len(configs["searchability"].get("searchableElements")) > 0 else 0
     # entry title already exists?
     c = dictDB.execute(f"select id from entries where title = {ques} and id <> {ques}", (title, entryID)) 
-    # Comment: I think this query is not true, ex, (select id from entries where title = "مدرسة" and id <> "125") retreive no row. while the entry is already existed in the DB
-    # However, select id from entries where title = {ques} and id <=> {ques} retrun the row.. should I replace ? 
     c = c if c else dictDB
     r = c.fetchone() if c else None
     feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
@@ -283,7 +281,7 @@ def createEntry(dictID, dictDB, configs, entryID, xml, email, historiography):
     # Brief: insert the entry in the global DB "lexo" if the dict is public
     if configs["publico"]["public"]:
         MainDB = getMainDB()
-        c1 = MainDB.execute(f"select id from entries where title = {ques} and id <=> {ques}", (title, entryID))
+        c1 = MainDB.execute(f"select id from entries where title = {ques} and id <> {ques}", (title, entryID))
         c1 = c1 if c1 else MainDB
 
     if entryID:
@@ -1411,7 +1409,7 @@ def listEntriesPublic(dictDB, dictID, configs, searchtext):
             if r1["level"] > 1:
                 item["title"] += " ← <span class='redirector'>" + r1["txt"] + "</span>"
             entries.append(item)
-        collator = Collator.createInstance(Locale(getLocale(configs)))
+        collator = Collator.createInstance(Locale("ar"))
 
     else:
         sql_list = f"select s.txt, min(s.level) as level, e.id, e.title, e.sortkey, case when s.txt={ques} then 1 else 2 end as priority from searchables as s inner join entries as e on e.id=s.entry_id where s.txt like {ques} and e.doctype={ques} group by e.id order by priority, level, s.level"
