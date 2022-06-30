@@ -2327,19 +2327,18 @@ def importfile(dictID: str, filepath: str, user: str, purge: bool = False, saveS
     args.append(user)
     args.append(dbpath)
     args.append(filepath)
-
     return _startSubprocess(subProcessID = filepath, scriptPath = os.path.join("adminscripts", "import.py"), args = args)
 
 def _startSubprocess(subProcessID: str, scriptPath: str, args: list[str]) -> ExternalProcessStatus:
     "Start the subprocess if it is not already running or finished. Return the status of the process if is was already running."
     import subprocess
     import sys
-
     pidfile = subProcessID + ".pid"
     errfile = subProcessID + ".err"
-    if os.path.isfile(pidfile):
+    if os.path.isfile(pidfile + ".lock"):
         return _getProcessStatus(pidfile, errfile)
 
+    open(pidfile + ".lock", "w").close()
     pidfile_f = open(pidfile, "w")
     errfile_f = open(errfile, "w")
 
