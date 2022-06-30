@@ -275,11 +275,11 @@ Screenful.Editor={
           var preview = linkdata["source_id"];
           if (linkdata["source_preview"] != "") preview = linkdata["source_preview"];
           if (linkdata['target_hw'] != '') {
-            var linkhtml = '<ul>'+preview+' → <a target="_top" href="/'+linkdata['target_dict']+'/edit/entry/view'+linkdata['target_entry']+'">'+linkdata['target_dict']+' : '+linkdata['target_el']+' : '+linkdata['target_id']+'</a>';
+            var linkhtml = '<ul>'+preview+' → <a target="_top" href="#/'+linkdata['target_dict']+'/edit/entry/'+linkdata['target_entry']+'/view?link='+linkdata['target_id']+'">'+linkdata['target_dict']+' : '+linkdata['target_el']+' : '+linkdata['target_id']+'</a>';
           } else if (linkdata['target_entry'] != '') {
-            var linkhtml = '<ul>'+preview+' → <a target="_top" href="/'+linkdata['target_dict']+'/edit/entry/view'+linkdata['target_entry']+'">'+linkdata['target_dict']+' : '+linkdata['target_el']+' : '+linkdata['target_id']+'</a>';
+            var linkhtml = '<ul>'+preview+' → <a target="_top" href="#/'+linkdata['target_dict']+'/edit/entry/'+linkdata['target_entry']+'/view?link='+linkdata['target_id']+'">'+linkdata['target_dict']+' : '+linkdata['target_el']+' : '+linkdata['target_id']+'</a>';
           } else {
-            var linkhtml = '<ul>'+preview+' → <a target="_top" href="/'+linkdata['target_dict']+'">'+linkdata['target_dict']+'</a> : '+linkdata['target_el']+' : '+linkdata['target_id'];
+            var linkhtml = '<ul>'+preview+' → <a target="_top" href="#/'+linkdata['target_dict']+'">'+linkdata['target_dict']+'</a> : '+linkdata['target_el']+' : '+linkdata['target_id'];
           }
           if (linkdata['confidence'] && linkdata['confidence'] != '') {
             linkhtml += ' ('+linkdata['confidence']+')';
@@ -296,11 +296,11 @@ Screenful.Editor={
         for (var link in links.in) {
           var linkdata = links.in[link];
           if (linkdata['source_hw'] != '') {
-            var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="/'+linkdata['source_dict']+'/edit/entry/view'+linkdata['source_entry']+'">'+linkdata['source_dict']+' : '+linkdata['source_hw']+' : '+linkdata['source_el']+' : '+linkdata['source_id']+'</a>';
+            var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="#/'+linkdata['source_dict']+'/edit/entry/'+linkdata['source_entry']+'/view?link='+linkdata['source_id']+'">'+linkdata['source_dict']+' : '+linkdata['source_hw']+' : '+linkdata['source_el']+' : '+linkdata['source_id']+'</a>';
           } else if (linkdata['source_entry'] != '') {
-            var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="/'+linkdata['source_dict']+'/edit/entry/view'+linkdata['source_entry']+'">'+linkdata['source_dict']+' : '+linkdata['source_el']+' : '+linkdata['source_id']+'</a>';
+            var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="#/'+linkdata['source_dict']+'/edit/entry/'+linkdata['source_entry']+'/view?link='+linkdata['source_id']+'">'+linkdata['source_dict']+' : '+linkdata['source_el']+' : '+linkdata['source_id']+'</a>';
           } else {
-            var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="/'+linkdata['source_dict']+'">'+linkdata['source_dict']+'</a> : '+linkdata['source_el']+' : '+linkdata['source_id'];
+            var linkhtml = '<ul>'+linkdata["target_id"]+' ← <a target="_top" href="#/'+linkdata['source_dict']+'">'+linkdata['source_dict']+'</a> : '+linkdata['source_el']+' : '+linkdata['source_id'];
           }
           if (linkdata['confidence'] && linkdata['confidence'] != '') {
             linkhtml += ' ('+linkdata['confidence']+')';
