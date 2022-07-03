@@ -79,11 +79,7 @@ export default {
     }
     if (this.state.headwordElement === this.elementName) {
       this.isHeadword = true
-      try {
-        this.state.headwordData = this.getHeadwordValue(this.content.elements)
-      } catch (e) {
-        console.error(e)
-      }
+      this.state.headwordData = this.getHeadwordValue(this.content.elements)
     }
   },
   beforeDestroy() {
