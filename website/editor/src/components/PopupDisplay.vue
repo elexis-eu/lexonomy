@@ -21,7 +21,7 @@
 
 <script>
 export default {
-  name: "PopupDisplayComponent",
+  name: "PopupDisplay",
   inject: ["$validator"],
   props: {
     value: {
@@ -97,19 +97,20 @@ export default {
   width: 100%; /* Full width */
   height: 100%; /* Full height */
   max-height: 100%;
-  overflow: auto; /* Enable scroll if needed */
+  overflow: hidden;
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
 /* Modal Content/Box */
 .modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
+  width: 80%; /* Could be more or less, depending on screen size */
+  height: calc(100% - 60px);
+  margin: 30px auto; /* 15% from the top and centered */
   padding: 15px 12px;
   border: 1px solid #888;
   border-radius: 16px;
-  width: 80%; /* Could be more or less, depending on screen size */
+  background-color: #fefefe;
 }
 
 /* The Close Button */

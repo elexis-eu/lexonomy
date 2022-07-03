@@ -138,10 +138,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .corpus-managers {
   .modal {
-    overflow: inherit;
     max-height: 100%;
   }
 
@@ -158,6 +156,7 @@ export default {
 
   .type-toggle {
     margin-right: 16px;
+
     .lever {
       background-color: #005FCC !important;
 
@@ -179,8 +178,8 @@ export default {
 
 .examples {
   margin: 24px 0;
-  max-height: 600px;
-  overflow-Y: scroll;
+  max-height: calc(100% - 235px);
+  overflow-Y: auto;
 }
 
 .example {
@@ -192,13 +191,23 @@ export default {
   }
 }
 
-.actions {
-  margin-top: 24px;
-  text-align: right;
+.navigation {
+  display: flex;
+  justify-content: center;
 
   button {
     margin-left: 16px;
   }
 }
 
+.actions {
+  position: absolute;
+  margin-top: 24px;
+  bottom: 46px;
+  right: calc(10% + 16px);
+
+  button {
+    margin-left: 16px;
+  }
+}
 </style>
