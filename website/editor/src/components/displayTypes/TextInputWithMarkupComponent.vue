@@ -77,50 +77,8 @@ export default {
     }
   },
   watch: {
-    values: {
-      handler(newVal) {
-        let elements
-        // Check if it's array
-        if (Array.isArray(this.values)) {
-          elements = []
-          this.values.forEach((element) => {
-            switch (element.type) {
-              case "text":
-                if (element.text !== "") {
-                  elements.push({
-                    type: "text",
-                    text: element.text
-                  })
-                }
-                break
-              default:
-                if (element.text !== "") {
-                  let newEl = {
-                    type: "element",
-                    name: element.name,
-                    elements: [{type: "text", text: element.text}]
-                  }
-                  let contentElement = this.content.find(el => el.name === element.name)
-                  if (contentElement && contentElement.attributes) {
-                    newEl.attributes = contentElement.attributes
-                  }
-                  elements.push(newEl)
-                }
-            }
-          })
-
-        } else {
-          // Assign new content
-          elements = Object.assign({}, this.content)
-          elements.text = "" + newVal[0].text
-        }
-        if (JSON.stringify(elements) === JSON.stringify(this.content)) {
-          return
-        }
-        // Emit event with new data
-        this.$emit('input', {elementName: this.elementName, elements: elements})
-      },
-      deep: true
+    content() {
+      this.computeValues()
     },
     showMarkActions(show) {
       if (show) {
@@ -163,6 +121,7 @@ export default {
       return (configData && configData.elementName) || elementName
     },
     computeValues() {
+      this.values = []
       if (Array.isArray(this.content) && this.content.length > 0) {
         this.content.forEach((element, index) => {
           if (element.type === "text") {
@@ -192,7 +151,49 @@ export default {
     },
     updateValue(event) {
       this.values[event.target.dataset.index].text = event.target.textContent
+      this.updateParent()
+    },
+    updateParent() {
+      let elements
+      // Check if it's array
+      if (Array.isArray(this.values)) {
+        elements = []
+        this.values.forEach((element) => {
+          switch (element.type) {
+            case "text":
+              if (element.text !== "") {
+                elements.push({
+                  type: "text",
+                  text: element.text
+                })
+              }
+              break
+            default:
+              if (element.text !== "") {
+                let newEl = {
+                  type: "element",
+                  name: element.name,
+                  elements: [{type: "text", text: element.text}]
+                }
+                let contentElement = this.content.find(el => el.name === element.name)
+                if (contentElement && contentElement.attributes) {
+                  newEl.attributes = contentElement.attributes
+                }
+                elements.push(newEl)
+              }
+          }
+        })
 
+      } else {
+        // Assign new content
+        elements = Object.assign({}, this.content)
+        elements.text = "" + this.values[0].text
+      }
+      if (JSON.stringify(elements) === JSON.stringify(this.content)) {
+        return
+      }
+      // Emit event with new data
+      this.$emit('input', {elementName: this.elementName, elements: elements})
     },
     findTextInElement(elements) {
       if (Array.isArray(elements)) {
@@ -272,6 +273,7 @@ export default {
 
       this.values.splice(Number(fromElement.dataset.index), 1, ...newValues)
       this.tryMergingValues()
+      this.updateParent()
     },
     tryMergingValues() {
       if (this.values.length < 2) {
