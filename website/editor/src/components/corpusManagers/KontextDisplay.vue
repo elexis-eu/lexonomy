@@ -1,15 +1,20 @@
 <template>
-  <PopupDisplay z-index="10" :value="value" @input="$emit('input', $event)">
+  <PopupDisplay
+          z-index="10"
+          :value="value"
+          :hideActions="true"
+          @input="$emit('input', $event)"
+  >
     <h2>Kontext search engine</h2>
     <div class="search-box">
-        <div class="switch type-toggle">
-            <label>
-                Headword
-                <input ref="searchTypeToggle" type="checkbox">
-                <span class="lever"></span>
-                CQL
-            </label>
-        </div>
+      <div class="switch type-toggle">
+        <label>
+          Headword
+          <input ref="searchTypeToggle" type="checkbox">
+          <span class="lever"></span>
+          CQL
+        </label>
+      </div>
       <input v-model="searchTerm" placeholder="Headword" type="text">
       <button @click="getExamples(1)">Search</button>
     </div>

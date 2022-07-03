@@ -35,6 +35,7 @@
     <PopupDisplay
       z-index="10"
       :value="showSubentriesSearchPopup"
+      :hideActions="true"
       @input="showSubentriesSearchPopup = $event"
       class="subentry-search-modal"
     >

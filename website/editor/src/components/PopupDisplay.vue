@@ -2,18 +2,26 @@
   <!--  <div v-if="!keepAlive">-->
   <div ref="wrapper" v-if="!keepAlive && value" class="modal" @click="maybeClosePopup"
        :style="computedStyles">
-    <div ref="modalContent" class="modal-content">
-      <span class="close" @click="closePopup">&times;</span>
+    <div ref="modalContent" class="modal-content" :class="{'full-height': fullHeight}">
+      <span class="close" @click="closeButtonClick">&times;</span>
       <slot></slot>
+      <div v-if="!hideActions" class="default-actions">
+        <button @click="$emit('save')">Ok</button>
+        <button @click="$emit('cancel')">Cancel</button>
+      </div>
     </div>
   </div>
   <!--  </div>-->
   <!--  <div v-else>-->
   <div ref="wrapper" v-else-if="keepAlive" v-show="value" class="modal" @click="maybeClosePopup"
        :style="computedStyles">
-    <div ref="modalContent" class="modal-content">
+    <div ref="modalContent" class="modal-content" :class="{'full-height': fullHeight}">
       <span class="close" @click="closePopup">&times;</span>
       <slot></slot>
+      <div v-if="!hideActions" class="default-actions">
+        <button @click="$emit('save')">Ok</button>
+        <button @click="$emit('cancel')">Cancel</button>
+      </div>
     </div>
   </div>
   <!--  </div>-->
@@ -35,6 +43,22 @@ export default {
     keepAlive: {
       type: Boolean,
       default: false
+    },
+    fullHeight: {
+      type: Boolean,
+      default: true
+    },
+    forceButtonClose: {
+      type: Boolean,
+      default: false
+    },
+    hideActions: {
+      type: Boolean,
+      default: false
+    },
+    saveButtonText: {
+      type: String,
+      default: "Save"
     }
   },
   watch: {
@@ -49,7 +73,7 @@ export default {
         }
       },
       immediate: true
-    },
+    }
   },
   computed: {
     computedStyles() {
@@ -62,9 +86,18 @@ export default {
     }
   },
   methods: {
+    closeButtonClick() {
+      if (!this.forceButtonClose) {
+        this.closePopup()
+      } else {
+        this.$emit('cancel')
+      }
+    },
     maybeClosePopup(event) {
       if (event.target === this.$refs.wrapper) {
-        this.closePopup()
+        if (!this.forceButtonClose) {
+          this.closePopup()
+        }
       }
     },
     closePopup() {
@@ -105,12 +138,18 @@ export default {
 /* Modal Content/Box */
 .modal-content {
   width: 80%; /* Could be more or less, depending on screen size */
-  height: calc(100% - 60px);
-  margin: 30px auto; /* 15% from the top and centered */
+  max-height: 70%;
+  margin: 15% auto; /* 15% from the top and centered */
   padding: 15px 12px;
   border: 1px solid #888;
   border-radius: 16px;
   background-color: #fefefe;
+
+  &.full-height {
+    height: calc(100% - 60px);
+    max-height: calc(100% - 60px);
+    margin: 30px auto;
+  }
 }
 
 /* The Close Button */
@@ -124,6 +163,16 @@ export default {
     color: black;
     text-decoration: none;
     cursor: pointer;
+  }
+}
+
+.default-actions {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-top: 24px;
+
+  button {
+    margin-left: 16px;
   }
 }
 </style>

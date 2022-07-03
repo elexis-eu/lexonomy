@@ -1,5 +1,10 @@
 <template>
-  <PopupDisplay :z-index="zIndex" :value="value" @input="$emit('input', $event)">
+  <PopupDisplay
+          :z-index="zIndex"
+          :value="value"
+          :hideActions="true"
+          @input="$emit('input', $event)"
+  >
     <h2>Move selected {{ computedElementName }} to:</h2>
     <div class="parents">
       <ReadOnlyComponentGenerator

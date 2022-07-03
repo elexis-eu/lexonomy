@@ -1,5 +1,9 @@
 <template>
-  <PopupDisplay z-index="10" :value="value" @input="$emit('input', $event)">
+  <PopupDisplay z-index="10"
+                :value="value"
+                :hideActions="true"
+                @input="$emit('input', $event)"
+  >
     <h2>Sketch Engine:{{ displayedType }} search</h2>
     <div class="search-box">
       <div v-if="searchType === 'xampl'" class="switch type-toggle">
