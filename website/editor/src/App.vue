@@ -128,6 +128,7 @@ $blue-600: #023672;
     font-size: 24px;
     line-height: 30px;
     font-weight: bold;
+    margin: 0 0 1.424rem 0;
   }
 
   h3 {

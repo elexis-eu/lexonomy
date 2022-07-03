@@ -9,6 +9,7 @@ import MediaComponent from "@/components/displayTypes/MediaComponent"
 import TextInputComponent from "@/components/displayTypes/TextInputComponent"
 import TextInputWithMarkupComponent from "@/components/displayTypes/TextInputWithMarkupComponent"
 import VeeValidate from "vee-validate"
+import SubentryComponent from "@/components/displayTypes/SubentryComponent"
 Vue.config.productionTip = false
 const bus = new Vue()
 
@@ -18,6 +19,7 @@ Vue.use(VeeValidate, {
 
 Vue.component("InlineComponent", InlineComponent)
 Vue.component("PopupComponent", PopupComponent)
+Vue.component("SubentryComponent", SubentryComponent)
 Vue.component("ReadOnlyComponent", ReadOnlyComponent)
 Vue.component("DropdownComponent", DropdownComponent)
 Vue.component("MediaComponent", MediaComponent)

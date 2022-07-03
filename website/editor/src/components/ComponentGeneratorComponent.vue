@@ -58,10 +58,7 @@ export default {
       displayTypeToComponentMap: {
         "popup": "PopupComponent",
         "inline": "InlineComponent",
-        "read-only": "ReadOnlyComponent",
-        "text-input": "TextInputComponent",
-        "dropdown": "DropdownComponent",
-        "media": "MediaComponent"
+        "subentry": "SubentryComponent"
       },
       renderedChildren: [],
       numberOfRenderedChildren: 0,
@@ -138,7 +135,7 @@ export default {
         } else {
           if (newContent.elements) {
             newContentForChildType = newContent.elements.filter(element => {
-              return element.name === elementType.name
+              return this.getElementName(element) === elementType.name
             })
           }
         }
@@ -185,7 +182,6 @@ export default {
       if (!this.children) {
         return
       }
-
       for (const child of this.children) {
         if (this.numberOfRenderedChildren === this.maxDisplayedChildren) {
           break
@@ -210,7 +206,7 @@ export default {
         } else {
           if (Array.isArray(XMLContent && XMLContent.elements)) {
             content = XMLContent.elements.filter(element => {
-              return element.name === elementName
+              return this.getElementName(element) === elementName
             })
             if (content.length === 0) {
               content = [{}]
@@ -345,7 +341,7 @@ export default {
       if (!content.elements) {
         content.elements = this.createElementTemplate(data.elementName)
       } else if (!content.elements.find(el => {
-        return el.name === data.elementName
+        return this.getElementName(el) === data.elementName
       })) {
         content.elements.push(data.content)
         this.$emit("input", {content: content})
@@ -374,6 +370,12 @@ export default {
       if (this.forceReadOnlyElements) {
         return this.displayTypeToComponentMap["inline"]
       }
+      if (Object.keys(this.state.entry.dictConfigs.subbing).includes(elementName)) {
+        if (this.state.entry.entryData.doctype !== elementName) {
+          return this.displayTypeToComponentMap["subentry"]
+        }
+      }
+
       let formatterConfig = this.state.entry.dictConfigs.xemplate
       let elementConfig
       if (isAttribute) {
@@ -428,7 +430,8 @@ export default {
       let consecutiveNumber = 0
       let elementToDeleteIndex = -1
       for (const i in elements) {
-        if (elements[i].name === name) {
+
+        if (this.getElementName(elements[i]) === name) {
           elements[i]._index = consecutiveNumber
           if (consecutiveNumber === position) {
             elementToDeleteIndex = i
@@ -447,7 +450,7 @@ export default {
     },
     isNewPositionInBounds(elements, elementName, position, direction) {
       let newPosition = position + direction
-      let elementsLength = elements.filter(el => el.name === elementName).length
+      let elementsLength = elements.filter(el => this.getElementName(el) === elementName).length
       return newPosition >= 0 && newPosition < elementsLength
     },
     getPositionOfElementInContent(name, position, content) {
@@ -455,7 +458,7 @@ export default {
       let consecutiveNumber = 0
       let elementToMoveIndex
       for (const i in elements) {
-        if (elements[i].name === name) {
+        if (this.getElementName(elements[i]) === name) {
           if (consecutiveNumber === position) {
             elementToMoveIndex = i
             break
@@ -464,6 +467,12 @@ export default {
         }
       }
       return Number(elementToMoveIndex)
+    },
+    getElementName(element) {
+      if (element.name === "lxnm:subentryParent") {
+        return element.attributes.doctype
+      }
+      return element.name
     }
   }
 }

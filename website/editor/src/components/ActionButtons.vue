@@ -19,10 +19,15 @@
               @click="triggerEvent('select-new-parent')">
         Change parent of {{ computedElementName }}
       </button>
-      <button v-if="canAddElement"
+      <button v-if="canAddElement && !subentryElement"
               class="tertiary"
               @click="triggerEvent('add-element')">
         Create new {{ computedElementName }}
+      </button>
+      <button v-if="canAddElement && subentryElement"
+              class="tertiary"
+              @click="triggerEvent('link-element')">
+        Link a new {{ computedElementName }}
       </button>
       <button v-if="canAddElement && elementEditorConfig.enableCopying"
               class="tertiary"
@@ -49,7 +54,8 @@ export default {
     elementEditorConfig: Object,
     parentElementName: String,
     numberOfElements: Number,
-    editorChildNumber: Number
+    editorChildNumber: Number,
+    subentryElement: Boolean
   },
   mixins: [
     computedElementName,
