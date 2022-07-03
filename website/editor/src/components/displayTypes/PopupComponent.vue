@@ -1,7 +1,6 @@
 <template>
   <div class="popup-component">
     <div>
-      <!--      <button @click="openPopup">Open {{ elementName }}</button>-->
       <section v-if="elementData.shown" class="preview drop-shadow--100" @click="openPopup">
         <ActionButtons
           v-if="!isAttribute"
@@ -43,7 +42,13 @@
           />
         </section>
       </section>
-      <PopupDisplay v-model="showPopup">
+      <PopupDisplay v-model="showPopup"
+                    :fullHeight="false"
+                    :forceButtonClose="true"
+                    saveButtonText="Ok"
+                    @cancel="handleCancel"
+                    @save="handleSave"
+      >
         <component
           v-if="elementData.shown"
           :is="valueComponent"
@@ -54,14 +59,14 @@
           :isAttribute="isAttribute"
           :parentElementName="parentElementName"
           @hide-children="hideChildren"
-          @input="handleValueUpdate"
+          @input="handleTempValueUpdate"
         />
         <ComponentGeneratorComponent
           v-if="showChildren"
           :children="children"
           :elementName="elementName"
           :content="calculatedContent"
-          @input="handleChildUpdate"
+          @input="handleTempChildUpdate"
         />
       </PopupDisplay>
     </div>
@@ -82,6 +87,7 @@ import ActionButtons from "@/components/ActionButtons"
 import layoutElementMixin from "@/shared-resources/mixins/layoutElementMixin"
 import PopupDisplay from "@/components/PopupDisplay"
 import SelectElementFromArray from "@/components/SelectElementFromArray"
+import {js2xml, xml2js} from "xml-js"
 
 export default {
   name: "PopupComponent",
@@ -112,16 +118,45 @@ export default {
       default: false
     }
   },
+  computed: {
+    calculatedContent() {
+      return this.updatedContent || this.content
+    }
+  },
   data() {
     return {
       showPopup: false,
       showChildren: true,
-      updatedContent: null
+      updatedContent: null,
+      dataOnPopupOpen: null,
+      unsavedData: null
     }
+  },
+  mounted() {
+    this.unsavedData = this.content
   },
   methods: {
     openPopup() {
       this.showPopup = true
+      this.dataOnPopupOpen = this.createDeepCopy(this.calculatedContent).elements[0]
+    },
+    handleCancel() {
+      this.updatedContent = this.dataOnPopupOpen
+      this.showPopup = false
+    },
+    handleSave() {
+      this.handleChildUpdate(this.unsavedData)
+      this.showPopup = false
+    },
+    handleTempValueUpdate(data) {
+      this.unsavedData.elements = {...this.unsavedData.elements, ...data.elements}
+    },
+    handleTempChildUpdate(data) {
+      this.unsavedData = data.content
+    },
+    createDeepCopy(content) {
+      let xml = js2xml({elements: [content]}, this.state.xml2jsConfig)
+      return xml2js(xml, this.state.xml2jsConfig)
     }
   }
 }
