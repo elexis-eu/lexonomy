@@ -210,7 +210,7 @@
                         if (window.editor._isVue) {
                            editor.$destroy()
                         }
-                        this.openGraphicalEditor(entry ? entry.content : newXml)
+                        this.openGraphicalEditor(entry ? entry : newXml)
                         return
                      } else {
                         Xonomy.render((entry ? entry.content : newXml), div, docSpec);
@@ -329,7 +329,7 @@
                dictConfigs: this.dictData.dictConfigs,
                userAccess: this.dictData.userAccess,
                userInfo: this.authData,
-               content: entry || ""
+               entryData: entry || ""
             }
             window.mountGraphicalEditor()
          },

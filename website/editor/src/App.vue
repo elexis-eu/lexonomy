@@ -25,11 +25,11 @@ export default {
       if (!data) {
         return
       }
-      console.log(data.content)
+      const content = (typeof data.entryData === 'string' || data.entryData instanceof String) ? data.entryData : data.entryData.content
       // We want to make 2 separate copies of content so we can easily track dirty flag
       this.state._initialContent = xml2js(data.content || "", this.state.xml2jsConfig)
-      data.content = xml2js(data.content || "", this.state.xml2jsConfig)
-      this.changeElementNames(data.content, null, data.dictConfigs.xema)
+      data.content = xml2js(content || "", this.state.xml2jsConfig)
+      this.changeElementNames(content, null, data.dictConfigs.xema)
       this.state.entry = {...this.state.entry, ...data}
     },
     changeElementNames(structure, parentName = null, config) {
