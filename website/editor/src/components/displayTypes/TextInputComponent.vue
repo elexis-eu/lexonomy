@@ -40,6 +40,7 @@ import computedValidation from "@/shared-resources/mixins/computedValidation"
 export default {
   name: "TextInputComponent",
   inject: ['$validator'],
+  mixins: [computedElementName, forceReadOnly, computedValidation],
   props: {
     elementData: Object,
     elementName: String,
@@ -48,7 +49,11 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName, forceReadOnly, computedValidation],
+  watch: {
+    content(content) {
+      this.value = content.text
+    }
+  },
   data() {
     return {
       value: ""
