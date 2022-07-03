@@ -8,10 +8,8 @@ export default {
           break
         case "collx":
         case "thes":
+         case "defo":
           this.saveSingleWord(element, data.elements)
-          break
-        case "defo":
-          this.saveDefinitions(element, data.elements)
           break
         case "xampl":
           this.saveSkeExamples(element, data.elements)
@@ -30,9 +28,6 @@ export default {
         ]
         this.createElement({name: element.name, content: newObject})
       }
-    },
-    saveDefinitions(element, data) {
-      console.log("saveDefinitions", element, data)
     },
     saveSingleWord(element, data) {
       for (const elementData of data) {
