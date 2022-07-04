@@ -2,6 +2,8 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["links", "Linking"]]}/>
    <h1>Manual linking between entries</h1>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
+
    <div>
       <p>Elements listed here can be used as target of cross-reference link. For each element, specify unique identifier in the form of placeholders <tt>'%(element)'</tt>. Eg. element <tt>entry</tt> can have identifier <tt>%(lemma)-%(pos)</tt>, element <tt>sense</tt> can have identifier <tt>%(lemma)-%(number)</tt>. Optionally, specify element you want to show as preview when selecting links.</p>
       <template if={!state.isLoading}>
@@ -9,7 +11,7 @@
             <thead>
                <tr>
                   <th>Linking element</th>
-                  <th>Idenitifier</th>
+                  <th>Identifier</th>
                   <th>Preview</th>
                   <th></th>
                </tr>
@@ -53,12 +55,6 @@
                   onclick={ doAddEl }>
                add element
                <i class="material-symbols-outlined right">add</i>
-            </button>
-            <button class="btn waves-effect waves-light"
-                  onclick={saveData}
-                  id="submit_button">
-               Save
-               <i class="material-symbols-outlined right">edit</i>
             </button>
          </div>
       </template>
