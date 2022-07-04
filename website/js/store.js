@@ -502,7 +502,7 @@ class StoreClass {
 
    loadKontextCorpora(){
       return $.ajax({
-         url: `${window.API_URL}kontext/corpora`
+         url: `${window.API_URL}${this.data.dictId}/kontext/corpora`
       })
             .fail(response => {
                M.toast({html: "Could not load Kontext corpora."})
