@@ -2,7 +2,13 @@
    <loading-overlay if={state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["autonumber", "Auto-numbering"]]}/>
    <h1>Auto-numbering of elements</h1>
-   <dict-config-buttons save-data={saveData}></dict-config-buttons>
+   <dict-config-buttons save-data={saveData}>
+      <a class="btn waves-effect waves-light"
+            onclick={ addNumbers }
+            id="submit_button">
+         <i class="material-symbols-outlined right">add</i>Save &amp; autonumber
+      </a>
+   </dict-config-buttons>
    <div class="row">
       <p>If you need to number some of entry elements automatically, Lexonomy can do that for you. First, go to Entry structure and add element/attribute where you want to store the number. Eg. in element <tt>sense</tt> add attribute <tt>number</tt>. When you're ready, select element to number (eg. <tt>sense</tt>) and element/attribute to store numbering (eg. <tt>@number</tt>). Lexonomy will fill the numbers where missing.</p>
    </div>
@@ -81,12 +87,12 @@
                <button type="button" class="btn waves-effect waves-light" style="height: 3rem; flex-shrink: 0; margin-left: 0.75rem;" onclick={ findNext.bind(this, config) }>Find next number</button>
             </div>
 
-            
+
             <label>
                <input name="{config.element + 'newValues'}" type="radio" class="with-gap" checked={ config.type == 'string'} onchange={set.bind(this, config, 'type', 'string')}/>
                <span>Use text</span>
             </label>
-      
+
             <input style="margin-left: 3rem;" disabled={config.type !== 'string'} type="text" id="stringFormat" placeholder="%(headword)-%(pos)" value={ config.string_template } onchange={setWithEvent.bind(this, config, 'string_template')}/>
 
 
@@ -104,13 +110,6 @@
       <button type="button" class="btn waves-effect waves-light" onclick={addElement}>Add</button>
    </div>
 
-   <div class="input-field col s3">
-      <a class="btn waves-effect waves-light"
-            onclick={ addNumbers }
-            id="submit_button">
-         <i class="material-symbols-outlined right">add</i>Autonumber my dictionary right now
-      </a>
-   </div>
 
    <div if={state.info}
          class="section">
@@ -118,14 +117,14 @@
          {state.info}
       </div>
    </div>
-   
+
    <script>
       export default {
          state: {
             isLoading: true,
             isSaving: false,
             info: "",
-            data: { 
+            data: {
             }
          },
 
@@ -161,7 +160,7 @@
             delete this.state.data[oldElement];
             this.update();
             event.target.value = newElement; // weird bug but the select goes out of sync otherwise
-            
+
          },
          deleteElement(element) {
             if (!element) return;
@@ -204,7 +203,7 @@
             const xema = this.dictData && this.dictData.config && this.dictData.config.xema;
             return (xema.elements[element].children || []).map(c => xema.elements[c.name].elementName || c.name);
          },
-       
+
 
 
          onMounted() {
