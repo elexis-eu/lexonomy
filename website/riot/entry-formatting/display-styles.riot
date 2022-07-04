@@ -4,6 +4,7 @@
       <h4>
         Configuration for {elementName}
       </h4>
+       <h5>Preview</h5>
       <div class="toggle-input">
         <label>Visibility</label>
         <div class="switch">
@@ -14,26 +15,6 @@
               type="checkbox"
               onchange={toggleVisibility}
               checked={state.elementData.shown === true}
-            >
-            <span class="lever"></span>
-            On
-          </label>
-        </div>
-      </div>
-      <div
-        if={state.elementData.shown}
-        each={setting in possibleToggles}
-        class="toggle-input"
-      >
-        <label>{setting.label}</label>
-        <div class="switch">
-          <label>
-            Off
-            <input
-              id={setting.type}
-              type="checkbox"
-              onchange={sendData}
-              checked={state.elementData[setting.type] === true}
             >
             <span class="lever"></span>
             On
@@ -73,6 +54,63 @@
         </select>
       </div>
     </div>
+
+     <div class="break"/>
+     <h5>Graphical editor</h5>
+
+     <div
+        if={state.elementData.shown}
+        each={setting in possibleToggles}
+        class="toggle-input"
+     >
+        <label>{setting.label}</label>
+        <div class="switch">
+           <label>
+              Off
+              <input
+                 id={setting.type}
+                 type="checkbox"
+                 onchange={sendData}
+                 checked={state.elementData[setting.type] === true}
+              >
+              <span class="lever"></span>
+              On
+           </label>
+        </div>
+     </div>
+
+     <div class="break"/>
+     <div if={state.elementData.shown}>
+        <div
+           each={style in graphicalEditorSettings}
+           if={this.shouldRenderStyle(style.type)}
+           class="select-input"
+        >
+           <label for={style.type}>{style.title}</label>
+           <select
+              id={style.type}
+              name={style.type}
+              value={state.elementData[style.type]}
+              required
+              onchange={sendData}
+              style="display: block"
+           >
+              <option
+                 selected={state.elementData[style.type] == null}
+                 value=""
+              >
+                 Select option
+              </option>
+              <option
+                 each={option in style.values}
+                 value={option.value}
+                 selected={option.value === state.elementData[style.type]}
+              >
+                 {option.label}
+              </option>
+           </select>
+        </div>
+     </div>
   </div>
   <script>
     export default {
@@ -89,7 +127,6 @@
           readOnly: false,
           hideElementName: false,
           displayType: null,
-          popupDetails: null,
           valueRenderType: null,
           captioning: null,
           interactivity: null,
@@ -188,10 +225,6 @@
           }
         }
 
-        if (style === "popupDetails") {
-          return this.state.elementData.displayType === "popup"
-        }
-
         if ((style === "separation" || style === "gutter")
           && structureConfig.root === this.elementName) {
           return false
@@ -241,8 +274,7 @@
           label: "Hide element name in editor"
         }
       ],
-
-      possibleStyles: [
+      graphicalEditorSettings: [
         {
           type: "displayType",
           title: "Display type of element",
@@ -255,29 +287,6 @@
               value: "inline",
               label: "Display in parent element"
             }
-          ]
-        },
-        {
-          type: "popupDetails",
-          title: "Detail of popup info next to popup button",
-          values: [
-            {
-              value: "all",
-              label: "All info"
-            },
-            {
-              value: "attributes",
-              label: "Attributes"
-            },
-            {
-              value: "elements",
-              label: "Children elements"
-            },
-            {
-              value: "self",
-              label: "Own value"
-            }
-
           ]
         },
         {
@@ -298,6 +307,9 @@
             }
           ]
         },
+      ],
+
+      possibleStyles: [
         {
           type: "captioning",
           title: "Caption display",
@@ -541,6 +553,10 @@
   <style>
     .display-styles {
       margin: 0 8px;
+    }
+
+    .display-styles h5 {
+      margin-left: 0;
     }
 
     .break {

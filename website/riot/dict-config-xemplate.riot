@@ -3,7 +3,7 @@
    <dict-nav links={[["config", "Configure"], ["xemplate", "Entry formatting"]]}/>
    <h1>Entry formatting</h1>
    <dict-config-buttons save-data={saveData}>
-      <button 
+      <button
          class="btn waves-effect waves-light"
          onclick={ toggleOverride }
       >
@@ -12,8 +12,6 @@
       </button>
    </dict-config-buttons>
 
-
- 
    <div if={ !state.override }>
       <div style="display: flex">
          <!-- TODO fixup styles so we don't need this sillyness. -->
@@ -48,6 +46,17 @@
                          config={this.dictData.dictConfigs}
                          save-data={handleElementData}
          />
+
+         <div id="preview" class="preview">
+            <div class="block">
+               <div class='title'><span class='reload' onclick={ loadNewPreview }>reload random entry</span> Preview
+               </div>
+            </div>
+            <div id="preview-box" class='area viewer'>
+
+            </div>
+            <div class='noentries' style='display: none'>The dictionary has no entries yet.</div>
+         </div>
       </div>
 
    </div>
@@ -91,16 +100,28 @@
 
          elementName: null,
          attributeName: null,
+         previewDOM: null,
 
          toggleOverride() {
-            this.state.override = !this.state.override;
+            this.state.override = !this.state.override
             if (!this.state.override) {
                delete this.state.data._xsl
                delete this.state.data._css
             }
-            this.update();
+            this.update()
          },
 
+         async onMounted() {
+            await this.fillConfigForm()
+            this.loadNewPreview()
+         },
+         onBeforeUpdate() {
+            const xema = (this.dictData.dictConfigs || {}).xema
+            if (!xema || !xema.elements) return
+            const roots = new Set(Object.keys(xema.elements))
+            Object.values(xema.elements).forEach(el => el.children.forEach(c => roots.delete(c.name)))
+            this.state.roots = [...roots].map(id => ({...xema.elements[id], id})) // add ID so tree renderer knows the id of every element
+         },
 
          exampleXsl() {
             $('#editor_xsl').val(
@@ -126,19 +147,8 @@ div.myEntry span.myHeadword {font-weight: bold}
             M.updateTextFields()
          },
 
-         onMounted() {
-            this.fillConfigForm()
-         },
-         onBeforeUpdate() {
-            const xema = (this.dictData.dictConfigs || {}).xema
-            if (!xema || !xema.elements) return
-            const roots = new Set(Object.keys(xema.elements))
-            Object.values(xema.elements).forEach(el => el.children.forEach(c => roots.delete(c.name)))
-            this.state.roots = [...roots].map(id => ({...xema.elements[id], id})) // add ID so tree renderer knows the id of every element
-         },
-
          async fillConfigForm() {
-            this.store.loadDictionaryConfig("xemplate")
+            return this.store.loadDictionaryConfig("xemplate")
                .done(response => {
                   this.state.data = response.content
                   this.state.override = !!(this.state.data._xsl || this.state.data._css)
@@ -189,6 +199,27 @@ div.myEntry span.myHeadword {font-weight: bold}
                }
                this.state.data[elementName][attribute] = value
             }
+            this.reloadPreview()
+         },
+         loadNewPreview() {
+            $.ajax({
+               url: "/" + this.dictData.dictId + "/randomone.json",
+               dataType: "json",
+               method: "POST"
+            }).done((data) => {
+               if (data.id > 0) {
+                  this.previewDOM = (new DOMParser()).parseFromString(data.xml, 'text/xml')
+                  this.reloadPreview()
+                  $(".designer .preview .area").hide().fadeIn()
+               } else {
+                  $(".designer .preview .area").hide()
+                  $(".designer .preview .noentries").show()
+               }
+            })
+         },
+         reloadPreview() {
+            const html = Xemplatron.xml2html(this.previewDOM, this.state.data, this.dictData.dictConfigs.xema)
+            $("#preview-box").html(html)
          },
 
          saveData() {
@@ -203,6 +234,61 @@ div.myEntry span.myHeadword {font-weight: bold}
 
       #editor.designer input[type=radio] {
          opacity: 1 !important;
+      }
+
+      #preview {
+         position: absolute;
+         top: 0px;
+         left: 60%;
+         bottom: 0px;
+         right: 0px;
+         overflow-x: hidden;
+         overflow-y: auto;
+         padding: 5px 0px;
+         border-left: 1px solid #1e6bcf;
+         background-color: #f6f6f6;
+      }
+
+      #preview .block {
+         margin: 10px 15px 0px 15px;
+         padding: 5px 0px 5px 0px;
+      }
+
+      #preview .block:first-child {
+         padding-top: 0px;
+      }
+
+      #preview .block > .title {
+         background-color: #dddddd;
+         padding: 10px 10px;
+         border-radius: 2px;
+         margin-bottom: 10px;
+         text-shadow: 1px 1px 0px #ffffff;
+      }
+
+      #preview .block > .title > .reload {
+         float: right;
+         background-image: url(./furniture/arrow_refresh.png);
+         background-position: left center;
+         background-repeat: no-repeat;
+         padding: 5px 0px 5px 25px;
+         position: relative;
+         top: -5px;
+         cursor: pointer;
+         color: #004f9b;
+      }
+
+      #preview .block > .title > .reload:hover {
+         color: #1969b6;
+      }
+
+      #preview .viewer {
+         padding: 0px 30px 30px 30px;
+      }
+
+      #preview .noentries {
+         padding: 0px 20px 20px 25px;
+         color: #999999;
       }
    </style>
 </dict-config-xemplate>
