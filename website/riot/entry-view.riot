@@ -27,7 +27,12 @@
 
          initViewer(){
             if(this.dictData.entry && this.dictData.entry.content){
-               let html = Xemplatron.xml2html(this.dictData.entry.content, this.dictData.config.xemplate, this.dictData.config.xema)
+               let html = '';
+               if (this.dictData.entry.contentHtml.length == 0) {
+                  html = Xemplatron.xml2html(this.dictData.entry.content, this.dictData.config.xemplate, this.dictData.config.xema)
+               } else {
+                  html = this.dictData.entry.contentHtml;
+               }
                $('#viewer').html(html)
                Gmedia.addVoicePublic(this.dictData.entry, this.dictData.config.gapi, this.dictData.config.titling);
             }
