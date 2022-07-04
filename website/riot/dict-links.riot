@@ -29,7 +29,7 @@
                <table if={dict.to.length}>
                   <tr each={link in dict.to}>
                      <td>
-                        <a href="#/{dictData.dictId}/edit/entry/view/{link.source_entry}">
+                        <a href="#/{dictData.dictId}/edit/entry/{link.source_entry}/view?link={link.source_id}">
                            {link.source_hw || link.source_id}
                         </a>
                      </td>
@@ -40,7 +40,7 @@
                         <i class="material-symbols-outlined">arrow_forward</i>
                      </td>
                      <td>
-                        <a href="#/{link.target_dict}/edit/entry/view/{link.target_entry}">
+                        <a href="#/{link.target_dict}/edit/entry/{link.target_entry}/view?link={link.target_id}">
                            {link.target_hw || (link.target_el + ' ' + link.target_id)}
                         </a>
                      </td>
@@ -59,7 +59,7 @@
                <table if={dict.from.length}>
                   <tr each={link in dict.from}>
                      <td>
-                        <a href="#/{link.source_dict}/edit/entry/{link.source_entry}/view">
+                        <a href="#/{link.source_dict}/edit/entry/{link.source_entry}/view?link={link.source_id}">
                            {link.source_hw || (link.source_el + ' ' + link.source_id)}
                         </a>
                      </td>
@@ -71,7 +71,7 @@
                         <i class="material-symbols-outlined">arrow_forward</i>
                      </td>
                      <td>
-                        <a href="#/{dictData.dictId}/edit/entry/{link.target_entry}/view">
+                        <a href="#/{dictData.dictId}/edit/entry/{link.target_entry}/view?link={link.target_id}">
                            {link.target_hw || link.target_id}
                         </a>
                      </td>
