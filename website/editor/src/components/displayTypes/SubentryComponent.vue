@@ -123,7 +123,7 @@ export default {
       if (structureConfig.values.length > 0) {
         return structureConfig.values.find(el => el.value === this.calculatedContent.attributes.title).caption
       }
-      return this.calculatedContent.attributes.title
+      return (this.calculatedContent && this.calculatedContent.attributes && this.calculatedContent.attributes.title) || ""
     },
     isAnySubentryChecked() {
       return this.subentries.filter(el => el.checked).length > 0
@@ -146,7 +146,6 @@ export default {
     linkNewSubentry() {
       this.showSubentriesSearchPopup = true
       this.getSubentries()
-
     },
     getSubentries() {
       let url = `${window.location.origin}/${this.state.entry.dictId}/subget/`
