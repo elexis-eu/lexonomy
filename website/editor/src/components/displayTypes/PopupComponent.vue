@@ -28,7 +28,7 @@
                      :parentElementName="parentElementName"
                      :forceReadOnlyElements="true"
                      @hide-children="hideChildren"
-                     @input="handleValueUpdate"
+                     @input="handleTempValueUpdate"
           />
 
           <ComponentGeneratorComponent
@@ -38,7 +38,8 @@
             :elementName="elementName"
             :content="calculatedContent"
             :forceReadOnlyElements="true"
-            @input="handleChildUpdate"
+            :maxDisplayedChildren="5"
+            @input="handleTempChildUpdate"
           />
         </section>
       </section>

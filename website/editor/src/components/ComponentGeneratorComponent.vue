@@ -139,7 +139,7 @@ export default {
             })
           }
         }
-        if (newContentForChildType.length !== elementType.children.length) {
+        if (!newContentForChildType || (newContentForChildType.length !== elementType.children.length)) {
           this.loadNewData(newContent)
           return
         }
@@ -183,7 +183,7 @@ export default {
         return
       }
       for (const child of this.children) {
-        if (this.numberOfRenderedChildren === this.maxDisplayedChildren) {
+        if (this.maxDisplayedChildren !== -1 && this.numberOfRenderedChildren >= this.maxDisplayedChildren) {
           break
         }
         // Get element name
@@ -234,13 +234,14 @@ export default {
                 key: Math.random()
               }
             })
-            this.numberOfRenderedChildren++
-            if (this.numberOfRenderedChildren === this.maxDisplayedChildren) {
-              break
+            if (this.maxDisplayedChildren !== -1) {
+              this.numberOfRenderedChildren += this.calculateRenderedElements(elementName, child.isAttribute, contentInstance)
+              if (this.numberOfRenderedChildren >= this.maxDisplayedChildren) {
+                break
+              }
             }
           }
         } else {
-          // content._editorChildNumber = 0
           sameTypeChildren.push({
             componentName: componentName,
             props: {
@@ -256,9 +257,11 @@ export default {
               key: Math.random()
             }
           })
-          this.numberOfRenderedChildren++
-          if (this.numberOfRenderedChildren === this.maxDisplayedChildren) {
-            break
+          if (this.maxDisplayedChildren !== -1) {
+            this.numberOfRenderedChildren += this.calculateRenderedElements(elementName, child.isAttribute, content)
+            if (this.numberOfRenderedChildren >= this.maxDisplayedChildren) {
+              break
+            }
           }
         }
 
@@ -266,6 +269,47 @@ export default {
           name: elementName,
           children: sameTypeChildren
         })
+      }
+    },
+
+    calculateRenderedElements(elementName, isAttribute, content) {
+      let xemplate = this.state.entry.dictConfigs.xemplate[elementName]
+      if (isAttribute) {
+        if (xemplate && !xemplate.shown) {
+          return 0
+        }
+        return 1
+      }
+
+      let xema = this.state.entry.dictConfigs.xema.elements[elementName]
+      let renderedElements = 0
+      if (xema.attributes) {
+        Object.keys(xema.attributes).forEach(attr => {
+          const attrXemplate = this.state.entry.dictConfigs.xemplate[attr]
+          if (!attrXemplate || attrXemplate.shown) {
+            renderedElements++
+          }
+          return renderedElements
+        })
+      }
+      switch (xema.filling) {
+        case "txt":
+        case "lst":
+        case "med":
+        case "inl":
+        case "emp":
+          if (!xemplate || xemplate.shown) {
+            renderedElements++
+          }
+          return renderedElements
+        case "chd":
+          this.getElementChildren(elementName, content).forEach(child => {
+            renderedElements += this.calculateRenderedElements(child.name, {elements: []})
+          })
+          if (!xemplate || xemplate.shown) {
+            renderedElements++
+          }
+          return renderedElements
       }
     },
 

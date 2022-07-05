@@ -10,7 +10,7 @@
         :ref="element.props.elementName + element.props.editorChildNumber"
         v-bind="element.props"
         :forceReadOnlyElements="true"
-        :max-displayed-children="5"
+        :maxDisplayedChildren="5"
         :class="{'is-attribute': element.props.isAttribute}"
       />
     </section>
