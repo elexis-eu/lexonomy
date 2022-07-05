@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import {xml2js} from "xml-js"
+import {js2xml, xml2js} from "xml-js"
 import CorpusComponent from "@/components/CorpusComponent"
 import corpusMixin from "@/shared-resources/mixins/corpusMixin"
 
@@ -331,7 +331,10 @@ export default {
       return elementData
     },
     handleChildUpdate(data) {
-      let content = Object.assign({}, this.content)
+      let content = this.createDeepCopy(this.content)
+      if (content.elements) {
+        content = content.elements[0]
+      }
       if (data.isAttribute) {
         content.attributes = {...content.attributes, ...data.content}
         this.$emit("input", {content: content})
@@ -473,6 +476,10 @@ export default {
         return element.attributes.doctype
       }
       return element.name
+    },
+    createDeepCopy(content) {
+      let xml = js2xml({elements: [content]}, this.state.xml2jsConfig)
+      return xml2js(xml, this.state.xml2jsConfig)
     }
   }
 }
