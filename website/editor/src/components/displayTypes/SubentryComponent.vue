@@ -159,6 +159,7 @@ export default {
           this.errorMessage = "No results found."
           return
         }
+        this.error = false
         this.subentries = []
         response.data.entries.forEach(el => {
           this.subentries.push({...el, ...{checked: false}})
