@@ -2,7 +2,7 @@
   <!--  <div v-if="!keepAlive">-->
   <div ref="wrapper" v-if="!keepAlive && value" class="modal" @click="maybeClosePopup"
        :style="computedStyles">
-    <div ref="modalContent" class="modal-content" :class="{'full-height': fullHeight}">
+    <div ref="modalContent" class="modal-content" :class="{'full-height': fullHeight, 'adjustable-height': !fullHeight}">
       <span class="close" @click="closeButtonClick">&times;</span>
       <slot></slot>
       <div v-if="!hideActions" class="default-actions">
@@ -15,7 +15,7 @@
   <!--  <div v-else>-->
   <div ref="wrapper" v-else-if="keepAlive" v-show="value" class="modal" @click="maybeClosePopup"
        :style="computedStyles">
-    <div ref="modalContent" class="modal-content" :class="{'full-height': fullHeight}">
+    <div ref="modalContent" class="modal-content" :class="{'full-height': fullHeight, 'adjustable-height': !fullHeight}">
       <span class="close" @click="closePopup">&times;</span>
       <slot></slot>
       <div v-if="!hideActions" class="default-actions">
@@ -137,6 +137,7 @@ export default {
 
 /* Modal Content/Box */
 .modal-content {
+  position: relative;
   width: 80%; /* Could be more or less, depending on screen size */
   max-height: 70%;
   margin: 15% auto; /* 15% from the top and centered */
@@ -149,6 +150,11 @@ export default {
     height: calc(100% - 60px);
     max-height: calc(100% - 60px);
     margin: 30px auto;
+  }
+
+  &.adjustable-height {
+    overflow-y: auto;
+    padding-bottom: 0;
   }
 }
 
@@ -170,6 +176,16 @@ export default {
   display: flex;
   flex-direction: row-reverse;
   margin-top: 24px;
+
+  .adjustable-height & {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: 15px;
+    background-color: white;
+    box-shadow: 0px -5px 10px 0px rgb(255 255 255);
+  }
 
   button {
     margin-left: 16px;

@@ -300,7 +300,7 @@ export default {
 
 .examples {
   margin: 24px 0;
-  max-height: calc(100% - 235px);
+  max-height: calc(100% - 165px);
   overflow-Y: auto;
 }
 
@@ -325,8 +325,8 @@ export default {
 .actions {
   position: absolute;
   margin-top: 24px;
-  bottom: 46px;
-  right: calc(10% + 16px);
+  bottom: 15px;
+  right: 12px;
 
   button {
     margin-left: 16px;
