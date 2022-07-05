@@ -146,7 +146,7 @@ export default {
       this.showPopup = false
     },
     handleSave() {
-      this.handleChildUpdate(this.unsavedData)
+      this.handleChildUpdate({content: this.unsavedData})
       this.showPopup = false
     },
     handleTempValueUpdate(data) {
