@@ -191,7 +191,6 @@ export default {
     },
     //  ------------ EVENT HANDLERS ----------------
     handlePossibleNewParent(data) {
-      console.log(data)
       this.newPossibleParents.push(data.content)
     },
     handleIsParentToElement(data) {
