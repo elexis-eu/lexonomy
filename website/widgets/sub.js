@@ -1,5 +1,5 @@
 // @ts-check
-/// <reference path="../node_modules/@kcmertens/xonomy/dist/src/xonomy.d.ts"/>
+/// <reference path="../node_modules/@elexis-eu/xonomy/dist/src/xonomy.d.ts"/>
 
 
 window.Sub = {
@@ -11,7 +11,7 @@ window.Sub = {
   entryID: null // NOTE: might be null! when creating new entry.
 }
 
-Sub.extendDocspec = function(/** @type {import("@kcmertens/xonomy").XonomyDocSpec} */ docspec, xema, entry) {
+Sub.extendDocspec = function(/** @type {import("@elexis-eu/xonomy").XonomyDocSpec} */ docspec, xema, entry) {
   entry = {
     id: null,
     parententries: [],
@@ -40,7 +40,7 @@ Sub.extendDocspec = function(/** @type {import("@kcmertens/xonomy").XonomyDocSpe
     const subentryChildren = element.children.filter(c => subbing[c.name]);
     if (!subentryChildren.length) return;
 
-    /** @type {import("@kcmertens/xonomy").XonomyElementDefinitionExternal} */
+    /** @type {import("@elexis-eu/xonomy").XonomyElementDefinitionExternal} */
     const spec = docspec.elements[id] = docspec.elements[id] || {}
     
     // add menu entry to find new subentries
@@ -111,12 +111,12 @@ Sub.menuSubentry = function (htmlID) {
         ${parents.length > 0 ? `<div class='entrylines'>${parentLinks.join('')}</div>` : ''}
       </div>`
 
-    document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
+    Xonomy.makeBubble(html); //create bubble
     Xonomy.showBubble($("#" + htmlID + " > .inlinecaption")); //anchor bubble to opening tag
   }
   
   function placeholderBubble() {
-    document.body.appendChild(Xonomy.makeBubble(`<div>Loading parents...</div>`))
+    Xonomy.makeBubble(`<div>Loading parents...</div>`)
     Xonomy.showBubble($("#" + htmlID + " > .inlinecaption"));
   }
 
@@ -148,7 +148,7 @@ Sub.getHeadword = function () {
  */
 Sub.subentrySearchMenu = function (htmlID, param) {
   Sub.htmlID = htmlID;
-  document.body.appendChild(Xonomy.makeBubble(Sub.boxSubentries(param.elName))); //create bubble
+  Xonomy.makeBubble(Sub.boxSubentries(param.elName)); //create bubble
   if (Xonomy.lastClickWhat == "openingTagName") Xonomy.showBubble($("#" + htmlID + " > .tag.opening > .name")); //anchor bubble to opening tag
   else if (Xonomy.lastClickWhat == "closingTagName") Xonomy.showBubble($("#" + htmlID + " > .tag.closing > .name")); //anchor bubble to closing tag
   else Xonomy.showBubble($("#" + htmlID));

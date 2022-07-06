@@ -28,7 +28,6 @@ registerPreprocessor('css', 'scss', function(code, { options }) {
   }
 })
 
-const options = {}
 export default [{
   input: 'app.js',
   output: {
@@ -37,9 +36,13 @@ export default [{
     strict: false
   },
   plugins: [
-    riot(options),
-    nodeResolve()
-  ]
+    riot({}),
+    nodeResolve(),
+  ],
+  onwarn(warning, warn) {
+    if (warning.code === 'EVAL') return;
+    warn(warning);
+  }
 }, {
   input: 'app.static.js',
   context: "window",
@@ -47,6 +50,10 @@ export default [{
     file: 'dist/riot/bundle.static.js',
     format: 'iife',
     strict: false
+  },
+  onwarn(warning, warn) {
+    if (warning.code === 'EVAL') return;
+    warn(warning);
   }
 }, {
   /*
@@ -68,11 +75,12 @@ export default [{
           // places to check for assets/images used in url() in the css files included in app.css.js
           // Use path.resolve to transform into absolute paths so we don't have to mess about with relatives
           basePath: [
-            path.resolve('.'),
+            path.resolve('.'), // relative to the current (./website) directory
             path.resolve('widgets/'),
             path.resolve('libs/screenful/'),
             path.resolve('img/materialize-colorpicker'),
-            path.resolve('libs/jquery')
+            path.resolve('libs/jquery'),
+            '.' // relative to the input css
           ],
         }]),
       ],

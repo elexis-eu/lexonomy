@@ -19,57 +19,9 @@
       <div id="editorStyle"></div>
    </div>
 
-   <style>
-      .editorContainer {
-         position: relative;
-         margin-bottom: 0;
-      }
-
-      .editorContainer #toolbar {
-         box-shadow: none;
-         border-bottom: 1px solid #d9d9d8;
-      }
-
-      .editorContainer #container {
-         z-index: 5;
-         background-color: white;
-         transition-delay: 1s;
-      }
-
-      .editorContainer #container #editor.laic {
-         padding-left: 30px;
-      }
-
-      .editorContainer #history {
-         position: absolute;
-         top: 45px;
-         border-left: 1px solid #d9d9d8;
-         background-color: #f2f2f2;
-      }
-
-      .xonomy div.modeSwitcher {
-         position: absolute;
-         bottom: 26px;
-      }
-
-      #sourceCode {
-         position: absolute;
-         top: 60px;
-         left: 10px;
-         right: 10px;
-         bottom: 40px;
-      }
-
-      #sourceCode textarea {
-         border: none;
-         box-shadow: none;
-         background-color: #f2f2f2;
-         border-radius: 0;
-      }
-   </style>
-
    <script>
-     import {parseDTD, struct2Xonomy, initialDocument} from '../libs/xonomy-tools/dtdconvert/dtd2xonomy'
+      import {Xonomy as XonomyClass} from '@elexis-eu/xonomy';
+      import {parseDTD, struct2Xonomy, initialDocument} from '../libs/xonomy-tools/dtdconvert/dtd2xonomy'
 
       export default {
          bindings: [["store", "entryIdChanged", "onEntryIdChanged"]],
@@ -376,11 +328,62 @@
             this.initEditorIfNeeded()
          },
 
+         onBeforeMount() {
+            globalThis.Xonomy = new XonomyClass();
+         },
          onBeforeUnmount() {
-            Screenful.Editor.editor = null
+            Screenful.Editor.editor = null;
          }
       }
    </script>
 
+   <style>
+      .editorContainer {
+         position: relative;
+         margin-bottom: 0;
+      }
+
+      .editorContainer #toolbar {
+         box-shadow: none;
+         border-bottom: 1px solid #d9d9d8;
+      }
+
+      .editorContainer #container {
+         z-index: 5;
+         background-color: white;
+         transition-delay: 1s;
+      }
+
+      .editorContainer #container #editor.laic {
+         padding-left: 30px;
+      }
+
+      .editorContainer #history {
+         position: absolute;
+         top: 45px;
+         border-left: 1px solid #d9d9d8;
+         background-color: #f2f2f2;
+      }
+
+      .xonomy div.modeSwitcher {
+         position: absolute;
+         bottom: 26px;
+      }
+
+      #sourceCode {
+         position: absolute;
+         top: 60px;
+         left: 10px;
+         right: 10px;
+         bottom: 40px;
+      }
+
+      #sourceCode textarea {
+         border: none;
+         box-shadow: none;
+         background-color: #f2f2f2;
+         border-radius: 0;
+      }
+   </style>
 </dict-edit-entry>
 

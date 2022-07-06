@@ -41,15 +41,15 @@ Gmedia.menuRoot=function(htmlID) {
     var url = '/'+dictID+'/getmedia/'+headword;
     $.get(url, function(json) {
       if (json.images && json.images.length > 0) {
-        $('#xonomyBubbleContent .menu').html('');
+        $('.xonomyBubbleContent .menu').html('');
         json.images.forEach((image) => {
           var imhtml = '<i>' + image.title + '</i><br/>';
           imhtml += '<img onclick="Gmedia.addLink(\'' + htmlID + '\', this)" data-url="' + image.url + '" src="' + image.thumb + '" class="Gmediathumb">';
           imhtml += '</br>';
-          $('#xonomyBubbleContent .menu').append(imhtml)
+          $('.xonomyBubbleContent .menu').append(imhtml)
         });
       } else {
-        $('#xonomyBubbleContent .menu').html("no results found");
+        $('.xonomyBubbleContent .menu').html("no results found");
       }
     });
   } else {
@@ -57,7 +57,7 @@ Gmedia.menuRoot=function(htmlID) {
   }
 
   html += "</div>";
-  document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
+  Xonomy.makeBubble(html); //create bubble
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
 };
 

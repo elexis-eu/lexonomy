@@ -231,7 +231,7 @@ Kontext.menuRoot=function(htmlID, additional=false){
     html+="</div>";
   }
   html+="</div>";
-  document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
+  Xonomy.makeBubble(html); //create bubble
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
 };
 Kontext.getHeadword=function(){
@@ -245,7 +245,7 @@ Kontext.getSearchword=function(elementID){
 };
 Kontext.menuExamples=function(htmlID, param){
   if(param=="layby") Kontext.htmlID=null; else  Kontext.htmlID=htmlID;
-  document.body.appendChild(Xonomy.makeBubble(Kontext.boxExamples())); //create bubble
+  Xonomy.makeBubble(Kontext.boxExamples()); //create bubble
   $("input[name=kontextsearchtype]").on("click", function() {
     var val = $(this).val() == "kontextsimple"
     $("#kontextsimple").nextAll("input").first().prop("disabled", !val)
