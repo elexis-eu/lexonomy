@@ -65,18 +65,16 @@ export default {
   },
   methods: {
     updateParent() {
-      this.$nextTick(() => {
-        if (this.value === this.content.text) {
-          return
-        }
-        if (this.content.type === "attribute") {
-          this.$emit('input', {elementName: this.elementName, attributes: {[this.content.name]: this.value}})
-        } else {
-          let elements = Object.assign({}, this.content)
-          elements.text = this.value
-          this.$emit('input', {elementName: this.elementName, elements: [elements]})
-        }
-      })
+      if (this.value === this.content.text) {
+        return
+      }
+      if (this.content.type === "attribute") {
+        this.$emit('input', {elementName: this.elementName, attributes: {[this.content.name]: this.value}})
+      } else {
+        let elements = Object.assign({}, this.content)
+        elements.text = this.value
+        this.$emit('input', {elementName: this.elementName, elements: [elements]})
+      }
     },
     previewValue() {
       window.open(this.value, "_blank")

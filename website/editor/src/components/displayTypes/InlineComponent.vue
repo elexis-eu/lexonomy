@@ -42,7 +42,6 @@
                  :parentElementName="parentElementName"
                  :forceReadOnly="forceReadOnlyElements"
                  @hide-children="hideChildren"
-                 @input="handleValueUpdate"
       />
     </section>
     <ComponentGeneratorComponent

@@ -1,5 +1,4 @@
 <template>
-  <!--  <div v-if="!keepAlive">-->
   <div ref="wrapper" v-if="!keepAlive && value" class="modal" @click="maybeClosePopup"
        :style="computedStyles">
     <div ref="modalContent" class="modal-content" :class="{'full-height': fullHeight, 'adjustable-height': !fullHeight}">
@@ -11,8 +10,6 @@
       </div>
     </div>
   </div>
-  <!--  </div>-->
-  <!--  <div v-else>-->
   <div ref="wrapper" v-else-if="keepAlive" v-show="value" class="modal" @click="maybeClosePopup"
        :style="computedStyles">
     <div ref="modalContent" class="modal-content" :class="{'full-height': fullHeight, 'adjustable-height': !fullHeight}">
@@ -24,7 +21,6 @@
       </div>
     </div>
   </div>
-  <!--  </div>-->
 </template>
 
 <script>
@@ -69,7 +65,9 @@ export default {
             this.popupId = Math.random()
           }
           this.state.openedPopups.push(this.popupId)
-          document.addEventListener('keydown', this.handleEscKey)
+          document.addEventListener('keydown', this.handleNavigationKeys)
+        } else {
+          document.removeEventListener('keydown', this.handleNavigationKeys)
         }
       },
       immediate: true
@@ -84,6 +82,9 @@ export default {
     return {
       popupId: null
     }
+  },
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.handleNavigationKeys)
   },
   methods: {
     closeButtonClick() {
@@ -101,17 +102,23 @@ export default {
       }
     },
     closePopup() {
-      this.$emit('input', false)
+      this.$emit("input", false)
+      this.$emit("cancel")
     },
-    handleEscKey(event) {
-      if (event.key !== "Escape") {
+    handleNavigationKeys(event) {
+      if (!["Escape", "Enter"].includes(event.key)) {
         return
       }
       this.$nextTick(() => {
         if (this.state.openedPopups[this.state.openedPopups.length - 1] === this.popupId) {
-          document.removeEventListener('keydown', this.handleEscKey)
-          this.closePopup()
-          this.state.openedPopups.pop()
+          switch (event.key) {
+            case "Escape":
+              this.closePopup()
+              this.state.openedPopups.pop()
+              break
+            case "Enter":
+              this.$emit("save")
+          }
         }
       })
 

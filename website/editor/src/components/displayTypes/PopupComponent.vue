@@ -28,7 +28,6 @@
                      :parentElementName="parentElementName"
                      :forceReadOnlyElements="true"
                      @hide-children="hideChildren"
-                     @input="handleTempValueUpdate"
           />
 
           <ComponentGeneratorComponent
@@ -39,7 +38,6 @@
             :content="calculatedContent"
             :forceReadOnlyElements="true"
             :maxDisplayedChildren="5"
-            @input="handleTempChildUpdate"
           />
         </section>
       </section>
@@ -146,8 +144,10 @@ export default {
       this.showPopup = false
     },
     handleSave() {
-      this.handleChildUpdate({content: this.unsavedData})
       this.showPopup = false
+      this.$nextTick(() => {
+        this.handleChildUpdate({content: this.unsavedData})
+      })
     },
     handleTempValueUpdate(data) {
       this.unsavedData.elements = {...this.unsavedData.elements, ...data.elements}
