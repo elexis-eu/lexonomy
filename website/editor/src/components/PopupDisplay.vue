@@ -176,6 +176,7 @@ export default {
   display: flex;
   flex-direction: row-reverse;
   margin-top: 24px;
+  z-index: 1;
 
   .adjustable-height & {
     position: sticky;
