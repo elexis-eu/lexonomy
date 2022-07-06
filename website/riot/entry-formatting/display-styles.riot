@@ -5,7 +5,7 @@
         Configuration for {elementName}
       </h4>
        <h5>Preview</h5>
-      <div class="toggle-input">
+      <div class="toggle-input toggle-input--preview">
         <label>Visibility</label>
         <div class="switch">
           <label>
@@ -24,6 +24,23 @@
     </div>
     <div class="break"/>
     <div if={state.elementData.shown}>
+       <div class="toggle-input toggle-input--preview">
+          <label>Layout</label>
+          <div class="switch">
+             <label>
+                Inline
+                <input
+                   id="layout"
+                   type="checkbox"
+                   onchange={toggleLayout}
+                   checked={state.elementData.layout === "block"}
+                >
+                <span class="lever"></span>
+                Line break before and after
+             </label>
+          </div>
+       </div>
+       <div class="break"/>
       <div
         each={style in possibleStyles}
         if={this.shouldRenderStyle(style.type)}
@@ -121,6 +138,7 @@
       state: {
         elementData: {
           shown: true,
+          layout: "inline",
           enablePositionChange: false,
           enableParentChange: false,
           enableCopying: false,
@@ -162,7 +180,11 @@
         this.state.elementData.shown = !this.state.elementData.shown
         this.props.saveData(this.elementName, this.attributeName, "shown", this.state.elementData.shown)
         this.update()
-
+      },
+       toggleLayout() {
+        this.state.elementData.layout = (this.state.elementData.layout === "block") ? "inline" : "block"
+        this.props.saveData(this.elementName, this.attributeName, "layout", this.state.elementData.layout)
+        this.update()
       },
       sendData(event) {
         let attribute = event.srcElement.id
@@ -567,6 +589,9 @@
 
     .toggle-input {
       margin: 16px 0;
+    }
+    .toggle-input--preview .switch{
+       margin-top: 8px;
     }
 
     .select-input {
