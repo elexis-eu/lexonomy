@@ -1,5 +1,5 @@
 <template>
-  <div class="inline-component" :class="{'read-only': forceReadOnlyElements}" :style="configStyles">
+  <div class="inline-component" :class="{'read-only': forceReadOnlyElements, 'element-hidden': !elementData.shown}" :style="configStyles">
     <section v-if="elementData.shown && !readOnly" class="content">
       <ActionButtons
         v-if="!isAttribute"
@@ -131,7 +131,9 @@ export default {
       flex: 1;
     }
   }
-
+  &.element-hidden {
+    padding: 0;
+  }
   &.read-only {
     padding: 0;
     margin-bottom: 0;

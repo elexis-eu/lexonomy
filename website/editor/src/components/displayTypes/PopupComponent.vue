@@ -1,5 +1,5 @@
 <template>
-  <div class="popup-component">
+  <div class="popup-component" :class="{'element-hidden': !elementData.shown}">
     <div>
       <section v-if="elementData.shown" class="preview drop-shadow--100" @click="openPopup">
         <ActionButtons
@@ -167,6 +167,10 @@ export default {
 .popup-component {
   padding: 8px 16px;
   margin-bottom: 8px;
+
+  &.element-hidden {
+    padding: 0;
+  }
 
   .preview {
     display: flex;
