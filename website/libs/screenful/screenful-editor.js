@@ -462,8 +462,10 @@ Screenful.Editor={
           } else if(Screenful.Aftersave){
             Screenful.Aftersave.batch();
           }
+          window.location = window.location.href.replace(/\/edit$/, "/view");
           // headword might be renamed
-          Screenful.Editor.onListChange()
+          Screenful.Editor.onListChange();
+          Screenful.Editor.view;
         }
     	});
     }
