@@ -57,7 +57,7 @@ Screenful.Editor={
     $("<span id='errorMessage' style='display: none;'></span>").appendTo($toolbar);
     if(!Screenful.Editor.singleton) {
       if(Screenful.Editor.createUrl) {
-    		$("<button id='butNew' class='btn btn-secondary'>"+Screenful.Loc.new+"<i class='material-icons right'>add<i></button></button>").appendTo($toolbar).on("click", Screenful.Editor.new);
+    		$("<button id='butNew' class='btn btn-secondary'>"+Screenful.Loc.new+"<i class='material-icons right'>add<i></button>").appendTo($toolbar).on("click", Screenful.Editor.newEntry);
     		$("<span class='divider'></span>").appendTo($toolbar);
       }
       //$("<span id='idlabel'>ID</span>").appendTo($toolbar);
@@ -171,6 +171,21 @@ Screenful.Editor={
       $("#butLeave").hide();
     }
   },
+   newEntry: function(event, content) {
+      $("#container").css("right", ""); //remove room for xonomy layby
+      Screenful.Editor.needsSaving=false;
+      Screenful.Editor.hideHistory();
+      id=$("#idbox").val("");
+      Screenful.Editor.entryID=null;
+      $("#container").removeClass("empty").removeClass("withHistory").removeClass("withSourceCode").html("<div id='editor'></div>");
+      var fakeentry=null; if(content) fakeentry={id: null, content: content};
+      Screenful.Editor.editor(document.getElementById("editor"), fakeentry);
+      if($("#container #editor .xonomy .layby").length>0) $("#container").remove(".withHistory").css("right", "15px"); //make room for xonomy layby
+      $("#container").hide().fadeIn();
+      Screenful.status(Screenful.Loc.ready);
+      Screenful.Editor.updateToolbar();
+      if(window.parent!=window && window.parent.Screenful && window.parent.Screenful.Navigator) window.parent.Screenful.Navigator.setEntryAsCurrent(null);
+   },
   new: function(event, content){
      Screenful.Editor.needsSaving=false;
     if(!Screenful.Editor.needsSaving || confirm(Screenful.Loc.unsavedConfirm)){ //"are you sure?"
