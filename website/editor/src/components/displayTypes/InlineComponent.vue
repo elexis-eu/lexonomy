@@ -121,7 +121,7 @@ export default {
 <style lang="scss" scoped>
 .inline-component {
   margin-bottom: 8px;
-  padding: 8px 4px 8px 4px;
+  padding: 8px 4px 0 4px;
 
   .actions-button {
     margin-right: 8px;
