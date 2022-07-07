@@ -29,6 +29,9 @@ import ReadOnlyComponentGenerator from "@/components/ReadOnlyComponentGenerator"
 export default {
   name: "SelectElementFromArray",
   components: {ReadOnlyComponentGenerator, PopupDisplay},
+  mixins: [
+    computedElementName
+  ],
   props: {
     value: {
       type: Boolean,
@@ -47,9 +50,6 @@ export default {
       required: true
     }
   },
-  mixins: [
-    computedElementName
-  ],
   computed: {
     children() {
       return this.possibleParentElements.map(el => el.name).filter((item, i, ar) => ar.indexOf(item) === i).map(name => {return {name: name}})

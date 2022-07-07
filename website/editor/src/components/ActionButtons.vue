@@ -1,42 +1,49 @@
 <template>
   <div v-if="!isRootElement" ref="actionButton" class="dropdown">
-    <button class="button--sm secondary" @click.stop="toggleDropdown" :disabled="numberOfActions === 0">
+    <button class="button--sm secondary" @click.prevent.stop.stop="toggleDropdown" :disabled="numberOfActions === 0">
       {{ computedElementName }}
     </button>
     <div v-show="show" class="vue-dropdown-content">
-      <button v-if="canMoveElementDown"
-              class="tertiary"
-              @click="triggerEvent('move-element-down')">
-        Move {{ computedElementName }} <img :src="iconUrl('arrow-down.svg')">
-      </button>
       <button v-if="canMoveElementUp"
               class="tertiary"
-              @click="triggerEvent('move-element-up')">
+              @click.prevent.stop="triggerEvent('move-element-up')">
         Move {{ computedElementName }} <img :src="iconUrl('arrow-up.svg')">
+      </button>
+      <button v-if="canMoveElementDown"
+              class="tertiary"
+              @click.prevent.stop="triggerEvent('move-element-down')">
+        Move {{ computedElementName }} <img :src="iconUrl('arrow-down.svg')">
+      </button>
+      <div v-if="canMoveElementDown || canMoveElementUp" class="break"></div>
+      <button v-if="canAddElement && !subentryElement"
+              class="tertiary"
+              @click.prevent.stop="triggerEvent('add-element')">
+        Create new {{ computedElementName }}
       </button>
       <button v-if="canAddElement && elementEditorConfig.enableCopying"
               class="tertiary"
-              @click="triggerEvent('select-new-parent')">
-        Change parent of {{ computedElementName }}
-      </button>
-      <button v-if="canAddElement && !subentryElement"
-              class="tertiary"
-              @click="triggerEvent('add-element')">
-        Create new {{ computedElementName }}
+              @click.prevent.stop="triggerEvent('clone-element')">
+        Duplicate {{ computedElementName }}
       </button>
       <button v-if="canAddElement && subentryElement"
               class="tertiary"
-              @click="triggerEvent('link-element')">
-        Link a new {{ computedElementName }}
+              @click.prevent.stop="triggerEvent('link-element')">
+        Add new {{ computedElementName }} subentry
       </button>
       <button v-if="canAddElement && elementEditorConfig.enableCopying"
               class="tertiary"
-              @click="triggerEvent('clone-element')">
-        Duplicate {{ computedElementName }}
+              @click.prevent.stop="triggerEvent('select-new-parent')">
+        Change parent of {{ computedElementName }}
       </button>
+      <button v-if="canAddLink"
+              class="tertiary"
+              @click.prevent.stop="triggerEvent('add-link')">
+        Link to another element
+      </button>
+      <div v-if="canAddElement && canRemoveElement" class="break"></div>
       <button v-if="canRemoveElement"
               class="tertiary"
-              @click="triggerEvent('remove-element')">
+              @click.prevent.stop="triggerEvent('remove-element')">
         Remove selected {{ computedElementName }}
       </button>
     </div>
@@ -77,21 +84,16 @@ export default {
       const xemaElements = this.state.entry.dictConfigs.xema.elements
       let parentChildren = (xemaElements && xemaElements[this.parentElementName] && xemaElements[this.parentElementName].children) || []
       let childElement = parentChildren.find(el => el.name === this.elementName)
-      // if (!childElement) {
-      //   parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
-      //   childElement = parentChildren[this.elementName]
-      // }
       return childElement && (!Number(childElement.max) || this.numberOfElements < Number(childElement.max))
     },
     canRemoveElement() {
       const xemaElements = this.state.entry.dictConfigs.xema.elements
       let parentChildren = (xemaElements && xemaElements[this.parentElementName] && xemaElements[this.parentElementName].children) || []
       let childElement = parentChildren.find(el => el.name === this.elementName)
-      // if (!childElement) {
-      //   parentChildren = this.state.entry.dictConfigs.xema.elements[this.parentElementName].attributes || {}
-      //   childElement = parentChildren[this.elementName]
-      // }
       return childElement && (!Number(childElement.min) || this.numberOfElements > Number(childElement.min))
+    },
+    canAddLink() {
+      return this.state.entry.dictConfigs.linking[this.elementName]
     },
     canMoveElementDown() {
       return this.elementEditorConfig.enablePositionChange && this.editorChildNumber < this.numberOfElements - 1
@@ -151,6 +153,10 @@ export default {
   overflow: auto;
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
   z-index: 2;
+
+  .break {
+    border-bottom: 1px solid #D9EAFF;
+  }
 
   button {
     display: block;

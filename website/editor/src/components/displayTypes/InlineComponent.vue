@@ -1,5 +1,6 @@
 <template>
-  <div class="inline-component" :class="{'read-only': forceReadOnlyElements, 'element-hidden': !elementData.shown}" :style="configStyles">
+  <div class="inline-component" :class="{'read-only': forceReadOnlyElements, 'element-hidden': !elementData.shown}"
+       :style="configStyles">
     <section v-if="elementData.shown && !readOnly" class="content">
       <ActionButtons
         v-if="!isAttribute"
@@ -13,6 +14,7 @@
         @move-element-up="moveElementUp"
         @add-element="createSibling"
         @select-new-parent="selectNewParent"
+        @add-link="addLink"
         @clone-element="cloneElement"
         @remove-element="deleteElement"
       />
@@ -61,6 +63,12 @@
       :parentElementName="parentElementName"
       @selected-element="handleSelectedNewParent"
     />
+    <LinkingElementSelector
+      v-if="showSelectLinkedElement"
+      v-model="showSelectLinkedElement"
+      :sourceId="calculatedContent.attributes && calculatedContent.attributes['lxnm:linkable']"
+      :element-name="elementName"
+    />
 
   </div>
 </template>
@@ -71,11 +79,13 @@ import ComponentGeneratorComponent from "@/components/ComponentGeneratorComponen
 import ActionButtons from "@/components/ActionButtons"
 import layoutElementMixin from "@/shared-resources/mixins/layoutElementMixin"
 import SelectElementFromArray from "@/components/SelectElementFromArray"
+import LinkingElementSelector from "@/components/LinkingElementSelector"
 
 export default {
   name: "InlineComponent",
   inject: ['$validator'],
   components: {
+    LinkingElementSelector,
     SelectElementFromArray,
     ActionButtons,
     ComponentGeneratorComponent
@@ -131,9 +141,11 @@ export default {
       flex: 1;
     }
   }
+
   &.element-hidden {
     padding: 0;
   }
+
   &.read-only {
     padding: 0;
     margin-bottom: 0;

@@ -129,7 +129,7 @@ export default {
 
 <style lang="scss" scoped>
 .modal {
-  display: block;
+  display: flex;
   position: fixed; /* Stay in place */
   z-index: 2; /* Sit on top */
   left: 0;
@@ -147,7 +147,7 @@ export default {
   position: relative;
   width: 80%; /* Could be more or less, depending on screen size */
   max-height: 70%;
-  margin: 15% auto; /* 15% from the top and centered */
+  margin: auto; /* 15% from the top and centered */
   padding: 15px 12px;
   border: 1px solid #888;
   border-radius: 16px;
@@ -193,6 +193,12 @@ export default {
     padding-bottom: 15px;
     background-color: white;
     box-shadow: 0px -5px 10px 0px rgb(255 255 255);
+  }
+
+  .full-height & {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
   }
 
   button {

@@ -14,6 +14,7 @@
           @move-element-up="moveElementUp"
           @add-element="createSibling"
           @select-new-parent="selectNewParent"
+          @add-link="addLink"
           @clone-element="cloneElement"
           @remove-element="deleteElement"
         />
@@ -77,6 +78,12 @@
       :parentElementName="parentElementName"
       @selected-element="handleSelectedNewParent"
     />
+    <LinkingElementSelector
+      v-if="showSelectLinkedElement"
+      v-model="showSelectLinkedElement"
+      :sourceId="calculatedContent.attributes && calculatedContent.attributes['lxnm:linkable']"
+      :element-name="elementName"
+    />
   </div>
 </template>
 
@@ -87,11 +94,13 @@ import layoutElementMixin from "@/shared-resources/mixins/layoutElementMixin"
 import PopupDisplay from "@/components/PopupDisplay"
 import SelectElementFromArray from "@/components/SelectElementFromArray"
 import {js2xml, xml2js} from "xml-js"
+import LinkingElementSelector from "@/components/LinkingElementSelector"
 
 export default {
   name: "PopupComponent",
   inject: ['$validator'],
   components: {
+    LinkingElementSelector,
     ComponentGeneratorComponent,
     ActionButtons,
     PopupDisplay,
