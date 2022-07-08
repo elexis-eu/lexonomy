@@ -337,10 +337,11 @@ def skeget_defo(dictID: str, user: User, dictDB: Connection, configs: Configs):
     url += "&username=" + request.query.username
     url += "&api_key=" + request.query.apikey
     url += "&format=json"
-    url += "&iquery=" + ops.makeQuery(request.query.lemma)
+    url += "&iquery=" + urllib.parse.quote(ops.makeQuery(request.query.lemma))
     url += "&viewmode=sen"
     if request.query.fromp:
         url += "&" + request.query.fromp
+    print(url)
     req = urllib.request.Request(url, headers = {"Authorization": "Bearer " + request.query.apikey})
     res = urllib.request.urlopen(req)
     data = json.loads(res.read())
