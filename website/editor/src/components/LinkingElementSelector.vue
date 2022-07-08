@@ -123,8 +123,16 @@ export default {
         target_id: selectedEl.link,
       }
       axios.get(url, {params: params}).then(() => {
-        // eslint-disable-next-line no-undef
-        M.toast({html: "Linked!"});
+        try {
+          // eslint-disable-next-line no-undef
+          Screenful.Editor.addLinks(`${window.location.origin}/${this.state.entry.dictId}/entrylinks.json`, $('#editor'), Screenful.Editor.entryID);
+          // eslint-disable-next-line no-undef
+          M.toast({html: "Linked!"});
+        } catch (e) {
+          // eslint-disable-next-line no-undef
+          M.toast({html: "Linked!"});
+          console.error("Failed to add link", e.message)
+        }
         this.$emit("input", false)
       }).catch(e => {
         // eslint-disable-next-line no-undef
