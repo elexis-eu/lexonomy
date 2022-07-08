@@ -341,7 +341,6 @@ def skeget_defo(dictID: str, user: User, dictDB: Connection, configs: Configs):
     url += "&viewmode=sen"
     if request.query.fromp:
         url += "&" + request.query.fromp
-    print(url)
     req = urllib.request.Request(url, headers = {"Authorization": "Bearer " + request.query.apikey})
     res = urllib.request.urlopen(req)
     data = json.loads(res.read())
