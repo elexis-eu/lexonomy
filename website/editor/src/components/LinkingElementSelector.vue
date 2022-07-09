@@ -114,7 +114,7 @@ export default {
     },
     linkToElement() {
       const selectedEl = this.displayedLinks[this.selectedElement]
-      const url = `${window.location.origin}/${this.selectedDictionary}/links/add`
+      const url = `${window.location.origin}/${this.state.entry.dictId}/links/add`
       const params = {
         source_el: this.elementName,
         source_id: this.sourceId,
