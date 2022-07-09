@@ -1,7 +1,7 @@
 <template>
   <div v-if="!isRootElement" ref="actionButton" class="dropdown">
     <button class="button--sm secondary" @click.prevent.stop.stop="toggleDropdown" :disabled="numberOfActions === 0">
-      {{ computedElementName }}
+      {{ buttonText }}
     </button>
     <div v-show="show" class="vue-dropdown-content">
       <button v-if="canMoveElementUp"
@@ -76,6 +76,21 @@ export default {
   computed: {
     isRootElement() {
       return this.elementName === this.state.entry.dictConfigs.xema.root
+    },
+    buttonText() {
+      const xemplate = this.state.entry.dictConfigs.xemplate
+      if (!xemplate || !xemplate[this.elementName]) {
+        return this.computedElementName
+      }
+      switch(xemplate[this.elementName].gutter) {
+        case "sensenum0":
+        case "sensenum1":
+        case "sensenum2":
+        case "sensenum3":
+          return (this.editorChildNumber+1) + ". " + this.computedElementName
+        default:
+          return this.computedElementName
+      }
     },
     numberOfActions() {
       return [this.canAddElement, this.canRemoveElement, this.canMoveElementUp, this.canMoveElementDown].filter(bool => bool === true).length
