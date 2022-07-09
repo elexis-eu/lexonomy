@@ -71,6 +71,11 @@
                </option>
             </select>
          </div>
+         <div class="break"/>
+         <div class="select-input">
+            <label for="label">Label</label>
+            <input id="label" class="textbox" onchange={sendData} value={state.elementData.label}>
+         </div>
       </div>
       <div if={state.elementData.shown} class="section--graphical">
          <div class="break"/>
@@ -158,7 +163,8 @@
                background: null,
                border: null,
                gutter: null,
-               separation: null
+               separation: null,
+               label: "",
             }
          },
          editorConfigOptions: [],
@@ -627,6 +633,9 @@
          padding: 0 16px;
          text-align: center;
          background: #f6f6f6;
+      }
+      .display-styles .textbox {
+         border: 1px solid #f2f2f2;
       }
    </style>
 
