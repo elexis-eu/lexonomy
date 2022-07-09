@@ -44,6 +44,7 @@
          <div
             each={style in possibleStyles}
             if={this.shouldRenderStyle(style.type)}
+            key={style.type}
             class="select-input"
          >
             <label for={style.type}>{style.title}</label>
@@ -125,7 +126,7 @@
          </div>
          <div if={store.data.dictConfigs.editing.xonomyMode !== "graphical"} class="overlay--disabled">
             <div class="notification">
-               <p>Enable <b>Graphical mode</b> to apply these changes</p>
+               <p>Enable <b>Graphical mode</b></p>
             </div>
          </div>
       </div>
@@ -194,10 +195,7 @@
 
             this.state.elementData[attribute] = value
             this.props.saveData(this.elementName, this.attributeName, attribute, value)
-
-            if (attribute === "displayType") {
-               this.update()
-            }
+            this.update()
          },
 
          setInitialData() {
