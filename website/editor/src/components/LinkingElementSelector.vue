@@ -95,7 +95,7 @@ export default {
       const url = `${window.location.origin}/${this.selectedDictionary}/linkablelist.json`
       axios.get(url).then(response => {
         this.availableLinks = response.data.links
-        this.displayedLinks = this.availableLinks
+        this.displayedLinks = this.availableLinks.slice(0, 100)
       })
     },
     applySearchFilter() {
