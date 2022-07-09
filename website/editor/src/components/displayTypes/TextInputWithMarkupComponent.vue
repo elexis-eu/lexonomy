@@ -42,6 +42,7 @@
         <span v-for="(element, i) in readOnlyValues"
               :key="i + element.type"
               style="white-space: pre-wrap"
+              :style="calculatedStyles(element)"
               v-html="element.text"/>
       </span>
     </section>
