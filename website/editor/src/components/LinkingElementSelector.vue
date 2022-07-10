@@ -94,10 +94,12 @@ export default {
   methods: {
     getLinkableElements() {
       this.selectedElement = null
+      this.availableLinks = []
+      this.displayedLinks = []
       const url = `${window.location.origin}/${this.selectedDictionary}/linkablelist.json`
       axios.get(url).then(response => {
         this.availableLinks = response.data.links
-        this.displayedLinks = this.availableLinks.slice(0, 40)
+        this.applySearchFilter()
       })
     },
     applySearchFilter() {
