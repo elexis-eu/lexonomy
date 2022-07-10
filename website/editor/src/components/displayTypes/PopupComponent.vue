@@ -36,7 +36,7 @@
             class="preview-components"
             :children="children"
             :elementName="elementName"
-            :content="calculatedContent"
+            :content="viewOnlyContent"
             :forceReadOnlyElements="true"
             :maxDisplayedChildren="5"
           />
@@ -127,8 +127,11 @@ export default {
     }
   },
   computed: {
-    calculatedContent() {
+    viewOnlyContent() {
       return this.updatedContent || this.content
+    },
+    calculatedContent() {
+      return this.updatedContent || this.unsavedData
     }
   },
   data() {
@@ -140,13 +143,14 @@ export default {
       unsavedData: null
     }
   },
-  mounted() {
+  created() {
     this.unsavedData = this.content
   },
   methods: {
     openPopup() {
       this.showPopup = true
-      this.dataOnPopupOpen = this.createDeepCopy(this.calculatedContent).elements[0]
+      let deepCopy = this.createDeepCopy(this.calculatedContent).elements
+      this.dataOnPopupOpen = (deepCopy && deepCopy[0]) ? deepCopy[0] : {}
     },
     handleCancel() {
       this.updatedContent = this.dataOnPopupOpen

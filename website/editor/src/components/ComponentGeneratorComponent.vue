@@ -376,9 +376,6 @@ export default {
     },
     handleChildUpdate(data) {
       let content = this.createDeepCopy(this.content)
-      if (content.elements) {
-        content = content.elements[0]
-      }
       if (data.isAttribute) {
         content.attributes = {...content.attributes, ...data.content}
         this.$emit("input", {content: content})
@@ -449,7 +446,7 @@ export default {
     },
 
     createElement(data) {
-      let nextChildNumber = this.content.elements.filter(el => el.name === data.name).length
+      let nextChildNumber = (this.content.elements && this.content.elements.filter(el => el.name === data.name).length) || 0
       this.handleChildUpdate({
         elementName: data.name,
         editorChildNumber: nextChildNumber,
@@ -522,8 +519,11 @@ export default {
       return element.name
     },
     createDeepCopy(content) {
-      let xml = js2xml({elements: [content]}, this.state.xml2jsConfig)
-      return xml2js(xml, this.state.xml2jsConfig)
+      let tmpRoot = this.createElementTemplate(this.elementName)[0]
+      tmpRoot.elements = content.elements
+      let xml = js2xml({elements: [tmpRoot]}, this.state.xml2jsConfig)
+      const newObject = xml2js(xml, this.state.xml2jsConfig)
+      return (newObject.elements) ? newObject.elements[0] : {}
     }
   }
 }
