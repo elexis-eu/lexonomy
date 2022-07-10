@@ -82,8 +82,10 @@ export default {
       displayedLinks: []
     }
   },
-  mounted() {
+  created() {
     this.selectedDictionary = this.linkableDicts[0] && this.linkableDicts[0].id
+  },
+  mounted() {
     this.$nextTick(() => {
       // eslint-disable-next-line no-undef
       M.FormSelect.init(document.querySelectorAll('select'), {})
@@ -95,7 +97,7 @@ export default {
       const url = `${window.location.origin}/${this.selectedDictionary}/linkablelist.json`
       axios.get(url).then(response => {
         this.availableLinks = response.data.links
-        this.displayedLinks = this.availableLinks.slice(0, 100)
+        this.displayedLinks = this.availableLinks.slice(0, 40)
       })
     },
     applySearchFilter() {
@@ -105,9 +107,8 @@ export default {
           return link.element.toLowerCase().includes(normalizedSearchTerm) ||
             link.link.toLowerCase().includes(normalizedSearchTerm) ||
             link.preview.toLowerCase().includes(normalizedSearchTerm)
-        })
+        }).slice(0, 40)
       }
-
     },
     cancelAddLink() {
       this.$emit("input", false)
