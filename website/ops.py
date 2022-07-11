@@ -551,7 +551,7 @@ def get_xslt_transformer(xsl: Optional[str]) -> Callable[[str], Optional[str]]:
 
     if xsl:
         try:
-            xsl_dom = ET.xml(xsl)
+            xsl_dom = ET.XML(xsl.encode())
             xslt = ET.XSLT(xsl_dom)
         except:
             return no_op
