@@ -215,13 +215,17 @@
          },
 
          onHeadwordClick(entryId, evt){
-            this.store.changeEntryId(entryId)
+            if(!window.editorNeedsSaving(evt)){
+               this.store.changeEntryId(entryId)
+            }
          },
 
          onHeadwordLinkClick(entryId, evt){
             evt.preventDefault()
-            this.onDocumentClick(evt)
-            this.store.changeEntryId(entryId)
+            if(!window.editorNeedsSaving(evt)){
+               this.onDocumentClick(evt)
+               this.store.changeEntryId(entryId)
+            }
          },
 
          onOpenFlagMenuClick(entry, evt){

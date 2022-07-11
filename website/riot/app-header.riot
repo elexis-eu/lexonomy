@@ -178,7 +178,9 @@
    <script>
       export default {
          doLogout(event) {
-            this.auth.logout()
+            if(!window.editorNeedsSaving(event)){
+               this.auth.logout()
+            }
          },
 
          onIncreaseFontSize(){

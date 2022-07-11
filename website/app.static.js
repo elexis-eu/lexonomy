@@ -1,5 +1,5 @@
 import './libs/riot/riot.min.js'
-import './libs/riot/route.min.js'
+import './libs/riot/route.js'
 import './libs/riot/observable.js'
 import './libs/jquery/jquery.min.js'
 import './libs/jquery/jquery-ui.min.js'
