@@ -248,14 +248,17 @@ Xemplatron._senseNum=function(ly, html, n, startLevel) {
 
 }
 Xemplatron._bullet=function(ly, name, html){
+   console.log(ly)
+   console.log(name)
+   console.log(html)
   var symbol=""; var className="";
   if(name=="square") { symbol="⯀"; className=name; }
   else if(name=="diamond") { symbol="⯁"; className=name; }
   else if(name=="arrow") { symbol="⯈"; className=name; }
   else if(name=="disk") { symbol="⏺"; className=name; }
   else symbol=name;
-  if(ly=="block") return "<div class='bulleted "+className+"'><div class='bullet'>"+symbol+"</div> <div class='inside'>"+html+"</div><div class='clear'></div></div>";
   if(ly=="inline") return "<span class='bulleted "+className+"'>"+symbol+"</span>&nbsp;"+html;
+  return "<div class='bulleted "+className+"'><div class='bullet'>"+symbol+"</div> <div class='inside'>"+html+"</div><div class='clear'></div></div>";
 }
 Xemplatron.detectFileType=function(url) {
   var fileExtension = url.split('.').pop().split(/\#|\?/)[0].toLowerCase();
