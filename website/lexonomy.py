@@ -807,10 +807,8 @@ def resavejson(dictID: str, user: User, dictDB: Connection, configs: Configs):
     dictDB.execute("PRAGMA cache_size = -100000") # about 100 megs
     dictDB.execute("begin")
 
-    while count < stats["needUpdate"] and count <= 127:
-        entry = dictDB.execute("select id, xml from entries where needs_update=1 limit 1").fetchone()
+    for entry in dictDB.execute("select id, xml from entries where needs_update=1 limit 127").fetchall():
         ops.createEntry(dictDB, configs, entry["xml"], "system@lexonomy", entry["id"])
-        count += 1
 
     dictDB.commit()
     todo = ops.getDictStats(dictDB)["needUpdate"]
