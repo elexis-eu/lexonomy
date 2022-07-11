@@ -743,16 +743,17 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
             if titlePlain:
                 ret["titlePlain"] = get_entry_title(parsedXml, configs)[0]
         if html:
-            ret["html"] = get_entry_html(configs, row["xml"], run_xslt)
+            ret["html"] = get_entry_html(dictDB, configs, row["xml"], run_xslt)
         entries.append(ret)
     sortEntries(configs, entries, sortdesc)  # type: ignore - SortableEntry is a subset of Entry so this always works
     return entries
 
-def get_entry_html(configs: Configs, xml: str, run_xslt: Any) -> str:
+def get_entry_html(dictDB: Connection, configs: Configs, xml: str, run_xslt: Any) -> str:
     "Run the xslt on the xml, or - failing that - return a <script> tag that will transform it clientside using the Xemplatron. Result should be used with 'element.innerHTML = ...'"
     if not run_xslt:
         run_xslt = get_xslt_transformer(configs.get("xemplate", {}).get("_xsl", ""))
 
+    xml = str(resolveSubentries(dictDB, xml))
     safeXml = re.sub(r"[\n\r]", "", re.sub(r"'", "\\'", xml))
     return run_xslt(xml) or f"""
         <script type='text/javascript'>
@@ -2184,6 +2185,18 @@ def exportEntryXml(dictDB: Connection, dictID: str, entryID: int, configs: Confi
         return {"entryID": row["id"], "xml": xml}
     else:
         return {"entryID": 0, "xml": ""}
+
+def resolveSubentries(dictDB: Connection, xml: Union[str, Tag]) -> Tag:
+    "Recursively replace subentry references (<lxnm:subentryParent>) with their contents."
+    if type(xml) is str:
+        xml = parse(xml)
+    subs = xml.find_all("lxnm:subentryParent")
+    for sub in subs:
+        subentryID = int(sub.attrs["id"])
+        r = dictDB.execute("select * from entries where id = ?", (subentryID, )).fetchone()
+        sub.replace_with(resolveSubentries(dictDB, r["xml"]))
+   
+    return xml
 
 def export(dictID: str, dictDB: Connection, configs: Configs, clean: bool = True) -> Iterable[str]:
     "Export all entries, (optionally) cleaning all lexonomy things."
