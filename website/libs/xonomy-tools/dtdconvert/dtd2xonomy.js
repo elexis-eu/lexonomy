@@ -171,7 +171,7 @@ function SplitBalanced(input, split, open, close, toggle, escape) {
 }
 
 //parse DTD in text string to structure object
-function parseDTD(dtdData) {
+export function parseDTD(dtdData) {
   elements = new Array();
   attributes = new Array();
   usedChildren = new Array();
@@ -233,7 +233,7 @@ function initialElement(element) {
 }
 
 //initial XML document - select root+required children
-function initialDocument(xmlStructure) {
+export function initialDocument(xmlStructure) {
   var ret = "<"+xmlStructure.root+">";
   var children = getFlatChildren(xmlStructure.elements.find(function(xe) {return xe.name==xmlStructure.root}));
   if (children != null) {
@@ -248,7 +248,7 @@ function initialDocument(xmlStructure) {
 }
 
 //transform xml structure to Xonomy docSpec
-function struct2Xonomy(xmlStructure) {
+export function struct2Xonomy(xmlStructure) {
 	var docSpec = {
 		elements: {},
 		unknownElement: function(elName){
@@ -436,7 +436,7 @@ function struct2Xonomy(xmlStructure) {
 
 
 //transform xml structure to Lexonomy Xema
-function struct2Xema(xmlStructure) {
+export function struct2Xema(xmlStructure) {
   var xema = {root: xmlStructure.root, elements: {}};
 
   //add information for elements
@@ -522,19 +522,3 @@ function getFlatLevel(childrenLevel, resultList, topMin, topMax) {
   }
   return resultList;
 }
-
-try {
-module.exports = {
-  dtd2xonomy: function(dtdData) {
-    var xmlStructure = parseDTD(dtdData);
-    //console.log(xmlStructure)
-    var spec = struct2Xonomy(xmlStructure);
-    // console.log(spec)
-    var xema = struct2Xema(xmlStructure);
-    // console.log(JSON.stringify(xema,undefined,1))
-  },
-  struct2Xema: function(xmlStructure) {
-    return struct2Xema(xmlStructure);
-  }
-}
-} catch(e) {}

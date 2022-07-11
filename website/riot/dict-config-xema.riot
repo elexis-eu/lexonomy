@@ -202,7 +202,7 @@
 
          getConfigData() {
             var newData = { ...this.state.xema }
-            if (this.override) {
+            if (this.state.override) {
                if ($('#editor_doc').val()) newData._xonomyDocSpec = $('#editor_doc').val();
                if ($('#editor_xml').val()) newData._newXml = $('#editor_xml').val();
                if ($('#editor_dtd').val()) newData._dtd = $('#editor_dtd').val();
