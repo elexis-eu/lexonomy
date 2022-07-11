@@ -330,6 +330,7 @@
 
          onBeforeMount() {
             globalThis.Xonomy = new XonomyClass();
+            Xonomy.buttonClass = 'btn';
          },
          onBeforeUnmount() {
             Screenful.Editor.editor = null;
