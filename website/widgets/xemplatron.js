@@ -263,7 +263,7 @@ Xemplatron._bullet=function(ly, name, html){
 Xemplatron.detectFileType=function(url) {
   var fileExtension = url.split('.').pop().split(/\#|\?/)[0].toLowerCase();
   console.log('FE'+fileExtension)
-  if (['jpg','jpeg','png','gif'].includes(fileExtension)) return 'image';
+  if (['jpg','jpeg','png','gif','svg'].includes(fileExtension)) return 'image';
   if (['avi','mp4','webm'].includes(fileExtension)) return 'video';
   if (['wav','ogg','weba'].includes(fileExtension)) return 'audio';
   return '';
