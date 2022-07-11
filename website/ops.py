@@ -2769,7 +2769,7 @@ def changeFavDict(userEmail: str, dictID: str, status: Literal["true"]):
 
 def get_iso639_1() -> List[IsoCode]:
     codes = []
-    for line in open("libs/iso-639-3.tab").readlines():
+    for line in open("libs/iso-639-3.tab", encoding="utf-8").readlines():
         la = line.split("\t")
         if la[3] != "" and la[3] != "Part1":
             codes.append({'code':la[3], 'code3':la[1], 'lang':la[6]})
