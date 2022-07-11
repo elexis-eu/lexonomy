@@ -121,9 +121,9 @@
             this.update({isResaving: true});
             while (true && !this.state.isUnmounted) {
                try {
-                  const {progressMessage, finished, errors} = await $.post(`${this.dictData.dictId}/resave.json`);
+                  const {progressMessage, finished, errors, todo} = await $.post(`${this.dictData.dictId}/resave.json`);
                   if (finished) {
-                     this.update({isResaving: false});
+                     this.update({isResaving: false, resaveProgressMessage: 'Finished', stats: {needUpdate: 0}});
                      return;
                   }
                   this.update({resaveProgressMessage: progressMessage});
