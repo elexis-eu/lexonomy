@@ -22,8 +22,7 @@
             <label for="corpus">Corpus name</label>
             <span class="helper-text">Select a KonText corpus from the list of corpora available to you.</span>
             <span class="helper-text"
-                  id="corpusInfo"
-                  hide={ true }></span>
+                  id="corpusInfo">Currently selected corpus: { state.data.corpus }</span>
          </div>
       </div>
       <div class="row">
@@ -86,7 +85,7 @@
             isSaving: false,
             data: {
                url: 'https://www.clarin.si/kontext/', searchElements: [],
-               container: '', template: '', markup: ''
+               container: '', template: '', markup: '', corpus: ''
             }
          },
 
@@ -119,7 +118,6 @@
                                  if ($('#corpus').data('selected-corpus') == e.corpus_id) {
                                     selected = eInfo
                                     $('#corpusInfo').html('Currently selected corpus: ' + e.name + ".")
-                                    $('#corpusInfo').show()
                                  }
                               })
                               $('#corpus').autocomplete({data: corporaList})
@@ -148,7 +146,14 @@
                   })
                   .always(() => {
                      this.update({isLoading: false})
-                     $('select').formSelect()
+                     $('select').formSelect().on("change", (evt) => {
+                        let template = evt.target.dataset.template
+                        let element = evt.target.value
+                        if(template){
+                           $(`#${template}`).val(`<${element}>$text</${element}>`)
+                        }
+                     })
+
                      M.updateTextFields()
                   })
          },
