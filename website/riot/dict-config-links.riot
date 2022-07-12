@@ -216,8 +216,10 @@
 
          startBabelnet() {
             $.post(window.API_URL + this.dictData.dictId + '/babelnet', (response) => {
-               this.state.data.babelnet_id = response;
-               this.saveData();
+               if (response.babelnet_id != undefined && response.babelnet_id != '') {
+                  this.state.data.babelnet_id = response.babelnet_id;
+                  this.saveData();
+               }
             });
          },
 
