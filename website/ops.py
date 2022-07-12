@@ -2195,7 +2195,7 @@ def resolveSubentries(dictDB: Connection, xml: Union[str, Tag]) -> Tag:
         subentryID = int(sub.attrs["id"])
         r = dictDB.execute("select * from entries where id = ?", (subentryID, )).fetchone()
         sub.replace_with(resolveSubentries(dictDB, r["xml"]))
-   
+
     return xml
 
 def export(dictID: str, dictDB: Connection, configs: Configs, clean: bool = True) -> Iterable[str]:
@@ -2799,6 +2799,32 @@ def getLocale(configs):
     if "locale" in configs["titling"] and configs["titling"]["locale"] != "":
         locale = configs["titling"]["locale"]
     return locale
+
+def extractText(xml, elName):
+    elName = str(elName)
+    if elName == "":
+        return []
+    pat = r"<" + elName + "[^>]*>([^<]*)</" + elName + ">"
+    return re.findall(pat, xml)
+
+def extractFirstText(xml):
+    pat = r"<([^\s>]+)[^>]*>([^<>]*?)</([^\s>]+)>"
+    for match in re.findall(pat, xml):
+        if match[0] == match[2] and match[1].strip() != "":
+            return match[1].strip()
+    return ""
+
+def getEntryHeadword(xml, headword_elem):
+    ret = "?"
+    arr = extractText(xml, headword_elem)
+    if len(arr)>0:
+        ret = arr[0]
+    else:
+        ret = extractFirstText(xml)
+    if len(ret) > 255:
+        ret = ret[0:255]
+    return ret
+
 
 def preprocessLex0(entryXml):
     from xml.dom import minidom, Node
