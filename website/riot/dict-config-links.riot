@@ -84,10 +84,19 @@
             <raw-html content={state.info}></raw-html>
          </div>
       </div>
+      <div>
+         <h2>Automatic linking using Babelnet</h2>
+         <div if={state.data.babelnet_id == ''}>
+            <button id="babelnet_link"
+                  class="btn waves-effect waves-light"
+                  onclick={ startBabelnet }
+                  style="margin-left: 10px;">Start linking</button>
+         </div>
+         <div if={state.data.babelnet_id != ''}>
+            <p>Babelnet linking status: <span id="babelnet-status"/></p>
+         </div>
+      </div>
    </div>
-   <br>
-   <a href="#{dictData.dictId}/config"
-         class="btn btn-secondary btn-flat">Back</a>
 
    <style>
       tbody tr{
@@ -112,7 +121,7 @@
             isLinking: false,
             isChecking: true,
             unusedElements: [],
-            data: {elements: []},
+            data: {elements: [], babelnet_id: ''},
             info: "",
             checkDelay: 1000
          },
@@ -132,12 +141,15 @@
 
          onMounted() {
             this.store.loadDictionaryConfig("links")
-                  .done(response => {
-                     this.state.data = {elements: Object.values(response.content)}
-                  })
-                  .always(() => {
-                     this.update({isLoading: false})
-                  })
+               .done(response => {
+                  if (response.content.babelnet_id != undefined) {
+                     this.state.data.babelnet_id = response.content.babelnet_id;
+                  }
+                  this.state.data.elements =Object.values(response.content).filter(el => el.linkElement != undefined);
+               })
+               .always(() => {
+                  this.update({isLoading: false})
+               })
 
             //check NAISC status
             this.store.linkingCheckIfRunning()
@@ -150,6 +162,7 @@
                   .always(() => {
                      this.update({isChecking: false})
                   })
+
          },
 
          onBeforeUpdate(){
@@ -157,6 +170,14 @@
          },
 
          onUpdated() {
+            //check Babelnet status
+            if (this.state.data.babelnet_id != '') {
+               $.post(window.API_URL + this.dictData.dictId + '/babelnet',{babelnet_id: this.state.data.babelnet_id}, (response) => {
+                  console.log(response)
+                  $('#babelnet-status').html(response.state)
+               });
+            }
+
             if (this.dictData.config.xema && this.dictData.config.xema.elements) {
                $("select").each(function(idx, el){
                   var $select = $(el)
@@ -191,6 +212,13 @@
             this.state.unusedElements = Object.keys(this.dictData.config.xema.elements).filter(el => {
                return !savedElements.includes(el)
             })
+         },
+
+         startBabelnet() {
+            $.post(window.API_URL + this.dictData.dictId + '/babelnet', (response) => {
+               this.state.data.babelnet_id = response;
+               this.saveData();
+            });
          },
 
          startLinking() {
@@ -248,6 +276,7 @@
             this.state.data.elements.forEach(item => {
                data[item.linkElement] = item
             })
+            data['babelnet_id'] = this.state.data.babelnet_id;
             this.update({isSaving: true})
             this.store.updateDictionaryConfig("links", data)
                   .always(() => this.update({isSaving: false}))

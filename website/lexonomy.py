@@ -420,6 +420,26 @@ def kontext_xampl(dictID: str, user: User, dictDB: Connection, configs: Configs)
     data = json.loads(res.read())
     return data
 
+@post(siteconfig["rootPath"] + "<dictID>/babelnet")
+@authDict([])
+def babelnet(dictID: str, user: User, dictDB: Connection, configs: Configs):
+    import base64
+    if request.forms.babelnet_id == '':
+        url = 'http://babelnet.linkingmachine.org/submit/'
+        data = {'entries': [], 'source': {'id': dictID, 'apiKey': user['apiKey']}}
+        req = urllib.request.Request(url, data=bytes(json.dumps(data), encoding="utf-8"), method='POST')
+    else:
+        url = 'http://babelnet.linkingmachine.org/status/?request_id=' + request.forms.babelnet_id
+        req = urllib.request.Request(url, method='GET')
+    base64string = base64.b64encode(bytes('%s:%s' % ('rest', 'tKn!.X/sWnr5'),'ascii'))
+    req.add_header("Authorization", "Basic %s" % base64string.decode('utf-8'))
+    res = urllib.request.urlopen(req)
+    try:
+        data = json.loads(res.read())
+    except:
+        data = res.read()
+    return data
+
 @post(siteconfig["rootPath"] + "login.json")
 def check_login():
     if request.forms.email != "" and request.forms.password != "":

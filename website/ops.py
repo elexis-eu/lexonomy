@@ -1237,6 +1237,8 @@ def presave_linkables(dictDB: Connection, configs: Configs, entryXml: Tag, entry
 
     ret: List[Tuple[int, str, str, str]] = []
     for linkref in config_links.values():
+        if type(linkref) is str:
+            continue
         linkElement = xema_get_element_name_from_id(xema, linkref["linkElement"])
 
         identifierEscapes = split_template_string(linkref["identifier"]) # pre-process
