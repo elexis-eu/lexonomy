@@ -13,7 +13,7 @@ nav.white {
 /*main.main {
 	background-color: #f0f8ff !important;
 }*/
-input:not(.flag-color) {
+input[type=text]:not(.flag-color) {
 	background-color: white !important;
 }
 div.input-field label {
