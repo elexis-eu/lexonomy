@@ -93,12 +93,11 @@
                   style="margin-left: 10px;">Start linking</button>
          </div>
          <div if={state.data.babelnet_id != ''}>
-            <p>Babelnet linking status: <span id="babelnet-status"/>
+            <p>Babelnet linking status: ({ state.data.babelnet_id }) <span id="babelnet-status"/>
             <button id="babelnet_error"
                   class="btn waves-effect waves-light"
                   onclick={ clearBabelnet }
-                  hide={ true }
-                  style="margin-left: 10px;">Dismiss error</button>
+                  style="margin-left: 10px;display:none;">Dismiss error</button>
             </p>
          </div>
       </div>
