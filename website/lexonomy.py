@@ -48,7 +48,7 @@ if not cgi and len(sys.argv) > 1:
     my_url = sys.argv[1]
 
 # serve static files
-@route('/<path:re:(widgets|furniture|libs|index.*\.html|config\.js|img|js|css|docs|dist|version\.txt).*>')
+@route('/<path:re:(widgets|furniture|libs|index.*\.html|config\.js|img|js\/|css|docs|dist|version\.txt).*>')
 def server_static(path: str):
     return static_file(path, root="./")
 

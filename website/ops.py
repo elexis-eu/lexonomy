@@ -3148,7 +3148,6 @@ def elexisConvertTei(xml_entry):
     xml_entry: The entry as a string"""
     from io import BytesIO
     from lxml import etree as ET
-
     try:
         # strip NS
         it = ET.iterparse(BytesIO(xml_entry.encode("UTF-8")), recover=True)
