@@ -3115,7 +3115,7 @@ def elexisGetEntry(dictID, entryID):
     query = "SELECT id, xml FROM entries WHERE id=?"
     c = dictDB.execute(query, (entryID, ))
     r = c.fetchone()
-    return r if r["xml"] else None
+    return r['xml'] if r["xml"] else None
 
 
 def loadHandleMeta(configs: Configs):
