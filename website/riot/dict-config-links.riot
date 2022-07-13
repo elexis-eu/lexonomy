@@ -93,7 +93,13 @@
                   style="margin-left: 10px;">Start linking</button>
          </div>
          <div if={state.data.babelnet_id != ''}>
-            <p>Babelnet linking status: <span id="babelnet-status"/></p>
+            <p>Babelnet linking status: <span id="babelnet-status"/>
+            <button id="babelnet_error"
+                  class="btn waves-effect waves-light"
+                  onclick={ clearBabelnet }
+                  hide={ true }
+                  style="margin-left: 10px;">Dismiss error</button>
+            </p>
          </div>
       </div>
    </div>
@@ -173,8 +179,10 @@
             //check Babelnet status
             if (this.state.data.babelnet_id != '') {
                $.post(window.API_URL + this.dictData.dictId + '/babelnet',{babelnet_id: this.state.data.babelnet_id}, (response) => {
-                  console.log(response)
                   $('#babelnet-status').html(response.state)
+                  if (response.state == 'ERROR') {
+                     $('#babelnet_error').show();
+                  }
                });
             }
 
@@ -221,6 +229,11 @@
                   this.saveData();
                }
             });
+         },
+
+         clearBabelnet() {
+            this.state.data.babelnet_id = '';
+            this.saveData();
          },
 
          startLinking() {
