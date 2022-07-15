@@ -1266,12 +1266,11 @@ def get_next_autonumber_value(dictDB: Connection, element: str, target: Optional
         target_is_attribute = True
         target = target[1:]
 
-
     # """Get the next unused integer for an autonumber configuration."""
     highest = -1
     for e in dictDB.execute("select xml from entries"):
         entry = parse(e["xml"])
-        for el in entry.findAll(element):
+        for el in ([entry] + entry.findAll(element)) if entry.name == element else entry.findAll(element):
             existing_value = el.attrs.get(target) if target_is_attribute else get_text(el, target)
             if existing_value:
                 try:
@@ -1336,7 +1335,7 @@ def presave_autonumbering(dictDB: Connection, configs: Configs, entry: Tag, isAu
             if not template_parts: # template string is empty, missing, or contains nothing to evaluate; skip.
                 continue
 
-        for el in entry.findAll(element_to_number):
+        for el in ([entry] + entry.findAll(element_to_number)) if entry.name == element_to_number else entry.findAll(element_to_number):
             existing_value = el.attrs.get(target) if target_is_attribute else get_text(el, target)
             write_new_value = not existing_value or c.get("overwrite_existing")
 

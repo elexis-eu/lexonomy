@@ -567,7 +567,6 @@ testables = [{
     "entry": """<entry lxnm:id="0"><n some-attribute="0"/><headword>test</headword></entry>""",
     "xml":   """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n id="autonumber test 0" some-attribute="0"></n><headword>test</headword></entry>"""
 }, {
-    "debug": True,
     "description": "Test autonumbering can place string template in child element",
     "configs": {"autonumbering": {"n": {
         "auto_apply": True,
@@ -662,6 +661,19 @@ testables = [{
     "entry": """<entry lxnm:id="0"><n/><n>1</n></entry>""",
     "xml": """<entry lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n>11</n><n>12</n></entry>""",
     "actions": ["create", "autonumber"]
+}, {
+    "description": "Test autonumbering can write to entry root",
+    "configs": {"autonumbering": {"entry": {
+        "auto_apply": True,
+        "element": "entry",
+        "target": "@auto_id",
+        "type": "number", 
+        "number_globally": True,
+        "number_next": 10,
+        "overwrite_existing": True
+    }}},
+    "entry": """<entry lxnm:id="0"><n/><n></n></entry>""",
+    "xml": """<entry auto_id="10" lxnm:id="0" xmlns:lxnm="http://www.lexonomy.eu/"><n></n><n></n></entry>""",
 }, {
     "description": "Test that parent entry is flagged for update when subentry changes",
 
