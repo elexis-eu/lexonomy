@@ -61,9 +61,11 @@ class StoreClass {
       } else {
          let searchtext = searchParams.searchtext || ""
          let modifier = searchParams.modifier || "start"
-         if(searchtext !== this.data.searchtext || modifier !== this.data.modifier){
+         let searchflag = searchParams.searchflag || ""
+         if(searchtext !== this.data.searchtext || modifier !== this.data.modifier || searchflag !== this.data.searchflag){
             this.data.searchtext = searchtext
             this.data.modifier = modifier
+            this.data.searchflag = searchflag
             this.loadEntryList()
          }
       }
@@ -84,7 +86,8 @@ class StoreClass {
       this.loadEntryList()
       url.setQuery(this.data.searchtext ? {
          s: this.data.searchtext,
-         m: this.data.modifier
+         m: this.data.modifier,
+         f: this.data.searchflag
       } : {}, true)
    }
 
@@ -159,6 +162,7 @@ class StoreClass {
          dictId: null,
          entryId: null,
          searchtext: '',
+         searchflag: '',
          modifier: 'start',
          mode: 'view',
          userAccess: {
@@ -286,6 +290,7 @@ class StoreClass {
       let data = {
          searchtext: this.data.searchtext,
          modifier: this.data.modifier,
+         searchflag: this.data.searchflag,
          howmany: howmany ? howmany : (this.data.dictConfigs.titling.numberEntries || 1000)
       }
       if(authorized){

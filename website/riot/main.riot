@@ -112,7 +112,8 @@
                let query = route.query()
                this.store.changeSearchParams({
                   searchtext: decodeURIComponent(query.s || ""),
-                  modifier: query.m
+                  modifier: query.m,
+                  searchflag: decodeURIComponent(query.f || ""),
                })
 
                this.update(Object.assign({

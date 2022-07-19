@@ -16,6 +16,13 @@
          <option value="wordstart" selected={dictData.modifier == 'wordstart'}>contains a word that starts like this</option>
          <option value="substring" selected={dictData.modifier == 'substring'}>contains this sequence of characters</option>
       </select>
+      <select id="flagType" if="{store.data && store.data.config && store.data.config.flagging.flags.length}">
+         <option selected={!dictData.searchflag} value="">Any flag</option>
+         <option each={flag in store.data.config.flagging.flags} 
+            selected={dictData.searchflag === flag.name}
+            value="{flag.name}"
+         ><span><span class="flag-dot" style="background: {flag.color};"></span> {flag.label}</span></option>
+      </select>
    </div>
 
    <style>
@@ -42,6 +49,15 @@
          right: 5px;
          top: 11px;
       }
+      .flag-dot {
+         width: 1em;
+         height: 1em;
+         content: " ";
+         display: inline-block;
+         border-radius: 100%;
+         vertical-align: middle;
+         margin-right: 0.5em;
+      }
    </style>
 
    <script>
@@ -49,6 +65,7 @@
          search() {
             this.dictData.searchtext = $('#searchBox').val()
             this.dictData.modifier = $('#searchType').val()
+            this.dictData.searchflag = $('#flagType').val()
             this.props.searchFunc()
          },
 
