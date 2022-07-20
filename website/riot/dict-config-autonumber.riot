@@ -3,9 +3,7 @@
    <dict-nav links={[["config", "Configure"], ["autonumber", "Auto-numbering"]]}/>
    <h1>Auto-numbering of elements</h1>
    <dict-config-buttons save-data={saveData}>
-      <a class="btn waves-effect waves-light"
-            onclick={ addNumbers }
-            id="submit_button">
+      <a class="btn waves-effect waves-light" onclick={ addNumbers }>
          <i class="material-symbols-outlined right">add</i>Save &amp; autonumber
       </a>
    </dict-config-buttons>
@@ -22,33 +20,27 @@
             </select>
             <label>Element to number</label>
          </div>
-         <div id="hasChildren" class="input-field col s4">
-            <select name="children" onchange={setWithEvent.bind(this, config, 'target')} class="browser-default">
+         <!-- child/attribute selection -->
+         <div class="input-field col s4">
+            <select name="{config.element}_children" onchange={setWithEvent.bind(this, config, 'target')} class="browser-default">
                <option value="" selected={config.target === ""}>{config.element} itself</option>
                <option each={attribute in getAttributesForElement(config.element)} value=@{attribute} selected={config.target === '@' + attribute}>@{attribute}</option>
                <option each={childElement in getChildElementsForElement(config.element)} value={childElement} selected={config.target === childElement}>{childElement}</option>
             </select>
-            <label for="children">Add numbers to</label>
+            <label for="{config.element}children">Add numbers to</label>
          </div>
          <div class="input-field col s4">
             <button type="button" class="btn waves-effect waves-light" onclick={deleteElement.bind(this, config.element)} style="height:3rem;">Remove</button>
          </div>
 
-         <div id="hasNoChildren"
-               class="input-field col s4 grey-text"
-               style="display: none; padding-top: 10px;">
-            element has no children
-         </div>
-
-
          <div class="col s12">
             <label>
-               <input name={config.element + 'autoApply'} type="radio" class="with-gap" value="false" checked={ config.auto_apply } onchange={set.bind(this, config, 'auto_apply', true)}/>
+               <input name={config.element}_autoApply} type="radio" class="with-gap" value="false" checked={ config.auto_apply } onchange={set.bind(this, config, 'auto_apply', true)}/>
                <span>Apply numbers automatically</span>
             </label>
             <br>
             <label>
-               <input name={config.element + 'autoApply'} type="radio" class="with-gap" value="true" checked={ !config.auto_apply } onchange={set.bind(this, config, 'auto_apply', false)}/>
+               <input name={config.element}_autoApply} type="radio" class="with-gap" value="true" checked={ !config.auto_apply } onchange={set.bind(this, config, 'auto_apply', false)}/>
                <span>Only run numbering manually</span>
             </label>
          </div>
@@ -56,12 +48,12 @@
          <h3 class="col s12" style="margin-top: 2rem;">What to do with existing values</h3>
          <div class="col s12" style="padding-left: 2.75rem;">
             <label>
-               <input name="existingValues" id="existingValues_keep" type="radio" class="with-gap" value="false" checked={ !config.overwrite_existing } onchange={set.bind(this, config, 'overwrite_existing', false)}/>
+               <input name="{config.element}_existingValues" type="radio" class="with-gap" value="false" checked={ !config.overwrite_existing } onchange={set.bind(this, config, 'overwrite_existing', false)}/>
                <span><b>Keep</b> existing values</span>
             </label>
             <br>
             <label>
-               <input name="existingValues" id="existingValues_overwrite" type="radio" class="with-gap" value="true" checked={ config.overwrite_existing } onchange={set.bind(this, config, 'overwrite_existing', true)}/>
+               <input name="{config.element}_existingValues" type="radio" class="with-gap" value="true" checked={ config.overwrite_existing } onchange={set.bind(this, config, 'overwrite_existing', true)}/>
                <span><b>Overwrite</b> existing values</span>
             </label>
          </div>
@@ -69,18 +61,18 @@
          <h3 class="col s12" style="margin-top: 2rem;">New values</h3>
          <div class="col s12" style="padding-left: 2.75rem;">
             <label>
-               <input name="{config.element + 'newValues'}" type="radio" class="with-gap" value="number" checked={ config.type == 'number' } onchange={setWithEvent.bind(this, config, 'type')} />
+               <input name="{config.element}_newValues}" type="radio" class="with-gap" value="number" checked={ config.type == 'number' } onchange={setWithEvent.bind(this, config, 'type')} />
                <span>Use numbers</span>
             </label>
             <br>
 
             <label style="margin-left: 3rem; margin-top: 0.75rem;">
-               <input name="{config.element} + 'useNumbers'" type="radio" class="with-gap" disabled={config.type !== 'number'} checked={ !config.number_globally } onchange={set.bind(this, config, 'number_globally', false)}/>
+               <input name="{config.element}_useNumbers" type="radio" class="with-gap" disabled={config.type !== 'number'} checked={ !config.number_globally } onchange={set.bind(this, config, 'number_globally', false)}/>
                <span>Start at 0 in every entry</span>
             </label>
             <div style="margin-left: 3rem; display: flex; flex-wrap: wrap; align-items: baseline;">
                <label style="white-space: nowrap;">
-                  <input style="margin-left: 0.75rem;" name="{config.element} + 'useNumbers'" type="radio" class="with-gap" disabled={config.type !== 'number'} checked={ config.number_globally } onchange={set.bind(this, config, 'number_globally', true)}/>
+                  <input style="margin-left: 0.75rem;" name="{config.element}_useNumbers" type="radio" class="with-gap" disabled={config.type !== 'number'} checked={ config.number_globally } onchange={set.bind(this, config, 'number_globally', true)}/>
                   <span>Keep counting up, starting from</span>
                </label>
                <input type="text" style="margin-left: 0.75rem; flex-basis: 5ch; flex-grow: 1;" value={ config.number_next } onchange={setWithEvent.bind(this, config, 'number_next')}/>
@@ -89,13 +81,11 @@
 
 
             <label>
-               <input name="{config.element + 'newValues'}" type="radio" class="with-gap" checked={ config.type == 'string'} onchange={set.bind(this, config, 'type', 'string')}/>
+               <input name="{config.element}_newValues}" type="radio" class="with-gap" checked={ config.type == 'string'} onchange={set.bind(this, config, 'type', 'string')}/>
                <span>Use text</span>
             </label>
 
-            <input style="margin-left: 3rem;" disabled={config.type !== 'string'} type="text" id="stringFormat" placeholder="%(headword)-%(pos)" value={ config.string_template } onchange={setWithEvent.bind(this, config, 'string_template')}/>
-
-
+            <input style="margin-left: 3rem;" disabled={config.type !== 'string'} type="text" placeholder="%(headword)-%(pos)" value={ config.string_template } onchange={setWithEvent.bind(this, config, 'string_template')}/>
          </div>
 
       </div>
@@ -151,7 +141,6 @@
          changeElement(config, event) {
             oldElement = config.element;
             newElement = event.target.value;
-            console.log('changing element ->', oldElement, newElement)
             if (!oldElement || !newElement) return;
 
             this.state.data[newElement] = config;
@@ -160,7 +149,6 @@
             delete this.state.data[oldElement];
             this.update();
             event.target.value = newElement; // weird bug but the select goes out of sync otherwise
-
          },
          deleteElement(element) {
             if (!element) return;
@@ -201,7 +189,7 @@
          },
          getChildElementsForElement(element) {
             const xema = this.dictData && this.dictData.config && this.dictData.config.xema;
-            return (xema.elements[element].children || []).map(c => xema.elements[c.name].elementName || c.name);
+            return xema ? (xema.elements[element].children || []).map(c => xema.elements[c.name].elementName || c.name) : [];
          },
 
 
