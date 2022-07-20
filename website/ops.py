@@ -581,14 +581,14 @@ def sortEntries(configs: Configs, sortables: List[SortableEntry], reverse: bool 
     return sortables
 
 def searchEntries(
-    dictDB: Connection, 
-    configs: Configs, 
-    
-    doctype: str, 
+    dictDB: Connection,
+    configs: Configs,
+
+    doctype: str,
     flag: Optional[str],
-    searchtext: Optional[str], 
-    modifier: Optional[Literal["start", "wordstart", "substring", "exact"]] = "start", 
-    sortdesc: Union[str, bool] = False, 
+    searchtext: Optional[str],
+    modifier: Optional[Literal["start", "wordstart", "substring", "exact"]] = "start",
+    sortdesc: Union[str, bool] = False,
     limit: Optional[int] = None,
 ) -> Tuple[int, List[SortableEntry]]:
     """Retrieve entries sorted by sortkey. Optionally filtered by their headword.
@@ -609,7 +609,7 @@ def searchEntries(
         searchtext = ""
         modifier = None # can't search parts of words when not searching at all.
     searchtext = searchtext.lower()
-    
+
     if type(sortdesc) == str:
         sortdesc = sortdesc == "true"
     if configs["titling"].get("sortDesc", False): # if default sort is inverted also invert descending
@@ -690,7 +690,7 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
 
     for r in doSql(dictDB, f"""select id, xml from entries where needs_update = 1 and id in ({",".join("?" * len(ids))})""", ids).fetchall():
         createEntry(dictDB, configs, r["xml"], "system@lexonomy", id = r["id"])
-    dictDB.commit() # createEntry does not perform commit every call for performance sake.
+    dictDB.commit()
 
     rows = doSql(dictDB, f"""
         WITH children_by_parent AS (
@@ -1439,6 +1439,7 @@ def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], emai
 
     # Report if headword exists.
     c = dictDB.execute("select id from entries where title = ? and id <> ?", (titleText, id))
+    dictDB.commit()
     r = c.fetchone()
     feedback = {"type": "saveFeedbackHeadwordExists", "info": r["id"]} if r else None
 
