@@ -520,7 +520,12 @@ export default {
     },
     createDeepCopy(content) {
       let tmpRoot = this.createElementTemplate(this.elementName)[0]
-      tmpRoot.elements = content.elements
+      if (content.elements) {
+        tmpRoot.elements = content.elements
+      }
+      if (content.attributes) {
+        tmpRoot.attributes = content.attributes
+      }
       let xml = js2xml({elements: [tmpRoot]}, this.state.xml2jsConfig)
       const newObject = xml2js(xml, this.state.xml2jsConfig)
       return (newObject.elements) ? newObject.elements[0] : {}
