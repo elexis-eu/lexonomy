@@ -580,13 +580,24 @@ def sortEntries(configs: Configs, sortables: List[SortableEntry], reverse: bool 
     sortables.sort(key=lambda x: collator.getSortKey(x["sortkey"]), reverse=reverse)
     return sortables
 
-def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext: Optional[str], modifier: Optional[Literal["start", "wordstart", "substring", "exact"]] = "start", sortdesc: Union[str, bool] = False, limit: Optional[int] = None) -> Tuple[int, List[SortableEntry]]:
+def searchEntries(
+    dictDB: Connection, 
+    configs: Configs, 
+    
+    doctype: str, 
+    flag: Optional[str],
+    searchtext: Optional[str], 
+    modifier: Optional[Literal["start", "wordstart", "substring", "exact"]] = "start", 
+    sortdesc: Union[str, bool] = False, 
+    limit: Optional[int] = None,
+) -> Tuple[int, List[SortableEntry]]:
     """Retrieve entries sorted by sortkey. Optionally filtered by their headword.
 
     Args:
         dictDB (Connection):
         configs (Configs):
         doctype (str): doctype of the entries to retrieve. Usually the root element, but might be different when requesting subentries.
+        flag (Optional[str]): find only entries with the given flag
         searchtext (Optional[str]):
         modifier (Optional[Literal["start", "wordstart", "substring", "exact"]], optional): Defaults to "start".
         sortdesc (Union[bool, str], optional): Reverse the usual sort order? The usual sort order is determined by ConfigTitling["sortDesc"]
@@ -598,7 +609,7 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
         searchtext = ""
         modifier = None # can't search parts of words when not searching at all.
     searchtext = searchtext.lower()
-
+    
     if type(sortdesc) == str:
         sortdesc = sortdesc == "true"
     if configs["titling"].get("sortDesc", False): # if default sort is inverted also invert descending
@@ -607,32 +618,40 @@ def searchEntries(dictDB: Connection, configs: Configs, doctype: str, searchtext
     # Special case: when searching wildcard (i.e. retrieve all entries) and the dictionary is large (>2000) entries.
     # Don't read all entries before sorting and limiting, but use a shorter path.
     if not searchtext or not modifier:
-        total = dictDB.execute("select count(*) as total from entries where doctype = ?", (doctype, )).fetchone()["total"]
+        params = (doctype, flag) if flag else (doctype, )
+        total = dictDB.execute(f"select count(*) as total from entries where doctype = ? {'and flag = ?' if flag else ''}", params).fetchone()["total"]
         if total > 2000:
             results: list[SortableEntry] = []
-            for rf in dictDB.execute("select id, sortkey from entries where doctype = ? order by sortkey limit 200", (doctype, )).fetchall():
+            for rf in dictDB.execute(f"select id, sortkey from entries where doctype = ? {'and flag = ?' if flag else ''} order by sortkey limit 200", params).fetchall():
                 results.append({"id": rf["id"], "sortkey": rf["sortkey"]})
             sortEntries(configs, results, reverse=sortdesc)
             return total, results
 
-    if modifier == "start":
-        sql1 = "select distinct e.id, e.sortkey from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by s.level"
-        params1 = (doctype, searchtext+"%")
-    elif modifier == "wordstart":
-        sql1 = "select distinct e.id, e.sortkey from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and (s.txt like ? or s.txt like ?) group by e.id order by s.level"
-        params1 = (doctype, searchtext + "%", "% " + searchtext + "%")
-    elif modifier == "substring":
-        sql1 = "select distinct e.id, e.sortkey from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt like ? group by e.id order by s.level"
-        params1 = (doctype, "%" + searchtext + "%")
-    elif modifier == "exact":
-        sql1 = "select distinct e.id, e.sortkey from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? and s.txt=? group by e.id order by s.level"
-        params1 = (doctype, searchtext)
-    else: # default: searchtext not used
-        sql1 = "select distinct e.id, e.sortkey from searchables as s inner join entries as e on e.id=s.entry_id where doctype=? group by e.id order by s.level"
-        params1 = (doctype, )
+    where = " where doctype = ? "
+    params = (doctype, )
 
+    if flag:
+        where = where + " and flag = ? "
+        params = params + (flag, )
+
+    if modifier == "start":
+        where = where + " and s.txt like ? "
+        params = params + (searchtext+"%", )
+    elif modifier == "wordstart":
+        where = where + " and (s.txt like ? or s.txt like ?) "
+        params = params + (searchtext + "%", "% " + searchtext + "%")
+    elif modifier == "substring":
+        where = where + " and s.txt like ? "
+        params = params + ("%" + searchtext + "%",)
+    elif modifier == "exact":
+        where = where + " and s.txt=? "
+        params = params + (searchtext, )
+    else: # default: searchtext not used
+        pass
+
+    sql = f"select distinct e.id, e.sortkey from searchables as s inner join entries as e on e.id=s.entry_id {where} group by e.id order by s.level"
     results: List[SortableEntry] = []
-    for r in dictDB.execute(sql1, params1).fetchall():
+    for r in dictDB.execute(sql, params).fetchall():
         results.append({"id": r["id"], "sortkey": r["sortkey"]})
 
     results = sortEntries(configs, results, reverse=sortdesc)
