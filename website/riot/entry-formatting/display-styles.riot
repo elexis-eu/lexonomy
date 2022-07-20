@@ -232,6 +232,11 @@
                let value = existingData[key] || null
                if (elementConfigData[key] != null) {
                   value = elementConfigData[key]
+               } else if (key === "layout"){
+                  if (!value) {
+                     value = "inline"
+                  }
+                  this.props.saveData(this.elementName, this.attributeName, "layout", value)
                }
                this.state.elementData[key] = value
             }
