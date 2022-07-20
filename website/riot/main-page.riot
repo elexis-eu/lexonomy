@@ -17,15 +17,20 @@
          </div>
       </div>
       <div class="row">
-      <div class="col s12 m5 offset-m4 login-box">
-         <login if={props.mainSubPage == 'login'}></login>
-         <register if={props.mainSubPage == 'register'}></register>
-         <register-password if={props.mainSubPage == 'registerPassword'}
+         <div class="col s12 m5 offset-m4 login-box">
+            <login if={props.mainSubPage == 'login'}></login>
+            <register if={props.mainSubPage == 'register'}></register>
+            <register-password if={props.mainSubPage == 'registerPassword'}
                token={props.token}></register-password>
-         <forgot if={props.mainSubPage == 'forgot'}></forgot>
-         <forgot-password if={props.mainSubPage == 'forgotPassword'}
+            <forgot if={props.mainSubPage == 'forgot'}></forgot>
+            <forgot-password if={props.mainSubPage == 'forgotPassword'}
                token={props.token}></forgot-password>
+         </div>
       </div>
+      <div class="row" if={props.mainSubPage == 'login'}>
+         <div class="col s12 m5 offset-m4" style="margin-top: -10px;">
+            <a class="login-public-link" href="#/opendictionaries">Public dictionaries</a>
+         </div>
       </div>
    </div>
 
@@ -51,6 +56,12 @@
          display: inline-block;
          padding-right: 5px;
          padding-left: 5px;
+      }
+      .login-public-link {
+         color: #ffffff;
+      }
+      .login-public-link:hover {
+         color: #c62132;
       }
    </style>
 </main-page>
