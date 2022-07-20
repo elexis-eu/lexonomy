@@ -21,6 +21,7 @@
       <!--     for ActionButton   :class="{'hide': isAttribute}"-->
       <component :is="valueComponent"
                  class="value-display"
+                 :class="{'value-display--attribute': isAttribute}"
                  :elementEditorConfig="elementData"
                  :elementName="elementName"
                  :elementData="elementData"
@@ -139,6 +140,9 @@ export default {
 
     .value-display {
       flex: 1;
+      &.value-display--attribute {
+        margin-left: 14px;
+      }
     }
   }
 
