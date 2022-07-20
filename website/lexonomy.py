@@ -188,7 +188,6 @@ def entryread(dictID: str, user: User, dictDB: Connection, configs: Configs):
 def entryupdate(dictID: str, user: User, dictDB: Connection, configs: Configs):
     entryID = int(request.forms.id ) if request.forms.id else None
     id, xml, success, feedback = ops.createEntry(dictDB, configs, xml = request.forms.content, email=user["email"], id=entryID)
-    dictDB.commit()
     result = {"success": success, "id": id, "content": "", "contentHtml": "", "feedback": feedback}
     if success:
         entry = ops.readEntries(dictDB, configs, id, html = True, titlePlain = True)[0]
@@ -214,7 +213,6 @@ def entrycreate(dictID: str, user: User, dictDB: Connection, configs: Configs):
 
     id, xml, success, feedback = ops.createEntry(dictDB, configs, xml , email=user["email"])
 
-    dictDB.commit()
     result = {"success": success, "id": id, "content": "", "contentHtml": "", "feedback": feedback}
     if success:
         entry = ops.readEntries(dictDB, configs, id, html = True, titlePlain = True)[0]
@@ -831,7 +829,6 @@ def resavejson(dictID: str, user: User, dictDB: Connection, configs: Configs):
     for entry in dictDB.execute("select id, xml from entries where needs_update=1 limit 127").fetchall():
         ops.createEntry(dictDB, configs, entry["xml"], "system@lexonomy", entry["id"])
 
-    dictDB.commit()
     todo = ops.getDictStats(dictDB)["needUpdate"]
     return {
         "todo": todo,

@@ -690,7 +690,6 @@ def readEntries(dictDB: Connection, configs: Configs, ids: Union[int, List[int],
 
     for r in doSql(dictDB, f"""select id, xml from entries where needs_update = 1 and id in ({",".join("?" * len(ids))})""", ids).fetchall():
         createEntry(dictDB, configs, r["xml"], "system@lexonomy", id = r["id"])
-    dictDB.commit()
 
     rows = doSql(dictDB, f"""
         WITH children_by_parent AS (
@@ -1405,7 +1404,6 @@ def createEntry(dictDB: Connection, configs: Configs, xml: Union[str, Tag], emai
     """
     Create or re-index an entry, ensuring the xml is conformant and the database is up to date.
     Returns in order: id, parsed xml, success (true/false), feedback as JSON object {"type": string, "info": string|int} when duplicate entry or otherwise error.
-    NOTE: for efficiency during import, COMMIT is not called and is left to the caller.
 
     When ID is passed, it is used instead of whatever ID is contained in the xml. If no id is passed, extract the id from the xml, or, failing that, auto-assign an ID.
     """
