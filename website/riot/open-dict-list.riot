@@ -1,5 +1,13 @@
 <open-dict-list>
-   <h1>Open dictionaries</h1>
+	<nav if={ authData.authorized} class="nav-breadcrumbs">
+      <div class="nav-wrapper">
+         <a href="#/"
+               class="breadcrumb">Dictionaries</a>
+         <a href="#/opendictionaries"
+               class="breadcrumb">Public dictionaries</a>
+      </div>
+	</nav>
+   <h1>Public dictionaries</h1>
    <loading-overlay if={dictData.isPublicDictionaryListLoading}></loading-overlay>
    <div if={!dictData.isPublicDictionaryListLoading}>
       <div>
@@ -36,7 +44,6 @@
             <th>Title</th>
             <th>Language</th>
             <th>Size</th>
-            <th>Author</th>
             <th>Licence</th>
             <th></th>
          </thead>
@@ -58,11 +65,6 @@
                <td>
                   <span id="l_{idx}">
                      {row.size}
-                  </span>
-               </td>
-               <td>
-                  <span id="a_{idx}">
-                     {row.author}
                   </span>
                </td>
                <td>
@@ -118,7 +120,6 @@
             this.dictData.publicDictionaryList.forEach(c => {
                delete c.h_title
                delete c.h_lang
-               delete c.h_author
                delete c.h_licence
             })
             this.state.visibleDictionaries = this.dictData.publicDictionaryList
@@ -128,12 +129,11 @@
             if(this.state.query !== ""){
                let sortResult = FuzzySort.go(this.state.query, this.state.visibleDictionaries, {
                   key: "id",
-                  keys: ["title", "lang", "author", "licence"]
+                  keys: ["title", "lang", "licence"]
                })
                this.state.visibleDictionaries = sortResult.map(fs => {
                   fs.obj.h_title = FuzzySort.highlight(fs[0], '<b class="red-text">', "</b>")
                   fs.obj.h_lang = FuzzySort.highlight(fs[1], '<b class="red-text">', "</b>")
-                  fs.obj.h_author = FuzzySort.highlight(fs[2], '<b class="red-text">', "</b>")
                   fs.obj.h_licence = FuzzySort.highlight(fs[3], '<b class="red-text">', "</b>")
                   fs.obj.score = fs.score
                   return fs.obj
@@ -154,8 +154,6 @@
                   el.innerHTML = c.h_title ? c.h_title : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
                   el = this.$(`#l_${idx}`)
                   el.innerHTML = c.h_lang ? c.h_lang : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
-                  el = this.$(`#a_${idx}`)
-                  el.innerHTML = c.h_author ? c.h_author : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
                   el = this.$(`#i_${idx}`)
                   el.innerHTML = c.h_licence ? c.h_licence : el.innerHTML.replace(/<b class="red-text">|<\/b>/g, '')
                }
