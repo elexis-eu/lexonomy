@@ -21,6 +21,10 @@ from collections import defaultdict
 from icu import Locale, Collator
 import logging
 import sys
+import calendar
+from cachetools import cached, TTLCache
+import pandas as pd
+
 
 
 siteconfig = json.load(open(os.environ.get("LEXONOMY_SITECONFIG",
@@ -43,6 +47,9 @@ defaultDictConfig = {"editing": {"xonomyMode": "nerd", "xonomyTextEditor": "askS
                      "flagging": {"flag_element": "", "flags": []}}
 
 prohibitedDictIDs = ["login", "logout", "make", "signup", "forgotpwd", "changepwd", "users", "dicts", "oneclick", "recoverpwd", "createaccount", "consent", "userprofile", "dictionaries", "about", "list", "lemma", "json", "ontolex", "tei"];
+
+# cache = TTLCache(maxsize=3, ttl=datetime.timedelta(hours=12), timer=datetime.now)
+# cache = TTLCache(maxsize=10, ttl=86400)
 
 # db management
 def getDB(dictID):
@@ -680,7 +687,8 @@ def attachDict(dictDB, dictID):
     conn.execute(f"delete from dicts where id={ques}", (dictID,))
     conn.execute(f"delete from user_dict where dict_id={ques}", (dictID,))
     title = configs["ident"]["title"]
-    conn.execute(f"insert into dicts(id, title) values ({ques}, {ques})", (dictID, title))
+    blurb = configs["ident"]["blurb"]
+    conn.execute(f"insert into dicts(id, title, blurb) values ({ques}, {ques}, {ques})", (dictID, title, blurb))
     for email in configs["users"]:
         conn.execute(f"insert into user_dict(dict_id, user_email) values ({ques}, {ques})", (dictID, email.lower()))
     close_db(conn)
@@ -1108,10 +1116,10 @@ def readNabesByText(dictDB, dictID, configs, text):
     nabes_after = []
     nabes = []
     if not dictID:
-        c = dictDB.execute(f"select id, title, sortkey from entries")
+        c = dictDB.execute(f"select entries.dict_id,  dicts.title as dict_title, dicts.blurb, entries.id, entries.title, entries.sortkey from entries left join dicts on entries.dict_id= dicts.id")
         c = c if c else dictDB
         for r in c.fetchall() if c else []:
-            nabes.append({"id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
+            nabes.append({"dict_id":  str(r["dict_id"]), "dictTitle":  r["dict_title"], "dictBlurb":  r["blurb"], "id": str(r["id"]), "title": r["title"], "sortkey": r["sortkey"]})
         # sort by selected locale
         collator = Collator.createInstance(Locale(configs))
 
@@ -1249,10 +1257,54 @@ def importfile(dictID, filename, email):
     else:
         p = subprocess.Popen(["adminscripts/importMysql.py", dictID, filename, email], stdout=pidfile_f, stderr=errfile_f, start_new_session=True, close_fds=True)
     return {"progressMessage": "Import started. Please wait...", "finished": False, "errors": False}
+
+# 3/7/2022 
+# Brief: save search history logs
+def searchHistoryLogs(word):
+    logsDB = getDB("logs")
+    unixtime=calendar.timegm(datetime.datetime.utcnow().utctimetuple())
+    logsDB.execute(f"insert into SearchHistory(title, {SQL_SEP}when{SQL_SEP}, unixtime) values({ques},{ques},{ques})", (word, datetime.datetime.utcnow(),unixtime))
+
+
+# 3/7/2022 
+# Brief: returns the most frequant word in the search history logs in day
+@cached(cache = TTLCache(maxsize = 30, ttl = 160))    #86400
+def mostSearched():
+    logsDB = getDB("logs")
+    c=logsDB.execute(f"SELECT title, COUNT(title) AS `value_occurrence` FROM SearchHistory where DAY(FROM_UNIXTIME(unixtime))= {ques}  GROUP BY title ORDER BY `value_occurrence` DESC LIMIT 1;", (datetime.datetime.utcnow().day,)) 
+    #just a thought, when I use datetime.datetime.utcnow().day it gonna return the day number ex, 21 ..  Thus, the selection query gonna return all 21's date in each month
+    # if we want to calculate the statsict of start/middle/end of month this is perfect. However, if we want to return today frequancy the  datetime.datetime.utcnow should be used :)
+    c = c if c else logsDB
+    for r in c.fetchall() if c else []:
+        wordOfDay=r["title"]
+        freqD=r["value_occurrence"]
+    return wordOfDay, freqD
+
+
+# 3/7/2022 
+# Brief: returns the most frequant word in the search history logs in month, year
+@cached(cache = TTLCache(maxsize = 30, ttl = 86400))    #86400
+def wordsOfYM():
+    logsDB = getDB("logs")
+    c1=logsDB.execute(f"SELECT title, COUNT(title) AS `value_occurrence` FROM SearchHistory where MONTH(FROM_UNIXTIME(unixtime))= {ques}  GROUP BY title ORDER BY `value_occurrence` DESC LIMIT 1;", (datetime.datetime.utcnow().month,))
+    c1 = c1 if c1 else logsDB
+    for r1 in c1.fetchall() if c1 else []:
+        wordOfMonth=r1["title"]
+        freqM=r1["value_occurrence"]
+
+    c2=logsDB.execute(f"SELECT title, COUNT(title) AS `value_occurrence` FROM SearchHistory where YEAR(FROM_UNIXTIME(unixtime))= {ques}  GROUP BY title ORDER BY `value_occurrence` DESC LIMIT 1;", (datetime.datetime.utcnow().year,))
+    c2 = c2 if c2 else logsDB
+    for r2 in c2.fetchall() if c2 else []:
+        wordOfYear=r2["title"]
+        freqY=r2["value_occurrence"]
+    return wordOfMonth,freqM, wordOfYear, freqY
+
+    # return {"wordOfMonth": wordOfMonth, "wordOfMonthFreq": freqM, "wordOfYear": wordOfYear, "wordOfYearFreq": freqY}
+
+
 # Added by Waad Alshammari
 # 22/6/2022 
 # Brief: insert all puplic dict inot the golable DB "lexo", in table searchable and entries
-
 
 def insertToGlobalSearchables(dictID):
 
@@ -1269,6 +1321,122 @@ def insertToGlobalSearchables(dictID):
     elif DB == 'sqlite': 
         return {"success": False, "state": "elif DB == 'sqlite' is none exists"}
 
+
+# Added by Waad Alshammari
+# 20/7/2022 
+# Brief: return daily word + create daily words for a future year if add=True
+
+def dailyWords(add=False):
+    MainDB= getMainDB()
+    if DB == 'mysql':
+        if add:
+            date= pd.date_range(datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0), periods=365)
+            date=date.strftime("%Y-%m-%d %H:%M:%S").tolist()
+            for d in date: 
+                sql=f"INSERT INTO daily_words (entry_id, txt, dict_id,{SQL_SEP}when{SQL_SEP}) SELECT entry_id, txt, dict_id, {ques} FROM searchables ORDER BY RAND() LIMIT 1"
+                MainDB.execute(sql, (d,))
+    
+    sql=f"SELECT entry_id, txt, dict_id, {SQL_SEP}when{SQL_SEP} FROM daily_words where {SQL_SEP}when{SQL_SEP}= {ques}"
+    c=MainDB.execute(sql, (datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0),))
+    c = c if c else MainDB
+    for r in c.fetchall() if c else []:
+        word=r["txt"]
+        dict_id=r["dict_id"]
+        id=r["entry_id"]
+    return {"title": word, "dict_id": dict_id, "id": id}
+
+
+
+
+# def translate_text(target, text):
+#     """Translates text into the target language.
+
+#     Target must be an ISO 639-1 language code.
+#     See https://g.co/cloud/translate/v2/translate-reference#supported_languages
+#     """
+#     credential_path= "/opt/service/website/forward-fuze-354909-7c459293bf4d.json"
+#     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credential_path
+    
+#     import six
+#     from google.cloud import translate_v2 as translate
+
+#     translate_client = translate.Client()
+
+#     if isinstance(text, six.binary_type):
+#         text = text.decode("utf-8")
+
+#     # Text can also be a sequence of strings, in which case this method
+#     # will return a sequence of results for each text.
+#     result = translate_client.translate(text, target_language=target)
+
+#     print((u"Text: {}".format(result["input"])),file=sys.stderr)
+#     print((u"Translation: {}".format(result["translatedText"])),file=sys.stderr)
+#     print((u"Detected source language: {}".format(result["detectedSourceLanguage"])),file=sys.stderr)
+#     print("result",result,file=sys.stderr)
+
+
+
+# # # from google.cloud import translate_v2
+# # from google.cloud import translate
+# # def translate_text(text="Hello, world!", project_id="forward-fuze-354909"):
+# #     credential_path= "/opt/service/website/forward-fuze-354909-7c459293bf4d.json"
+# #     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credential_path
+
+# #     client = translate.TranslationServiceClient()
+    
+# #     location = "global"
+# #     parent = f"projects/{project_id}/locations/{location}"
+    
+
+# #     response = client.translate_text(
+# #         request={
+# #             "parent": parent,
+# #             "contents": [text],
+# #             "mime_type": "text/plain",
+# #             "source_language_code": "ar",
+# #             "target_language_code": "en",
+# #         }
+
+# #     )
+
+# #     print("response.translations", response.translations,file=sys.stderr)
+
+
+# #     for translation in response.translations:
+# #         print("Translated text: {}".format(translation.translated_text),file=sys.stderr)
+
+# #     # print("Translated text: {}".format(response.extra_data['possible-mistakes']),file=sys.stderr)
+        
+
+
+
+# # # [START translate_text_with_model]
+# # def translate_text_with_model(target, text, model="nmt"):
+# #     """Translates text into the target language.
+
+# #     Make sure your project is allowlisted.
+
+# #     Target must be an ISO 639-1 language code.
+# #     See https://g.co/cloud/translate/v2/translate-reference#supported_languages
+# #     """
+# #     import six
+# #     from google.cloud import translate_v2 as translate
+
+# #     translate_client = translate.Client()
+
+# #     if isinstance(text, six.binary_type):
+# #         text = text.decode("utf-8")
+
+# #     # Text can also be a sequence of strings, in which case this method
+# #     # will return a sequence of results for each text.
+# #     result = translate_client.translate(text, target_language=target, model=model)
+
+# #     print(u"Text: {}".format(result["input"]))
+# #     print(u"Translation: {}".format(result["translatedText"]))
+# #     print(u"Detected source language: {}".format(result["detectedSourceLanguage"]))
+
+
+# # # [END translate_text_with_model]
 
 def checkImportStatus(pidfile, errfile):
     content = ''

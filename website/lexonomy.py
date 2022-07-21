@@ -16,6 +16,7 @@ import bottle
 from bottle import (hook, route, get, post, run, template, error, request,
                     response, static_file, abort, redirect, install)
 import pyarabic.araby as araby
+import pandas as pd
 
 i18nDump = json.dumps(i18n, ensure_ascii=False);
 # configuration
@@ -195,6 +196,8 @@ def entrydelete(dictID, user, dictDB, configs):
 @post(siteconfig["rootPath"]+"<dictID>/entryread.json")
 @authDict([])
 def entryread(dictID, user, dictDB, configs):
+    # if request.forms.dictID:
+    #     dictDB=getDB(request.forms.dictID)
     adjustedEntryID, xml, _title = ops.readEntry(dictDB, configs, request.forms.id)
     adjustedEntryID = int(adjustedEntryID)
     xml = xml.replace(">\n<", "><")
@@ -904,8 +907,9 @@ def dictsearch(dictID):
     user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, dictDB)
     if not configs["publico"]["public"]:
         return {"ok": False}
-    sentence = request.query.q
-    lemma=disam(sentence)
+    word = request.query.q
+    ops.searchHistoryLogs(word)
+    lemma=disam(word)
     text=araby.strip_tashkeel(lemma.json()['text'][0])
     entries = ops.listEntriesPublic(dictDB, dictID, configs, text)
     if len(entries) == 1 and entries[0]["exactMatch"]:
@@ -923,8 +927,10 @@ def dictsearch(dictID):
 def dictsearch(dictID=""):
     dictDB = ops.getMainDB()
     configs="ar"
-    sentence = request.query.q
-    lemma=disam(sentence)
+    word = request.query.q
+    ops.dailyWords(False)
+    ops.searchHistoryLogs(word)
+    lemma=disam(word)
     text=araby.strip_tashkeel(lemma.json()['text'][0])
     entries = ops.listEntriesPublic(dictDB, dictID, configs, text)
     if len(entries) == 1 and entries[0]["exactMatch"]:
@@ -933,7 +939,26 @@ def dictsearch(dictID=""):
     else:
         nabes = ops.readNabesByText(dictDB, dictID, configs, text)
         return {"dictID": "كل المعاجم", "q": text, "entries": entries, "nabes": nabes}
-      
+
+
+# Brief: return most searched word in day, month, year
+@enable_cors
+@get(siteconfig["rootPath"]+"mostSearched.json")
+def mostSearched():
+    wordOfMonth,freqM, wordOfYear, freqY= ops.wordsOfYM()
+    wordOfDay, freqD= ops.mostSearched()
+    return {"wordOfDay": wordOfDay, "wordOfDayFreq": freqD, "wordOfMonth": wordOfMonth, "wordOfMonthFreq": freqM, "wordOfYear": wordOfYear, "wordOfYearFreq": freqY}
+
+
+# Added by Waad Alshammari
+# 21/7/2022 
+# Brief: return daily word
+@enable_cors
+@get(siteconfig["rootPath"]+"dailyWords.json")
+def dailyWords():
+    return ops.dailyWords()
+
+
 def disam(sentence):
 
     url = 'http://camel:5005/lemma'

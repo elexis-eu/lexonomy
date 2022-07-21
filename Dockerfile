@@ -14,4 +14,7 @@ RUN apk add --virtual .build-deps gcc g++ libxslt-dev libffi-dev openssl-dev icu
     apk del .build-deps && \
     [ -z "$VER" ] || echo "$VER" > version.txt 
 
+# RUN export GOOGLE_APPLICATION_CREDENTIALS="/Users/WaadTSS/Downloads/forward-fuze-354909-7c459293bf4d.json"
+
+
 ENTRYPOINT ["python3", "lexonomy.py", "localhost:8000"]

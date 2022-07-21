@@ -9,3 +9,6 @@ requests
 PyJWT==1.7.1
 mysql-connector-python
 pyarabic
+google-cloud-translate
+cachetools
+pandas
