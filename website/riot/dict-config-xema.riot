@@ -174,7 +174,7 @@
             const roots = new Set(Object.keys(this.state.xema.elements));
             // then remove anything reachable through a child anywhere.
             Object.values(this.state.xema.elements).forEach(/** @param {XemaElement} el */ el => (el.children || []).forEach(c => roots.delete(c.name)));
-            
+
             if (!roots.size) {
                // hmm, there is no root? (it might be its own child i.e. recursive)
                // add from xema if it exists, otherwise add a random element (again - if it exists)
@@ -201,7 +201,14 @@
          },
 
          getConfigData() {
-            var newData = { ...this.state.xema }
+            var provData = { ...this.state.xema }
+            var newData = {elements: {}, root: 'entry'}
+            Object.values(provData.elements).forEach(el=>{
+               newData.elements[el.elementName] = el;
+            });
+            let roots = new Set(Object.keys(newData.elements));
+            Object.values(newData.elements).forEach(/** @param {XemaElement} el */ el => (el.children || []).forEach(c => roots.delete(c.name)));
+            if (roots.size) newData.root = [...roots][0]
             if (this.state.override) {
                if ($('#editor_doc').val()) newData._xonomyDocSpec = $('#editor_doc').val();
                if ($('#editor_xml').val()) newData._newXml = $('#editor_xml').val();
@@ -236,7 +243,7 @@
                      currentElement: undefined,
                      currentAttribute: undefined,
                   })
-               } else 
+               } else
                   this.update();
             }
          },
