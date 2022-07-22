@@ -3199,6 +3199,23 @@ def elexisConvertTei(xml_entry):
     except Exception as e:
         return None
 
+def elexisConvertAll(dictID):
+    """Get all entries in dictionary and convert them to TEI JSON
+    dictID: dictionary ID"""
+    try:
+        dictDB = getDB(dictID)
+    except IOError:
+        return None
+
+    result = []
+    query = "SELECT id, xml FROM entries WHERE doctype='entry'"
+    c = dictDB.execute(query)
+    for r in c.fetchall():
+        json = elexisConvertTei(r['xml'])
+        if json != None:
+            result.append(json)
+    return result
+
 def elexisNormalisePos(pos):
     if pos in ["adjective", "adposition", "adverb", "auxiliary",
             "coordinatingConjunction", "determiner", "interjection",

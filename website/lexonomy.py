@@ -1172,6 +1172,18 @@ def elexgetentry(dictID, entryID):
     else:
         return entry
 
+@get(siteconfig["rootPath"] + "jsonAll/<dictID>")
+def elexgetentry(dictID):
+    apikey = request.headers["X-API-KEY"]
+    user = ops.verifyUserApiKey("", apikey)
+    if not user["valid"]:
+        abort(403, "Forbidden (API key not specified or not valid")
+    data = ops.elexisConvertAll(dictID)
+    if data is None:
+        abort(404, "Dictionary not found (identifier not known)")
+    else:
+        return json.dumps(data)
+
 @error(404)
 def error404(error):
     if request.path.startswith("/about/") or request.path.startswith("/list/") or request.path.startswith("/lemma/") or request.path.startswith("/tei/") or request.path.startswith("/json/"):
