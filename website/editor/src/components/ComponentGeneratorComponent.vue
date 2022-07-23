@@ -543,6 +543,7 @@ export default {
 <style lang="scss" scoped>
 .is-attribute {
   padding: 0 !important;
+  padding-left: 4px !important;
   margin: 0;
 }
 </style>
