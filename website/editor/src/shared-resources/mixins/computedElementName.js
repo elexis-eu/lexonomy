@@ -9,25 +9,10 @@ export default {
   },
   computed: {
     computedElementNameWithColon() {
-      if (this.elementData && this.elementData.hideElementName) {
-        return ""
-      }
-      const structureConfig = this.state.entry.dictConfigs.xema.elements
-      let name = (structureConfig[this.elementName] && structureConfig[this.elementName].elementName) || this.elementName
-      if (this.isAttribute) {
-        try {
-          let optionality = structureConfig[this.parentElementName].attributes[this.elementName].optionality
-
-          if (optionality === "obligatory") {
-            name += "*"
-          }
-        } catch (e) {
-          console.log("", name)
-        }
-      }
-
-      name += ":"
-      return name
+       if (!this.computedElementName) {
+          return ""
+       }
+      return this.computedElementName + ":"
     },
     computedElementName() {
       if (this.elementData && this.elementData.hideElementName) {
