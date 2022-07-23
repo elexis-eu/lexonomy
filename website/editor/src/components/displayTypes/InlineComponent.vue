@@ -18,7 +18,6 @@
         @clone-element="cloneElement"
         @remove-element="deleteElement"
       />
-      <!--     for ActionButton   :class="{'hide': isAttribute}"-->
       <component :is="valueComponent"
                  class="value-display"
                  :class="{'value-display--attribute': isAttribute}"
@@ -34,7 +33,7 @@
                  @input="handleValueUpdate"
       />
     </section>
-    <section v-if="elementData.shown && readOnly">
+    <section v-if="!isElementHidden && readOnly">
       <component :is="valueComponent"
                  :elementEditorConfig="elementData"
                  :elementName="elementName"
@@ -111,9 +110,25 @@ export default {
       type: Boolean,
       default: false
     },
+    hideEmptyElements: {
+      type: Boolean,
+      default: false
+    },
     maxDisplayedChildren: {
       type: Number,
       default: -1
+    }
+  },
+  computed: {
+    isElementHidden() {
+      if (!this.elementData.shown) {
+        return true
+      }
+      if (this.hideEmptyElements) {
+        const xema = this.state.entry.dictConfigs.xema.elements[this.elementName]
+        return xema ? ["chd", "emp"].includes(xema && xema.filling) : false
+      }
+      return false
     }
   }
 }

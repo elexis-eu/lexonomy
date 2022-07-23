@@ -38,6 +38,7 @@
             :elementName="elementName"
             :content="viewOnlyContent"
             :forceReadOnlyElements="true"
+            :hideEmptyElements="true"
             :maxDisplayedChildren="5"
           />
         </section>

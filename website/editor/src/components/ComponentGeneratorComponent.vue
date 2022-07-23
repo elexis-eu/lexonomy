@@ -48,6 +48,10 @@ export default {
     maxDisplayedChildren: {
       type: Number,
       default: -1
+    },
+    hideEmptyElements: {
+      type: Boolean,
+      default: false
     }
   },
   mixins: [
@@ -231,6 +235,7 @@ export default {
                 numberOfElements: content.length,
                 isAttribute: child.isAttribute,
                 forceReadOnlyElements: this.forceReadOnlyElements,
+                hideEmptyElements: this.hideEmptyElements,
                 key: Math.random()
               }
             })
@@ -254,6 +259,7 @@ export default {
               numberOfElements: content.length,
               isAttribute: child.isAttribute,
               forceReadOnlyElements: this.forceReadOnlyElements,
+              hideEmptyElements: this.hideEmptyElements,
               key: Math.random()
             }
           })
