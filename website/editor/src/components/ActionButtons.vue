@@ -30,7 +30,7 @@
               @click.prevent.stop="triggerEvent('link-element')">
         Add new {{ computedElementName }} subentry
       </button>
-      <button v-if="canAddElement && elementEditorConfig.enableCopying"
+      <button v-if="elementEditorConfig.enableParentChange"
               class="tertiary"
               @click.prevent.stop="triggerEvent('select-new-parent')">
         Change parent of {{ computedElementName }}
