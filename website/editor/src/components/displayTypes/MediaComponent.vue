@@ -11,7 +11,7 @@
 
     <ImageSearcher v-if="elementData.shown && !readOnly" ref="imageSearcher" @selected="updateValue"/>
     <section v-if="elementData.shown && readOnly" class="read-only">
-      <p :class="computedClass">{{ computedElementNameWithColon }} </p>
+      <p v-if="showPreview" :class="computedClass">{{ computedElementNameWithColon }} </p>
       <span :class="computedClass">{{ value }}</span>
     </section>
   </div>

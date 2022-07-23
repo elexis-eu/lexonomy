@@ -1,7 +1,7 @@
 <template>
   <div>
     <section v-if="elementData.shown">
-      <p :class="computedClass">{{ showPreview ? computedElementNameWithColon : "" }} </p>
+      <p v-if="showPreview" :class="computedClass">{{ showPreview ? computedElementNameWithColon : "" }} </p>
       <span :class="computedClass"> {{ content.text }}</span>
     </section>
   </div>

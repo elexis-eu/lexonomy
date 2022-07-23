@@ -33,8 +33,19 @@
                  @input="handleValueUpdate"
       />
     </section>
-    <section v-if="!isElementHidden && readOnly">
+    <section v-if="!isElementHidden && readOnly" class="content">
+        <ActionButtons
+                v-if="!showElementsPreview && !isAttribute"
+                class="actions-button"
+                :elementName="elementName"
+                :elementEditorConfig="elementData"
+                :editorChildNumber="editorChildNumber"
+                :parentElementName="parentElementName"
+                :numberOfElements="numberOfElements"
+                :disable="true"
+        />
       <component :is="valueComponent"
+                 :class="{'read-only-element': !showElementsPreview}"
                  :elementEditorConfig="elementData"
                  :elementName="elementName"
                  :elementData="elementData"
@@ -158,6 +169,11 @@ export default {
       &.value-display--attribute {
         margin-left: 14px;
       }
+    }
+
+    .read-only-element {
+      display: flex;
+      align-items: center;
     }
   }
 

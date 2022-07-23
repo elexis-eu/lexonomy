@@ -36,8 +36,7 @@
       </div>
     </section>
     <section class="read-only" v-if="elementData.shown && readOnly && readOnlyValues.length > 0">
-
-      <p :class="computedClass">{{ computedElementNameWithColon }} </p>
+      <p v-if="showPreview" :class="computedClass">{{ computedElementNameWithColon }} </p>
       <span :class="computedClass">
         <span v-for="(element, i) in readOnlyValues"
               :key="i + element.type"

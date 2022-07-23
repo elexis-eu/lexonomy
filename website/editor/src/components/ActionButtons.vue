@@ -1,6 +1,6 @@
 <template>
   <div v-if="!isRootElement" ref="actionButton" class="dropdown">
-    <button class="button--sm secondary" @click.prevent.stop.stop="toggleDropdown" :disabled="numberOfActions === 0">
+    <button class="button--sm secondary" @click.prevent.stop.stop="toggleDropdown" :disabled="disable || numberOfActions === 0">
       {{ buttonText }}
     </button>
     <div v-show="show" class="vue-dropdown-content">
@@ -62,7 +62,11 @@ export default {
     parentElementName: String,
     numberOfElements: Number,
     editorChildNumber: Number,
-    subentryElement: Boolean
+    subentryElement: Boolean,
+    disable: {
+      type: Boolean,
+      default: false
+    }
   },
   mixins: [
     computedElementName,

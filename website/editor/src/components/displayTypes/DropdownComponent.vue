@@ -20,7 +20,7 @@
       </select>
     </section>
     <section v-if="elementData.shown && readOnly" class="read-only">
-      <p :class="computedClass">{{ computedElementNameWithColon }} </p>
+      <p v-if="showPreview" :class="computedClass">{{ computedElementNameWithColon }} </p>
       <span :class="computedClass">{{ valueCaption }}</span>
     </section>
   </div>
