@@ -20,7 +20,7 @@
 <script>
 import computedElementName from "@/shared-resources/mixins/computedElementName"
 import ImageSearcher from "@/components/ImageSearcher"
-import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
+import showPreview from "@/shared-resources/mixins/showPreview"
 import iconUrl from "@/shared-resources/mixins/iconUrl"
 
 export default {
@@ -34,7 +34,7 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName, forceReadOnly, iconUrl],
+  mixins: [computedElementName, showPreview, iconUrl],
   computed: {
     isMultimediaAPI() {
       return true

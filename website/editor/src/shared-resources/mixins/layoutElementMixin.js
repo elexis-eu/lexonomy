@@ -10,39 +10,19 @@ export default {
          let output = {}
          for (const [style, value] of Object.entries(this.elementData)) {
             switch (style) {
-               //     case "background":
-               //       output[style] = value
-               //       break
-               //     case "colour":
-               //       output.color = value
-               //       break
                case "border":
                   output.border = `1px ${value} #B3D6FF`
                   break
-               //     case "slant":
-               //       output.fontStyle = value
-               //       break
-               //     case "weight":
-               //       output.fontWeight = value
-               //       break
-               //     case "separation":
-               //       if (value === "space") {
-               //         output.marginBottom = "24px"
-               //       }
-               //       break
-               //   }
             }
-            // if (!this.elementData.color) {
-            //   output.color = "#767676"
          }
-         if (this.forceReadOnlyElements) {
+         if (this.showElementsPreview) {
             return
          }
          return output
 
       },
       readOnly() {
-         return this.elementData.readOnly || this.forceReadOnlyElements
+         return this.elementData.readOnly || this.showElementsPreview
       },
       componentData() {
          if (this.valueComponent === "TextInputWithMarkupComponent") {
@@ -72,7 +52,7 @@ export default {
       }
    },
    created() {
-      if (this.forceReadOnlyElements) {
+      if (this.showElementsPreview) {
          return
       }
       if (this.children && this.children.length > 0) {

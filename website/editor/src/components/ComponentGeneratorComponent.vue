@@ -41,7 +41,7 @@ export default {
       type: [Object, Array],
       required: true
     },
-    forceReadOnlyElements: {
+    showElementsPreview: {
       type: Boolean,
       default: false
     },
@@ -84,7 +84,7 @@ export default {
   },
   methods: {
     useExampleEngine() {
-      return !this.forceReadOnlyElements
+      return !this.showElementsPreview
     },
     getEncompassingStyles(elementName) {
       let gutter = this.state.entry.dictConfigs.xemplate[elementName].gutter
@@ -234,7 +234,7 @@ export default {
                 parentElementName: this.elementName,
                 numberOfElements: content.length,
                 isAttribute: child.isAttribute,
-                forceReadOnlyElements: this.forceReadOnlyElements,
+                showElementsPreview: this.showElementsPreview,
                 hideEmptyElements: this.hideEmptyElements,
                 key: Math.random()
               }
@@ -258,7 +258,7 @@ export default {
               parentElementName: this.elementName,
               numberOfElements: content.length,
               isAttribute: child.isAttribute,
-              forceReadOnlyElements: this.forceReadOnlyElements,
+              showElementsPreview: this.showElementsPreview,
               hideEmptyElements: this.hideEmptyElements,
               key: Math.random()
             }
@@ -417,7 +417,7 @@ export default {
     },
 
     getComponentFromElementName(elementName, parentName, isAttribute) {
-      if (this.forceReadOnlyElements) {
+      if (this.showElementsPreview) {
         return this.displayTypeToComponentMap["inline"]
       }
       if (Object.keys(this.state.entry.dictConfigs.subbing).includes(elementName)) {

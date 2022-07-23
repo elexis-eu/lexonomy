@@ -1,5 +1,5 @@
 <template>
-  <div class="inline-component" :class="{'read-only': forceReadOnlyElements, 'element-hidden': !elementData.shown}"
+  <div class="inline-component" :class="{'read-only': showElementsPreview, 'element-hidden': !elementData.shown}"
        :style="configStyles">
     <section v-if="elementData.shown && !readOnly" class="content">
       <ActionButtons
@@ -28,7 +28,7 @@
                  :children="children"
                  :isAttribute="isAttribute"
                  :parentElementName="parentElementName"
-                 :forceReadOnly="forceReadOnlyElements"
+                 :showPreview="showElementsPreview"
                  @hide-children="hideChildren"
                  @input="handleValueUpdate"
       />
@@ -42,7 +42,7 @@
                  :children="children"
                  :isAttribute="isAttribute"
                  :parentElementName="parentElementName"
-                 :forceReadOnly="forceReadOnlyElements"
+                 :showPreview="showElementsPreview"
                  @hide-children="hideChildren"
       />
     </section>
@@ -51,7 +51,7 @@
       :children="children"
       :elementName="elementName"
       :content="calculatedContent"
-      :forceReadOnlyElements="forceReadOnlyElements"
+      :showElementsPreview="showElementsPreview"
       :maxDisplayedChildren="maxDisplayedChildren"
       @input="handleChildUpdate"
     />
@@ -106,7 +106,7 @@ export default {
     childrenContent: Object,
     editorChildNumber: Number,
     isAttribute: Boolean,
-    forceReadOnlyElements: {
+    showElementsPreview: {
       type: Boolean,
       default: false
     },

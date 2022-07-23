@@ -9,7 +9,7 @@
         :is="element.componentName"
         :ref="element.props.elementName + element.props.editorChildNumber"
         v-bind="element.props"
-        :forceReadOnlyElements="true"
+        :showElementsPreview="true"
         :maxDisplayedChildren="5"
         :class="{'is-attribute': element.props.isAttribute}"
       />
@@ -83,7 +83,7 @@ export default {
             parentElementName: this.elementName,
             numberOfElements: 1,
             isAttribute: child.isAttribute,
-            forceReadOnlyElements: this.forceReadOnlyElements,
+            showElementsPreview: this.showElementsPreview,
             key: Math.random()
           }
         })

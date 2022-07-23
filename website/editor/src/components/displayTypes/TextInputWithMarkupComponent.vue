@@ -53,7 +53,7 @@
 
 import stylesFromConfig from "@/shared-resources/mixins/stylesFromConfig"
 import computedElementName from "@/shared-resources/mixins/computedElementName"
-import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
+import showPreview from "@/shared-resources/mixins/showPreview"
 
 
 export default {
@@ -70,7 +70,7 @@ export default {
   mixins: [
     stylesFromConfig,
     computedElementName,
-    forceReadOnly
+    showPreview
   ],
   computed: {
     readOnlyValues() {

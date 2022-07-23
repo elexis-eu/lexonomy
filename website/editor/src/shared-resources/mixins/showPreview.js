@@ -1,16 +1,16 @@
 export default {
   props: {
-    forceReadOnly: {
+    showPreview: {
       type: Boolean,
       default: false
     }
   },
   computed: {
     computedClass() {
-      return (this.forceReadOnly) ? "text--xs" : "text--md"
+      return (this.showPreview) ? "text--xs" : "text--md"
     },
     readOnly() {
-      return this.elementData.readOnly || this.forceReadOnly
+      return this.elementData.readOnly || this.showPreview
     }
   }
 }

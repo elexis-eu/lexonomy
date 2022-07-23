@@ -29,7 +29,7 @@
 <script>
 
 import computedElementName from "@/shared-resources/mixins/computedElementName"
-import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
+import showPreview from "@/shared-resources/mixins/showPreview"
 import computedValidation from "@/shared-resources/mixins/computedValidation"
 
 export default {
@@ -43,7 +43,7 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName, forceReadOnly, computedValidation],
+  mixins: [computedElementName, showPreview, computedValidation],
   computed: {
     valueCaption() {
       let selectedOption = this.options.find(el => el.value === this.value)

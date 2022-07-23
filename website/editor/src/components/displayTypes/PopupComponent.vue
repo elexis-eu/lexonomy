@@ -27,7 +27,7 @@
                      :content="componentData"
                      :isAttribute="isAttribute"
                      :parentElementName="parentElementName"
-                     :forceReadOnlyElements="true"
+                     :showElementsPreview="true"
                      @hide-children="hideChildren"
           />
 
@@ -37,7 +37,7 @@
             :children="children"
             :elementName="elementName"
             :content="viewOnlyContent"
-            :forceReadOnlyElements="true"
+            :showElementsPreview="true"
             :hideEmptyElements="true"
             :maxDisplayedChildren="5"
           />
@@ -122,7 +122,7 @@ export default {
     },
     editorChildNumber: Number,
     isAttribute: Boolean,
-    forceReadOnlyElements: {
+    showElementsPreview: {
       type: Boolean,
       default: false
     }

@@ -34,13 +34,13 @@
 <script>
 
 import computedElementName from "@/shared-resources/mixins/computedElementName"
-import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
+import showPreview from "@/shared-resources/mixins/showPreview"
 import computedValidation from "@/shared-resources/mixins/computedValidation"
 
 export default {
   name: "TextInputComponent",
   inject: ['$validator'],
-  mixins: [computedElementName, forceReadOnly, computedValidation],
+  mixins: [computedElementName, showPreview, computedValidation],
   props: {
     elementData: Object,
     elementName: String,

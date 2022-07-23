@@ -100,7 +100,7 @@ export default {
     },
     editorChildNumber: Number,
     isAttribute: Boolean,
-    forceReadOnlyElements: {
+    showElementsPreview: {
       type: Boolean,
       default: false
     }

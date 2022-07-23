@@ -1,7 +1,7 @@
 <template>
   <div>
     <section v-if="elementData.shown">
-      <p :class="computedClass">{{ forceReadOnly ? computedElementNameWithColon : "" }} </p>
+      <p :class="computedClass">{{ showPreview ? computedElementNameWithColon : "" }} </p>
       <span :class="computedClass"> {{ content.text }}</span>
     </section>
   </div>
@@ -9,7 +9,7 @@
 
 <script>
 import computedElementName from "@/shared-resources/mixins/computedElementName"
-import forceReadOnly from "@/shared-resources/mixins/forceReadOnly"
+import showPreview from "@/shared-resources/mixins/showPreview"
 
 export default {
   name: "ReadOnlyComponent",
@@ -22,7 +22,7 @@ export default {
       required: true
     }
   },
-  mixins: [computedElementName, forceReadOnly]
+  mixins: [computedElementName, showPreview]
 }
 </script>
 
