@@ -146,6 +146,8 @@
                   };
                }
                Screenful.Editor.editor = function (div, entry, uneditable) {
+                  $('#container').removeClass('withSourceCode'); // fix bug when switching entry while viewing entry source XML
+                  
                   uneditable = !this.dictData.userAccess.canEdit
                   Xonomy.lang = "en";
                   Xonomy.baseUrl = window.API_URL
