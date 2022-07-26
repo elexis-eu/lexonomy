@@ -98,7 +98,16 @@
                   class="btn waves-effect waves-light"
                   onclick={ clearBabelnet }
                   style="margin-left: 10px;display:none;">Dismiss error</button>
+            <button id="babelnet_complete"
+                  class="btn waves-effect waves-light"
+                  onclick={ importBabelnet }
+                  style="margin-left: 10px;display:none;">Import links</button>
             </p>
+            <p id="babelnet_complete_msg" style="display:none">Import of Babelnet links finished</p>
+            <button id="babelnet_finish"
+                  class="btn waves-effect waves-light"
+                  onclick={ clearBabelnet }
+                  style="margin-left: 10px;display:none;">Confirm links</button>
          </div>
       </div>
    </div>
@@ -182,6 +191,9 @@
                   if (response.state == 'ERROR') {
                      $('#babelnet_error').show();
                   }
+                  if (response.state == 'COMPLETED') {
+                     $('#babelnet_complete').show();
+                  }
                });
             }
 
@@ -233,6 +245,18 @@
          clearBabelnet() {
             this.state.data.babelnet_id = '';
             this.saveData();
+         },
+
+         importBabelnet() {
+            $('#babelnet_complete').prop('disabled',true);
+            $.post(window.API_URL + this.dictData.dictId + '/babelnetImport', {babelnet_id: this.state.data.babelnet_id}, (response) => {
+               $('#babelnet_complete').hide();
+               $('#babelnet_complete_msg').show();
+               $('#babelnet_finish').show();
+               if (response.count) {
+                  $('#babelnet_complete_msg').html('Import of Babelnet links finished, links imported: '+response.count);
+               }
+            })
          },
 
          startLinking() {
