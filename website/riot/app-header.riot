@@ -53,7 +53,7 @@
             <span class="site-logo" />
          </a>
          <ul class="right hide-on-med-and-down">
-            <li if={ authData.authorized && dictData.isDictionaryLoaded }>
+            <li if={ authData.authorized && dictData.isDictionaryLoaded && dictData.userAccess }>
                <a class="dropdown-trigger"
                      href="#/"
                      data-target="dropdown-menu-dict">
