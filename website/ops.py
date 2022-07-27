@@ -2854,8 +2854,9 @@ def importBabelnetLinks(dictID, dictDB, links):
             c = dictDB.execute('SELECT * FROM linkables WHERE preview=?', (link['source_sense']['definition'], ))
             res = c.fetchone()
             if res:
-                links_add(dictID, res['element'], res['txt'], 'BABELNET', 'sense', link['target_sense'][0], link['score'])
+                links_add(dictID, res['element'], res['txt'], 'BABELNET', 'sense', link['target_sense'][0], float(link['score']), linkDB)
                 count += 1
+    linkDB.close()
     return count
 
 def preprocessLex0(entryXml):
