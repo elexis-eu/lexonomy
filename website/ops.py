@@ -2849,13 +2849,15 @@ def importBabelnetLinks(dictID, dictDB, links):
     linkDB = getLinkDB()
     linkDB.execute('DELETE FROM links WHERE source_dict=? AND target_dict=?', (dictID, 'BABELNET'))
     linkDB.commit()
-    if links[0]['linking']:
-        for link in links[0]['linking']:
-            c = dictDB.execute('SELECT * FROM linkables WHERE preview=?', (link['source_sense']['definition'], ))
-            res = c.fetchone()
-            if res:
-                links_add(dictID, res['element'], res['txt'], 'BABELNET', 'sense', link['target_sense'][0], float(link['score']), linkDB)
-                count += 1
+    for linkentry in links:
+        if isinstance(linkentry['linking'], list):
+            for link in linkentry['linking']:
+                if link['source_sense']:
+                    c = dictDB.execute('SELECT * FROM linkables WHERE preview=?', (link['source_sense']['definition'], ))
+                    res = c.fetchone()
+                    if res:
+                        links_add(dictID, res['element'], res['txt'], 'BABELNET', 'sense', link['target_sense'][0], float(link['score']), linkDB)
+                        count += 1
     linkDB.close()
     return count
 
