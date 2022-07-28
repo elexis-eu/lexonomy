@@ -70,7 +70,7 @@
 
    <script>
      import {parseDTD, struct2Xonomy, initialDocument} from '../libs/xonomy-tools/dtdconvert/dtd2xonomy'
-     
+
       export default {
          bindings: [["store", "entryIdChanged", "onEntryIdChanged"]],
 
@@ -134,8 +134,16 @@
                      Gmedia.addVoice(entry);
                      $(div).find("a.xref").on("click", function (e) {
                         var text = $(e.delegateTarget).attr("data-text");
-                        window.parent.$("#searchbox").val(text);
-                        window.parent.Screenful.Navigator.list();
+                        window.parent.$("#searchBox").val(text);
+                        let evt = new CustomEvent('keyup');
+                        evt.which = 13;
+                        evt.keyCode = 13;
+                        document.getElementById("searchBox").dispatchEvent(evt);
+                        e.stopPropagation();
+                        e.preventDefault();
+                        window.setTimeout(function() {
+                           window.location.hash = $('a.headword-link').attr('href');
+                        }, 500)
                      });
                      // url contain linkable?
                      let match = window.location.hash.match(/.*\?link=(.*)/)
@@ -147,7 +155,7 @@
                }
                Screenful.Editor.editor = function (div, entry, uneditable) {
                   $('#container').removeClass('withSourceCode'); // fix bug when switching entry while viewing entry source XML
-                  
+
                   uneditable = !this.dictData.userAccess.canEdit
                   Xonomy.lang = "en";
                   Xonomy.baseUrl = window.API_URL
