@@ -52,7 +52,10 @@ Xematron.xema2docspec=function(xema, stringAsker){
 			let leastDeep = Number.MAX_SAFE_INTEGER;
 			let target = '';
 
+			const seenElements = new Set(); // track processed elements to avoid infinite recursion (since elements may recursively has themselves as children)
 			function descend(id, depth = 0) {
+				seenElements.add(id);
+
 				if (depth >= leastDeep) return;
 				const curElementName = xema.elements[id]?.elementName || id;
 				if (curElementName === elementName && depth < leastDeep) {
@@ -60,8 +63,8 @@ Xematron.xema2docspec=function(xema, stringAsker){
 					target = id;
 					return;
 				}
-				// didn't match, try children
-				xema.elements[id]?.children?.forEach(c => descend(c.name, depth+1));
+				// didn't match, try children (at least, those we haven't seen yet). 
+				xema.elements[id]?.children?.filter(c => !seenElements.has(c.name)).forEach(c => descend(c.name, depth+1));
 			}
 			descend(xema.root);
 			if (target) return target; // found, return it
