@@ -203,8 +203,8 @@
          getConfigData() {
             var provData = { ...this.state.xema }
             var newData = {elements: {}, root: 'entry'}
-            Object.values(provData.elements).forEach(el=>{
-               newData.elements[el.elementName] = el;
+            Object.entries(provData.elements).forEach(([key, value]) => {
+               newData.elements[key] = value;
             });
             let roots = new Set(Object.keys(newData.elements));
             Object.values(newData.elements).forEach(/** @param {XemaElement} el */ el => (el.children || []).forEach(c => roots.delete(c.name)));
