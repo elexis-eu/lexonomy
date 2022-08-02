@@ -2,7 +2,7 @@
 .xonomy.laic .lexonomyKontextCaption {top: 0px; margin-right: 0px; margin-left: 10px;}
 .xonomy .readonly .lexonomyKontextCaption {display: none;}
 .xonomy .lexonomyKontextCaption:hover {color: #004f9b; }
-#xonomyBubble .menuItem > a {display: block; color: inherit; text-decoration: inherit;}
+.xonomyBubble .menuItem > a {display: block; color: inherit; text-decoration: inherit;}
 
 div.kontextbox {padding: 0px; width: 600px; height: 300px; position: relative;}
 div.kontextbox form.topbar {position: absolute; top: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }

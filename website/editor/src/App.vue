@@ -90,7 +90,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 $blue-100: #D9EAFF;
 $blue-200: #B3D6FF;
 $blue-300: #0077FF;

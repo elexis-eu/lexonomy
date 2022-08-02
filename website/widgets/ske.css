@@ -2,7 +2,7 @@
 .xonomy.laic .lexonomySkeCaption {top: 0px; margin-right: 0px; margin-left: 10px;}
 .xonomy .readonly .lexonomySkeCaption {display: none;}
 .xonomy .lexonomySkeCaption:hover {color: #004f9b; }
-#xonomyBubble .menuItem > a {display: block; color: inherit; text-decoration: inherit;}
+.xonomyBubble .menuItem > a {display: block; color: inherit; text-decoration: inherit;}
 
 div.skebox {padding: 0px; width: 600px; height: 300px; position: relative;}
 div.skebox form.topbar {position: absolute; top: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }

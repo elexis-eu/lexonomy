@@ -1,7 +1,17 @@
+// @ts-check
+
+// @ts-ignore
 window.Xematron={};
 
 //takes a xema, returns a Xonomy docSpec:
+/**
+ * 
+ * @param {Xema} xema 
+ * @param {string} stringAsker 
+ * @returns 
+ */
 Xematron.xema2docspec=function(xema, stringAsker){
+	/** @type {import('@elexis-eu/xonomy').XonomyDocSpecExternal} */
 	var docSpec={
 		elements: {},
 		unknownElement: function(elName){
@@ -24,19 +34,60 @@ Xematron.xema2docspec=function(xema, stringAsker){
 			};
 		},
 		validate: function(jsElement){ Xematron.validate(xema, jsElement); },
-	};
-	var elnames=[]; for(var elname in xema.elements) elnames.push(elname); elnames.forEach(function(elname){
-		var xel=xema.elements[elname]; //the xema element from which we are creating a docSpec element
-		var del={}; docSpec.elements[elname]=del; //the docSpec element we are creating
-		del.menu=[];
-		del.inlineMenu=[];
-		del.collapsible=false;
+		getElementId(elementName, parentID) {
+			const parentXema = parentID ? xema.elements[parentID] : undefined;
+			if (parentXema) {
+				// find the child that has the element as name.
+				const theXemaChild = parentXema.children.find(c => xema.elements[c.name]?.elementName === elementName)
+				if (theXemaChild) return theXemaChild.name; // child.name is actually ID/key in xema.elements.
+				// no child by this name.
+			}
+			// we don't know the parent element, is it the root?
+			const rootID = xema.root;
+			const rootElementName = xema.elements[rootID]?.elementName || rootID;
+			if (rootElementName === elementName) return xema.root;
 
+			// not the root, find the least deep element with this name.
+			// to do this, we need to find the number of steps to every element definition (with the elementName we're looking for)
+			let leastDeep = Number.MAX_SAFE_INTEGER;
+			let target = '';
+
+			function descend(id, depth = 0) {
+				if (depth >= leastDeep) return;
+				const curElementName = xema.elements[id]?.elementName || id;
+				if (curElementName === elementName && depth < leastDeep) {
+					leastDeep = depth;
+					target = id;
+					return;
+				}
+				// didn't match, try children
+				xema.elements[id]?.children?.forEach(c => descend(c.name, depth+1));
+			}
+			descend(xema.root);
+			if (target) return target; // found, return it
+			return elementName; // not found
+		}
+	};
+	
+	for(var elementID in xema.elements) {
+		const xel=xema.elements[elementID]; //the xema element from which we are creating a docSpec element
+		const elementName = xel?.elementName || elementID;
+		//the docSpec element we are creating
+		/** @type {import("@elexis-eu/xonomy").XonomyElementDefinitionExternal} */
+		const del = {
+			elementName: elementName,
+			menu: [],
+			inlineMenu: [],
+			collapsible: false,
+			attributes: {}
+		};
+		docSpec.elements[elementID] = del;
+		
 		var submenu=[];
 
 		//children of inl elements have a menu item to unwrap themselves:
 		submenu.push({
-			caption: "Unwrap <"+elname+">",
+			caption: "Unwrap <"+elementName+">",
 			action: Xonomy.unwrap,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling!="inl"; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
@@ -45,7 +96,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		//all elements have a menu item to remove themselves, except the top-level element and except children of inl elements:
 		submenu.push({
-			caption: "Remove <"+elname+">",
+			caption: "Remove <"+elementName+">",
 			action: Xonomy.deleteElement,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==88 },
@@ -54,7 +105,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		//all elements have a menu item to duplicate themselves, except the top-level element and except children of inl elements:
 		submenu.push({
-			caption: "Duplicate <"+elname+">",
+			caption: "Duplicate <"+elementName+">",
 			action: Xonomy.duplicateElement,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl"; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==68 },
@@ -63,14 +114,14 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		//all elements have a menu item to move themselves up and down, except the top-level element, and except children of inl elements, and expect elements that have nowhere to move to:
 		submenu.push({
-			caption: "Move <"+elname+"> up",
+			caption: "Move <"+elementName+"> up",
 			action: Xonomy.moveElementUp,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementUp(jsMe.htmlID); },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==38 },
 			keyCaption: "Ctrl + Shift + Up",
 		});
 		submenu.push({
-			caption: "Move <"+elname+"> down",
+			caption: "Move <"+elementName+"> down",
 			action: Xonomy.moveElementDown,
 			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !Xonomy.canMoveElementDown(jsMe.htmlID); },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==40 },
@@ -79,16 +130,16 @@ Xematron.xema2docspec=function(xema, stringAsker){
 
 		//all elements have a menu item to merge themselves with a sibling, except the top-level element, and except children of inl elements, and expect elements that have no-one to merge with:
 		submenu.push({
-			caption: "Merge <"+elname+"> with previous",
+			caption: "Merge <"+elementName+"> with previous",
 			action: Xonomy.mergeWithPrevious,
-			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getPrecedingSibling() || jsMe.getPrecedingSibling().name!=elname },
+			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getPrecedingSibling() || jsMe.getPrecedingSibling().name!=elementID },
 			keyTrigger: function(event){ return event.altKey && event.shiftKey && event.which==38 },
 			keyCaption: "Alt + Shift + Up",
 		});
 		submenu.push({
-			caption: "Merge <"+elname+"> with next",
+			caption: "Merge <"+elementName+"> with next",
 			action: Xonomy.mergeWithNext,
-			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getFollowingSibling() || jsMe.getFollowingSibling().name!=elname },
+			hideIf: function(jsMe){ return jsMe.parent()==null || xema.elements[jsMe.parent().name].filling=="inl" || !jsMe.getFollowingSibling() || jsMe.getFollowingSibling().name!=elementID },
 			keyTrigger: function(event){ return event.altKey && event.shiftKey && event.which==40 },
 			keyCaption: "Alt + Shift + Down",
 		});
@@ -128,7 +179,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 			del.asker=Xonomy[stringAsker] || Xonomy.askLongString;
 		}
 
-		del.attributes={};
+		
 		var submenu=[];
 		var attnames=[]; for(var attname in xel.attributes) attnames.push(attname); attnames.forEach(function(attname){
 			var xatt=xel.attributes[attname]; //the xema attribute from which we are creating a docSpec attribute
@@ -214,44 +265,46 @@ Xematron.xema2docspec=function(xema, stringAsker){
 		}
 
 		//all elements can be dragged-and-droped:
-		del.canDropTo=Xematron.listParents(xema, elname);
+		del.canDropTo=Xematron.listParents(xema, elementID);
 
 		//all elements have a fixed position among their siblings if the parent is a 'chd' element:
-		del.mustBeAfter=Xematron.listPrecedingSiblings(xema, elname);
-		del.mustBeBefore=Xematron.listFollowingSiblings(xema, elname)
+		del.mustBeAfter=Xematron.listPrecedingSiblings(xema, elementID);
+		del.mustBeBefore=Xematron.listFollowingSiblings(xema, elementID)
 
 		//Menu items for adding siblings:
 		var submenu=[];
-		Xematron.listElements(xema).forEach(function(siblingName){
+		Xematron.listElements(xema).forEach(function(siblingID){
+			const elementName = xema.elements[siblingID]?.elementName || siblingID;
 			submenu.push({
-				caption: "Add <"+siblingName+">",
+				caption: "Add <"+siblingID+">",
 				action: Xonomy.newElementBefore,
-				actionParameter: Xematron.initialElement(xema, siblingName),
-				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingName) || (jsMe.getPrecedingSibling() && jsMe.getPrecedingSibling().name==jsMe.name) || del.mustBeAfter(jsMe).indexOf(siblingName)==-1; },
+				actionParameter: Xematron.initialElement(xema, siblingID),
+				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingID) || (jsMe.getPrecedingSibling() && jsMe.getPrecedingSibling().name==jsMe.name) || del.mustBeAfter(jsMe).indexOf(siblingID)==-1; },
 			});
 		});
 		submenu.push({
-			caption: "Add another <"+elname+"> before",
+			caption: "Add another <"+elementName+"> before",
 			action: Xonomy.newElementBefore,
-			actionParameter: Xematron.initialElement(xema, elname),
+			actionParameter: Xematron.initialElement(xema, elementID),
 			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl"; },
 		});
 		submenu.push({
-			caption: "Add another <"+elname+"> after",
+			caption: "Add another <"+elementName+"> after",
 			action: Xonomy.newElementAfter,
-			actionParameter: Xematron.initialElement(xema, elname),
+			actionParameter: Xematron.initialElement(xema, elementID),
 			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl"; },
 		});
-		Xematron.listElements(xema).forEach(function(siblingName){
+		Xematron.listElements(xema).forEach(function(siblingID){
+			const elementName = xema.elements[siblingID]?.elementName || siblingID;
 			submenu.push({
-				caption: "Add <"+siblingName+">",
+				caption: "Add <"+elementName+">",
 				action: Xonomy.newElementAfter,
-				actionParameter: Xematron.initialElement(xema, siblingName),
-				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingName) || (jsMe.getFollowingSibling() && jsMe.getFollowingSibling().name==jsMe.name) || del.mustBeBefore(jsMe).indexOf(siblingName)==-1; },
+				actionParameter: Xematron.initialElement(xema, siblingID),
+				hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().hasChildElement(siblingID) || (jsMe.getFollowingSibling() && jsMe.getFollowingSibling().name==jsMe.name) || del.mustBeBefore(jsMe).indexOf(siblingID)==-1; },
 			});
 		});
 		submenu.push({
-			caption: "Remove all <"+elname+"> siblings",
+			caption: "Remove all <"+elementName+"> siblings",
 			action: Xonomy.deleteEponymousSiblings,
 			hideIf: function(jsMe){ return !jsMe.parent() || xema.elements[jsMe.parent().name].filling=="inl" || jsMe.parent().getChildElements(jsMe.name).length<2; },
 			keyTrigger: function(event){ return (event.ctrlKey||event.metaKey) && event.shiftKey && event.which==90 },
@@ -263,8 +316,7 @@ Xematron.xema2docspec=function(xema, stringAsker){
 				menu: submenu,
 			});
 		}
-
-	}); //end of loop over elements
+	}; 
 	return docSpec;
 };
 
@@ -274,15 +326,16 @@ Xematron.xema2xml= function(xema){
 };
 
 //helper functions:
-Xematron.listParents=function(xema, elname){
+/** Return IDS of all elements that have the target element as child */
+Xematron.listParents=function(xema, elementID){
 	var list=[];
-	for(var parname in xema.elements){
-		var parent=xema.elements[parname];
+	for(var someElementID in xema.elements){
+		var parent=xema.elements[someElementID];
 		if(parent.filling=="chd"){
 			if(!parent.children) parent.children=[];
 			for(var i=0; i<parent.children.length; i++){
-				if(parent.children[i].name==elname) {
-					list.push(parname);
+				if(parent.children[i].name==elementID) {
+					list.push(someElementID);
 					break;
 				}
 			}
@@ -290,17 +343,17 @@ Xematron.listParents=function(xema, elname){
 	}
 	return list;
 };
-Xematron.listPrecedingSiblings=function(xema, elname){
+Xematron.listPrecedingSiblings=function(xema, elementID){
 	var list={};
-	for(var parname in xema.elements){
-		var parent=xema.elements[parname];
+	for(var someElementID in xema.elements){
+		var parent=xema.elements[someElementID];
 		if(parent.filling=="chd"){
 			var templist=[];
 			for(var i=0; i<parent.children.length; i++){
-				if(parent.children[i].name!=elname) {
+				if(parent.children[i].name!=elementID) {
 					templist.push(parent.children[i].name);
-				} else if(parent.children[i].name==elname) {
-					list[parname]=templist;
+				} else if(parent.children[i].name==elementID) {
+					list[someElementID]=templist;
 					break;
 				}
 			}
@@ -311,21 +364,21 @@ Xematron.listPrecedingSiblings=function(xema, elname){
 		return [];
 	};
 };
-Xematron.listFollowingSiblings=function(xema, elname){
+Xematron.listFollowingSiblings=function(xema, elementID){
 	var list={};
-	for(var parname in xema.elements){
-		var parent=xema.elements[parname];
+	for(var someElementID in xema.elements){
+		var parent=xema.elements[someElementID];
 		if(parent.filling=="chd"){
 			var templist=[];
 			var found=false;
 			for(var i=0; i<parent.children.length; i++){
-				if(parent.children[i].name!=elname && found) {
+				if(parent.children[i].name!=elementID && found) {
 					templist.push(parent.children[i].name);
-				} else if(parent.children[i].name==elname) {
+				} else if(parent.children[i].name==elementID) {
 					found=true;
 				}
 			}
-			list[parname]=templist;
+			list[someElementID]=templist;
 		}
 	}
 	return function(jsMe){
@@ -333,29 +386,30 @@ Xematron.listFollowingSiblings=function(xema, elname){
 		return [];
 	};
 };
-Xematron.initialAttributes=function(xema, elname){
+Xematron.initialAttributes=function(xema, elementID){
 	var ret="";
-  if (xema.elements[elname] != undefined) {
-    for(var attname in xema.elements[elname].attributes){
-      var att=xema.elements[elname].attributes[attname];
-      if(att.optionality=="obligatory") {
-        var attvalue="";
-        ret+=" "+attname+"='"+Xonomy.xmlEscape(attvalue)+"'";
-      }
-    }
-  }
+	if (xema.elements[elementID] != undefined) {
+		for(var attname in xema.elements[elementID].attributes){
+		var att=xema.elements[elementID].attributes[attname];
+		if(att.optionality=="obligatory") {
+			var attvalue="";
+			ret+=" "+attname+"='"+Xonomy.xmlEscape(attvalue)+"'";
+		}
+		}
+	}
 	return ret;
 };
-Xematron.initialElement=function(xema, elname, depth){
+Xematron.initialElement=function(xema, elementID, depth){
 	if(!depth) depth=0;
-	var el=xema.elements[elname];
-	var ret="<"+elname+Xematron.initialAttributes(xema, elname)+">";
+	var el=xema.elements[elementID];
+	const elementName = xema.elements[elementID]?.elementName || elementID;
+	var ret="<"+elementName+Xematron.initialAttributes(xema, elementID)+">";
 	if (el != undefined && el.filling=="chd" && el.children && depth < 10) {
 		el.children.forEach(function(child) {
 			for(var i=0; i<child.min; i++) ret+=Xematron.initialElement(xema, child.name, depth+1);
 		});
 	}
-	ret+="</"+elname+">";
+	ret+="</"+elementName+">";
 	return ret;
 };
 Xematron.valuesHave=function(values, value){
@@ -373,22 +427,29 @@ Xematron.childrenHave=function(children, childName){
 	}
 	return ret;
 };
+/**
+ * 
+ * @param {any} xema 
+ * @param {import('@elexis-eu/xonomy').XonomyElementInstance} jsElement 
+ * @param {number} level 
+ * @returns 
+ */
 Xematron.validate=function(xema, jsElement, level){
 	if (level == null) level = 0
-	var xel=xema.elements[jsElement.name];
+	var xel=xema.elements[jsElement.id || jsElement.name];
 	
-	if (jsElement.name === "lxnm:subentryParent") {
+	if (jsElement.elementName === "lxnm:subentryParent") {
 		return; // a subentry reference - should never be validated.
 	} else if(!xel){ //is the element allowed to exist?
 		if (level === 0)
-			Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The top element should be <"+xema.root+">."});
+			Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The top element should be <"+(xema.elements[xema.root] || {}).elementName || xema.root+">."});
 		else 
-			Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "No element <"+jsElement.name+"> should exist here."});
+			Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "No element <"+jsElement.elementName+"> should exist here."});
 	}  else {
 		//cycle through the attributes the element should have:
 		for(var attname in xel.attributes){
 			if(xel.attributes[attname].optionality=="obligatory" && !jsElement.getAttribute(attname)){
-				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element is missing the @"+attname+" attribute."});
+				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.elementName+"> element is missing the @"+attname+" attribute."});
 			}
 		}
 
@@ -397,7 +458,7 @@ Xematron.validate=function(xema, jsElement, level){
 			var jsAttribute=jsElement.attributes[i];
 			var xatt=xel.attributes[jsAttribute.name];
 			if(!xatt) { //is the attribute allowed to exist?
-				Xonomy.warnings.push({htmlID: jsAttribute.htmlID, text: "The <"+jsElement.name+"> element should not have an attribute called @"+jsAttribute.name+"."});
+				Xonomy.warnings.push({htmlID: jsAttribute.htmlID, text: "The <"+jsElement.elementName+"> element should not have an attribute called @"+jsAttribute.name+"."});
 			} else if(jsAttribute.value=="") { //is the attribute non-empty?
 				Xonomy.warnings.push({htmlID: jsAttribute.htmlID, text: "The @"+jsAttribute.name+" attribute should not be empty."});
 			} else if(xatt.filling=="lst" && !Xematron.valuesHave(xatt.values, jsAttribute.value)) { //does the attribute have an allowed value?
@@ -408,30 +469,30 @@ Xematron.validate=function(xema, jsElement, level){
 		//if this is an emp element:
 		if(xel.filling=="emp") {
 			if(jsElement.children.length>0) { //is the element empty like it should?
-				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should be empty."});
+				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.elementName+"> element should be empty."});
 			}
 		}
 
 		//if this is a lst element:
 		if(xel.filling=="lst") {
 			if(jsElement.getText()=="") { //does the element have text?
-					Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should not be empty."});
+					Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.elementName+"> element should not be empty."});
 			} else if(!Xematron.valuesHave(xel.values, jsElement.getText())) { //does the element have an allowed value?
-				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should not have the value @\""+jsElement.getText()+"\"."});
+				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.elementName+"> element should not have the value @\""+jsElement.getText()+"\"."});
 			}
 		}
 
 		//if this is a txt element:
 		if(xel.filling=="txt") {
 			if(jsElement.getText()=="") { //does the element have text?
-				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should have some text."});
+				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.elementName+"> element should have some text."});
 			}
 		}
 
 		//if this is an inl element:
 		if(xel.filling=="inl") {
 			if(jsElement.getText()=="") { //does the element have text?
-				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should have some text."});
+				Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.elementName+"> element should have some text."});
 			}
 		}
 
@@ -439,7 +500,7 @@ Xematron.validate=function(xema, jsElement, level){
 		if(xel.filling=="chd") {
 			for(var i=0; i<jsElement.children.length; i++) { //does the element not have text?
 				if(jsElement.children[i].type=="text" && jsElement.children[i].value.trim() !== '') { 
-					Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should not have any text."});
+					Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.elementName+"> element should not have any text."});
 					break; 
 				}
 			}
@@ -448,7 +509,8 @@ Xematron.validate=function(xema, jsElement, level){
 		//if this is an inl or chd element:
 		if(xel.filling=="inl" || xel.filling=="chd") {
 			for(var i=0; i<xel.children.length; i++){
-				xchild=xel.children[i];
+				const xchild=xel.children[i];
+				const xchildel = xema.elements[xchild.name];
 				var children=jsElement.getChildElements(xchild.name);
 				if( (xchild.min>0 && children.length<xchild.min) || (xchild.max>0 && children.length>xchild.max) )	{
 					var msg="Should have ";
@@ -458,10 +520,10 @@ Xematron.validate=function(xema, jsElement, level){
 					msg+=".";
 					if(children.length>0) {
 						children.forEach(function(item){
-							Xonomy.warnings.push({htmlID: item.htmlID, text: "The <"+jsElement.name+"> element does not have the correct number of <"+xchild.name+"> child elements. "+msg});
+							Xonomy.warnings.push({htmlID: item.htmlID, text: "The <"+jsElement.name+"> element does not have the correct number of <"+xchildel.elementName+"> child elements. "+msg});
 						});
 					} else {
-						Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element does not have the correct number of <"+xchild.name+"> child elements. "+msg});
+						Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element does not have the correct number of <"+xchildel.elementName+"> child elements. "+msg});
 					}
 				}
 			}
@@ -471,8 +533,8 @@ Xematron.validate=function(xema, jsElement, level){
 		for(var i=0; i<jsElement.children.length; i++) {
 			var jsChild=jsElement.children[i];
 			if(jsChild.type=="element") {
-				if(!Xematron.childrenHave(xel.children, jsChild.name)) {
-					Xonomy.warnings.push({htmlID: jsChild.htmlID, text: "The <"+jsElement.name+"> element should not have a child element called <"+jsChild.name+">."});
+				if(!Xematron.childrenHave(xel.children, jsChild.id)) {
+					Xonomy.warnings.push({htmlID: jsChild.htmlID, text: "The <"+jsElement.name+"> element should not have a child element called <"+jsChild.elementName+">."});
 				} else {
 					Xematron.validate(xema, jsChild, level+1);
 				}
@@ -489,13 +551,13 @@ Xematron.validate=function(xema, jsElement, level){
 					whereAreWe="after";
 				} else {
 					if(whereAreWe=="after") { //jsSibling is after jsElement == jsElement is before jsSibling
-						if(Xonomy.docSpec.elements[jsElement.name].mustBeAfter(jsElement).indexOf(jsSibling.name)>-1){
-							Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should appear after the <"+jsSibling.name+"> element, not before it."});
+						if(Xonomy.docSpec.elements[jsElement.id].mustBeAfter(jsElement).indexOf(jsSibling.id)>-1){
+							Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.elementName+"> element should appear after the <"+jsSibling.elementName+"> element, not before it."});
 						}
 					}
 					if(whereAreWe=="before") { //jsSibling is before jsElement == jsElement is after jsSibling
-						if(Xonomy.docSpec.elements[jsElement.name].mustBeBefore(jsElement).indexOf(jsSibling.name)>-1){
-							Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.name+"> element should appear before the <"+jsSibling.name+"> element, not after it."});
+						if(Xonomy.docSpec.elements[jsElement.id].mustBeBefore(jsElement).indexOf(jsSibling.id)>-1){
+							Xonomy.warnings.push({htmlID: jsElement.htmlID, text: "The <"+jsElement.elementName+"> element should appear before the <"+jsSibling.elementName+"> element, not after it."});
 						}
 					}
 				}
@@ -504,6 +566,7 @@ Xematron.validate=function(xema, jsElement, level){
 	}
 };
 
+/** Get all reachable element IDS used in the xema. Reachable means it has a valid parent, all the way to the root. (so we stop descending at text elements for example.) */
 Xematron.listElements=function(xema){
 	var ret=[];
 	var done=[];
