@@ -10,7 +10,13 @@ INSERT INTO configs VALUES ('xemplate','{	"entry": {		"shown": true,		"layout": 
 INSERT INTO configs VALUES ('collx','{	"container": "collocation",	"template": "<collocation><collocate>$text</collocate></collocation>"}');
 INSERT INTO configs VALUES ('thes','{	"container": "thesaurusItem",	"template": "<thesaurusItem>$text</thesaurusItem>"}');
 INSERT INTO configs VALUES ('defo','{	"container": "definition",	"template": "<definition>$text</definition>"}');
-CREATE TABLE searchables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, level INTEGER);
+CREATE TABLE searchables (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    entry_id    INTEGER REFERENCES entries (id) ON DELETE CASCADE,
+    txt         TEXT,
+    level       INTEGER
+);
+CREATE INDEX search ON searchables (txt, level);
 CREATE TABLE history (
     id             INTEGER  PRIMARY KEY AUTOINCREMENT,
     entry_id       INTEGER,
@@ -20,24 +26,31 @@ CREATE TABLE history (
     xml            TEXT,
     historiography TEXT
 );
-CREATE TABLE sub (id INTEGER PRIMARY KEY AUTOINCREMENT, parent_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, child_id INTEGER REFERENCES entries (id) ON DELETE CASCADE);
-CREATE TABLE entries (id INTEGER PRIMARY KEY AUTOINCREMENT, doctype TEXT, xml TEXT, title TEXT, sortkey TEXT, needs_resave BOOLEAN DEFAULT (0), needs_refresh BOOLEAN DEFAULT (0), needs_refac BOOLEAN DEFAULT (0));
-CREATE TABLE linkables (id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER REFERENCES entries (id) ON DELETE CASCADE, txt TEXT, element TEXT, preview TEXT);
-CREATE INDEX search ON searchables (txt, level);
-CREATE INDEX history_by_entry_id ON history (
-    entry_id,
-    "when"
+CREATE TABLE sub (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    parent_id   INTEGER REFERENCES entries (id) ON DELETE CASCADE,
+    child_id    INTEGER REFERENCES entries (id) ON DELETE CASCADE
 );
-CREATE INDEX history_by_email ON history (
-    email,
-    "when"
+CREATE TABLE entries (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    doctype         TEXT,
+    xml             TEXT,
+    title           TEXT,
+    sortkey         TEXT,
+    flag            TEXT NOT NULL DEFAULT (''),
+    needs_update    BOOLEAN DEFAULT (0)
 );
-CREATE INDEX history_by_when ON history (
-    "when"
+CREATE TABLE linkables (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    entry_id    INTEGER REFERENCES entries (id) ON DELETE CASCADE,
+    txt         TEXT,
+    element     TEXT,
+    preview     TEXT
 );
-CREATE INDEX history_by_action ON history (
-    "action",
-    "when"
-);
+CREATE INDEX history_by_entry_id ON history (entry_id, "when");
+CREATE INDEX history_by_email ON history (email, "when");
+CREATE INDEX history_by_when ON history ("when");
+CREATE INDEX history_by_action ON history ("action", "when");
 CREATE INDEX sortkey ON entries (sortkey);
-CREATE INDEX needs_re ON entries (needs_resave, needs_refresh, needs_refac);
+CREATE INDEX needs_re ON entries (needs_update);
+CREATE INDEX flag ON entries (flag);

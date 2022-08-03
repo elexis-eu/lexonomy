@@ -13,8 +13,11 @@ Xemplatron.el2html=function(el, isFirst, isLast){
   if(!Xemplatron.getXemplate(el).shown) return "";
   var html="";
   var caption="";
+  if (el.hasAttribute('lxnm:linkable')) {
+     html+="<span style='display:none' name='"+el.getAttribute('lxnm:linkable')+"' class='linkable'><img src='/furniture/link.png'/>"+el.getAttribute('lxnm:linkable')+"</span>";
+  }
   var xema=Xemplatron.xema.elements[el.nodeName]; if(xema && xema.filling=="lst") {
-    html=el.textContent;
+    html+=el.textContent;
     if(xema.values) for(var i=0; i<xema.values.length; i++) if(xema.values[i].value==el.textContent) {caption=xema.values[i].caption; break;}
   } else if (xema && xema.filling=="med") {
     var fileType = Xemplatron.detectFileType(el.textContent);
@@ -245,19 +248,22 @@ Xemplatron._senseNum=function(ly, html, n, startLevel) {
 
 }
 Xemplatron._bullet=function(ly, name, html){
+   console.log(ly)
+   console.log(name)
+   console.log(html)
   var symbol=""; var className="";
   if(name=="square") { symbol="⯀"; className=name; }
   else if(name=="diamond") { symbol="⯁"; className=name; }
   else if(name=="arrow") { symbol="⯈"; className=name; }
   else if(name=="disk") { symbol="⏺"; className=name; }
   else symbol=name;
-  if(ly=="block") return "<div class='bulleted "+className+"'><div class='bullet'>"+symbol+"</div> <div class='inside'>"+html+"</div><div class='clear'></div></div>";
   if(ly=="inline") return "<span class='bulleted "+className+"'>"+symbol+"</span>&nbsp;"+html;
+  return "<div class='bulleted "+className+"'><div class='bullet'>"+symbol+"</div> <div class='inside'>"+html+"</div><div class='clear'></div></div>";
 }
 Xemplatron.detectFileType=function(url) {
   var fileExtension = url.split('.').pop().split(/\#|\?/)[0].toLowerCase();
   console.log('FE'+fileExtension)
-  if (['jpg','jpeg','png','gif'].includes(fileExtension)) return 'image';
+  if (['jpg','jpeg','png','gif','svg'].includes(fileExtension)) return 'image';
   if (['avi','mp4','webm'].includes(fileExtension)) return 'video';
   if (['wav','ogg','weba'].includes(fileExtension)) return 'audio';
   return '';

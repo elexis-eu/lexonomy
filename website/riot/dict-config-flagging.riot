@@ -2,6 +2,7 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["flagging", "Entry flags"]]}/>
    <h1>Entry flags</h1>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
    <template if={!state.isLoading}>
       <div if={!state.data.flags.length}
             class="center-align grey-text">
@@ -10,7 +11,7 @@
          <a class="btn btn-primary waves-effect waves-light"
                onclick={ doAddEl }>
             add flag
-            <i class="material-icons right">add</i>
+            <i class="material-symbols-outlined right">add</i>
          </a>
       </div>
 
@@ -57,7 +58,7 @@
                   <td>
                      <a class="btn btn-flat"
                            onclick={ doDeleteEl.bind(this, index) }>
-                        <i class="material-icons">delete</i>
+                        <i class="material-symbols-outlined">delete</i>
                      </a>
                   </td>
                </tr>
@@ -67,7 +68,7 @@
             <a class="btn waves-effect waves-light"
                   onclick={ doAddEl }>
                add flag
-               <i class="material-icons right">add</i>
+               <i class="material-symbols-outlined right">add</i>
             </a>
          </div>
          <br>
@@ -81,8 +82,6 @@
       </template>
    </template>
    <br><br>
-   <dict-config-buttons save-data={saveData}
-         show-save={state.data.flags.length}></dict-config-buttons>
 
    <style>
       tr{

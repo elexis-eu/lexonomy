@@ -1,36 +1,36 @@
 <dict-new>
    <loading-overlay if={state.isLoading}/>
-   <h1>
-      New dictionary
-   </h1>
-   <div class="row">
-      <div class="input-field">
-         <input id="title"
-               type="text"
-               class="validate inlineBlock"
-               required
-               style="max-width: 300px;"/>
-         <label for="title">Title</label>
-         <span class="helper-text">Enter a human-readable title such as "My Esperanto Dictionary". You will be able to change this later.</span>
+   <div class="col s12 m8 offset-m2">
+      <h3 style="border-bottom: 2px solid #004494;">
+         Create a dictionary
+      </h3>
+      <div class="newBox">
+      <div class="row">
+         <div class="input-field">
+            <input id="title"
+            type="text"
+            class="validate inlineBlock"
+            required/>
+            <label for="title">Title</label>
+            <span class="helper-text">Enter a human-readable title such as "My Esperanto Dictionary". You will be able to change this later.</span>
+         </div>
       </div>
-   </div>
-   <div>
-      <label for="url">URL</label>
-   </div>
+      <div>
+         <label for="url">URL</label>
+      </div>
 
-   <div class="row">
-      <div style="display: flex; align-items: baseline;">
-         <span class="grey-text">{state.baseUrl}</span>
-         <span class="input-field"
-               style="margin-top: 0;">
+      <div class="row">
+         <div style="display: flex; align-items: baseline;">
+            <span class="grey-text">{state.baseUrl}</span>
+            <span class="input-field"
+            style="margin-top: 0;">
             <input id="url"
-                  type="text"
-                  class="validate inlineBlock"
-                  value={state.url}
+            type="text"
+            class="validate inlineBlock"
+            value={state.url}
                   required
-                  minlength="5"
-                  pattern="[a-zA-Z0-9\-_]*"
-                  style="max-width: 300px;"/>
+            minlength="5"
+            pattern="[a-zA-Z0-9\-_]*"/>
             <span class="helper-text">This will be your dictionary's address on the web. You will be able to change this later. Allowed:  letters, numbers, - and _</span>
          </span>
       </div>
@@ -38,7 +38,7 @@
    <div>
    </div>
    <div class="input-field">
-      <div style="max-width: 300px;">
+      <div >
          <select id="template">
             <option value="blank">(none)</option>
             <option value="smd">Simple Monolingual Dictionary</option>
@@ -50,20 +50,34 @@
    </div>
    <div if={ state.errorMessage != ''}
          class="section">
-      <div class="message messageError">
-         { state.errorMessage }
-      </div>
+   <div class="message messageError">
+      { state.errorMessage }
+   </div>
    </div>
    <div class="buttons">
-      <button class="btn waves-effect waves-light"
-            name="makeDict"
-            id="makeButton"
-            onclick={ doMake }>Create dictionary
-         <i class="material-icons left">add</i>
+      <button class="btn waves-effect waves-light" style="margin-left: auto" name="makeDict" id="makeButton" onclick={ doMake }>Create
       </button>
-      <a href="#"
-            class="btn btn-flat">cancel</a>
    </div>
+   </div>
+   </div>
+
+   <style>
+      .newBox {
+         padding: 1em;
+         background: #FFFFFF;
+         box-shadow: 0px 0px 0px rgba(19, 19, 151, 0.2);
+         border-radius: 8px;
+      }
+      .newBox label {
+         color: #000000 !important;
+         font-weight: 500;
+      }
+      .newBox input {
+         border: 1px solid #c7d0dd !important;
+         outline: unset !important;
+         border-radius: 4px !important;
+      }
+   </style>
 
    <script>
       export default {

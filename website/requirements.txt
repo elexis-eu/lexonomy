@@ -1,9 +1,10 @@
 bottle==0.12.20
-express==1.0
-lxml>=4.3.4
+lxml>=4.9.1
 Paste==3.0.8
 six==1.12.0
 Markdown>=3.1.0
 PyICU>=2.2
 requests
-PyJWT==2.4.0
+beautifulsoup4>=4.4.0
+typing-extensions
+PyJWT

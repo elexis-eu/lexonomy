@@ -7,18 +7,26 @@
     "doc": "docs"
   },
   "devDependencies": {
+    "@elexis-eu/xonomy": "^1.3.0",
     "@riotjs/cli": "^6.0.5",
     "@rollup/plugin-node-resolve": "^13.1.3",
-    "node-sass": "^7.0.1",
+    "concurrently": "^7.2.1",
+    "postcss": "^8.4.14",
+    "postcss-url": "^10.1.3",
     "riot": "^6.1.2",
-    "rollup-plugin-import-css": "^3.0.3",
-    "rollup-plugin-uglify": "^6.0.4",
+    "rollup": "^2.75.5",
+    "rollup-plugin-postcss": "^4.0.2",
+    "sass": "^1.51.0",
     "terser": "^5.12.1"
   },
   "scripts": {
-    "build": "npx rollup -c",
-    "watch": "npx rollup -c -w",
-    "minify": "npx terser bundle.js -c -m --source-map \"url='bundle.min.js.map'\" --output bundle.min.js"
+    "build": "npm run build:riot && npm run build:editor",
+    "build:riot": "rollup -c && npm run build:riot:minify",
+    "build:riot:minify": "npx terser dist/riot/bundle.js -c -m --source-map \"url='dist/riot/bundle.min.js.map'\" --output dist/riot/bundle.min.js",
+    "build:editor": "npm run --prefix editor build ",
+    "watch": "concurrently \"npm run watch:riot\" \"npm run watch:editor\"",
+    "watch:riot": "rollup -c -w",
+    "watch:editor": "npm run --prefix editor serve"
   },
   "repository": {
     "type": "git",

@@ -31,7 +31,7 @@ Xrefs.linkBox=function(htmlID) {
   html += "<div class='input-field'><input id='xreftarget' name='xreftarget' class='autocomplete'/></div>";
   html += "<button class=\"btn\"onclick='Xrefs.makeLink(\""+htmlID+"\")'>Link</button>";
   html += "</div>";
-  document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
+  Xonomy.makeBubble(html); //create bubble
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
   // read dictionary preference from cookie
   if (document.cookie.split('; ').find(row => row.startsWith('linkPref='))) {

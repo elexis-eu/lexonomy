@@ -203,13 +203,13 @@ Ske.menuRoot=function(htmlID, additional=false){
     html+="</div>";
   }
   html+="</div>";
-  document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
+  Xonomy.makeBubble(html); //create bubble
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
 };
 
 Ske.menuExamples=function(htmlID, param){
   if(param=="layby") Ske.htmlID=null; else  Ske.htmlID=htmlID;
-  document.body.appendChild(Xonomy.makeBubble(Ske.boxExamples())); //create bubble
+  Xonomy.makeBubble(Ske.boxExamples()); //create bubble
   $("input[name=skesearchtype]").on("click", function() {
     var val = $(this).val() == "skesimple"
     $("#skesimple").nextAll("input").first().prop("disabled", !val)
@@ -317,7 +317,7 @@ Ske.insertExamples=function(){
 
 Ske.menuThes=function(htmlID, param){
   if(param=="layby") Ske.htmlID=null; else  Ske.htmlID=htmlID;
-  document.body.appendChild(Xonomy.makeBubble(Ske.boxThes())); //create bubble
+  Xonomy.makeBubble(Ske.boxThes()); //create bubble
   if(Xonomy.lastClickWhat=="openingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.opening > .name")); //anchor bubble to opening tag
   else if(Xonomy.lastClickWhat=="closingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.closing > .name")); //anchor bubble to closing tag
   else Xonomy.showBubble($("#"+htmlID));
@@ -398,7 +398,7 @@ Ske.insertThes=function(){
 
 Ske.menuCollx=function(htmlID, param){
   if(param=="layby") Ske.htmlID=null; else  Ske.htmlID=htmlID;
-  document.body.appendChild(Xonomy.makeBubble(Ske.boxCollx())); //create bubble
+  Xonomy.makeBubble(Ske.boxCollx()); //create bubble
   if(Xonomy.lastClickWhat=="openingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.opening > .name")); //anchor bubble to opening tag
   else if(Xonomy.lastClickWhat=="closingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.closing > .name")); //anchor bubble to closing tag
   else Xonomy.showBubble($("#"+htmlID));
@@ -479,7 +479,7 @@ Ske.insertCollx=function(){
 
 Ske.menuDefo=function(htmlID, param){
   if(param=="layby") Ske.htmlID=null; else  Ske.htmlID=htmlID;
-  document.body.appendChild(Xonomy.makeBubble(Ske.boxDefo())); //create bubble
+  Xonomy.makeBubble(Ske.boxDefo()); //create bubble
   if(Xonomy.lastClickWhat=="openingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.opening > .name")); //anchor bubble to opening tag
   else if(Xonomy.lastClickWhat=="closingTagName") Xonomy.showBubble($("#"+htmlID+" > .tag.closing > .name")); //anchor bubble to closing tag
   else Xonomy.showBubble($("#"+htmlID));

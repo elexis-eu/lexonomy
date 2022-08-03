@@ -18,7 +18,7 @@
 
 .viewer .border {border-radius: 4px;}
 .viewer div.border {padding: 5px 10px; margin: 15px -10px; }
-.viewer span.border {padding: 0px 2px; margin: 0px 0px;}
+.viewer span.border {padding: 0px 2px; margin: 0px 0px;display:inline-block}
 .viewer .border.dotted {border: 1px dotted #999999;}
 .viewer .border.solid {border: 1px solid #999999;}
 .viewer .border.thick {border: 2px solid #999999;}
@@ -31,7 +31,7 @@
 .viewer .background.xema_grey {background-color: #eeeeee; text-shadow: 1px 1px 0px #ffffff;}
 
 .viewer div.indented {margin-left: 40px;}
-.viewer span.indented {margin-left: 0.5em; margin-right: 0.5em;}
+.viewer span.indented {margin-left: 0.5em; margin-right: 0.5em;padding-left:0.5em}
 
 .viewer div.hanging {margin-left: 40px; text-indent: -40px;}
 .viewer span.hanging {margin-right: 0.5em;}

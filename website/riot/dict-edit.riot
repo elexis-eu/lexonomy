@@ -42,9 +42,9 @@
                      </a>
                      <span if={dictData.config.flagging.flags.length}
                            onclick={onOpenFlagMenuClick.bind(this, entry)}
-                           class="flag {entry.flag && entry.flag[0] ? 'badge' : 'noFlag'}"
-                           style={getFlagStyle(entry.flag ? entry.flag[0] : '')}>
-                        {store.getFlagLabel(entry.flag && entry.flag[0]) || "no flag"}
+                           class="flag {entry.flag ? 'badge' : 'noFlag'}"
+                           style={getFlagStyle(entry.flag)}>
+                        {store.getFlagLabel(entry.flag) || entry.flag || "No flag"}
                      </span>
                   </div>
                   <div if={!dictData.entryList.length && !dictData.isEntryListLoading}
@@ -56,14 +56,14 @@
                      id="flagDropdown"
                      class="dropdown-content flagDropdown">
                   <li data-flag="">
-                     <i class="material-icons"
+                     <i class="material-symbols-outlined"
                            style="color: grey">label_outline</i>
                      <div>no flag</div>
                      <div class="right flagKey">delete</div>
                   </li>
                   <li each={flag in dictData.config.flagging.flags}
                         data-flag={flag.name}>
-                     <i class="material-icons"
+                     <i class="material-symbols-outlined"
                            style="color: {flag.color}">label</i>
                      <div>{flag.label}</div>
                      <div class="right flagKey">{flag.key}</div>
@@ -215,13 +215,17 @@
          },
 
          onHeadwordClick(entryId, evt){
-            this.store.changeEntryId(entryId)
+            if(!window.editorNeedsSaving(evt)){
+               this.store.changeEntryId(entryId)
+            }
          },
 
          onHeadwordLinkClick(entryId, evt){
             evt.preventDefault()
-            this.onDocumentClick(evt)
-            this.store.changeEntryId(entryId)
+            if(!window.editorNeedsSaving(evt)){
+               this.onDocumentClick(evt)
+               this.store.changeEntryId(entryId)
+            }
          },
 
          onOpenFlagMenuClick(entry, evt){
@@ -291,6 +295,18 @@
                      this.store.setEntryFlag(this.dictData.entryList[this.state.cursorPosition - 1].id, flag.name)
                   }
                }
+            }
+            if (evt.keyCode == 69 && (evt.ctrlKey || evt.metaKey) && evt.shiftKey) { //E key
+               evt.preventDefault()
+               evt.stopImmediatePropagation()
+               $("#butEdit:visible").click()
+               $("#butView:visible").click()
+               return
+            }
+            if (evt.keyCode == 83 && (evt.ctrlKey || evt.metaKey) && evt.shiftKey) { //S key
+               evt.preventDefault()
+               evt.stopImmediatePropagation()
+               $("#butSave:visible").click();
             }
          },
 

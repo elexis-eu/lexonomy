@@ -6,17 +6,20 @@
          <div style="display: flex; align-items: center; flex-wrap: wrap;">
             <span if={dictData.dictionaryList.length}
                   class="searchBox input-field">
-                  <i class="material-icons prefix grey-text">search</i>
-               <input id="searchBox"
+                  <i class="material-symbols-outlined prefix">search</i>
+               <input id="searchBox" placeholder="search"
                      oninput={onSearchInput}>
                <i onclick={onClearFilterClick}
-                  class="material-icons clearFilterIcon grey-text clickable">close</i>
+                  class="material-symbols-outlined clearFilterIcon clickable">close</i>
             </span>
-            <span style="margin-left: auto;">
+            <span style="margin-left: auto; margin-right: 1em;">
+               <a href="#/opendictionaries" style="color:#004494">Public dictionaries</a>
+            </span>
+            <span>
                <a href="#/make"
                      class="btn waves-effect waves-light">
-                  <i class="material-icons left">add</i>
-                  create new dictionary
+                  create a dictionary
+                  <i class="material-symbols-outlined right">edit_note</i>
                </a>
             </span>
          </div>
@@ -27,44 +30,35 @@
                   class="collection-item {dict.selected ? 'selected' : ''}"
                   key={dict.id}>
                <div>
-                  <label if={dict.currentUserCanDelete}
-                           class="checkbox">
-                     <input id="chb_{idx}"
-                           type="checkbox"
-                           idx={idx}
-                           checked={dict.selected}
-                           onclick={onCheckboxClick}/>
-                     <span></span>
-                  </label>
                   <a href="#/{ dict.id }"
                         id="t_{idx}"
                         class="title">{ dict.title }</a>
                   <span if={ dict.lang }
                         class="dict-lang">{ dict.lang }</span>
-                  <span class="dict-lang grey-text">{ dict.size } entries</span>
+                     <span class="dict-lang grey-text">{ dict.size } <template if={ dict.size == 1 }> entry</template><template if={ dict.size != 1}> entries</template></span>
                   <a if={ dict.currentUserCanDelete }
                         class="secondary-content clickable"
                         title="delete dictionary"
                         onclick={ doDeleteDict.bind(this, dict.id) }>
-                     <i class="material-icons">delete</i>
+                     <i class="material-symbols-outlined">delete</i>
                   </a>
                   <a class="secondary-content clickable"
                         title="clone dictionary"
                         onclick={ doCloneDict.bind(this, dict.id) }>
-                     <i class="material-icons">content_copy</i>
+                     <i class="material-symbols-outlined">control_point_duplicate</i>
                   </a>
                   <a  if={ dict.currentUserCanDelete }
                         class="secondary-content clickable"
                         title="config dictionary"
                         onclick={ doConfigDict.bind(this, dict.id) }>
-                     <i class="material-icons">settings</i>
+                     <i class="material-symbols-outlined">settings</i>
                   </a>
                   <a if={ dict.currentUserCanEdit }
                         class="secondary-content clickable"
                         data-dict-id={ dict.id }
                         title="edit dictionary"
                         onclick={ doEditDict.bind(this, dict.id) }>
-                     <i class="material-icons">edit</i>
+                     <i class="material-symbols-outlined">edit</i>
                   </a>
                </div>
             </li>
@@ -97,11 +91,13 @@
          <h1>no dictionaries</h1>
          <div>
             You have no dictionary yet. Create one using button below.
+            <br>
+            <a href="#/opendictionaries" style="color:#004494">View public dictionaries</a>
          </div>
          <br>
          <a href="#/make"
                class="btn waves-effect waves-light">
-            <i class="material-icons left">add</i>
+            <i class="material-symbols-outlined left">edit_note</i>
             create new dictionary
          </a>
       </div>
@@ -112,10 +108,20 @@
          max-width: 200px;
          display: inline-block;
          margin: 0 15px 0 0;
+         border-bottom: 2px solid #004494;
       }
       .searchBox input{
          padding-right: 27px;
+         border: unset;
+         background-color: #F0F8FF !important;
       }
+   .searchBox input:focus{
+         border: unset !important;
+         outline: unset !important;
+   }
+   .searchBox input::placeholder{
+         color: #004494;
+   }
       .clearFilterIcon{
          position: absolute;
          right: 5px;
@@ -169,8 +175,8 @@
 
    <script>
       export default {
-         bindings: [["store", "dictionaryListChanged", "onDictionaryListChange"],
-                    ["store", "dictionaryListLoadingChanged", "update"]],
+         bindings: [["store", "dictionaryListChanged", "onDictionaryListLoadingChange"],
+                    ["store", "dictionaryListLoadingChanged", "onDictionaryListLoadingChange"]],
          state: {
             isLoading: false,
             lastCheckedIdx: null,

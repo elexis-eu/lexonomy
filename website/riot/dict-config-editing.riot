@@ -2,141 +2,145 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["editing", "Entry editor"]]}/>
    <h1>Entry editor</h1>
-   <div if={ (!state.data._js || state.data._js == "") && !state.override }>
-      <div class="input-field">
-         <p>
-            <label>
-               <input name="xonomyMode"
-                     id="xonomyMode_nerd"
-                     type="radio"
-                     class="with-gap"
-                     checked={ state.data.xonomyMode == "nerd" }
-                     onchange={ changeInfo } />
-               <span>Nerd mode</span>
-            </label>
-            <label style="margin-left: 30px;">
-               <input name="xonomyMode"
-                     id="xonomyMode_laic"
-                     type="radio"
-                     class="with-gap"
-                     checked={ state.data.xonomyMode == "laic" }
-                     onchange={ changeInfo }/>
-               <span>Laic mode</span>
-            </label>
-         </p>
-         <span class="helper-text">Choose what the entry editor will look like.</span>
-      </div>
-      <div id="info_nerd">
-         <p>When editing an entry in <b>nerd mode</b> the user sees the XML source code, angle brackets and all.
-            <div class='instro'>
-               <img src='docs/mode-nerd.png' alt='Illustration'/>
-            </div>
-            <br/>
-            Individual users can overide this setting by clicking an icon in the bottom-left corner of their screen.
-         </p>
-      </div>
-      <div id="info_laic">
-         <p>When editing an entry in <b>laic mode</b> the XML source code is hidden and the entry looks more like a bulleted list.
-            <div class='instro'>
-               <img src='docs/mode-laic.png' alt='Illustration'/>
-            </div>
-            <br/>
-            Individual users can overide this setting by clicking an icon in the bottom-left corner of their screen.
-         </p>
-      </div>
-      <br>
-      <div class="input-field">
-         <p>
-            <label>
-               <input name="xonomyTextEditor"
-                     id="xonomyTextEditor_string"
-                     type="radio"
-                     class="with-gap"
-                     checked={ state.data.xonomyTextEditor == "askString" }
-                     onchange={ changeInfo }/>
-               <span>Single line</span>
-            </label>
-            <label style="margin-left: 30px;">
-               <input name="xonomyTextEditor"
-                     id="xonomyTextEditor_longstring"
-                     type="radio"
-                     class="with-gap"
-                     checked={ state.data.xonomyTextEditor == "askLongString" }
-                     onchange={ changeInfo }/>
-               <span>Multi line</span>
-            </label>
+ 
+   <template if={!state.isLoading}>
+      <dict-config-buttons save-data={saveData}>
+         <button class="btn waves-effect waves-light" onclick={ toggleOverride } >
+            {state.override ? 'Disable entry editor customizations' : 'Customize entry editor' }
+            <i class="material-symbols-outlined right">{state.override ? 'close' : 'edit'}</i>
+         </button>
+      </dict-config-buttons>
+      <div if={ !state.override }>
+         <div class="input-field">
+            <p>
+               <label>
+                  <input name="xonomyMode"
+                        id="xonomyMode_nerd"
+                        type="radio"
+                        class="with-gap"
+                        checked={ state.data.xonomyMode == "nerd" }
+                        onchange={ changeInfo } />
+                  <span>Nerd mode</span>
+               </label>
+               <label style="margin-left: 30px;">
+                  <input name="xonomyMode"
+                        id="xonomyMode_laic"
+                        type="radio"
+                        class="with-gap"
+                        checked={ state.data.xonomyMode == "laic" }
+                        onchange={ changeInfo }/>
+                  <span>Laic mode</span>
+               </label>
+               <label style="margin-left: 30px;">
+                  <input name="xonomyMode"
+                        id="xonomyMode_graphical"
+                        type="radio"
+                        class="with-gap"
+                        checked={ state.data.xonomyMode == "graphical" }
+                        onchange={ changeInfo }/>
+                  <span>Graphical mode</span>
+               </label>
             </p>
-         <span class="helper-text">Choose the default text editor for node values.</span>
-      </div>
-      <div id="info_string"
-            style="margin-left: 30px;">
-         <p>When editing text in <b>single line mode</b> the user sees a smaller editor.
-            <div class='instro'>
-               <img src='docs/text-editor-askstring.png' alt='Illustration'/>
-            </div>
-         </p>
-      </div>
-      <div id="info_longstring"
-            style="margin-left: 30px;">
-         <p>When editing text in <b>multi line mode</b> the user sees a full-fledged text editor.
-            <div class='instro'>
-               <img src='docs/text-editor-asklongstring.png' alt='Illustration'/>
-            </div>
-         </p>
-      </div>
-      <div>
+            <span class="helper-text">Choose what the entry editor will look like.</span>
+         </div>
+         <div id="info_nerd">
+            <p>When editing an entry in <b>nerd mode</b> the user sees the XML source code, angle brackets and all.
+               <div class='instro'>
+                  <img src='docs/mode-nerd.png' alt='Illustration'/>
+               </div>
+               <br/>
+               Individual users can overide this setting by clicking an icon in the bottom-left corner of their screen.
+            </p>
+         </div>
+         <div id="info_laic">
+            <p>When editing an entry in <b>laic mode</b> the XML source code is hidden and the entry looks more like a bulleted list.
+               <div class='instro'>
+                  <img src='docs/mode-laic.png' alt='Illustration'/>
+               </div>
+               <br/>
+               Individual users can overide this setting by clicking an icon in the bottom-left corner of their screen.
+            </p>
+         </div>
+         <div id="info_graphical" style="padding-left: 50px;">
+            <p>When editing an entry in <b>graphical mode</b> the XML source code is hidden and the entry uses settings configuration to display a more graphically friendly interface.
+            <div class='instro'>Image of graphical editor</div>
+            </p>
+         </div>
          <br>
-         <button class="btn waves-effect waves-light"
-               onclick={ startOverride } >
-            Customize entry editor
-            <i class="material-icons right">edit</i>
-         </button>
-      </div>
-      <br><br>
-      <dict-config-buttons save-data={saveData}></dict-config-buttons>
-   </div>
-   <div if={ (state.data._js && state.data._js != "") || state.override }>
-      <div class="row">
          <div class="input-field">
-            <div id="codeStatus"></div>
-            <textarea id="editor_js"
-                  class="materialize-textarea"
-                  oninput={checkJSCode}>{ state.data._js }</textarea>
-            <label>JavaScript</label>
-            <span class="helper-text">
-               You can customize the editor by defining two functions in JavaScript: one that will render the HTML editor from the XML entry and one that will harvest the (edited) HTML back into XML. If you would like to see an example,
-               <a onclick={ exampleJS }>click here to load a sample JavaScript code</a>.
-            </span>
+            <p>
+               <label>
+                  <input name="xonomyTextEditor"
+                        id="xonomyTextEditor_string"
+                        type="radio"
+                        class="with-gap"
+                        checked={ state.data.xonomyTextEditor == "askString" }
+                        onchange={ changeInfo }/>
+                  <span>Single line</span>
+               </label>
+               <label style="margin-left: 30px;">
+                  <input name="xonomyTextEditor"
+                        id="xonomyTextEditor_longstring"
+                        type="radio"
+                        class="with-gap"
+                        checked={ state.data.xonomyTextEditor == "askLongString" }
+                        onchange={ changeInfo }/>
+                  <span>Multi line</span>
+               </label>
+            </p>
+            <span class="helper-text">Choose the default text editor for node values.</span>
+         </div>
+         <div id="info_string"
+               style="margin-left: 30px;">
+            <p>When editing text in <b>single line mode</b> the user sees a smaller editor.
+               <div class='instro'>
+                  <img src='docs/text-editor-askstring.png' alt='Illustration'/>
+               </div>
+            </p>
+         </div>
+         <div id="info_longstring"
+               style="margin-left: 30px;">
+            <p>When editing text in <b>multi line mode</b> the user sees a full-fledged text editor.
+               <div class='instro'>
+                  <img src='docs/text-editor-asklongstring.png' alt='Illustration'/>
+               </div>
+            </p>
          </div>
       </div>
-      <div class="row">
-         <div class="input-field">
-            <textarea id="editor_css"
-                  class="materialize-textarea">{ state.data._css }</textarea>
-            <label for="editor_css">CSS</label>
-            <span class="helper-text">
-               You can customize the editor look and feel by writing your own CSS styles. If you would like to see an example,
-               <a onclick={ exampleCSS }>click here to load a sample CSS style</a>.
-            </span>
+      <div if={ state.override }>
+         <div class="row">
+            <div class="input-field">
+               <div id="codeStatus"></div>
+               <textarea id="editor_js"
+                     class="materialize-textarea"
+                     oninput={checkJSCode}>{ state.data._js }</textarea>
+               <label>JavaScript</label>
+               <span class="helper-text">
+                  You can customize the editor by defining two functions in JavaScript: one that will render the HTML editor from the XML entry and one that will harvest the (edited) HTML back into XML. If you would like to see an example,
+                  <a onclick={ exampleJS }>click here to load a sample JavaScript code</a>.
+               </span>
+            </div>
+         </div>
+         <div class="row">
+            <div class="input-field">
+               <textarea id="editor_css"
+                     class="materialize-textarea">{ state.data._css }</textarea>
+               <label for="editor_css">CSS</label>
+               <span class="helper-text">
+                  You can customize the editor look and feel by writing your own CSS styles. If you would like to see an example,
+                  <a onclick={ exampleCSS }>click here to load a sample CSS style</a>.
+               </span>
+            </div>
          </div>
       </div>
-      <div class="buttons">
-         <a class="btn btn-secondary waves-effect waves-light"
-               onclick={backFromOverride} >back</a>
-         <button class="btn waves-effect waves-light"
-               onclick={ stopOverride } >
-            Disable entry editor customizations
-            <i class="material-icons right">edit</i>
+      <dict-config-buttons save-data={saveData}>
+         <button class="btn waves-effect waves-light" onclick={ toggleOverride } >
+            {state.override ? 'Disable entry editor customizations' : 'Customize entry editor' }
+            <i class="material-symbols-outlined right">{state.override ? 'close' : 'edit'}</i>
          </button>
-         <button class="btn waves-effect waves-light"
-               onclick={saveData}
-               id="submit_button">
-            Save
-            <i class="material-icons right">save</i>
-         </button>
-      </div>
-      <br><br>
-   </div>
+      </dict-config-buttons>
+   </template>
+
 
    <style>
       textarea{
@@ -176,9 +180,15 @@
             if ($("#xonomyMode_laic").is(":checked")) {
                $('#info_nerd').hide();
                $('#info_laic').show();
-            } else {
+              $('#info_graphical').hide();
+            } else if ($("#xonomyMode_nerd").is(":checked")) {
                $('#info_nerd').show();
                $('#info_laic').hide();
+               $('#info_graphical').hide();
+            } else {
+              $('#info_nerd').hide();
+              $('#info_laic').hide();
+              $('#info_graphical').show();
             }
             if ($("#xonomyTextEditor_longstring").is(":checked")) {
                $('#info_string').hide();
@@ -189,18 +199,12 @@
             }
          },
 
-         startOverride() {
-            this.update({override: true});
-         },
-
-         stopOverride() {
-            this.state.data._js = '';
-            this.state.data._css = '';
-            this.update({override: false});
-         },
-
-         backFromOverride(){
-            this.update({override: false});
+         toggleOverride() {
+            this.update({override: !this.state.override});
+            if (this.state.override) {
+               M.textareaAutoResize($('#editor_css'))
+               M.textareaAutoResize($('#editor_js'))
+            }
          },
 
          exampleJS() {
@@ -276,6 +280,9 @@ div.myEditor input {font-weight: bold}`
             };
             if ($("#xonomyMode_laic").is(":checked")) {
                newData.xonomyMode = "laic";
+            }
+            if ($("#xonomyMode_graphical").is(":checked")) {
+               newData.xonomyMode = "graphical";
             }
             if ($("#xonomyTextEditor_longstring").is(":checked")) {
                newData.xonomyTextEditor = "askLongString";

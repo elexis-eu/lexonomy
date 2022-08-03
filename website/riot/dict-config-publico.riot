@@ -3,6 +3,7 @@
    <dict-nav links={[["config", "Configure"], ["publico", "Publishing"]]}/>
    <h1>Publishing</h1>
    <template if={!isLoading}>
+      <dict-config-buttons save-data={saveData}></dict-config-buttons>
       <div class="row">
          <div class="input-field">
             <p>
@@ -45,7 +46,6 @@
             <span class="helper-text"></span>
          </div>
       </div>
-      <dict-config-buttons save-data={saveData}></dict-config-buttons>
    </template>
 
 

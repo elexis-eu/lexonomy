@@ -2,13 +2,13 @@
 .xonomy.laic .lexonomyKontextCaption {top: 0px; margin-right: 0px; margin-left: 10px;}
 .xonomy .readonly .lexonomyKontextCaption {display: none;}
 .xonomy .lexonomyKontextCaption:hover {color: #004f9b; }
-#xonomyBubble .menuItem > a {display: block; color: inherit; text-decoration: inherit;}
+.xonomyBubble .menuItem > a {display: block; color: inherit; text-decoration: inherit;}
 
 div.kontextbox {padding: 0px; width: 600px; height: 300px; position: relative;}
 div.kontextbox form.topbar {position: absolute; top: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }
 div.kontextbox div.bottombar {position: absolute; bottom: 0px; left: 0px; right: 0px; height: 28px; padding: 5px; background-color: rgb(238, 238, 238); }
 
-div.kontextbox form.topbar input.textbox {width: 150px !important;}
+div.kontextbox form.topbar input.textbox {width: auto !important;}
 div.kontextbox input.kontext {background-image: url(./furniture/kontext.png); background-position: center center; background-repeat: no-repeat; padding: 4px 0px 4px 0px; width: 40px; border-width: 1px; border-radius: 2px; cursor: pointer;}
 div.kontextbox button.insert {background-image: url(./furniture/add.png); background-position: 10px center; background-repeat: no-repeat; padding: 5px 10px 5px 30px; border-width: 1px; border-radius: 2px; cursor: pointer;}
 div.kontextbox button.prevnext {padding: 5px 10px 5px 10px; border-width: 1px; border-radius: 2px; cursor: pointer; float: right;}
@@ -19,7 +19,6 @@ div.kontextbox div.waiter {position: absolute; top: 43px; left: 0px; right: 0px;
 div.kontextbox div.choices {position: absolute; top: 43px; left: 0px; right: 0px; bottom: 45px; overflow-y: scroll; }
 div.kontextbox div.choices label {cursor: pointer; padding: 5px 5px; font-size: 0.9rem; display: block; position: relative;}
 div.kontextbox div.choices label input {position: absolute; top: 4px; left: 5px; }
-div.kontextbox div.choices label span.inside {display: block; margin-left: 30px; }
 div.kontextbox div.choices label:hover {color: #333333; background-color: #ffffcc;}
 div.kontextbox div.choices label.selected {color: #002e88;}
 

@@ -4,6 +4,7 @@
    <h1>Description</h1>
    <div>
       <form>
+         <dict-config-buttons save-data={saveData}></dict-config-buttons>
          <div class="row">
             <div class="input-field">
                <input value={ state.data.title }
@@ -51,7 +52,6 @@
                <span class="helper-text">Link to metadata recorded in CLARIN repository, provide URL to 'handle' link, eg. <tt>http://hdl.handle.net/11356/1094</tt>.</span>
             </div>
          </div>
-         <dict-config-buttons save-data={saveData}></dict-config-buttons>
       </form>
    </div>
 

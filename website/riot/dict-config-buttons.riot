@@ -8,8 +8,10 @@
          onclick={props.saveData}
          id="submit_button">
       {props.label || "Save"}
-      <i class="material-icons right">save</i>
+      <i class="material-symbols-outlined right">edit</i>
    </button>
+
+   <slot/>
 
    <style>
       :host{

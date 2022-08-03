@@ -1,4 +1,4 @@
-<main class="main">
+<main class="main { ( ['login', 'register', 'registerPassword', 'forgot', 'forgotPassword'].includes(state.subPage) && !authData.authorized ) ? 'login-page' : '' } {['dict-public-entry', 'dict-public', 'open-dict-list'].includes(state.content) && !authData.authorized ? 'dark-page':''}" >
    <loading-overlay if={authData.isCheckingAuth || dictData.isSiteconfigLoading} fullscreen=1/>
    <app-header/>
    <div class="contentWrapper">
@@ -13,6 +13,7 @@
    <style>
       .contentWrapper{
          position: relative;
+         background-color: #f0f8ff;
       }
       .content{
          padding-left: 10px;
@@ -21,6 +22,63 @@
       .wideContainer{
          max-width: 1600px;
          width: 90vw;
+      }
+      main.login-page app-header {
+         visibility: hidden;
+      }
+      main.dark-page app-header, main.dark-page app-header nav.white {
+         background-color: #004494 !important;
+      }
+      main.dark-page app-header a {
+         color: #ffffff;
+      }
+      main.dark-page app-header .site-logo {
+         background-image: url(img/logo_lexonomy_white.png) !important;
+      }
+      main.main {
+         background-color: #f0f8ff;
+      }
+      main.dark-page, main.login-page {
+         background-image: url(img/background_dark.png);
+         background-size: cover;
+      }
+      main.dark-page .contentWrapper,
+      main.login-page .contentWrapper {
+         background-color: unset;
+      }
+      main.dark-page .footer-logos,
+      main.login-page .footer-logos{
+         background-color: unset;
+         border-top: 1px solid #ffffff;
+      }
+      main.dark-page app-footer a,
+      main.login-page app-footer a,
+      main.dark-page app-footer .version,
+      main.login-page app-footer .version,
+      main.dark-page app-footer .horizon-info,
+      main.login-page app-footer .horizon-info {
+         color: #ffffff;
+      }
+      main.dark-page app-footer .eulogo,
+      main.login-page app-footer .eulogo {
+         background-image: url(img/logo_eu_white.png) !important;
+      }
+      main.dark-page app-footer .elexislogo,
+      main.login-page app-footer .elexislogo {
+         background-image: url(img/logo_elexis_white.png) !important;
+      }
+      main.dark-page app-footer .githublogo,
+      main.login-page app-footer .githublogo {
+         background-image: url(img/github-white.png) !important;
+      }
+      main.dark-page .container h1 {
+         color: #ffffff;
+      }
+      main.dark-page .container > div {
+         background: #FFFFFF;
+         box-shadow: 0px 0px 30px rgba(92, 32, 170, 0.7);
+         border-radius: 16px;
+         padding: 2em;
       }
    </style>
 
@@ -54,7 +112,8 @@
                let query = route.query()
                this.store.changeSearchParams({
                   searchtext: decodeURIComponent(query.s || ""),
-                  modifier: query.m
+                  modifier: query.m,
+                  searchflag: decodeURIComponent(query.f || ""),
                })
 
                this.update(Object.assign({
@@ -65,7 +124,7 @@
          },
 
          needAuthorization(content, subPage){
-            if(['e404', 'open-dict-list', 'dict-public', 'dict-public-entry', 'docs-intro'].includes(content)
+            if(['e404', 'open-dict-list', 'dict-public', 'dict-public-entry', 'docs-intro', 'docs-about'].includes(content)
                   || content == 'main-page' && !['new', 'userprofile'].includes(subPage)){
                return false
             }
@@ -110,6 +169,9 @@
             })
             route('/docs/intro', () => {
                this.goTo('docs-intro')
+            })
+            route('/docs/about', () => {
+               this.goTo('docs-about')
             })
             route('/createaccount/*', (token) => {
                this.goTo('main-page', 'registerPassword', '', {token: token})

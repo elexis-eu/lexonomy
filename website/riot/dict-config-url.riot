@@ -2,6 +2,8 @@
    <loading-overlay if={state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["url", "Change URL"]]}/>
    <h1>Change URL</h1>
+   <dict-config-buttons save-data={saveData}
+         label="Change"></dict-config-buttons>
    <div class="row">
       <label for="url">Current URL</label>
       <div style="margin: 0 0 30px;">
@@ -25,38 +27,43 @@
          </div>
          <div class="input-field"
                style="margin-top: 0;">
-            <span class="helper-text">This will be your dictionary's address on the web. You will be able to change this later. Allowed: letters, numbers, - and _</span>
+            <span class="helper-text">This will be your dictionary's address on the web. Minimum length: 5 characters. Allowed: letters, numbers, - and _</span>
          </div>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData}
-         label="Change"></dict-config-buttons>
    <br>
    <div>
       <span id="error"
             style="display:none">This URL is already taken.</span>
       <span id="success"
             style="display:none">
-         Your dictionary has been moved to a new URL.
-         <a href="" id="newlink">Go to new dictionary URL</a>.
+      <b>Your dictionary has been moved to a new URL.</b>
+      <a class="btn waves-effect waves-light" href="" id="newlink">
+         Go to new dictionary URL
+      <i class="material-symbols-outlined right">trending_flat</i>
+   </a>
       </span>
    </div>
 
    <script>
       export default {
          saveData() {
-            this.update({isSaving: true})
-            var newurl = $('#url').val()
-            if (newurl != "" && $('#url').hasClass('valid')) {
-               $.post(window.API_URL + this.dictData.dictId + "/move.json", {url: newurl}, (response) => {
-                  if (response.success) {
-                     $('#success').show()
-                     $('#newlink').attr('href', '#/' + newurl)
-                  } else {
-                     $('#error').show()
-                  }
-                  this.update({isSaving: false})
-               })
+            if ($('#url').hasClass('valid')) {
+               this.update({isSaving: true})
+               var newurl = $('#url').val()
+               if (newurl != "" && $('#url').hasClass('valid')) {
+                  $.post(window.API_URL + this.dictData.dictId + "/move.json", {url: newurl}, (response) => {
+                     if (response.success) {
+                        $('#success').show()
+                        $('#newlink').attr('href', '#/' + newurl)
+                     } else {
+                        $('#error').show()
+                     }
+                     this.update({isSaving: false})
+                  })
+               }
+            } else {
+               M.toast({html: 'Please fix invalid URL.'});
             }
          }
       }

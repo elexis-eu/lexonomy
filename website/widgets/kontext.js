@@ -27,7 +27,7 @@ Kontext.render=function(div, json){
     var corpus_input = $("#kontext_corpus");
     corpus_input.data("corpname", json.corpus);
     $.get({
-      url: "/" + dictID + "/kontext/corpora",
+      url: "/" + dictId + "/kontext/corpora",
     }).done(function(res) {
         Kontext.corpora = res.corpus_list;
         corpus_input.easyAutocomplete({
@@ -224,14 +224,14 @@ Kontext.menuRoot=function(htmlID, additional=false){
   }
   if(headword) {
     html+="<div class='menuItem')'>";
-        html+="<a target='kontext' href='/"+dictID+"/kontext/conc?lemma="+headword+"&redir=1'>";
+        html+="<a target='kontext' href='/"+dictId+"/kontext/conc?lemma="+headword+"&redir=1'>";
         html+="<span class='icon'><img src='../../../furniture/kontext.png'/></span> ";
         html+="Show concordance";
       html+="</a>";
     html+="</div>";
   }
   html+="</div>";
-  document.body.appendChild(Xonomy.makeBubble(html)); //create bubble
+  Xonomy.makeBubble(html); //create bubble
   Xonomy.showBubble($("#"+htmlID+" > .inlinecaption")); //anchor bubble to opening tag
 };
 Kontext.getHeadword=function(){
@@ -245,7 +245,7 @@ Kontext.getSearchword=function(elementID){
 };
 Kontext.menuExamples=function(htmlID, param){
   if(param=="layby") Kontext.htmlID=null; else  Kontext.htmlID=htmlID;
-  document.body.appendChild(Xonomy.makeBubble(Kontext.boxExamples())); //create bubble
+  Xonomy.makeBubble(Kontext.boxExamples()); //create bubble
   $("input[name=kontextsearchtype]").on("click", function() {
     var val = $(this).val() == "kontextsimple"
     $("#kontextsimple").nextAll("input").first().prop("disabled", !val)
@@ -303,7 +303,7 @@ Kontext.searchExamples=function(fromp){
   var query=$.trim($(".kontextbox input.textbox:enabled").val());
   var querytype=$("input[name=kontextsearchtype]:checked").val();
   if(query!="") {
-    $.get(rootPath+dictID+"/kontext/conc/", {querytype: querytype, query: query, fromp: fromp}, function(json){
+    $.get("/"+dictId+"/kontext/conc/", {querytype: querytype, query: query, fromp: fromp}, function(json){
         $(".kontextbox .choices").html("");
         if(json.error && json.error=="Empty result"){
           $(".kontextbox .choices").html("<div class='error'>No results found.</div>");

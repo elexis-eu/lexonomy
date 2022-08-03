@@ -50,31 +50,15 @@
       <div class="nav-wrapper">
          <a href="#"
                class="brand-logo">
-            <img class="site-logo" src="img/logo_50.png"/>
+            <span class="site-logo" />
          </a>
-         <span class="fontSize black-text right">
-            <span style="font-size: 15px; position: relative; top: 2px;">A</span>
-            <span style="font-size: 22px; margin-right: 10px;">A</span>
-            <span class="fontSizeArrows">
-               <i class="material-icons clickable"
-                     onclick={onIncreaseFontSize}>arrow_drop_up</i>
-               <i class="material-icons clickable"
-                     onclick={onDecreaseFontSize}>arrow_drop_down</i>
-            </span>
-         </span>
-         <a href="#"
-               data-target="mobile-demo"
-               class="sidenav-trigger">
-            <i class="material-icons">menu</i>
-         </a>
-         <ul id="nav-mobile"
-               class="right hide-on-med-and-down">
-            <li if={ authData.authorized && dictData.isDictionaryLoaded }>
+         <ul class="right hide-on-med-and-down">
+            <li if={ authData.authorized && dictData.isDictionaryLoaded && dictData.userAccess }>
                <a class="dropdown-trigger"
                      href="#/"
                      data-target="dropdown-menu-dict">
-                  Dictionary
-                  <i class="material-icons right">arrow_drop_down</i>
+                  Dictionary { dictData.title }
+                  <i class="material-symbols-outlined right">arrow_drop_down</i>
                </a>
             </li>
             <li if={ !authData.authorized }>
@@ -82,7 +66,7 @@
                      href="#/"
                      data-target="dropdown-menu-anon">
                   anonymous user
-                  <i class="material-icons right">arrow_drop_down</i>
+                  <i class="material-symbols-outlined right">arrow_drop_down</i>
                </a>
             </li>
             <li if={ authData.authorized }>
@@ -90,7 +74,7 @@
                      href="#/"
                      data-target="dropdown-menu-user">
                   {authData.username}
-                  <i class="material-icons right">arrow_drop_down</i>
+                  <i class="material-symbols-outlined right">arrow_drop_down</i>
                </a>
             </li>
          </ul>
@@ -165,9 +149,14 @@
          padding: 0 20px 0 40px;
       }
       .site-logo{
-         height: 50px;
+         height: 40px;
          position: relative;
-         top: 20px
+         top: 20px;
+         width: 223px;
+         background-image: url(img/logo_lexonomy.png);
+         background-size: contain;
+         display: inline-block;
+         background-repeat: no-repeat;
       }
       .sidenav-trigger i{
          font-size: 36px;
@@ -189,7 +178,9 @@
    <script>
       export default {
          doLogout(event) {
-            this.auth.logout()
+            if(!window.editorNeedsSaving(event)){
+               this.auth.logout()
+            }
          },
 
          onIncreaseFontSize(){

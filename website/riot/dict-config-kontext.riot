@@ -2,6 +2,7 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["kontext", "KonText connection"]]}/>
    <h1>KonText connection</h1>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
    <div class="row">
       <div class="input-field">
          <input value={ state.data.url }
@@ -19,10 +20,9 @@
                   class="autocomplete"
                   placeholder="Retrieving available corpora from KonText, please wait...">
             <label for="corpus">Corpus name</label>
-            <span class="helper-text">Select a Sketch Engine corpus from the list of corpora available to you.</span>
+            <span class="helper-text">Select a KonText corpus from the list of corpora available to you.</span>
             <span class="helper-text"
-                  id="corpusInfo"
-                  hide={ true }></span>
+                  id="corpusInfo">Currently selected corpus: { state.data.corpus }</span>
          </div>
       </div>
       <div class="row">
@@ -46,7 +46,7 @@
    </div>
    <div class="row">
       <div class="input-field">
-         <select id="container">
+         <select id="container" data-template="template">
             <option value="">(not set)</option>
          </select>
          <label for="container">Example container</label>
@@ -71,7 +71,6 @@
          <span class="helper-text">Select the element which should mark up the headword in inserted corpus examples. This setting is optional: if you make no selection, corpus examples will be inserted without mark-up.</span>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
    <style>
       #searchElements {
@@ -86,12 +85,12 @@
             isSaving: false,
             data: {
                url: 'https://www.clarin.si/kontext/', searchElements: [],
-               container: '', template: '', markup: ''
+               container: '', template: '', markup: '', corpus: ''
             }
          },
 
          onMounted() {
-            this.store.loadDictionaryConfig("kontex")
+            this.store.loadDictionaryConfig("kontext")
                   .done(response => {
                      this.state.data = response.content
                      if (!response.url || response.url == '') {
@@ -119,7 +118,6 @@
                                  if ($('#corpus').data('selected-corpus') == e.corpus_id) {
                                     selected = eInfo
                                     $('#corpusInfo').html('Currently selected corpus: ' + e.name + ".")
-                                    $('#corpusInfo').show()
                                  }
                               })
                               $('#corpus').autocomplete({data: corporaList})
@@ -148,7 +146,14 @@
                   })
                   .always(() => {
                      this.update({isLoading: false})
-                     $('select').formSelect()
+                     $('select').formSelect().on("change", (evt) => {
+                        let template = evt.target.dataset.template
+                        let element = evt.target.value
+                        if(template){
+                           $(`#${template}`).val(`<${element}>$text</${element}>`)
+                        }
+                     })
+
                      M.updateTextFields()
                   })
          },
@@ -158,24 +163,30 @@
                if ($('#searchElements option').length == 0) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
                      if (info.filling == 'txt' || info.filling == 'lst') {
-                        var checked = this.state.data.searchElements.includes(key)? 'checked':''
-                        $('#searchElements').append('<option value="' + key + '" ' + checked + '>' + key + '</option>')
+                        var selected = this.state.data.searchElements.includes(key)? 'selected':''
+                        $('#searchElements').append('<option value="' + key + '" ' + selected + '>' + key + '</option>')
                      }
                   })
                }
                if ($('#container option').length == 1) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
-                        var checked = (this.state.data.container == key)? 'checked':''
-                        $('#container').append('<option value="' + key + '" ' + checked + '>' + key + '</option>')
+                        var selected = (this.state.data.container == key)? 'selected':''
+                        $('#container').append('<option value="' + key + '" ' + selected + '>' + key + '</option>')
                   })
                }
                if ($('#markup option').length == 1) {
                   Object.entries(this.dictData.config.xema.elements).forEach(([key, info]) => {
-                        var checked = (this.state.data.markup == key)? 'checked':''
-                        $('#markup').append('<option value="' + key + '" ' + checked + '>' + key + '</option>')
+                        var selected = (this.state.data.markup == key)? 'selected':''
+                        $('#markup').append('<option value="' + key + '" ' + selected + '>' + key + '</option>')
                   })
                }
-               $('select').formSelect()
+               $('select').formSelect().on("change", (evt) => {
+                  let template = evt.target.dataset.template
+                  let element = evt.target.value
+                  if(template){
+                     $(`#${template}`).val(`<${element}>$text</${element}>`)
+                  }
+               })
             }
          },
 

@@ -5,7 +5,7 @@
          class="header">
       { dictData.title }
    </h1>
-   <template if={ dictData.public && dictData.isEntryListLoaded}>
+   <div if={ dictData.public && dictData.isEntryListLoaded}>
       <div class="row">
          <div class="col s4 leftCol">
             <loading-overlay if={dictData.isEntryListLoading && dictData.isEntryListLoaded}/>
@@ -40,7 +40,7 @@
       <div class="section">
          { dictData.licence }
       </div>
-   </template>
+   </div>
 
    <style>
       .infoIcon{

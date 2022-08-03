@@ -5,47 +5,57 @@
          class="section message messageError">
       {state.message}
    </div>
-   <div class="section">
+   <div class="section" style="position:relative">
+      <h4>Registered user login</h4>
       <div class="input-field">
          <input id="username"
                type="email"
-               class="validate"/>
-         <label for="username">Username</label>
-         <small>
-            No account?
-            <a href="#register" tabindex="-1">Sign up</a>
-         </small>
+               class="validate" placeholder="E-mail address"/>
       </div>
       <div class="input-field">
          <input id="password"
                type="password"
-               onkeyup={ onKeyUp }/>
-         <label for="password">Password</label>
+               onkeyup={ onKeyUp } placeholder="Password"/>
          <small>
             <a href="#forgot" tabindex="-1">Forgot password?</a>
          </small>
       </div>
+   <a href="#register">Get an account</a>
+   <span if={ dictData.siteconfig && dictData.siteconfig.sketchengineLoginPage }>
+   <br/>or log in with
+   <a href={ dictData.siteconfig.sketchengineLoginPage + encodeURIComponent(window.location.href)}>
+            Sketch Engine</a>
+      </span>
       <button class="btn btn-primary waves-effect waves-light"
             name="login"
             id="loginButton"
             onclick={ doLogin }>
          Log in
-         <i class="material-icons right">send</i>
       </button>
-   </div>
-   <div if={ dictData.siteconfig && dictData.siteconfig.sketchengineLoginPage }
-         class="section" >
-      <a class="btn waves-effect waves-light"
-            href={ dictData.siteconfig.sketchengineLoginPage + encodeURIComponent(window.location.href)}>Sign up or log in with &nbsp;
-         <img class="skelogin"
-               alt="Sketch Engine"
-               title="Sketch Engine"
-               src="img/logo_ske_white.png"/>
-         <i class="material-icons right">send</i>
-      </a>
    </div>
 
    <style>
+   h4 {
+      color: black;
+      text-align: center;
+   }
+   .input-field input {
+      border: 1px solid #C7D0DD;
+      border-radius: 4px;
+   }
+   .input-field input:focus {
+      border: 1px solid #005FCC;
+      border-radius: 4px;
+      color: #005fcc;
+   }
+   #loginButton {
+      position: absolute;
+      right: 1em;
+      bottom: 2em;
+   }
+   a {
+      color: #0000ee;
+      }
       .skelogin {
          width: 80px;
          height: 30px;

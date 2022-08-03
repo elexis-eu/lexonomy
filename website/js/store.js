@@ -46,7 +46,7 @@ class StoreClass {
       if(this.data.isDictionaryLoading){
          this.one("dictionaryChanged", this.changeDoctype.bind(this, doctype))
       } else {
-         doctype = doctype || this.data.doctypes[0]
+         doctype = doctype || this.data.dictConfigs.xema.root || this.data.doctypes[0]
          if(doctype != this.data.doctype){
             this.data.doctype = doctype
             this.data.config.xema.root = doctype
@@ -61,9 +61,11 @@ class StoreClass {
       } else {
          let searchtext = searchParams.searchtext || ""
          let modifier = searchParams.modifier || "start"
-         if(searchtext !== this.data.searchtext || modifier !== this.data.modifier){
+         let searchflag = searchParams.searchflag || ""
+         if(searchtext !== this.data.searchtext || modifier !== this.data.modifier || searchflag !== this.data.searchflag){
             this.data.searchtext = searchtext
             this.data.modifier = modifier
+            this.data.searchflag = searchflag
             this.loadEntryList()
          }
       }
@@ -84,7 +86,8 @@ class StoreClass {
       this.loadEntryList()
       url.setQuery(this.data.searchtext ? {
          s: this.data.searchtext,
-         m: this.data.modifier
+         m: this.data.modifier,
+         f: this.data.searchflag
       } : {}, true)
    }
 
@@ -102,7 +105,7 @@ class StoreClass {
       })
             .done(function(flag, response) {
                if(response.success){
-                  entry.flag = [flag]
+                  entry.flag = flag
                }
             }.bind(this, flag))
             .fail(response => {
@@ -159,6 +162,7 @@ class StoreClass {
          dictId: null,
          entryId: null,
          searchtext: '',
+         searchflag: '',
          modifier: 'start',
          mode: 'view',
          userAccess: {
@@ -286,9 +290,10 @@ class StoreClass {
       let data = {
          searchtext: this.data.searchtext,
          modifier: this.data.modifier,
+         searchflag: this.data.searchflag,
          howmany: howmany ? howmany : (this.data.dictConfigs.titling.numberEntries || 1000)
       }
-      if(authorized){
+      if(authorized && this.data.userAccess.canEdit){
          url = `${window.API_URL}${this.data.dictId}/${this.data.doctype}/entrylist.json`
       } else {
          url = `${window.API_URL}${this.data.dictId}/search.json`
@@ -502,7 +507,7 @@ class StoreClass {
 
    loadKontextCorpora(){
       return $.ajax({
-         url: `${window.API_URL}kontext/corpora`
+         url: `${window.API_URL}${this.data.dictId}/kontext/corpora`
       })
             .fail(response => {
                M.toast({html: "Could not load Kontext corpora."})
@@ -575,18 +580,27 @@ class StoreClass {
             })
    }
 
-   autonumberElements(countElem, storeElem){
+   autonumberElements(){
       return $.ajax({
          url: `${window.API_URL}${this.data.dictId}/autonumber.json`,
          method: 'POST',
+      })
+      .fail(response => {
+         M.toast({html: "Autonumbering failed."})
+      })
+   }
+   autonumberNext(element, target){
+      return $.ajax({
+         url: `${window.API_URL}${this.data.dictId}/next_autonumber.json`,
+         method: 'POST',
          data: {
-            "countElem": countElem,
-            "storeElem": storeElem
+            "element": element,
+            "target": target
          }
       })
-            .fail(response => {
-               M.toast({html: "Autonumbering failed."})
-            })
+      .fail(response => {
+         M.toast({html: "Autonumbering failed."})
+      })
    }
 }
 

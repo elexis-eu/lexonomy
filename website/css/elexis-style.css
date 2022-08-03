@@ -1,0 +1,71 @@
+nav.white {
+	background-color: #f0f8ff !important;
+	border-bottom: unset !important;
+}
+.btn {
+	background-color: #004494 !important;
+	color: #ffffff !important;
+	border-radius: 10px !important;
+}
+/*.contentWrapper {
+	background-color: #f0f8ff !important;
+}*/
+/*main.main {
+	background-color: #f0f8ff !important;
+}*/
+input[type=text]:not(.flag-color) {
+	background-color: white !important;
+}
+div.input-field label {
+	color: #004494 !important;
+}
+html body {
+	font-family: 'Cairo', sans-serif !important;
+}
+h1, h2, h3, h4, h5, h6 {
+	text-transform: unset !important;
+	color: #004494;
+}
+.breadcrumb {
+	text-transform: unset !important;
+}
+h3.header {
+	border-bottom: 2px solid #004494;
+	padding-bottom: 10px;
+	font-size: 130%;
+}
+[is="dict-config"] .columnContainer div {
+	width: 20%;
+}
+[is="dict-config"] .columnContainer div ul li {
+	border-bottom: 1px solid #c7d0dd;
+	padding-top: 10px;
+	background-color: #ffffff;
+}
+[is="dict-config"] .columnContainer div ul li:hover {
+	background-color: #edf1f7;
+}
+.dropdown-trigger a, .dropdown-trigger a:hover {
+	color: #004494 !important;
+}
+.dropdown-content li a, .dropdown-content li a:hover {
+	color: #637383 !important;
+}
+a {
+	text-decoration: none !important;
+}
+.material-symbols-outlined {
+  color: #004494;
+}
+.btn .material-symbols-outlined {
+  color: #ffffff;
+}
+.collection .material-symbols-outlined {
+  margin-left: 15px;
+  padding: 3px;
+}
+.collection .material-symbols-outlined:hover {
+  background-color: #d4deed;
+  border-radius: 50%;
+
+}

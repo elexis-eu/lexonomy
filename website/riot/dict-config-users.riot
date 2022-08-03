@@ -9,7 +9,7 @@
          <br>
          <button class="btn btn-primary"
                onclick={doAddUser}>
-            <i class="material-icons right">add</i>
+            <i class="material-symbols-outlined right">add</i>
             Add new user
          </button>
          <br><br><br><br>
@@ -21,6 +21,7 @@
       <div>
 
       <div if={state.data.users.length}>
+         <dict-config-buttons save-data={saveData}></dict-config-buttons>
          <table>
             <thead>
                <tr style="border-bottom: none;">
@@ -83,7 +84,7 @@
                   <td>
                      <label>
                         <input type="checkbox"
-                              name="canEdit"
+                              name="canUpload"
                               checked={ user.canUpload }
                               onchange={onPermissionChange.bind(this, idx)}/>
                         <span></span>
@@ -92,7 +93,7 @@
                   <td>
                      <a class="btn btn-floating delete-user"
                            onclick={ doDeleteUser.bind(this, idx) }>
-                        <i class="material-icons">delete</i>
+                        <i class="material-symbols-outlined">delete</i>
                      </a>
                   </td>
                </tr>
@@ -102,12 +103,11 @@
          <div>
             <button class="btn"
                   onclick={doAddUser}>
-               <i class="material-icons right">add</i>
+               <i class="material-symbols-outlined right">add</i>
                Add new user
             </button>
          </div>
          <br><br>
-         <dict-config-buttons save-data={saveData}></dict-config-buttons>
          <div id="userConfigError"></div>
       </div>
    </template>

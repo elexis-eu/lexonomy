@@ -1,6 +1,16 @@
 <dict-config>
    <dict-nav links={[["config", "Configure"]]}/>
    <h1>Configuration</h1>
+   <div class="row" if="{!state.isResaving && state.stats && state.stats.needUpdate > 0}">
+      Your dictionary needs to be re-indexed ({state.stats.needUpdate} entries). <button class="btn" style="margin-left: 15px;" onclick="{resave}">Do it now </button>
+      <br>
+      <span style="opacity: 75%; font-size: 80%;">You don't have to do this right now. But your dictionary may take longer to load, and searching entries may not always return the results you expect until you re-index.</span>
+   </div>
+   <div if="{state.isResaving}">
+      <span>{state.resaveProgressMessage || 'Re-indexing...'}</span>
+      <br>
+      <span style="opacity: 75%; font-size: 80%;">You may close or leave this window at any time to pause the process, and return later to resume.</span>
+   </div>
    <div class="columnContainer"
          style="margin-left: 20px;">
       <div>
@@ -88,7 +98,41 @@
 
    <script>
       export default {
-         bindings: [["store", "dictionaryChanged", "update"]]
+         bindings: [["store", "dictionaryChanged", "update"]],
+         state: {
+            stats: {},
+            isResaving: false,
+            resaveProgressMessage: '',
+         },
+         
+         onMounted() {
+            this.getStats();
+            this.state.isUnmounted = false; // I don't think components are re-used, but just in case.
+         },
+         onUnmounted() {
+            this.state.isUnmounted = true;
+         },
+
+         getStats() {
+            $.get(`${this.dictData.dictId}/stats.json`).then(r => this.update({stats: r}));
+         },
+         async resave() {
+            if (this.state.isResaving) return;
+            this.update({isResaving: true});
+            while (true && !this.state.isUnmounted) {
+               try {
+                  const {progressMessage, finished, errors, todo} = await $.post(`${this.dictData.dictId}/resave.json`);
+                  if (finished) {
+                     this.update({isResaving: false, resaveProgressMessage: 'Finished', stats: {needUpdate: 0}});
+                     return;
+                  }
+                  this.update({resaveProgressMessage: progressMessage});
+               } catch (e) {
+                  this.update({isResaving: false});
+                  break
+               }
+            }
+         }
       }
    </script>
 </dict-config>

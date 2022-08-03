@@ -2,6 +2,7 @@
    <loading-overlay if={state.isLoading || state.isSaving}/>
    <dict-nav links={[["config", "Configure"], ["titling", "Headword list"]]}/>
    <h1>Headword</h1>
+   <dict-config-buttons save-data={saveData}></dict-config-buttons>
    <div class="row">
       <div class="input-field col s6">
          <select id="headword">
@@ -88,7 +89,6 @@
          <span class="helper-text">If your dictionary contains large entries (large XML files), it is recommended to reduce this number for quicker loading of entry list.</span>
       </div>
    </div>
-   <dict-config-buttons save-data={saveData}></dict-config-buttons>
 
    <script>
       export default {
