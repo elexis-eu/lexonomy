@@ -103,6 +103,22 @@
             if (this.dictData.dictId && !this.dictData.isEntryLoading) {
                this.store.loadEntry()
             }
+         },
+         onUpdated() {
+                     $("a.xref").on("click", function (e) {
+                        var text = $(e.delegateTarget).attr("data-text");
+                        window.parent.$("#searchBox").val(text);
+                        let evt = new CustomEvent('keyup');
+                        evt.which = 13;
+                        evt.keyCode = 13;
+                        document.getElementById("searchBox").dispatchEvent(evt);
+                        e.stopPropagation();
+                        e.preventDefault();
+                        window.setTimeout(function() {
+                           window.location.hash = $('a.headword-link').attr('href');
+                        }, 500)
+                     });
+
          }
       }
    </script>
