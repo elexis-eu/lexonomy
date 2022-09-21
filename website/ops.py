@@ -130,11 +130,11 @@ class ConfigXema(TypedDict):
 ConfigLinks = dict[str, ConfigLinksEntry]
 class ConfigSubbingEntry(TypedDict):
     attributes: NotRequired[dict[str, str]]
-    """A dictionary containing: { [name of attribute]: "required value of attribute" } (if empty value - only prescence of attribute is checked, any value is accepted)
+    """A dictionary containing: { [name of attribute]: "required value of attribute" } (if empty value - only presence of attribute is checked, any value is accepted)
         The attributes property is NotRequired because this setting didn't always exist, and so it won't be there in old configs.
     """
 
-ConfigSubbing = dict[str, dict[str, Any]] # values are empty dicts for now
+ConfigSubbing = dict[str, ConfigSubbingEntry] # values are empty dicts for now
 
 class ConfigIdent(TypedDict):
     "Dictionary info: title, description etc."
@@ -594,8 +594,8 @@ def searchEntries(
     """Retrieve entries sorted by sortkey. Optionally filtered by their headword.
 
     Args:
-        dictDB (Connection):
-        configs (Configs):
+        dictDB (Connection): the db for the dictionary
+        configs (Configs): configs for the dictionary
         doctype (str): doctype of the entries to retrieve. Usually the root element, but might be different when requesting subentries.
         flag (Optional[str]): find only entries with the given flag
         searchtext (Optional[str]):
@@ -827,6 +827,21 @@ def get_entry_id(xml: Tag, dictDB: Connection, maybeID: Optional[int] = None) ->
         del xml.attrs["lxnm:entryID"]
     return id, isNewEntry
 
+def is_subentry(config: ConfigSubbing, el: Tag, element_id: str) -> bool:
+    """Return True if this element is a subentry, i.e. it's in the sub config, and it has the required attributes."""
+    if not el.name in config:
+        return False
+    required_attributes = config.get(element_id, {}).get("attributes", {}).items()
+    if not(len(required_attributes)):
+        return True # no attributes required - always good.
+    # Find a matching attribute
+    for name, requiredValue in required_attributes:
+        if el.has_attr(name) and (not requiredValue or el.attrs.get(name) == requiredValue):
+            return True
+    # No matching attribute found, element has the correct <name>, but not the correct attributes.
+    return False
+
+
 def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entryID: int, email: str):
     """
     Ensure this entry has all subentries properly extracted and referenced through xml and database.
@@ -871,25 +886,11 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
             subentry.replaceWith(new_tag)
         return subentryID
 
-    def isActualSubentry(el: Tag, element_id: str):
-        """Return True if this element is a subentry, i.e. it's in the sub config, and it has the required attributes."""
-        if not el.name in config:
-            return False
-        required_attributes = config.get(element_id, {}).get("attributes", {}).items()
-        if not(len(required_attributes)):
-            return True # no attributes required - always good.
-        # Find a matching attribute
-        for name, requiredValue in required_attributes:
-            if el.has_attr(name) and (not requiredValue or el.attrs.get(name) == requiredValue):
-                return True
-        # No matching attribute found, element has the correct <name>, but not the correct attributes.
-        return False
-
     def isInsideOtherSubentry(el: Tag) -> bool:
         ancestor = el
         while (ancestor := ancestor.parent) != None and ancestor is not entryXml: # entry xml may not be root of doc, avoid looking at its parents (might happen in nested subentries)!
             ancestor_id = xema_get_id_from_element_name(configs["xema"], ancestor.name)
-            if isActualSubentry(ancestor, ancestor_id):
+            if is_subentry(config, ancestor, ancestor_id):
                 return True
         return False
 
@@ -900,7 +901,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
     for element_id in config:
         element_name = xema_get_element_name_from_id(configs["xema"], element_id)
         for subentryElement in entryXml.select(element_name):
-            if not isInsideOtherSubentry(subentryElement) and isActualSubentry(subentryElement, element_id):
+            if not isInsideOtherSubentry(subentryElement) and is_subentry(config, subentryElement, element_id):
                 nodesToTurnIntoSubentries.append(subentryElement)
     for subentryElement in nodesToTurnIntoSubentries:
         subentryID = turnChildElementIntoSubentry(entryXml, subentryElement)
@@ -927,7 +928,7 @@ def presave_subentries(dictDB: Connection, configs: Configs, entryXml: Tag, entr
                 subentryXml = parse(r["xml"])
 
             subentryID = int(r["id"])
-            isValid = isActualSubentry(subentryXml, xema_get_id_from_element_name(configs["xema"], r["doctype"]))
+            isValid = is_subentry(config, subentryXml, xema_get_id_from_element_name(configs["xema"], r["doctype"]))
             if isValid: # this <lxnm:subentryParent> may stay, but update its attributes anyway while we're here, so we're sure they are up to date.
                 for subentry in entryXml.findAll("lxnm:subentryParent", {"id": subentryID}): # and place xml content in the parent entry
                     subentry.attrs["title"] = get_entry_title(subentryXml, configs)[0]
@@ -2331,6 +2332,7 @@ def readRandomOne(dictDB: Connection, dictID: str, configs: Configs) -> EntryFro
         "title": "",
         "xml": "",
         "sortkey": "",
+        "doctype": "",
     }
 
 def purge(dictDB: Connection, email: str, historiography: Historiography):
@@ -2513,7 +2515,7 @@ def readDictHistory(dictDB: Connection, dictID: str, configs: Configs, entryID: 
             "entry_id": row["entry_id"],
             "revision_id": row["id"],
             "content": xml,
-            "contentHtml": get_entry_html(configs, xml, html_transformer),
+            "contentHtml": get_entry_html(dictDB, configs, xml, html_transformer),
             "action": row["action"],
             "when": row["when"],
             "email": row["email"] or "",
@@ -2617,7 +2619,7 @@ def links_get(source_dict: str, source_el: str, source_id: str, target_dict: str
         if source_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["source_id"]):
             source_entry = row["source_id"].split("_")[0]
         if source_entry != "":
-            source_hw = readEntries(sourceDB, sourceConfig, int(source_entry), titlePlain=True)[0]["titlePlain"]
+            source_hw = readEntries(sourceDB, sourceConfig, int(source_entry), titlePlain=True)[0].get("titlePlain", "")
         target_entry = ""
         target_hw = ""
         try:
@@ -2632,12 +2634,25 @@ def links_get(source_dict: str, source_el: str, source_id: str, target_dict: str
         if target_entry == "" and re.match(r"^[0-9]+_[0-9]+$", row["target_id"]):
             target_entry = row["target_id"].split("_")[0]
         if target_entry != "":
-            target_hw = readEntries(targetDB, targetConfig, int(target_entry), titlePlain=True)[0]["titlePlain"]
+            target_hw = readEntries(targetDB, targetConfig, int(target_entry), titlePlain=True)[0].get("titlePlain", "")
         if target_dict == "CILI":
             target_entry = row["target_id"]
             target_hw = row["target_id"]
 
-        res.append({"link_id": row["link_id"], "source_dict": row["source_dict"], "source_entry": str(source_entry), "source_hw": source_hw, "source_el": row["source_element"], "source_id": row["source_id"], "target_dict": row["target_dict"], "target_entry": str(target_entry), "target_hw": target_hw, "target_el": row["target_element"], "target_id": row["target_id"], "confidence": row["confidence"]})
+        res.append({
+            "link_id": row["link_id"], 
+            "source_dict": row["source_dict"], 
+            "source_entry": str(source_entry), 
+            "source_hw": source_hw, 
+            "source_el": row["source_element"], 
+            "source_id": row["source_id"], 
+            "target_dict": row["target_dict"], 
+            "target_entry": str(target_entry), 
+            "target_hw": target_hw, 
+            "target_el": row["target_element"], 
+            "target_id": row["target_id"], 
+            "confidence": row["confidence"]
+        })
     return res
 
 def getDictLinkables(dictDB: Connection):
