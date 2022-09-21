@@ -234,9 +234,30 @@ def entryflag(dictID: str, user: User, dictDB: Connection, configs: Configs):
 @authDict(["canEdit"])
 def subget(dictID: str, user: User, dictDB: Connection, configs: Configs):
     """For use with searching for eligible subentries: given a doctype and a lemma, find matching entries. (it is implied the doctype allows the entry to become a subentry)"""
+    requiredAttributes = configs["subbing"].get(request.query.doctype, {}).get("attributes", {})
+    checkXmlForAttributes = len(requiredAttributes) > 0
+    
     total, entryIds = ops.searchEntries(dictDB, configs, request.query.doctype, None, request.query.lemma, "wordstart", limit = 100)
-    entries = ops.readEntries(dictDB, configs, entryIds, xml = False)
-    return {"success": True, "total": total, "entries": entries}
+    entries = ops.readEntries(dictDB, configs, entryIds, tag = checkXmlForAttributes, xml = checkXmlForAttributes) # get xml only if we need it
+
+    if (checkXmlForAttributes):
+        def checkAttributes(entry: ops.EntryFromDatabase) -> bool:
+            tag = entry.get("tag")
+            if (tag is None): # should never happen: make linter happy. 
+                return False
+            return ops.is_subentry(configs["subbing"], tag, ops.xema_get_id_from_element_name(configs["xema"], tag.name))
+        entries = list(filter(checkAttributes, entries))
+
+    for entry in entries: 
+        # no longer needed, remove from returned data.
+        del entry["tag"]
+        del entry["xml"]
+
+    return {
+        "success": True, 
+        "total": 0 if len(entries) == 0 else total, 
+        "entries": entries
+    }
 
 @post(siteconfig["rootPath"]+"<dictID>/history.json")
 def history(dictID: str):
