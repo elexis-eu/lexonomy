@@ -26,7 +26,16 @@ if TYPE_CHECKING:
     response: Any
 
 # configuration
+def pathinfo_adjust_wrapper(func):
+    # A wrapper for _handle() method
+    @functools.wraps(func)
+    def _(environ):
+        environ["PATH_INFO"] = environ["PATH_INFO"].encode("utf8").decode("latin1")
+        return func(environ)
+    return _
+
 app = bottle.default_app()
+app._handle = pathinfo_adjust_wrapper(app._handle)
 app.config['autojson'] = True
 bottle.BaseRequest.MEMFILE_MAX = 10 * 1024 * 1024 #10MB upload
 my_url = siteconfig["baseUrl"].split("://")[1].rstrip("/")

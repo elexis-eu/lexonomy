@@ -3100,7 +3100,7 @@ def elexisGetLemma(dictID, headword, limit=None, offset=0):
         dictDB = getDB(dictID)
     except IOError:
         return None
-
+        
     info = {"language": "en", "release": "PRIVATE"}
     configs = readDictConfigs(dictDB)
     configs = loadHandleMeta(configs)
