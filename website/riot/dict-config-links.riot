@@ -188,11 +188,12 @@
             if (this.state.data.babelnet_id != '') {
                $.post(window.API_URL + this.dictData.dictId + '/babelnet',{babelnet_id: this.state.data.babelnet_id}, (response) => {
                   $('#babelnet-status').html(response.state)
-                  if (response.state == 'ERROR') {
-                     $('#babelnet_error').show();
-                  }
-                  if (response.state == 'COMPLETED') {
-                     $('#babelnet_complete').show();
+                  if (response.state != 'PROCESSING') {
+                     if (response.state == 'COMPLETED') {
+                        $('#babelnet_complete').show();
+                     } else {
+                        $('#babelnet_error').show();
+                     }
                   }
                });
             }
