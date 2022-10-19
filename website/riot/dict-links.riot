@@ -14,7 +14,7 @@
                <i if={dict.blurb}
                      class="material-symbols-outlined clickable"
                      onclick={openDictInfo.bind(this, dict)}>
-                  info_outline
+                  info
                </i>
                <a href="#/{dict.dictId}"
                      class="btn right">open</a>
@@ -34,7 +34,8 @@
                         </a>
                      </td>
                      <td class="grey-text">
-                        {link.source_hw ? ('(' + link.source_id + ')') : ''}
+                        {link.source_hw ? (link.source_el + ' ' + link.source_id) : ''}
+                        {link.source_preview ? (link.source_preview+'...') : ''}
                      </td>
                      <td class="arrowCell">
                         <i class="material-symbols-outlined">arrow_forward</i>
@@ -46,6 +47,7 @@
                      </td>
                      <td class="grey-text">
                         {link.target_hw ? (link.target_el + ' ' + link.target_id) : ''}
+                        {link.target_preview ? (link.target_preview+'...') : ''}
                      </td>
                   </tr>
                </table>
@@ -65,6 +67,7 @@
                      </td>
                      <td class="grey-text">
                         {link.source_hw ? (link.source_el + ' ' + link.source_id) : ''}
+                        {link.source_preview ? (link.source_preview+'...') : ''}
                      </td>
                      <td style="padding: 0 20px;"
                            class="grey-text">
@@ -76,7 +79,8 @@
                         </a>
                      </td>
                      <td class="grey-text">
-                        {link.target_hw ? ('(' + link.target_id + ')') : ''}
+                        {link.target_hw ? (link.target_el + ' ' + link.target_id) : ''}
+                        {link.target_preview ? (link.target_preview+'...') : ''}
                      </td>
                   </tr>
                </table>

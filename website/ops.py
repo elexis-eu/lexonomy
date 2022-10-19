@@ -2607,12 +2607,14 @@ def links_get(source_dict: str, source_el: str, source_id: str, target_dict: str
         targetConfig = dbconfigs[row["target_dict"]]
         source_entry = ""
         source_hw = ""
+        source_preview = ""
         try:
             # test if source DB has linkables tables
-            ress = sourceDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["source_id"],))
+            ress = sourceDB.execute("SELECT entry_id, preview FROM linkables WHERE txt=?", (row["source_id"],))
             rows = ress.fetchone()
             if rows:
                 source_entry = rows["entry_id"]
+                source_preview = ' '.join(rows["preview"].split()[:7])
         except:
             source_entry = ""
         # fallback for ontolex ids
@@ -2622,12 +2624,14 @@ def links_get(source_dict: str, source_el: str, source_id: str, target_dict: str
             source_hw = readEntries(sourceDB, sourceConfig, int(source_entry), titlePlain=True)[0].get("titlePlain", "")
         target_entry = ""
         target_hw = ""
+        target_preview = ""
         try:
             # test if target DB has linkables tables
-            rest = targetDB.execute("SELECT entry_id FROM linkables WHERE txt=?", (row["target_id"],))
+            rest = targetDB.execute("SELECT entry_id, preview FROM linkables WHERE txt=?", (row["target_id"],))
             rowt = rest.fetchone()
             if rowt:
                 target_entry = rowt["entry_id"]
+                target_preview = ' '.join(rowt["preview"].split()[:7])
         except:
             target_entry = ""
         # fallback for ontolex ids and CILI
@@ -2640,17 +2644,19 @@ def links_get(source_dict: str, source_el: str, source_id: str, target_dict: str
             target_hw = row["target_id"]
 
         res.append({
-            "link_id": row["link_id"], 
-            "source_dict": row["source_dict"], 
-            "source_entry": str(source_entry), 
-            "source_hw": source_hw, 
-            "source_el": row["source_element"], 
-            "source_id": row["source_id"], 
-            "target_dict": row["target_dict"], 
-            "target_entry": str(target_entry), 
-            "target_hw": target_hw, 
-            "target_el": row["target_element"], 
-            "target_id": row["target_id"], 
+            "link_id": row["link_id"],
+            "source_dict": row["source_dict"],
+            "source_entry": str(source_entry),
+            "source_hw": source_hw,
+            "source_el": row["source_element"],
+            "source_id": row["source_id"],
+            "source_preview": source_preview,
+            "target_dict": row["target_dict"],
+            "target_entry": str(target_entry),
+            "target_hw": target_hw,
+            "target_el": row["target_element"],
+            "target_id": row["target_id"],
+            "target_preview": target_preview,
             "confidence": row["confidence"]
         })
     return res
@@ -3100,7 +3106,7 @@ def elexisGetLemma(dictID, headword, limit=None, offset=0):
         dictDB = getDB(dictID)
     except IOError:
         return None
-        
+
     info = {"language": "en", "release": "PRIVATE"}
     configs = readDictConfigs(dictDB)
     configs = loadHandleMeta(configs)
