@@ -100,8 +100,11 @@
                      // url contain linkable?
                      let match = window.location.hash.match(/.*\?link=(.*)/)
                      if (match != null && match[1] != null) {
-                        $('.linkable[name="'+match[1]+'"]').show();
-                        $('.linkable[name="'+match[1]+'"]')[0].scrollIntoView();
+                        let linkname = decodeURIComponent(decodeURIComponent(match[1]));
+                        if ($('.linkable[name="'+linkname+'"]').length > 0) {
+                           $('.linkable[name="'+linkname+'"]').show();
+                           $('.linkable[name="'+linkname+'"]')[0].scrollIntoView();
+                        }
                      }
                   };
                }
