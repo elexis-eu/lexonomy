@@ -472,7 +472,7 @@ def babelnet(dictID: str, user: User, dictDB: Connection, configs: Configs):
 @authDict([])
 def babelnetImport(dictID: str, user: User, dictDB: Connection, configs: Configs):
     import base64
-    url = 'http://babelnet.linkingmachine.org/result/?request_id=' + request.forms.babelnet_id
+    url = 'http://babelnet.linkingmachine.org/result?request_id=' + request.forms.babelnet_id
     req = urllib.request.Request(url, method='GET')
     base64string = base64.b64encode(bytes('%s:%s' % ('rest', 'tKn!.X/sWnr5'),'ascii'))
     req.add_header("Authorization", "Basic %s" % base64string.decode('utf-8'))
