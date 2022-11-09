@@ -477,7 +477,9 @@ def babelnetImport(dictID: str, user: User, dictDB: Connection, configs: Configs
     base64string = base64.b64encode(bytes('%s:%s' % ('rest', 'tKn!.X/sWnr5'),'ascii'))
     req.add_header("Authorization", "Basic %s" % base64string.decode('utf-8'))
     res = urllib.request.urlopen(req)
-    count = ops.importBabelnetLinks(dictID, dictDB, json.loads(res.read()))
+    data = res.read()
+    jsondata = json.loads(data)
+    count = ops.importBabelnetLinks(dictID, dictDB, jsondata)
     return {'success': True, 'count': count}
 
 @post(siteconfig["rootPath"] + "login.json")
