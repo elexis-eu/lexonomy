@@ -672,7 +672,10 @@ def dictread(user: User):
 @get(siteconfig["rootPath"]+"<dictID>/config.json")
 def dictconfig(dictID: str):
     if not ops.dictExists(dictID):
-        return {"success": False}
+        if dictID == 'BABELNET':
+            return {"success": True, "publicInfo": {"title": "BABELNET"}}
+        else:
+            return {"success": False}
     else:
         user, configs = ops.verifyLoginAndDictAccess(request.cookies.email, request.cookies.sessionkey, ops.getDB(dictID))
         doctypes = [configs["xema"]["root"]] + list(configs["subbing"].keys()) + ops.readDoctypesUsed(ops.getDB(dictID))

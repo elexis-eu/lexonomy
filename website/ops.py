@@ -2601,9 +2601,9 @@ def links_get(source_dict: str, source_el: str, source_id: str, target_dict: str
     #now the actual results
     c = conn.execute(query, tuple(params))
     for row in c.fetchall():
-        sourceDB = dbs[row["source_dict"]]
+        sourceDB = dbs.get(row["source_dict"])
         sourceConfig = dbconfigs[row["source_dict"]]
-        targetDB = dbs[row["target_dict"]]
+        targetDB = dbs.get(row["target_dict"])
         targetConfig = dbconfigs[row["target_dict"]]
         source_entry = ""
         source_hw = ""

@@ -41,9 +41,14 @@
                         <i class="material-symbols-outlined">arrow_forward</i>
                      </td>
                      <td>
-                        <a href="#/{link.target_dict}/edit/entry/{link.target_entry}/view?link={link.target_id}">
-                           {link.target_hw || (link.target_el + ' ' + link.target_id)}
-                        </a>
+			<template if="link.target_dict != 'BABELNET'">
+        	                <a href="#/{link.target_dict}/edit/entry/{link.target_entry}/view?link={link.target_id}">
+	                           {link.target_hw || (link.target_el + ' ' + link.target_id)}
+                        	</a>
+			</template>
+			<template if="link.target_dict == 'BABELNET'">
+	                           {link.target_hw || (link.target_el + ' ' + link.target_id)}
+			</template>
                      </td>
                      <td class="grey-text">
                         {link.target_hw ? (link.target_el + ' ' + link.target_id) : ''}
