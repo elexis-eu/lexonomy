@@ -1901,7 +1901,7 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
         except IOError:
             dictDB = None
         if dictDB:
-            query = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND s.txt LIKE ? AND s.level=1"
+            query = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND s.txt LIKE ? "
             c = dictDB.execute(query, (headword+"%", ))
             for entry in c.fetchall():
                 info0 = {"sourceDict": d["id"], "sourceHeadword": entry["hw"]}
