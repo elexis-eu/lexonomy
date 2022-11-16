@@ -86,6 +86,12 @@
       </div>
       <div>
          <h2>Automatic linking using Babelnet</h2>
+         <p>For Babelnet linking to work, please add following element to manual linking config above (assuming TEI Lex0 format):<br/>
+            linking element: sense<br/>
+            identifier: %(@xml:id)<br/>
+            preview: %(def)
+         </p>
+         <p>Babelnet linking is done overnight. Please return tomorrow if you just started linking.</p>
          <div if={state.data.babelnet_id == ''}>
             <button id="babelnet_link"
                   class="btn waves-effect waves-light"
