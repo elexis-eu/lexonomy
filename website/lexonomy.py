@@ -37,7 +37,7 @@ def pathinfo_adjust_wrapper(func):
 app = bottle.default_app()
 app._handle = pathinfo_adjust_wrapper(app._handle)
 app.config['autojson'] = True
-bottle.BaseRequest.MEMFILE_MAX = 10 * 1024 * 1024 #10MB upload
+bottle.BaseRequest.MEMFILE_MAX = 100 * 1024 * 1024 #10MB upload
 my_url = siteconfig["baseUrl"].split("://")[1].rstrip("/")
 cgi = False
 if "SERVER_NAME" in os.environ and "SERVER_PORT" in os.environ:
