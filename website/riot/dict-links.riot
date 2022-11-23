@@ -46,8 +46,10 @@
 	                           {link.target_hw || (link.target_el + ' ' + link.target_id)}
                         	</a>
 			</template>
-			<template if={link.target_dict == 'BABELNET'}>
-	                           {link.target_hw || (link.target_el + ' ' + link.target_id)}
+         <template if={link.target_dict == 'BABELNET'}>
+                           <a href="https://babelnet.org/synset?id={link.target_id}&lang=EN" target="_blank">
+                              {link.target_hw || (link.target_el + ' ' + link.target_id)}
+                           </a>
 			</template>
                      </td>
                      <td class="grey-text">
