@@ -22,5 +22,5 @@ db = sqlite3.connect(dbname)
 db.row_factory = sqlite3.Row
 
 for line in sys.stdin:
-    link = re.match(r'^<[^>]+/([^>]+)#([^>]+):([0-9_]+)> <[^>]+> <[^>]+/([^>]+)#([^>]+):([0-9_]+)> \. # ([01][\.,][0-9]+)$', line)
+    link = re.match(r'^<[^>]+/([^>]+)#([^>]+):([^>]+)> <[^>]+> <[^>]+/([^>]+)#([^>]+):([^>]+)> \. # ([01][\.,][0-9]+)$', line)
     ops.links_add(link.group(1), link.group(2), link.group(3), link.group(4), link.group(5), link.group(6), link.group(7).replace(",","."), db)

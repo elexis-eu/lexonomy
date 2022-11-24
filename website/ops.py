@@ -2939,7 +2939,10 @@ def listOntolexEntries(dictDB: Connection, dictID: str, configs: Configs, doctyp
             if defText != "":
                 num += 1
                 defText = defText.replace('"', "'")
-                senseId = 'sense:' + str(r["id"]) + "_" + str(num)
+                if sense.get("{http://www.w3.org/XML/1998/namespace}id")
+                    senseId = "sense:" + sense.get("{http://www.w3.org/XML/1998/namespace}id")
+                else:
+                    senseId = "sense:" + str(r["id"]) + "_" + str(num)
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + entryId + "> <http://www.w3.org/ns/lemon/ontolex#sense> <" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> ."
                 yield line; yield "\n"
                 line = "<" + siteconfig["baseUrl"] + dictID + "#" + senseId + "> <http://www.w3.org/2004/02/skos/core#definition> \"" + defText + "\"@" + lang + " ."
