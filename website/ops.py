@@ -2939,7 +2939,7 @@ def listOntolexEntries(dictDB: Connection, dictID: str, configs: Configs, doctyp
             if defText != "":
                 num += 1
                 defText = defText.replace('"', "'")
-                if sense.get("{http://www.w3.org/XML/1998/namespace}id")
+                if sense.get("{http://www.w3.org/XML/1998/namespace}id"):
                     senseId = "sense:" + sense.get("{http://www.w3.org/XML/1998/namespace}id")
                 else:
                     senseId = "sense:" + str(r["id"]) + "_" + str(num)
