@@ -9,7 +9,12 @@
       </div>
       <div each={dict in Object.values(state.dictionaries)}>
          <div>
-            <h2 class="dictName">
+            <a onclick={showDict} style="cursor:pointer;" data-dictId={dict.dictId}>{dict.title}</a>
+         </div>
+      </div>
+      <div each={dict in Object.values(state.dictionaries)}>
+         <div>
+            <h2 class="dictName" id="dictLinks-{dict.dictId}">
                {dict.title}
                <i if={dict.blurb}
                      class="material-symbols-outlined clickable"
@@ -160,6 +165,11 @@
             }
          },
 
+         showDict(ev){
+            var dictId = ev.target.getAttribute('data-dictId');
+            document.getElementById('dictLinks-'+dictId).scrollIntoView();
+         },
+
          onMounted() {
             $('.modal').modal()
             this.state.dictionaries = {}
@@ -174,6 +184,7 @@
                                  .done(function(dictId, response) {
                                     if(response.success){
                                        Object.assign(this.state.dictionaries[dictId], {
+                                          dictId: dictId,
                                           title: response.publicInfo.title,
                                           blurb: response.publicInfo.blurb,
                                           isLoading: false
