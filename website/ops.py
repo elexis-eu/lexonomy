@@ -1937,7 +1937,7 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                         if r2["target_element"] == "sense" and "_" in r2["target_id"]:
                             lia = r2["target_id"].split("_")
                             info["targetSense"] = lia[1]
-                        query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=1"
+                        query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=?"
                         c3 = targetDB.execute(query3, (r2["target_id"],))
                         for r3 in c3.fetchall():
                             info["targetHeadword"] = r3["hw"]
@@ -1973,7 +1973,7 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                         if r2["source_element"] == "sense" and "_" in r2["source_id"]:
                             lia = r2["source_id"].split("_")
                             info["targetSense"] = lia[1]
-                        query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=1"
+                        query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=?"
                         c3 = sourceDB.execute(query3, (r2["source_id"],))
                         for r3 in c3.fetchall():
                             info["targetHeadword"] = r3["hw"]
