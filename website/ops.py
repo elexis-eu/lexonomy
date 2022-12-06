@@ -1901,10 +1901,10 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
         except IOError:
             dictDB = None
         if dictDB:
-            query = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND s.txt LIKE ? "
+            query = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw, l.preview as preview FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND s.txt LIKE ? "
             c = dictDB.execute(query, (headword+"%", ))
             for entry in c.fetchall():
-                info0 = {"sourceDict": d["id"], "sourceHeadword": entry["hw"]}
+                info0 = {"sourceDict": d["id"], "sourceHeadword": entry["hw"], "sourcePreview": entry["preview"]}
                 if entry["entry_id"] and entry["entry_id"] != "":
                     info0["sourceID"] = entry["entry_id"]
                 if entry["link_el"] == "sense" and "_" in entry["link_id"]:
@@ -1937,11 +1937,12 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                         if r2["target_element"] == "sense" and "_" in r2["target_id"]:
                             lia = r2["target_id"].split("_")
                             info["targetSense"] = lia[1]
-                        query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=?"
+                        query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw, l.preview as preview FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=?"
                         c3 = targetDB.execute(query3, (r2["target_id"],))
                         for r3 in c3.fetchall():
                             info["targetHeadword"] = r3["hw"]
                             info["targetID"] = r3["entry_id"]
+                            info["targetPreview"] = r3["preview"]
                             info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
                             links.append(info)
                     else:
@@ -1951,6 +1952,7 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                         info["targetURL"] = ""
                         info["targetSense"] = ""
                         info["targetLang"] = ""
+                        info["targetPreview"] = ""
                         links.append(info)
                 # second, find links with search dict as target
                 if targetLang:
@@ -1973,11 +1975,12 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                         if r2["source_element"] == "sense" and "_" in r2["source_id"]:
                             lia = r2["source_id"].split("_")
                             info["targetSense"] = lia[1]
-                        query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=?"
+                        query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw, l.preview as preview FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=?"
                         c3 = sourceDB.execute(query3, (r2["source_id"],))
                         for r3 in c3.fetchall():
                             info["targetHeadword"] = r3["hw"]
                             info["targetID"] = r3["entry_id"]
+                            info["targetPreview"] = r3["preview"]
                             info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
                             links.append(info)
                     else:
@@ -1987,6 +1990,7 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                         info["targetURL"] = ""
                         info["targetSense"] = ""
                         info["targetLang"] = ""
+                        info["targetPreview"] = ""
                         links.append(info)
         else:
             # source dictionary is "concept", use headword as target_id
@@ -2015,11 +2019,12 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                     if r2["target_element"] == "sense" and "_" in r2["target_id"]:
                         lia = r2["target_id"].split("_")
                         info["targetSense"] = lia[1]
-                    query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=(SELECT MIN(level) FROM searchables WHERE entry_id=l.entry_id)"
+                    query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw, l.preview as preview FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=(SELECT MIN(level) FROM searchables WHERE entry_id=l.entry_id)"
                     c3 = targetDB.execute(query3, (r2["target_id"],))
                     for r3 in c3.fetchall():
                         info["targetHeadword"] = r3["hw"]
                         info["targetID"] = r3["entry_id"]
+                        info["targetPreview"] = r3["preview"]
                         info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
                         links.append(info)
                 else:
@@ -2029,6 +2034,7 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                     info["targetURL"] = ""
                     info["targetSense"] = ""
                     info["targetLang"] = ""
+                    info["targetPreview"] = ""
                     links.append(info)
             # second, find links with search dict as target
             if targetLang:
@@ -2051,11 +2057,12 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                     if r2["source_element"] == "sense" and "_" in r2["source_id"]:
                         lia = r2["source_id"].split("_")
                         info["targetSense"] = lia[1]
-                    query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=(SELECT MIN(level) FROM searchables WHERE entry_id=l.entry_id)"
+                    query3 = "SELECT DISTINCT l.entry_id AS entry_id, l.txt AS link_id, l.element AS link_el, s.txt AS hw, l.preview as preview FROM searchables AS s, linkables AS l  WHERE s.entry_id=l.entry_id AND l.txt=? AND s.level=(SELECT MIN(level) FROM searchables WHERE entry_id=l.entry_id)"
                     c3 = sourceDB.execute(query3, (r2["source_id"], ))
                     for r3 in c3.fetchall():
                         info["targetHeadword"] = r3["hw"]
                         info["targetID"] = r3["entry_id"]
+                        info["targetPreview"] = r3["preview"]
                         info["targetURL"] = siteconfig["baseUrl"] + info["targetDict"] + "/" + str(info["targetID"])
                         links.append(info)
                 else:
@@ -2065,6 +2072,7 @@ def getLinkList(headword: str, sourceLang: str, sourceDict: str, targetLang: str
                     info["targetURL"] = ""
                     info["targetSense"] = ""
                     info["targetLang"] = ""
+                    info["targetPreview"] = ""
                     links.append(info)
 
     # add dictionary titles
