@@ -260,9 +260,13 @@
                $('#babelnet_complete').hide();
                $('#babelnet_complete_msg').show();
                $('#babelnet_finish').show();
-               if (response.count) {
-                  $('#babelnet_complete_msg').html('Import of Babelnet links finished, links imported: '+response.count);
+               if (response.count == undefined) response.count = 0;
+               if (response.count_error == undefined) response.count_error = 0;
+               let outtext = 'Import of Babelnet links finished, links imported: '+response.count+', errors: '+response.count_error;
+               if (response.count_error > 0) {
+                  outtext += '<br/>'+response.errors.join("<br/>");
                }
+               $('#babelnet_complete_msg').html(outtext);
             })
          },
 

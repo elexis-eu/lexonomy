@@ -2883,6 +2883,8 @@ def getEntryHeadword(xml, headword_elem):
 
 def importBabelnetLinks(dictID, dictDB, links):
     count = 0
+    count_error = 0
+    errors = []
     linkDB = getLinkDB()
     linkDB.execute('DELETE FROM links WHERE source_dict=? AND target_dict=?', (dictID, 'BABELNET'))
     linkDB.commit()
@@ -2895,8 +2897,11 @@ def importBabelnetLinks(dictID, dictDB, links):
                     if res:
                         links_add(dictID, res['element'], res['txt'], 'BABELNET', 'sense', link['target_sense'][0], float(link['score']), linkDB)
                         count += 1
+        else:
+            count_error += 1
+            errors.append(linkentry['linking'])
     linkDB.close()
-    return count
+    return count, count_error, list(set(errors))
 
 def preprocessLex0(entryXml):
     from xml.dom import minidom, Node

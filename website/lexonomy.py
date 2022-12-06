@@ -479,8 +479,8 @@ def babelnetImport(dictID: str, user: User, dictDB: Connection, configs: Configs
     res = urllib.request.urlopen(req)
     data = res.read()
     jsondata = json.loads(data)
-    count = ops.importBabelnetLinks(dictID, dictDB, jsondata)
-    return {'success': True, 'count': count}
+    count_succces, count_error, errors = ops.importBabelnetLinks(dictID, dictDB, jsondata)
+    return {'success': True, 'count_success': count_succces, 'count_error': count_error, 'errors': errors}
 
 @post(siteconfig["rootPath"] + "login.json")
 def check_login():
